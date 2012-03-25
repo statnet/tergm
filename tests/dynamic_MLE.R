@@ -1,4 +1,4 @@
-library(ergm)
+library(tergm)
 
 tolerance<-0.05
 n<-10

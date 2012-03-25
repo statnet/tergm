@@ -2,7 +2,7 @@
 #define DYNSA_H
 
 #include "MCMCDyn.h"
-#include "MHproposals.h"
+#include "MHproposal.h"
 
 void MCMCDynSArun_wrapper(// Observed network.
 			     int *tails, int *heads, int *time, int *lasttoggle, int *n_edges,

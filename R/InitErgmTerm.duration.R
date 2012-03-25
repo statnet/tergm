@@ -13,6 +13,7 @@ InitErgmTerm.edges.ageinterval<-function(nw, arglist, role, ...) {
   list(name=if(role=="target") "edges_ageinterval_mon" else "edges_ageinterval",
        coef.names = paste("edges","age",from,"to",to,sep="."),
        inputs=c(from, if(to==Inf) 0 else to),
+       pkgname="ergm",
        dependence=FALSE)
 }
 
@@ -22,6 +23,7 @@ InitErgmTerm.edge.ages<-function(nw, arglist, role, ...) {
   
   list(name="edge_ages_mon",
        coef.names = "edge.ages",
+       pkgname="ergm",
        dependence=FALSE)
 }
 
@@ -54,6 +56,6 @@ InitErgmTerm.edgecov.ages<-function(nw, arglist, role, ...) {
   }
   inputs <- c(NCOL(xm), as.double(xm))
   attr(inputs, "ParamsBeforeCov") <- 1
-  list(name="edgecov_ages_mon", coef.names = cn, inputs = inputs, dependence=FALSE
+  list(name="edgecov_ages_mon", coef.names = cn, inputs = inputs, pkgname="ergm", dependence=FALSE
        )
 }

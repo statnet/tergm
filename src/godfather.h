@@ -2,7 +2,6 @@
 #define godfather_H
 
 #include <R.h>
-#include "wtedgetree.h"
 #include "model.h"
 
 /* Function prototypes */

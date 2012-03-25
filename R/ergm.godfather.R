@@ -109,7 +109,7 @@ ergm.godfather <- function(formula, timestamps=NULL, toggles=NULL, sim=NULL,
           as.integer(accumulate),
           as.integer(verbose),
           as.integer(maxedges), 
-          PACKAGE="ergm")  
+          PACKAGE="tergm")  
   stats <- matrix(z$s + obsstat, ncol=Clist$nstats, byrow=TRUE)
   colnames(stats) <- m$coef.names
 

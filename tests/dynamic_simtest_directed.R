@@ -1,4 +1,4 @@
-library(ergm)
+library(tergm)
 library(coda)
 
 logit<-function(p)log(p/(1-p))

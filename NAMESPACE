@@ -1,7 +1,8 @@
 
-useDynLib(ergm)
+useDynLib(tergm)
 
 importFrom(utils, packageDescription)
+importFrom(ergm)
 
 # Export all names
 exportPattern(".")

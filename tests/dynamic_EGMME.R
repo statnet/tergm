@@ -1,4 +1,4 @@
-library(ergm)
+library(tergm)
 library(coda)
 
 n<-50

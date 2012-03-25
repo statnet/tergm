@@ -26,12 +26,12 @@
 #   MHproposal: a list containing:
 #        name   : the name of the proposal
 #        inputs : a vector to be passed to the proposal
-#        package: is "ergm"
+#        package: is "tergm"
 #
 ############################################################################
 
 InitMHP.formationMLE <- function(arguments, nw) {
-  MHproposal <- list(name = "FormationMLE", inputs=ergm.Cprepare.el(arguments$constraints$atleast$nw), package="ergm")
+  MHproposal <- list(name = "FormationMLE", inputs=ergm.Cprepare.el(arguments$constraints$atleast$nw), package="tergm")
   MHproposal
 }
 #ergm.MHP.table("c", "Bernoulli", "atleast",  0, "random", "formationMLE")
@@ -39,14 +39,14 @@ InitMHP.formationMLE <- function(arguments, nw) {
 
 
 InitMHP.formationMLETNT <- function(arguments, nw) {
-  MHproposal <- list(name = "FormationMLETNT", inputs=ergm.Cprepare.el(arguments$constraints$atleast$nw), package="ergm")
+  MHproposal <- list(name = "FormationMLETNT", inputs=ergm.Cprepare.el(arguments$constraints$atleast$nw), package="tergm")
   MHproposal
 }
 #ergm.MHP.table("c", "Bernoulli", "atleast",  1, "TNT", "formationMLETNT")
 #ergm.MHP.table("c", "Bernoulli", "atleast+bd",  1, "TNT", "formationMLETNT")
 
 InitMHP.dissolutionMLE <- function(arguments, nw) {
-  MHproposal <- list(name = "DissolutionMLE", inputs=ergm.Cprepare.el(arguments$constraints$atmost$nw), package="ergm")
+  MHproposal <- list(name = "DissolutionMLE", inputs=ergm.Cprepare.el(arguments$constraints$atmost$nw), package="tergm")
   MHproposal
 }
 #ergm.MHP.table("c", "Bernoulli", "atmost",  0, "random", "dissolutionMLE")

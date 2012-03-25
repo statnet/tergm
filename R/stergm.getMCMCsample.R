@@ -125,7 +125,7 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
             diffnwheads = integer(maxchanges),
             as.integer(verbose),
             status = integer(1), # 0 = OK, MCMCDyn_TOO_MANY_EDGES = 1, MCMCDyn_MH_FAILED = 2, MCMCDyn_TOO_MANY_CHANGES = 3
-            PACKAGE="ergm")
+            PACKAGE="tergm")
 
     if(z$status==0) break;
     if(z$status==1){

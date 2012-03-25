@@ -36,7 +36,7 @@ control.simulate.network<-function(MCMC.burnin=1000,
                                    MCMC.prop.weights.form="default",MCMC.prop.args.form=NULL,
                                    MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,                                  
                                    MCMC.init.maxedges=20000,
-                                   MCMC.packagenames="ergm",
+                                   MCMC.packagenames=c("tergm","ergm"),
                                    
                                    MCMC.init.maxchanges=1000000){
     control<-list()

@@ -453,7 +453,7 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
             # Verbosity.
             as.integer(max(verbose-1,0)),
             status = integer(1), # 0 = OK, MCMCDyn_TOO_MANY_EDGES = 1, MCMCDyn_MH_FAILED = 2, MCMCDyn_TOO_MANY_CHANGES = 3
-            PACKAGE="ergm")
+            PACKAGE="tergm")
     if(z$status==0) break;
     if(z$status==1){
       maxedges <- 5*maxedges
