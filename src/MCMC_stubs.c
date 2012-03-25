@@ -1,10 +1,5 @@
 #include "MCMC.h"
 #include "R_ext/Rdynload.h"
-#include "edgetree.h"
-#include "changestat.h"
-#include "MHproposal.h"
-#include "model.h"
-
 void MCMC_wrapper(int *dnumnets, int *dnedges,int *tails, int *heads,int *dn, int *dflag, int *bipartite,int *nterms, char **funnames,char **sonames,char **MHproposaltype, char **MHproposalpackage,double *inputs, double *theta0, int *samplesize,double *sample, int *burnin, int *interval,int *newnetworktails,int *newnetworkheads,int *fVerbose,int *attribs, int *maxout, int *maxin, int *minout,int *minin, int *condAllDegExact, int *attriblength,int *maxedges,int *status){
 static void (*fun)(int *,int *,int *,int *,int *,int *,int *,int *,char **,char **,char **,char **,double *,double *,int *,double *,int *,int *,int *,int *,int *,int *,int *,int *,int *,int *,int *,int *,int *,int *) = NULL;
 if(fun==NULL) fun = (void (*)(int *,int *,int *,int *,int *,int *,int *,int *,char **,char **,char **,char **,double *,double *,int *,double *,int *,int *,int *,int *,int *,int *,int *,int *,int *,int *,int *,int *,int *,int *)) R_FindSymbol("MCMC_wrapper", "ergm", NULL);

@@ -1,9 +1,5 @@
 #include "model.h"
 #include "R_ext/Rdynload.h"
-#include "edgetree.h"
-#include "changestat.h"
-#include "R_ext/Rdynload.h"
-
 Model* ModelInitialize(char *fnames, char *sonames, double **inputs,int n_terms){
 static Model* (*fun)(char *,char *,double **,int) = NULL;
 if(fun==NULL) fun = (Model* (*)(char *,char *,double **,int)) R_FindSymbol("ModelInitialize", "ergm", NULL);

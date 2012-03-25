@@ -1,10 +1,5 @@
 #include "edgetree.h"
 #include "R_ext/Rdynload.h"
-#include <math.h>
-#include <R.h>
-#include <Rinternals.h>
-#include <Rmath.h>
-
 Network NetworkInitialize(Vertex *tails, Vertex *heads, Edge nedges,Vertex nnodes, int directed_flag, Vertex bipartite,int lasttoggle_flag, int time, int *lasttoggle){
 static Network (*fun)(Vertex *,Vertex *,Edge,Vertex,int,Vertex,int,int,int *) = NULL;
 if(fun==NULL) fun = (Network (*)(Vertex *,Vertex *,Edge,Vertex,int,Vertex,int,int,int *)) R_FindSymbol("NetworkInitialize", "ergm", NULL);

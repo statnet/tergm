@@ -1,8 +1,5 @@
 #include "MHproposal.h"
 #include "R_ext/Rdynload.h"
-#include "edgetree.h"
-#include "R_ext/Rdynload.h"
-
 DegreeBound* DegreeBoundInitialize(int *attribs, int *maxout, int *maxin,int *minout, int *minin, int condAllDegExact,int attriblength, Network *nwp){
 static DegreeBound* (*fun)(int *,int *,int *,int *,int *,int,int,Network *) = NULL;
 if(fun==NULL) fun = (DegreeBound* (*)(int *,int *,int *,int *,int *,int,int,Network *)) R_FindSymbol("DegreeBoundInitialize", "ergm", NULL);

@@ -1,7 +1,5 @@
 #include "edgelist.h"
 #include "R_ext/Rdynload.h"
-#include "edgetree.h"
-
 unsigned int dEdgeListSearch(Vertex tail, Vertex head, double *el){
 static unsigned int (*fun)(Vertex,Vertex,double *) = NULL;
 if(fun==NULL) fun = (unsigned int (*)(Vertex,Vertex,double *)) R_FindSymbol("dEdgeListSearch", "ergm", NULL);
