@@ -73,12 +73,6 @@ stergm.CMLE <- function(nw, formation, dissolution, times, offset.coef.form, off
                         control,
                         verbose) {
 
-  # Translate the "estimate" from the stergm() argument to the ergm() argument.
-  estimate <- switch(estimate,
-                     CMLE = "MLE",
-                     CMPLE = "MPLE")
-  if(estimate=="MPLE") warning("MPLE for stergm() is extremely imprecise at this time!")
-
   if(is.null(times)){
     if(inherits(nw, "network.list") || is.list(nw)){
       times  <- c(1,2)
@@ -119,14 +113,74 @@ stergm.CMLE <- function(nw, formation, dissolution, times, offset.coef.form, off
   # Apply initial values passed to control.stergm() the separate controls, if necessary.
   if(is.null(control$CMLE.control.form$init)) control$CMLE.control.form$init <- control$init.form
   if(is.null(control$CMLE.control.diss$init)) control$CMLE.control.diss$init <- control$init.diss
+ 
+  model.form<-ergm.getmodel(formation, y.form, initialfit=TRUE)
+  model.diss<-ergm.getmodel(dissolution, y.diss, initialfit=TRUE)
+
+  if(!is.null(control$CMLE.control.form$init)){
+    # Check length of control$CMLE.control.form$init.
+    if(length(control$CMLE.control.form$init)!=length(model.form$etamap$offsettheta)) {
+      if(verbose) cat("control$CMLE.control.form$init is", control$CMLE.control.form$init, "\n", "number of statistics is",length(model.form$coef.names), "\n")
+      stop(paste("Invalid starting formation parameter vector control$CMLE.control.form$init:",
+                 "wrong number of parameters."))
+    }
+  }else control$CMLE.control.form$init <- rep(NA, length(model.form$etamap$offsettheta)) # Set the default value of control$CMLE.control.form$init.
+  if(!is.null(offset.coef.form)) control$CMLE.control.form$init[model.form$etamap$offsettheta]<-offset.coef.form
+  names(control$CMLE.control.form$init) <- model.form$coef.names
+
+  if(!is.null(control$CMLE.control.diss$init)){
+    # Check length of control$CMLE.control.diss$init.
+    if(length(control$CMLE.control.diss$init)!=length(model.diss$etamap$offsettheta)) {
+      if(verbose) cat("control$CMLE.control.diss$init is", control$CMLE.control.diss$init, "\n", "number of statistics is",length(model.diss$coef.names), "\n")
+      stop(paste("Invalid starting dissolution parameter vector control$CMLE.control.diss$init:",
+                 "wrong number of parameters."))
+    }
+  }else control$CMLE.control.diss$init <- rep(NA, length(model.diss$etamap$offsettheta)) # Set the default value of control$CMLE.control.diss$init.  
+  if(!is.null(offset.coef.diss)) control$CMLE.control.diss$init[model.diss$etamap$offsettheta]<-offset.coef.diss
+  names(control$CMLE.control.diss$init) <- model.diss$coef.names
+
+  CMPLE.is.CMLE <- (ergm.independencemodel(model.form)
+                    && ergm.independencemodel(model.diss))
+
+  
+  # Get the initial fit:
+  initialfit <- stergm.CMLE.initialfit(control$CMLE.control.form$init, control$CMLE.control.diss$init,
+                                       y0, y.form, y.diss,
+                                       model.form=model.form,
+                                       model.diss=model.diss,
+                                       control=control, verbose=verbose)
+
+  if(estimate=="CMPLE" || (CMPLE.is.CMLE && !control$force.main)){
+    initialfit <- c(initialfit, list(network=nw, times=times, estimate=estimate))
+    initialfit$formation.fit$formula <- formation
+    initialfit$dissolution.fit$formula <- dissolution
+    initialfit$formation.fit$constraints <- ~atleast(y0)
+    initialfit$dissolution.fit$constraints <- ~atmost(y0)
+    initialfit$formation.fit$target.stats <- summary(formation)
+    initialfit$dissolution.fit$target.stats <- summary(dissolution)
+    class(initialfit$formation.fit) <- class(initialfit$dissolution.fit) <- "ergm"
+
+    initialfit$estimate <- estimate
+    initialfit$control<-control
+    return(initialfit)
+  }else{
+    # Copy the initial parameters to ergm controls.
+    control$CMLE.control.form$init <- initialfit$formation.fit$coef
+    control$CMLE.control.diss$init <- initialfit$dissolution.fit$coef
+  }
+
+  # Translate the "estimate" from the stergm() argument to the ergm() argument.
+  ergm.estimate <- switch(estimate,
+                     CMLE = "MLE",
+                     CMPLE = "MPLE")
   
   # Now, call the ergm()s:
   cat("Fitting formation:\n")
-  fit.form <- ergm(formation, constraints=~atleast(y0), offset.coef=offset.coef.form, eval.loglik=eval.loglik, estimate=estimate, control=control$CMLE.control.form, verbose=verbose)
+  fit.form <- ergm(formation, constraints=~atleast(y0), offset.coef=offset.coef.form, eval.loglik=eval.loglik, estimate=ergm.estimate, control=control$CMLE.control.form, verbose=verbose)
   cat("Fitting dissolution:\n")
-  fit.diss <- ergm(dissolution, constraints=~atmost(y0), offset.coef=offset.coef.diss, eval.loglik=eval.loglik, estimate=estimate, control=control$CMLE.control.diss, verbose=verbose)
+  fit.diss <- ergm(dissolution, constraints=~atmost(y0), offset.coef=offset.coef.diss, eval.loglik=eval.loglik, estimate=ergm.estimate, control=control$CMLE.control.diss, verbose=verbose)
 
   # Construct the output list. Conveniently, this is mainly a list consisting of two ergms.
   
-  list(network=nw, times=times, formation=formation, dissolution=dissolution, formation.fit=fit.form, dissolution.fit=fit.diss, estimate=estimate)
+  list(network=nw, times=times, formation=formation, dissolution=dissolution, formation.fit=fit.form, dissolution.fit=fit.diss, estimate=estimate, initialfit = initialfit)
 }
