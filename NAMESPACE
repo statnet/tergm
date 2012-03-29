@@ -4,5 +4,5 @@ useDynLib(tergm)
 importFrom(utils, packageDescription)
 importFrom(ergm)
 
-# Export all names
+# Export all names that do not begin with a dot.
 exportPattern("^[^\\.]")
