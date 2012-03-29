@@ -13,11 +13,11 @@
           'or type citation("ergm").\n', sep="")
                         )
   
-  RegisterMHPs()
-  RegisterConstraintImplications()
+  .RegisterMHPs()
+  .RegisterConstraintImplications()
 }
 
-RegisterMHPs <- function(){
+.RegisterMHPs <- function(){
   ergm.MHP.table("c", "Bernoulli", "atleast",  0, "random", "formationMLE")
   ergm.MHP.table("c", "Bernoulli", "atleast+bd",  0, "random", "formationMLE")
   ergm.MHP.table("c", "Bernoulli", "atleast",  1, "TNT", "formationMLETNT")
@@ -34,7 +34,7 @@ RegisterMHPs <- function(){
   ergm.MHP.table("d", "Bernoulli", "bd",  0, "random", "dissolution")
 }
 
-RegisterConstraintImplications <- function(){
+.RegisterConstraintImplications <- function(){
   ergm.ConstraintImplications("atleast", c())
   ergm.ConstraintImplications("atmost", c())
 }

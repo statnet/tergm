@@ -5,4 +5,4 @@ importFrom(utils, packageDescription)
 importFrom(ergm)
 
 # Export all names
-exportPattern(".")
+exportPattern("^[^\\.]")
