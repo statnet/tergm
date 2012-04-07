@@ -75,7 +75,7 @@ void MCMCDynSArun_wrapper(// Observed network.
 
   if(*status==MCMCDyn_OK){
     newnetworktail[0]=newnetworkhead[0]=EdgeTree2EdgeList(newnetworktail+1,newnetworkhead+1,nw,*maxedges);
-    *time = nw->duration_info.MCMCtimer;
+    *time = nw->duration_info.time;
     memcpy(lasttoggle, nw->duration_info.lasttoggle, sizeof(int)*DYADCOUNT(*n_nodes, *bipartite, *dflag));
   }
 

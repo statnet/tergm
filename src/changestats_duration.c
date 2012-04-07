@@ -91,7 +91,7 @@ D_CHANGESTAT_FN(d_edge_ages_mon){
 }
 
 T_CHANGESTAT_FN(t_edge_ages_mon){
-  CHANGE_STAT[0] = +N_EDGES; // Each extant edge's age increase by 1, so their sum increases by their number.
+  CHANGE_STAT[0] = +N_EDGES; // Each extant edge's age increases by 1, so their sum increases by their number.
 }
 
 S_CHANGESTAT_FN(s_edge_ages_mon){

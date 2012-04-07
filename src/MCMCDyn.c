@@ -133,7 +133,7 @@ void MCMCDyn_wrapper(// Starting network.
 
   if(*status == MCMCDyn_OK && *maxedges>0 && newnetworktails && newnetworkheads){
     newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList(newnetworktails+1,newnetworkheads+1,nw,*maxedges-1);
-    *time = nw->duration_info.MCMCtimer;
+    *time = nw->duration_info.time;
     if(lasttoggle) memcpy(lasttoggle, nw->duration_info.lasttoggle, sizeof(int)*DYADCOUNT(*n_nodes, *bipartite, *dflag));
   }
 
@@ -400,7 +400,7 @@ int MCMCDyn1Step_record_reset(Edge maxchanges,
 			      Network *nwp, 
 			      Edge *nextdiffedge){
   Vertex tail, head;
-  const unsigned int t=nwp->duration_info.MCMCtimer;
+  const unsigned int t=nwp->duration_info.time;
   Edge ntoggles = nwp[1].nedges;
   
   for(unsigned int i=0; i<ntoggles; i++){
@@ -451,7 +451,7 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
   if(nextdiffedge) nde=*nextdiffedge;
 
   /* Update timer. */
-  nwp->duration_info.MCMCtimer++;  
+  nwp->duration_info.time++;  
 
   /* Run the dissolution process. */
   MCMCDyn1Step_sample(D_MH, D_eta, MH_interval, nwp, D_m);
