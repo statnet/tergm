@@ -144,8 +144,9 @@ stergm.CMLE <- function(nw, formation, dissolution, times, offset.coef.form, off
 
   
   # Get the initial fit:
-  initialfit <- stergm.CMLE.initialfit(control$CMLE.control.form$init, control$CMLE.control.diss$init,
-                                       y0, y.form, y.diss,
+  initialfit <- stergm.CMLE.initialfit(init.form=control$CMLE.control.form$init,
+                                       init.diss=control$CMLE.control.diss$init,
+                                       nw0=y0, nw.form=y.form, nw.diss=y.diss,
                                        model.form=model.form,
                                        model.diss=model.diss,
                                        control=control, verbose=verbose)
