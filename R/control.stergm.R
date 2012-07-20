@@ -24,7 +24,7 @@ control.stergm<-function(init.form=NULL,
                          CMLE.control.form=control.ergm(init=init.form, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, MCMC.interval=MCMC.burnin, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
                          CMLE.control.diss=control.ergm(init=init.diss, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, MCMC.interval=MCMC.burnin, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
 
-                         EGMME.main.method=c("One-Step","Gradient-Descent"),
+                         EGMME.main.method=c("Gradient-Descent"),
                          
                          SAN.maxit=10,
                          SAN.control=control.san(coef=init.form,
@@ -46,12 +46,12 @@ control.stergm<-function(init.form=NULL,
                          # Plot the progress of the optimization.
                          SA.plot.progress=FALSE,
                          SA.max.plot.points=400,
+                         SA.plot.stats=FALSE,
                          
                          # Initial gain --- if the process initially goes
                          # crazy beyond recovery, lower this.
-                         SA.init.gain=0.1,
-                         SA.gain.decay=0.8, # Gain decay factor.
-                         SA.gain.max.dist.boost=8, # Gain is boosted by the square root of the average mahalanobis distance between observed and simulated, up to this much.
+                         SA.init.gain=0.01,
+                         SA.gain.decay=0.7, # Gain decay factor.
                          
                          SA.runlength=25, # Number of jumps per .C call.
 
@@ -61,6 +61,7 @@ control.stergm<-function(init.form=NULL,
                          SA.interval.mul=2, # Set the mean duration of extant ties this to be the interval.
                          SA.init.interval=500, # Starting interval.
                          SA.min.interval=20, # The lowest it can go.
+                         SA.max.interval=500, # The highest it can go.
 
                         
                          SA.phase1.tries=20, # Number of iterations of trying to find a reasonable configuration. FIXME: nothing happens if it's exceeded.
@@ -79,8 +80,7 @@ control.stergm<-function(init.form=NULL,
                          SA.phase2.jitter.mul=0.2, # The jitter standard deviation of each parameter is this times its standard deviation sans jitter.
                          SA.phase2.maxreljump=4, # Maximum jump per run, relative to the magnitude of other jumps in the history.
                          SA.phase2.refine=FALSE, # Whether to use linear interpolation to refine the estimate after every run. More trouble than it's worth.
-                         
-
+                         SA.guard.mul = 2, # The multiplier for the range of parameter values to compute the guard width.
                          
 
                          SA.refine=c("linear","mean","none"), # Method, if any, used to refine the point estimate: linear interpolation, average, and none for the last value.
