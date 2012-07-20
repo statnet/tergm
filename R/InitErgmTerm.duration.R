@@ -27,6 +27,16 @@ InitErgmTerm.edge.ages<-function(nw, arglist, role, ...) {
        dependence=FALSE)
 }
 
+InitErgmTerm.mean.age<-function(nw, arglist, role, ...) {
+	if(role!="target") stop("Term mean.age can only be used as a target statistic.")
+	a <- check.ErgmTerm(nw, arglist)
+	
+	list(name="mean_age_mon",
+			coef.names = "mean.age",
+			pkgname="tergm",
+			dependence=FALSE)
+}
+
 InitErgmTerm.edgecov.ages<-function(nw, arglist, role, ...) {
   if(role!="target") stop("Term edgecov.ages can only be used as a target statistic.")
 

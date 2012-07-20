@@ -15,6 +15,10 @@ S_CHANGESTAT_FN(s_edge_ages_mon);
 D_CHANGESTAT_FN(d_edgecov_ages_mon);
 T_CHANGESTAT_FN(t_edgecov_ages_mon);
 S_CHANGESTAT_FN(s_edgecov_ages_mon);
+
+D_CHANGESTAT_FN(d_mean_age_mon);
+T_CHANGESTAT_FN(t_mean_age_mon);
+S_CHANGESTAT_FN(s_mean_age_mon);
 #endif
 
 
