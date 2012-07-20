@@ -11,7 +11,8 @@ typedef enum MCMCDynStatus_enum {
   MCMCDyn_OK = 0,
   MCMCDyn_TOO_MANY_EDGES = 1,
   MCMCDyn_MH_FAILED = 2,
-  MCMCDyn_TOO_MANY_CHANGES = 3
+  MCMCDyn_TOO_MANY_CHANGES = 3,
+  MCMCDyn_GUARD_HIT = 4
 } MCMCDynStatus;
 
 
@@ -57,7 +58,9 @@ void MCMCDyn_wrapper(// Starting network.
 		     double *nsteps,  int *MH_interval,
 		     double *burnin, double *interval,  
 		     // Space for output.
-		     double *F_sample, double *D_sample, double *M_sample,
+		     int *F_collect, double *F_sample, 
+		     int *D_collect, double *D_sample, 
+		     double *M_sample,
 		     int *maxedges,
 		     int *newnetworktails, int *newnetworkheads, 
 		     int *maxchanges,

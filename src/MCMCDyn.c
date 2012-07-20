@@ -80,7 +80,9 @@ void MCMCDyn_wrapper(// Starting network.
 		     double *nsteps,  int *MH_interval,
 		     double *burnin, double *interval,  
 		     // Space for output.
-		     double *F_sample, double *D_sample, double *M_sample,
+		     int *F_collect, double *F_sample, 
+		     int *D_collect, double *D_sample, 
+		     double *M_sample,
 		     int *maxedges,
 		     int *newnetworktails, int *newnetworkheads, 
 		     int *maxchanges,
@@ -125,7 +127,7 @@ void MCMCDyn_wrapper(// Starting network.
 			  F_m, &F_MH, F_eta,
 			  D_m, &D_MH, D_eta,
 			  M_m,
-			  F_sample, D_sample, M_sample, *maxedges, *maxchanges, difftime, difftail, diffhead,
+			  *F_collect?F_sample:NULL, *D_collect?D_sample:NULL, M_m?M_sample:NULL, *maxedges, *maxchanges, difftime, difftail, diffhead,
 			  *nsteps, *MH_interval, *burnin, *interval,
 			  *fVerbose);
    
@@ -383,8 +385,16 @@ void MCMCDyn1Step_commit(unsigned int ntoggles,
   }
 
   for(Edge i=0;i<ntoggles;i++){
-    ToggleEdgeWithTimestamp(difftail[i],diffhead[i],nwp);
-  }  
+    ToggleEdge(difftail[i],diffhead[i],nwp);
+  }
+
+  MCMCDyn1Step_advance(nwp, F_m, F_stats, D_m, D_stats, M_m, M_stats);
+  
+  nwp->duration_info.time++;
+
+  for(Edge i=0;i<ntoggles;i++){
+    TouchEdge(difftail[i],diffhead[i],nwp);
+  }
 }
 
 /* 
@@ -393,14 +403,14 @@ void MCMCDyn1Step_commit(unsigned int ntoggles,
    * record new generated network differences to pass back to R
    * undo the toggles to nwp[0]
    * empty the discordant network (nwp[1])
-   * return the number of edges toggled
+   * return the number of edges toggled, or -1 if ran out of space
 */
 int MCMCDyn1Step_record_reset(Edge maxchanges,
 			      Vertex *difftime, Vertex *difftail, Vertex *diffhead,
 			      Network *nwp, 
 			      Edge *nextdiffedge){
   Vertex tail, head;
-  const unsigned int t=nwp->duration_info.time;
+  const unsigned int t=nwp->duration_info.time+1; // Note that the toggle only takes effect on the next time step.
   Edge ntoggles = nwp[1].nedges;
   
   for(unsigned int i=0; i<ntoggles; i++){
@@ -450,9 +460,6 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
   Edge nde=1;
   if(nextdiffedge) nde=*nextdiffedge;
 
-  /* Update timer. */
-  nwp->duration_info.time++;  
-
   /* Run the dissolution process. */
   MCMCDyn1Step_sample(D_MH, D_eta, MH_interval, nwp, D_m);
   ntoggles_status = MCMCDyn1Step_record_reset(maxchanges, difftime, difftail, diffhead, nwp, &nde);
@@ -466,9 +473,8 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
   ntoggles += ntoggles_status;
   
   /* Commit both. */
-  MCMCDyn1Step_commit(ntoggles, difftail+nde-ntoggles, diffhead+nde-ntoggles, nwp, F_m, F_stats, D_m, D_stats, M_m, M_stats);
-  MCMCDyn1Step_advance(nwp, F_m, F_stats, D_m, D_stats, M_m, M_stats);
-  
+  MCMCDyn1Step_commit(ntoggles, difftail+nde-ntoggles, diffhead+nde-ntoggles, nwp, F_m, F_stats, D_m, D_stats, M_m, M_stats);  
+
   // If we don't keep a log of toggles, reset the position to save space.
   if(log_toggles)
     *nextdiffedge=nde;
