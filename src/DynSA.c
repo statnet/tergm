@@ -18,6 +18,8 @@ void MCMCDynSArun_wrapper(// Observed network.
 			     int *runlength,
 			     double *WinvGradient,
 			     double *jitter, double *dejitter,
+			     double *dev_guard,
+			     double *par_guard,
 			     // Degree bounds.
 			     int *attribs, int *maxout, int *maxin, int *minout,
 			     int *minin, int *condAllDegExact, int *attriblength,
@@ -56,21 +58,21 @@ void MCMCDynSArun_wrapper(// Observed network.
 
   *status = MCMCDynSArun(nw,
 			    
-			    F_m, &F_MH,
-			    D_m, &D_MH,
-
-			    eta0, M_m,
-			    init_dev, 
-			    *runlength,
-			    WinvGradient, jitter, dejitter,
-
-		  *maxedges, *maxchanges,
-		  difftime, difftail, diffhead,
-		  opt_history,
-
-		  *SA_burnin, *SA_interval, *MH_interval, 
-		  *fVerbose);
-
+			 F_m, &F_MH,
+			 D_m, &D_MH,
+			 
+			 eta0, M_m,
+			 init_dev, 
+			 *runlength,
+			 WinvGradient, jitter, dejitter, dev_guard, par_guard,
+			 
+			 *maxedges, *maxchanges,
+			 difftime, difftail, diffhead,
+			 opt_history,
+			 
+			 *SA_burnin, *SA_interval, *MH_interval, 
+			 *fVerbose);
+  
   /* record the final network to pass back to R */
 
   if(*status==MCMCDyn_OK){
@@ -100,7 +102,7 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 			      Model *M_m,
 			      double *dev, // DEViation of the current network's targeted statistics from the target statistics.
 			      int runlength,
-			      double *WinvGradient, double *jitter, double *dejitter,
+			      double *WinvGradient, double *jitter, double *dejitter, double *dev_guard, double *par_guard,
 			      
 			      // Space for output.
 			      Edge maxedges, Edge maxchanges,
@@ -112,21 +114,21 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 			      int fVerbose){
   Edge nextdiffedge=1;
   unsigned int hist_pos=0, p=F_m->n_stats+D_m->n_stats, n, rowsize = p*2 + M_m->n_stats;
-  double *meandev=(double*)calloc(M_m->n_stats,sizeof(double)), *last_jitter=(double*)calloc(p,sizeof(double));
+  double *meandev=(double*)R_alloc(M_m->n_stats,sizeof(double)), *last_jitter=(double*)R_alloc(p,sizeof(double)), *init_eta=(double*)R_alloc(p,sizeof(double));
+  memcpy(init_eta, eta, (F_m->n_stats+D_m->n_stats)*sizeof(double));
 
-
-  for (unsigned int i=0; i < runlength; i++){
+  for(unsigned int i=0; i < runlength; i++){
     n = 0;
     for(unsigned int j=0; j<M_m->n_stats; j++){
       meandev[j]=0;
     }
 
     // Jitter parameters
-    for (unsigned int j=0; j<p; j++){
+    for(unsigned int j=0; j<p; j++){
       if(jitter[j]!=0){
 	last_jitter[j] = rnorm(0,jitter[j]);
 	eta[j] += last_jitter[j];
-      }
+      }else last_jitter[j] = 0;
     }
 
     for(unsigned int j=0;j < SA_interval;j++){
@@ -140,6 +142,7 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 					  difftime, difftail, diffhead,
 					  MH_interval,
 					  fVerbose);
+
       if(status==MCMCDyn_TOO_MANY_CHANGES)
         return MCMCDyn_TOO_MANY_CHANGES;
       
@@ -174,7 +177,7 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
     }
 
     // Evaluate mean deviations.
-    for (unsigned int j=0; j<M_m->n_stats; j++){
+    for(unsigned int j=0; j<M_m->n_stats; j++){
       meandev[j]/=n;
     }
     
@@ -191,31 +194,46 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
       opt_history[hist_pos*rowsize+p+p+j] = meandev[j];
     }
     hist_pos++;
-  
+
+    // If the statistics are getting worse by too much, stop updating eta and collect data for the rest of the run.
+    for(unsigned int j=0; j<M_m->n_stats; j++){
+      if(fabs(meandev[j]) > dev_guard[j]){
+	memset(WinvGradient, 0, M_m->n_stats*p*sizeof(double));
+	memset(dejitter, 0, p*p*sizeof(double));
+      }
+    }
+
+    
     // Update formation and dissolution parameters, and cancel the effect of jitter.
     // eta[t+1] = eta[t] - a*(G^-1)*W*(d[t] - G*jit[t])
     //          = eta[t] - a*(G^-1)*W*d[t] + a*(G^-1)*W*G*jit[t]
     for(unsigned int k=0; k<M_m->n_stats; k++){
-      for (unsigned int j=0; j<p; j++){
-	eta[j] -= WinvGradient[k*p+j] * meandev[k];
+      for(unsigned int j=0; j<p; j++){
+    	  eta[j] -= WinvGradient[k*p+j] * meandev[k];
       }
     }
     for(unsigned int k=0; k<p; k++){
-      for (unsigned int j=0; j<p; j++){
-	eta[j] += dejitter[k*p+j] * last_jitter[k];
+      for(unsigned int j=0; j<p; j++){
+    	  eta[j] += dejitter[k*p+j] * last_jitter[k];
       }
     }
 
     // Undo jitter
-    for (unsigned int j=0; j<p; j++){
+    for(unsigned int j=0; j<p; j++){
       if(jitter[j]!=0){
-	eta[j] -= last_jitter[j];
+    	  eta[j] -= last_jitter[j];
+      }
+    }
+
+        // If a parameter has moved suspiciously far, keep it from moving any farther.
+    for(unsigned int j=0; j<p; j++){
+      double change = eta[j] - init_eta[j];
+      if(fabs(change) > par_guard[j]){
+	eta[j] = init_eta[j] + (change>0?+1:-1)*par_guard[j]; 
       }
     }
   }
 
-  free(meandev);
-  free(last_jitter);
   return MCMCDyn_OK;
 }
 

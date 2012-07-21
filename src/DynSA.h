@@ -22,6 +22,8 @@ void MCMCDynSArun_wrapper(// Observed network.
 			     int *runlength,
 			     double *WinvGradient,
 			     double *jitter, double *dejitter,
+			     double *dev_guard,
+			     double *par_guard,
 			     // Degree bounds.
 			     int *attribs, int *maxout, int *maxin, int *minout,
 			     int *minin, int *condAllDegExact, int *attriblength,
@@ -45,7 +47,8 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 			      Model *M_m,
 			      double *dev, // DEViation of the current network's targeted statistics from the target statistics.
 			      int runlength,
-			      double *WinvGradient, double *jitter, double *dejitter,
+			      double *WinvGradient, double *jitter, double *dejitter, 
+			      double *dev_guard, double *par_guard,
 			      
 			      // Space for output.
 			      Edge maxedges, Edge maxchanges,

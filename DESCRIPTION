@@ -1,6 +1,6 @@
 Package: tergm
-Version: 3.1-11538.1-2012.04.06-20.59.28
-Date: 2012-04-06
+Version: 3.1-11563-11574.1-2012.07.20-20.06.35
+Date: 2012-07-20
 Title:  Fit, Simulate and Diagnose Exponential-Family Models for Networks
 Author: Pavel N. Krivitsky <krivitsky@stat.psu.edu>,
         Mark S. Handcock <handcock@stat.ucla.edu>,

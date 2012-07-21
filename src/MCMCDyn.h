@@ -11,8 +11,7 @@ typedef enum MCMCDynStatus_enum {
   MCMCDyn_OK = 0,
   MCMCDyn_TOO_MANY_EDGES = 1,
   MCMCDyn_MH_FAILED = 2,
-  MCMCDyn_TOO_MANY_CHANGES = 3,
-  MCMCDyn_GUARD_HIT = 4
+  MCMCDyn_TOO_MANY_CHANGES = 3
 } MCMCDynStatus;
 
 
