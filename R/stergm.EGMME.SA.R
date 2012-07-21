@@ -5,16 +5,16 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
   if(verbose) cat("Starting optimization with with coef_F_0 = (",theta.form0, ") and coef_D_0 = (",theta.diss0,")\n" )
   
   ###### Set the constants and convenience variables. ######
-  offsets <- c(model.form$offset, model.diss$offset) # which parameters are offsets?
-  p.form.free <- sum(!model.form$offset) # number of free formation parameters
-  p.form <- length(model.form$offset) # total number of formation parameters
-  p.diss.free <- sum(!model.diss$offset) # number of free dissolution parameters
-  p.diss <- length(model.diss$offset) # total number of dissolution parameters
+  offsets <- c(model.form$etamap$offsettheta, model.diss$etamap$offsettheta) # which parameters are offsets?
+  p.form.free <- sum(!model.form$etamap$offsettheta) # number of free formation parameters
+  p.form <- length(model.form$etamap$offsettheta) # total number of formation parameters
+  p.diss.free <- sum(!model.diss$etamap$offsettheta) # number of free dissolution parameters
+  p.diss <- length(model.diss$etamap$offsettheta) # total number of dissolution parameters
   p.free <- p.form.free+p.diss.free  # number of free parameters (formation and dissolution)
   p <- p.form+p.diss # total number of parameters (free and offset)
   p.names<-c(paste("f.(",model.form$coef.names,")",sep=""),paste("d.(",model.diss$coef.names,")",sep=""))
   
-  q <- length(model.mon$offset) # number of target statistics
+  q <- length(model.mon$etamap$offsettheta) # number of target statistics
   q.names<-model.mon$coef.names
 
   ###### Define the optimization run function. ######
@@ -64,7 +64,9 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         get.dev("progress.plot")
         
         thin <- (nrow(oh)-1)%/%control$SA.max.plot.points + 1
-        print(xyplot(mcmc(oh),panel=function(...){panel.xyplot(...);panel.abline(0,0)},thin=thin,as.table=TRUE))
+        cols <- ceiling(sqrt(ncol(oh)))
+        layout <- c(cols,cols)
+        print(xyplot(mcmc(oh),panel=function(...){panel.xyplot(...);panel.abline(0,0)},thin=thin,as.table=TRUE,layout=layout))
       }
     }
     
@@ -87,8 +89,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     w <- robust.inverse(cov(oh.all[,-(1:p),drop=FALSE]))
     best.i <- which.min(mahalanobis((oh.all[-1,-(1:p),drop=FALSE]+oh.all[-nrow(oh.all),-(1:p),drop=FALSE])/2,0,w,inverted=TRUE))
     best.par <- oh.all[best.i,1:p][!offsets]
-    if(p.form.free) state$eta.form[!model.form$offset] <- best.par[seq_len(p.form.free)]
-    if(p.diss.free) state$eta.diss[!model.diss$offset] <- best.par[p.form.free+seq_len(p.diss.free)]
+    if(p.form.free) state$eta.form[!model.form$etamap$offsettheta] <- best.par[seq_len(p.form.free)]
+    if(p.diss.free) state$eta.diss[!model.diss$etamap$offsettheta] <- best.par[p.form.free+seq_len(p.diss.free)]
     state
   }
 
@@ -292,8 +294,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
                      mean = colMeans(oh[,1:p,drop=FALSE][,!offsets,drop=FALSE]),
                      linear = interpolate.par(out$oh.fit,out$w),
                      none = c(eta.form,eta.diss)[!offsets])
-  if(p.form.free) eta.form[!model.form$offset] <- eta.free[seq_len(p.form.free)]
-  if(p.diss.free) eta.diss[!model.diss$offset] <- eta.free[p.form.free+seq_len(p.diss.free)]
+  if(p.form.free) eta.form[!model.form$etamap$offsettheta] <- eta.free[seq_len(p.form.free)]
+  if(p.diss.free) eta.diss[!model.diss$etamap$offsettheta] <- eta.free[p.form.free+seq_len(p.diss.free)]
 
   if(verbose){
     cat("Refining the estimate using the", control$SA.refine,"method. New estimate:\n")
