@@ -25,15 +25,15 @@ get.dev <- local({
 })
 
 # A customized level plot that uses cyan for positive values, red for
-# negative, white for 0, and ensures that the scales on both sides are
-# the same.
+# negative, white for close to 0, black for exactly 0, and ensures
+# that the scales on both sides are the same.
 
 .my.levelplot <- function(m,levels=80,...){
   bound <- max(na.omit(c(abs(m))))
 
-  levelplot(m, at=unique(c(seq(-bound,0,length.out=levels/2+1),
-                 seq(0,+bound,length.out=levels/2+1))),
-            col.regions=c(hsv(h=0,s=seq(1,2/levels,length.out=levels/2),v=1),
+  levelplot(m, at=unique(c(seq(-bound,-.Machine$double.eps,length.out=levels/2+1),
+                 seq(.Machine$double.eps,+bound,length.out=levels/2+1))),
+            col.regions=c(hsv(h=0,s=seq(1,2/levels,length.out=levels/2),v=1),rgb(0,0,0),
               hsv(h=.5,s=seq(2/levels,1,length.out=levels/2),v=1)),
             ...)
 }
