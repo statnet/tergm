@@ -23,13 +23,14 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         sapply(1:q,
                function(i){
                  y<-ys[,i]
-                 try(gls(y~x+x2+x3, correlation=corARMA(p=2)),silent=TRUE)
+                 try(gls(y~x, correlation=corARMA(p=2)),silent=TRUE)
                },simplify=FALSE)
       else
         sapply(1:q,
              function(i){
                y<-ys[,i]
-               suppressWarnings(try(lmrob(y~x+x2+x3), silent=TRUE))
+               if(control$SA.robust) suppressWarnings(try(lmrob(y~x), silent=TRUE))
+               else suppressWarnings(try(lm(y~x), silent=TRUE))
              },simplify=FALSE)
     
     bad.fits <- sapply(h.fits, inherits, "try-error")
@@ -43,20 +44,22 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     ## Grab the coefficients, t-values, and residuals.
     
-    h.fit <- h.pvals <- matrix(NA, nrow=p.free+1,ncol=q)
+    h.fit <- h.pvals <- h.tvals <- matrix(NA, nrow=p.free+1,ncol=q)
     
-    h.pvals[,!bad.fits] <- if(test.G) sapply(h.fits[!bad.fits],function(fit) summary(fit)$tTable[seq_len(p.free+1),4]) else 0
+    h.pvals[,!bad.fits] <- if(test.G) sapply(h.fits[!bad.fits],function(fit) summary(fit)$tTable[seq_len(p.free+1),4]) else sapply(h.fits[!bad.fits],function(fit) summary(fit)$coefficients[seq_len(p.free+1),4])
     h.fit[,!bad.fits] <- sapply(h.fits[!bad.fits], coef)[seq_len(p.free+1),]
+
+    G.pvals <- t(h.pvals[-1,,drop=FALSE])
 
     h.resid <- matrix(NA, nrow=NROW(ys), ncol=q)
     h.resid[,!bad.fits] <- sapply(h.fits[!bad.fits], resid)
     
-    G.signif <- t(h.pvals[-1,,drop=FALSE] < 1-(1-control$SA.phase1.max.p)^(p*q))
+    G.signif <- t(G.pvals < 1-(1-control$SA.phase1.max.p)^(1/(p*q)))
     G.signif[is.na(G.signif)] <- FALSE
 
     ## Compute the variances (robustly) and the statistic weights.
     v <- matrix(NA, q,q)
-    v[!bad.fits,!bad.fits] <- covMcd(h.resid[,!bad.fits,drop=FALSE])$cov
+    v[!bad.fits,!bad.fits] <- if(control$SA.robust) covMcd(h.resid[,!bad.fits,drop=FALSE])$cov else cov(h.resid[,!bad.fits,drop=FALSE])
     v[is.na(v)] <- 0
 
     w <- robust.inverse(v)
@@ -72,24 +75,29 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     ## Detect parameters whose effect we aren't able to reliably detect.
     ineffectual.pars <- !apply(G.signif,2,any)
 
-    if(all(ineffectual.pars)){
+    if(test.G && all(ineffectual.pars)){
       cat("None of the parameters have a detectable effect. Increasing jitter.\n" )
       control$jitter[!offsets] <- control$jitter[!offsets]*2
     }
-    else if(any(ineffectual.pars)){
+    else if(test.G && any(ineffectual.pars)){
       cat("Parameters",paste.and(p.names[!offsets][ineffectual.pars]),"do not have a detectable effect. Shifting jitter to them.\n" )
       control$jitter[!offsets] <- control$jitter[!offsets] * (ineffectual.pars+1/2) / mean(control$jitter[!offsets] * (ineffectual.pars+1/2))
     }
 
     ## Evaluate the dstat/dpar gradient matrix.
     G <- t(h.fit[-1,,drop=FALSE])
-    G[!G.signif] <- 0
+    if(test.G) G[!G.signif] <- 0
+    # Shrink the gradient estimate as a function of the collective "level of significance".
     G[is.na(G)] <- 0
 
+    par.eff <- apply(sweep(G,1,sqrt(diag(v)),"/"),2,function(z)sum(z^2))
+    par.eff <- sqrt(par.eff)
+
+    
     rownames(w)<-colnames(w)<-rownames(v)<-colnames(v)<-q.names
     
-    colnames(G)<-p.names[!offsets]
-    rownames(G)<-q.names
+    names(par.eff)<-colnames(G.pvals)<-colnames(G)<-p.names[!offsets]
+    rownames(G.pvals)<-rownames(G)<-q.names
     if(verbose>1){
       cat("Most recent parameters:\n")
       cat("Formation:\n")
@@ -104,8 +112,12 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       print(mahalanobis(oh[nrow(oh),-(1:p),drop=FALSE],0,cov=w,inverted=TRUE))
       cat("Approximate objective function (last run):\n")
       print(mahalanobis(colMeans(oh.last[,-(1:p),drop=FALSE]),0,cov=w,inverted=TRUE))
+      cat("Estimaged gradient p-values:\n")
+      print(G.pvals)
       cat("Estimated gradient:\n")
       print(G)
+      cat("Normalized parameter effects:\n")
+      print(par.eff)
       cat("Estimated covariance of statistics:\n")
       print(v)
     }
@@ -118,23 +130,23 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       }else{
         library(lattice)
 
-        get.dev("gradients")
-        G.scl <- sweep(G, 1, apply(G, 1, function(x) sqrt(mean(x^2))), "/")
-        G.scl[is.nan(G.scl)] <- 0
-        G.scl <- sweep(G.scl, 2, apply(G.scl, 2, function(x) sqrt(mean(x^2))), "/")
-        G.scl[is.nan(G.scl)] <- 0
-        try(print(.my.levelplot(G.scl,main="Scaled Gradients")),silent=TRUE)
-
-        get.dev("correlations")
-        suppressWarnings(try(print(.my.levelplot(cov2cor(v),main="Correlations")),silent=TRUE))
-
+        try({
+          get.dev("gradients")
+          G.scl <- sweep(G, 1, apply(G, 1, function(x) sqrt(mean(x^2))), "/")
+          G.scl[is.nan(G.scl)] <- 0
+          G.scl <- sweep(G.scl, 2, apply(G.scl, 2, function(x) sqrt(mean(x^2))), "/")
+          G.scl[is.nan(G.scl)] <- 0
+          print(.my.levelplot(G.scl,main="Scaled Gradients"))
+        },silent=TRUE)
+            
+        suppressWarnings(try({
+          get.dev("correlations")
+          print(.my.levelplot(cov2cor(v),main="Correlations"))
+        },silent=TRUE))
+        
       }
     }
 
-    par.eff <- apply(sweep(G,1,sqrt(diag(v)),"/"),2,function(z)sum(z^2))
-    par.eff <- sqrt(par.eff)
-    
-    
     control$GainM <- matrix(0, nrow=p, ncol=q)
     control$GainM[!offsets,] <- t(sweep(G,2,par.eff,"/")) %*% w * control$gain
     control$GainM[!is.finite(control$GainM)] <- 0

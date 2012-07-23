@@ -45,7 +45,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     assign("oh.all",oh.all,envir=parent.frame())
 
     inds.last <- nrow(oh.all) + 1 - control$SA.runlength:1
-    inds.keep <- nrow(oh.all) + 1 - max(nrow(oh.all)*control$SA.keep.oh,min(control$SA.runlength*4,nrow(oh.all))):1
+    inds.keep <- nrow(oh.all) + 1 - max(nrow(oh.all)*control$SA.keep.oh,min(control$SA.runlength*control$SA.keep.min,nrow(oh.all))):1
 
     # Extract and store subhistories of interest.
     assign("oh",oh.all[inds.keep,,drop=FALSE],envir=parent.frame())
@@ -64,8 +64,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         get.dev("progress.plot")
         
         thin <- (nrow(oh)-1)%/%control$SA.max.plot.points + 1
-        cols <- ceiling(sqrt(ncol(oh)))
-        layout <- c(cols,cols)
+        cols <- floor(sqrt(ncol(oh)))
+        layout <- c(cols,ceiling(ncol(oh)/cols))
         print(xyplot(mcmc(oh),panel=function(...){panel.xyplot(...);panel.abline(0,0)},thin=thin,as.table=TRUE,layout=layout))
       }
     }
@@ -158,18 +158,20 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     for(try in 1:control$SA.phase1.tries){
       if(verbose) cat('======== Attempt ',try,' ========\n',sep="") else cat('Attempt',try,':\n')
-      state <- try(do.optimization(state, control), silent=!verbose)
-      if(inherits(state, "try-error") || all(apply(oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
-        cat("Something went very wrong. Restarting with smaller gain.\n")
-        control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
-        do.restart <- TRUE
-        break
-      }else do.restart <- FALSE
+      for(run in 1:control$SA.phase1.minruns){
+        state <- try(do.optimization(state, control), silent=!verbose)
+        if(inherits(state, "try-error") || all(apply(oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
+          cat("Something went very wrong. Restarting with smaller gain.\n")
+          control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
+          do.restart <- TRUE
+          break
+        }else do.restart <- FALSE
+      }
 
       state <- best.state()
 
       control$gain <- control$SA.init.gain
-      out <- try(eval.optpars(TRUE,restart>1,FALSE), silent=!verbose)
+      out <- if(control$SA.restart.on.err) try(eval.optpars(TRUE,restart>1,FALSE), silent=!verbose) else eval.optpars(TRUE,restart>1,FALSE)
       if(inherits(out, "try-error") || all(apply(oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
         cat("Something went very wrong. Restarting with smaller gain.\n")
         control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
@@ -178,8 +180,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       }else do.restart <- FALSE
       control <- out$control
 
-      if(any(!out$ineffectual.pars) && all(!out$bad.fits)){
-        cat("At least one gradient estimated and all statistics are moving. Proceeding to Phase 2.\n")
+      if(mean(!out$ineffectual.pars)>=0.5 && all(!out$bad.fits)){
+        cat("At least half the parameter has some effect and all statistics are moving. Proceeding to Phase 2.\n")
         break
       }
       if(try==control$SA.phase1.tries) stop("The optimizer was unable to find a reasonable configuration: one or more statistics are still stuck after multiple tries, and one or more parameters do not appear to have any robust effect.")
@@ -214,7 +216,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
           print(state$eta.diss)
         }
         
-        out <- try(eval.optpars(FALSE,TRUE,TRUE), silent=!verbose)
+        out <- if(control$SA.restart.on.err) try(eval.optpars(FALSE,TRUE,TRUE), silent=!verbose) else eval.optpars(FALSE,TRUE,TRUE)
         if(inherits(out, "try-error") || all(apply(oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
           cat("Something went very wrong. Restarting with smaller gain.\n")
           control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
@@ -223,11 +225,44 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         }else do.restart <- FALSE
         control <- out$control
         
-        if(control$SA.phase2.refine){
-          if(!is.null(out$state)){
-            state$eta.form <- out$state$eta.form
-            state$eta.diss <- out$state$eta.diss
-          }
+        if(control$SA.phase2.refine.every && regain%/%control$SA.phase2.refine.every==0){
+          if(verbose) cat("Performing a refining run...\n")
+          eta.form <- state$eta.form
+          eta.diss <- state$eta.diss
+          
+          eta.free <- interpolate.par(out$oh.fit,out$w)
+                      
+          if(p.form.free) eta.form[!model.form$etamap$offsettheta] <- eta.free[seq_len(p.form.free)]
+          if(p.diss.free) eta.diss[!model.diss$etamap$offsettheta] <- eta.free[p.form.free+seq_len(p.diss.free)]
+
+          state.refine <- state
+          
+          state.refine$eta.form <- eta.form
+          state.refine$eta.diss <- eta.diss
+
+          control.refine <- control
+
+          control.refine$GainM[,] <- 0
+          control.refine$dejitter[,] <- 0
+          control.refine$jitter[] <- 0
+
+          oh.bak <- oh.last
+          
+          state.refine <- try(do.optimization(state.refine, control.refine), silent=!verbose)
+
+          obj <- mahalanobis(colMeans(oh.last[,-(1:p),drop=FALSE]),0,robust.inverse(cov(oh[,-(1:p),drop=FALSE])),inverted=TRUE)
+          obj.bak <- mahalanobis(colMeans(oh.bak[,-(1:p),drop=FALSE]),0,robust.inverse(cov(oh[,-(1:p),drop=FALSE])),inverted=TRUE)
+
+          if(obj>obj.bak) state <- state.refine
+
+          out <- if(control$SA.restart.on.err) try(eval.optpars(FALSE,TRUE,TRUE), silent=!verbose) else eval.optpars(FALSE,TRUE,TRUE)
+          if(inherits(out, "try-error") || all(apply(oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
+            cat("Something went very wrong. Restarting with smaller gain.\n")
+            control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
+            do.restart <- TRUE
+            break
+          }else do.restart <- FALSE
+          control <- out$control
         }
         
         ## If the optimization appears to be actively reducing the objective function, keep

@@ -63,11 +63,12 @@ control.stergm<-function(init.form=NULL,
                          SA.min.interval=20, # The lowest it can go.
                          SA.max.interval=500, # The highest it can go.
 
-                        
+
+                         SA.phase1.minruns=4, # Number of pure-jitter runs before gradient calculation and such begin.
                          SA.phase1.tries=20, # Number of iterations of trying to find a reasonable configuration. FIXME: nothing happens if it's exceeded.
                          SA.phase1.jitter=0.1, # Initial jitter sd of each parameter..
                          SA.phase1.max.p=0.001, # P-value that a gradient estimate must obtain before it's accepted (since sign is what's important).
-                         SA.phase1.backoff.rat=1.05, # If a run produces this relative increase in the objective function, it will be backed off.                         
+                         SA.phase1.backoff.rat=1.05, # If a run produces this relative increase in the objective function, it will be backed off.
                          SA.phase2.levels=10, # Number of gain levels to go through.
                          SA.phase2.max.mc.se=0, # Maximum standard error of the parameter estimates.
                          SA.phase2.repeats=400, # Maximum number of times gain a subphase can be repeated if the optimization is "going somewhere".
@@ -77,16 +78,19 @@ control.stergm<-function(init.form=NULL,
                          SA.stepdown.ct.subphase=1, # Number of times added to the baseline per subphase.
                          SA.phase2.backoff.rat=1.1, # If a run produces this relative increase in the objective function, it will be backed off.
                          SA.keep.oh=0.5, # Fraction of optimization history that is used for gradient and covariance calculation.
+                         SA.keep.min=8, # Minimum number of runs that are used for gradient and covariance calculation.
                          SA.phase2.jitter.mul=0.2, # The jitter standard deviation of each parameter is this times its standard deviation sans jitter.
                          SA.phase2.maxreljump=4, # Maximum jump per run, relative to the magnitude of other jumps in the history.
-                         SA.phase2.refine=FALSE, # Whether to use linear interpolation to refine the estimate after every run. More trouble than it's worth.
+                         SA.phase2.refine.every=0, # Use linear interpolation every this many runs to refine the estimate after. (0 = never.)
                          SA.guard.mul = 2, # The multiplier for the range of parameter values to compute the guard width.
+                         SA.robust = FALSE, # Should the (slower) robust linear regression and covariance estimation be used?
                          
 
                          SA.refine=c("linear","mean","none"), # Method, if any, used to refine the point estimate: linear interpolation, average, and none for the last value.
                          
                          SA.se=TRUE, # Whether to run Phase 3 to compute the standard errors.
                          SA.phase3.samplesize=1000, # This times the interval is the number of steps to estimate the standard errors.
+                         SA.restart.on.err=TRUE, # Whether to wrap certain routines in try() statements so that they that an error is handled gracefully. Set to FALSE to debug errors in those routines.
 
                          seed=NULL,
                          parallel=0,
