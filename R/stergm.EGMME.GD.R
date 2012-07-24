@@ -1,5 +1,5 @@
 stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss, model.mon,
-                            control, MHproposal.form, MHproposal.diss,
+                            control, MHproposal.form, MHproposal.diss, cl=NULL,
                             verbose=FALSE){
 
   eval.optpars <- function(test.G,window,update.jitter){
@@ -10,28 +10,48 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     # since we want p-values. First row is the intercept.
 
     h <- get(if(window) "oh" else "oh.all")
+    ind <- get(if(window) "ind" else "ind.all")
+    tid <- get(if(window) "tid" else "tid.all")
     control <- get("control")
-    state <- get("state")
+    states <- get("states")
     x<-h[,1:p,drop=FALSE][,!offsets,drop=FALSE] # #$%^$ gls() doesn't respect I()...
     ys <- h[,-(1:p),drop=FALSE]
     
     x2 <- sweep(x,2,apply(x,2,median),"-")^2
     x3 <- sweep(x,2,apply(x,2,median),"-")^3
 
+
     h.fits <-
-      if(test.G)
-        sapply(1:q,
-               function(i){
-                 y<-ys[,i]
-                 try(gls(y~x, correlation=corARMA(p=2)),silent=TRUE)
-               },simplify=FALSE)
-      else
-        sapply(1:q,
-             function(i){
-               y<-ys[,i]
-               if(control$SA.robust) suppressWarnings(try(lmrob(y~x), silent=TRUE))
-               else suppressWarnings(try(lm(y~x), silent=TRUE))
-             },simplify=FALSE)
+      if(!is.null(cl)){
+        result <-
+          if(test.G)
+            clusterApplyLB(cl, 1:q,
+                           function(i){
+                             y<-ys[,i]
+                             try(gls(y~x, correlation=corARMA(p=2,form=~ind|tid)),silent=TRUE)
+                           })
+          else
+            clusterApplyLB(cl, 1:q,
+                           function(i){
+                             y<-ys[,i]
+                             if(control$SA.robust) suppressWarnings(try(lmrob(y~x), silent=TRUE))
+                             else suppressWarnings(try(lm(y~x), silent=TRUE))
+                           })
+      }else{
+         if(test.G)
+          sapply(1:q,
+                 function(i){
+                   y<-ys[,i]
+                   try(gls(y~x, correlation=corARMA(p=2,form=~ind|tid)),silent=TRUE)
+                 },simplify=FALSE)
+        else
+          sapply(1:q,
+                 function(i){
+                   y<-ys[,i]
+                   if(control$SA.robust) suppressWarnings(try(lmrob(y~x), silent=TRUE))
+                   else suppressWarnings(try(lm(y~x), silent=TRUE))
+                 },simplify=FALSE)
+      }
     
     bad.fits <- sapply(h.fits, inherits, "try-error")
 #    bad.fits <-     # Also, ignore fits where the statistics are too concentrated.    
@@ -65,8 +85,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     w <- robust.inverse(v)
     
     ## Adjust the number of time steps between jumps.
-    edge.ages <- state$nw%n%"time"-ergm.el.lasttoggle(state$nw)[,3]+1
-    
+    edge.ages <- unlist(sapply(states, function(state) state$nw%n%"time"-ergm.el.lasttoggle(state$nw)[,3]+1))
     control$SA.interval<- min(control$SA.max.interval, max(control$SA.min.interval, if(length(edge.ages)>0) control$SA.interval.mul*mean(edge.ages)))
     if(verbose>1){
       cat("New interval:",control$SA.interval ,"\n")
@@ -191,6 +210,6 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
   }
 
     stergm.EGMME.SA(theta.form0, theta.diss0, nw, model.form, model.diss, model.mon,
-                            control, MHproposal.form, MHproposal.diss, eval.optpars,
+                            control, MHproposal.form, MHproposal.diss, eval.optpars, cl=cl,
                             verbose)
 }

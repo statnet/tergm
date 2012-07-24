@@ -176,14 +176,21 @@ stergm.EGMME <- function(nw, formation, dissolution,  offset.coef.form, offset.c
   
   if(verbose) cat("Fitting STERGM Equilibrium GMME.\n")
 
+  if(control$parallel){
+    cl <- ergm.getCluster(control, verbose=verbose)
+    on.exit(suppressWarnings(try(ergm.stopCluster(cl),silent=TRUE)))
+  }else cl <- NULL
+  
   Cout <- switch(control$EGMME.main.method,
                  "Gradient-Descent" = stergm.EGMME.GD(initialfit$formation.fit$coef,
                    initialfit$dissolution.fit$coef, nw, model.form, model.diss, model.mon,
                    control=control, MHproposal.form=MHproposal.form,
-                   MHproposal.diss=MHproposal.diss,
+                   MHproposal.diss=MHproposal.diss, cl=cl,
                   verbose),
                  stop("Method ", control$EGMME.main.method, " is not implemented.")
                 )
+
+  if(!is.null(cl)) ergm.stopCluster(cl)
 
   out <- list(network = nw, formation = formation, dissolution = dissolution, targets = targets, target.stats=model.mon$target.stats, estimate=estimate, covar = Cout$covar, opt.history=Cout$opt.history, sample=Cout$sample, sample.obs=NULL, control=control, reference = "Bernoulli",
               formation.fit = with(Cout, list(network=nw, formula=formation, coef = eta.form, covar=covar.form, etamap = model.form$etamap, offset = model.form$etamap$offsettheta, constraints=~., estimate=estimate, control=control, reference = "Bernoulli")),
