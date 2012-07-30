@@ -28,13 +28,53 @@ InitErgmTerm.edge.ages<-function(nw, arglist, role, ...) {
 }
 
 InitErgmTerm.mean.age<-function(nw, arglist, role, ...) {
-	if(role!="target") stop("Term mean.age can only be used as a target statistic.")
-	a <- check.ErgmTerm(nw, arglist)
-	
-	list(name="mean_age_mon",
-			coef.names = "mean.age",
-			pkgname="tergm",
-			dependence=FALSE)
+  if(role!="target") stop("Term mean.age can only be used as a target statistic.")
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = "emptyval",
+                      vartypes = "numeric",
+                      defaultvalues = list(0),
+                      required = FALSE)
+  
+  
+  list(name="mean_age_mon",
+       coef.names = "mean.age",
+       pkgname = "tergm",
+       inputs = a$emptyval,
+       emptynwstats = a$emptyval,
+       dependence=FALSE)
+}
+
+InitErgmTerm.edgecov.mean.age<-function(nw, arglist, role, ...) {
+  if(role!="target") stop("Term mean.age can only be used as a target statistic.")
+
+  a <- check.ErgmTerm(nw, arglist, 
+                      varnames = c("x", "attrname", "emptyval"),
+                      vartypes = c("matrix,network", "character", "numeric"),
+                      defaultvalues = list(NULL, NULL, 0),
+                      required = c(TRUE, FALSE, FALSE))
+  
+  ### Check the network and arguments to make sure they are appropriate.
+  ### Process the arguments
+  if(is.network(a$x))
+    xm<-as.matrix(a$x,matrix.type="adjacency",a$attrname)
+  else if(is.character(a$x))
+    xm<-get.network.attribute(nw,a$x)
+  else
+    xm<-as.matrix(a$x)
+  
+  ### Construct the list to return
+  if(!is.null(a$attrname)) {
+    # Note: the sys.call business grabs the name of the x object from the 
+    # user's call.  Not elegant, but it works as long as the user doesn't
+    # pass anything complicated.
+    cn<-paste("mean.age", as.character(a$attrname), sep = ".")
+  } else {
+    cn<-paste("mean.age", as.character(sys.call(0)[[3]][2]), sep = ".")
+  }
+  inputs <- c(a$emptyval, NCOL(xm), as.double(xm))
+  attr(inputs, "ParamsBeforeCov") <- 2
+  list(name="edgecov_mean_age_mon", coef.names = cn, inputs = inputs, pkgname="tergm", dependence=FALSE
+       )
 }
 
 InitErgmTerm.edgecov.ages<-function(nw, arglist, role, ...) {
