@@ -115,12 +115,37 @@
   format.
 }
 
-\references{
-  Krivitsky PN (2009). Statistical Models for Social Network Data and
-  Processes. PhD Thesis. University of Washington.
+\examples{
+\donttest{
+n<-50
+g0<-network.initialize(n,dir=FALSE)
 
+#                     edges, degree(1), mean.age
+target.stats<-c(      n*1/2,    n*0.6,        20)
+
+dynfit<-stergm(g1,formation = ~edges+degree(1), dissolution = ~edges,
+               targets = ~edges+degree(1)+mean.age,
+               target.stats=c(target.stats,20), estimate="EGMME",
+               control=control.stergm(
+               SA.plot.progress=do.plot,SA.plot.stats=TRUE,
+               init.form=c(-1,0),init.diss=1))
+
+summary(dynfit)
+
+mcmc.diagnostics(dynfit)
+}
+}
+
+\references{
+  
   Krivitsky PN, Handcock MS (2010). A Separable Model for Dynamic
   Networks. \url{http://arxiv.org/abs/1011.1937}
+
+  Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
+  Egocentric Data with Durational Information. \emph{Pennsylvania State
+  University Department of Statistics Technical Report},
+  2012(2012-01). \url{http://stat.psu.edu/Research/2012-technical-reports}
+
 }
 
 \seealso{network, \%v\%, \%n\%, \code{\link{ergm-terms}}}
