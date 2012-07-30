@@ -326,35 +326,6 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
   }
 }
 
-
-/*
-  MCMCDyn1Step_advance
-  Increment the timer and update time-sensitive statistics.
-*/
-void MCMCDyn1Step_advance(Network *nwp,
-			  Model *F_m, double *F_stats,
-			  Model *D_m, double *D_stats,
-			  Model *M_m, double *M_stats){
- 
-  if(F_stats){
-    ChangeStatsT(nwp,F_m);
-    for (unsigned int i = 0; i < F_m->n_stats; i++)
-      F_stats[i] += F_m->workspace[i];
-  }
-  
-  if(D_stats){
-    ChangeStatsT(nwp,D_m);
-    for (unsigned int i = 0; i < D_m->n_stats; i++)
-      D_stats[i] += D_m->workspace[i];
-  }
-  
-  if(M_stats){
-    ChangeStatsT(nwp,M_m);
-    for (unsigned int i = 0; i < M_m->n_stats; i++)
-      M_stats[i] += M_m->workspace[i];
-  } 
-}
-
 /*
   MCMCDyn1Step_commit
   Applies a list of toggles to a network, updating change statistics and time stamps.
@@ -388,13 +359,11 @@ void MCMCDyn1Step_commit(unsigned int ntoggles,
     ToggleEdge(difftail[i],diffhead[i],nwp);
   }
 
-  MCMCDyn1Step_advance(nwp, F_m, F_stats, D_m, D_stats, M_m, M_stats);
-  
-  nwp->duration_info.time++;
-
   for(Edge i=0;i<ntoggles;i++){
     TouchEdge(difftail[i],diffhead[i],nwp);
   }
+  nwp->duration_info.time++;
+
 }
 
 /* 
@@ -420,7 +389,7 @@ int MCMCDyn1Step_record_reset(Edge maxchanges,
     
     if(*nextdiffedge<maxchanges){
       // and record the toggle.
-      difftime[*nextdiffedge] = t;
+      difftime[*nextdiffedge] = t+1; // Effective toggle time is t+1.
       difftail[*nextdiffedge] = tail;
       diffhead[*nextdiffedge] = head;
       (*nextdiffedge)++;

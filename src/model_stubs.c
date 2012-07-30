@@ -20,8 +20,3 @@ static void (*fun)(unsigned int,Vertex *,Vertex *,Network *,Model *) = NULL;
 if(fun==NULL) fun = (void (*)(unsigned int,Vertex *,Vertex *,Network *,Model *)) R_FindSymbol("ChangeStats", "ergm", NULL);
 fun(ntoggles,toggletail,togglehead,nwp,m);
 }
-void ChangeStatsT(Network *nwp, Model *m){
-static void (*fun)(Network *,Model *) = NULL;
-if(fun==NULL) fun = (void (*)(Network *,Model *)) R_FindSymbol("ChangeStatsT", "ergm", NULL);
-fun(nwp,m);
-}
