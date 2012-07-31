@@ -82,11 +82,11 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
           
           get.dev("progress.plot")
           
-          thin <- (nrow(oh)-1)%/%control$SA.max.plot.points + 1
+          thin <- (nrow(oh)-1)%/%(control$SA.max.plot.points/length(states)) + 1
           cols <- floor(sqrt(ncol(oh)))
           layout <- c(cols,ceiling(ncol(oh)/cols))
 
-          print(xyplot(do.call(mcmc.list,by(as.data.frame(oh),INDICES=list(tid=tid),mcmc)), panel = function(...) {panel.xyplot(...);panel.abline(0, 0)}, thin = thin, as.table = TRUE, layout = layout, xlab=NULL))
+          suppressWarnings(print(xyplot(do.call(mcmc.list,by(as.data.frame(oh),INDICES=list(tid=tid),mcmc,start=min.ind.keep)), panel = function(...) {panel.xyplot(...);panel.abline(0, 0)}, thin = thin, as.table = TRUE, layout = layout, xlab=NULL)))
         }
     }
     
@@ -350,7 +350,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       if(!is.null(cl)) clusterApply(cl,states,function(state) stergm.getMCMCsample(state$nw, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, eta.form, eta.diss, control.phase3, verbose))
       else list(stergm.getMCMCsample(states[[1]]$nw, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, eta.form, eta.diss, control.phase3, verbose))
     
-    sm.mons <- lapply(seq_along(zs), function(i) sweep(zs[[i]]$statsmatrix.mon,2,state[[i]]$nw.diff,"+"))
+    sm.mons <- lapply(seq_along(zs), function(i) sweep(zs[[i]]$statsmatrix.mon,2,states[[i]]$nw.diff,"+"))
     sm.mon <- do.call(rbind, sm.mons)
     if(verbose)cat("Finished.\n")
     V.stat<-cov(sm.mon)

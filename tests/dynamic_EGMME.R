@@ -1,5 +1,4 @@
 library(tergm)
-library(coda)
 
 n<-50
 
@@ -74,9 +73,8 @@ print(summary(dynfit))
 mcmc.diagnostics(dynfit)
 
 # All parameters free, edges, degree(1), and edge.ages as target.
-# I am not 100% sure the target statistic is correct.
 set.seed(1)
-dynfit<-stergm(g1,formation=~edges+degree(1),dissolution=~edges, targets=~edges+degree(1)+edge.ages, estimate="EGMME", target.stats=c(target.stats,target.stats[1]*20),control=control.stergm(SA.plot.progress=do.plot,init.form=c(-1,0),init.diss=1))
+dynfit<-stergm(g1,formation=~edges+degree(1),dissolution=~edges, targets=~edges+degree(1)+mean.age, estimate="EGMME", target.stats=c(target.stats,20),control=control.stergm(SA.plot.progress=do.plot,SA.plot.stats=TRUE,init.form=c(-1,0),init.diss=1))
 
 print(summary(dynfit))
 mcmc.diagnostics(dynfit)

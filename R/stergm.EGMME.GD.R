@@ -23,34 +23,19 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
     h.fits <-
       if(!is.null(cl)){
-        result <-
-          if(test.G)
-            clusterApplyLB(cl, 1:q,
-                           function(i){
-                             y<-ys[,i]
-                             try(gls(y~x, correlation=corARMA(p=2,form=~ind|tid)),silent=TRUE)
-                           })
-          else
-            clusterApplyLB(cl, 1:q,
-                           function(i){
-                             y<-ys[,i]
-                             if(control$SA.robust) suppressWarnings(try(lmrob(y~x), silent=TRUE))
-                             else suppressWarnings(try(lm(y~x), silent=TRUE))
-                           })
+        clusterApplyLB(cl, 1:q,
+                       function(i){
+                         y<-ys[,i]
+                         if(control$SA.robust) suppressWarnings(try(lmrob(y~x), silent=TRUE))
+                         else suppressWarnings(try(lm(y~x), silent=TRUE))
+                       })
       }else{
-         if(test.G)
-          sapply(1:q,
-                 function(i){
-                   y<-ys[,i]
-                   try(gls(y~x, correlation=corARMA(p=2,form=~ind|tid)),silent=TRUE)
-                 },simplify=FALSE)
-        else
-          sapply(1:q,
-                 function(i){
-                   y<-ys[,i]
-                   if(control$SA.robust) suppressWarnings(try(lmrob(y~x), silent=TRUE))
-                   else suppressWarnings(try(lm(y~x), silent=TRUE))
-                 },simplify=FALSE)
+        sapply(1:q,
+               function(i){
+                 y<-ys[,i]
+                 if(control$SA.robust) suppressWarnings(try(lmrob(y~x), silent=TRUE))
+                 else suppressWarnings(try(lm(y~x), silent=TRUE))
+               },simplify=FALSE)
       }
     
     bad.fits <- sapply(h.fits, inherits, "try-error")
@@ -64,15 +49,23 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     ## Grab the coefficients, t-values, and residuals.
     
-    h.fit <- h.pvals <- h.tvals <- matrix(NA, nrow=p.free+1,ncol=q)
-    
-    h.pvals[,!bad.fits] <- if(test.G) sapply(h.fits[!bad.fits],function(fit) summary(fit)$tTable[seq_len(p.free+1),4]) else sapply(h.fits[!bad.fits],function(fit) summary(fit)$coefficients[seq_len(p.free+1),4])
+    h.nfs <- h.fit <- h.pvals <- h.tvals <- matrix(NA, nrow=p.free+1,ncol=q)
+
     h.fit[,!bad.fits] <- sapply(h.fits[!bad.fits], coef)[seq_len(p.free+1),]
-
-    G.pvals <- t(h.pvals[-1,,drop=FALSE])
-
+    
     h.resid <- matrix(NA, nrow=NROW(ys), ncol=q)
     h.resid[,!bad.fits] <- sapply(h.fits[!bad.fits], resid)
+
+    h.tvals[,!bad.fits] <- sapply(h.fits[!bad.fits],function(fit) summary(fit)$coefficients[seq_len(p.free+1),3])
+
+    h.nfs[,!bad.fits] <- apply(h.resid[,!bad.fits,drop=FALSE],2,function(x) sum(tapply(x,list(tid),length)/tapply(x,list(tid),effectiveSize)))
+
+    h.tvals[,!bad.fits] <- h.tvals[,!bad.fits,drop=FALSE]/sqrt(h.nfs[,!bad.fits,drop=FALSE])
+
+    h.pvals[,!bad.fits] <- 2*pnorm(abs(h.tvals[,!bad.fits,drop=FALSE]),0,1,lower.tail=FALSE)
+    
+    G.pvals <- t(h.pvals[-1,,drop=FALSE])
+    
     
     G.signif <- t(G.pvals < 1-(1-control$SA.phase1.max.p)^(1/(p*q)))
     G.signif[is.na(G.signif)] <- FALSE
@@ -94,22 +87,24 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     ## Detect parameters whose effect we aren't able to reliably detect.
     ineffectual.pars <- !apply(G.signif,2,any)
 
-    if(test.G && all(ineffectual.pars)){
-      cat("None of the parameters have a detectable effect. Increasing jitter.\n" )
+    if(all(ineffectual.pars)){
+      if(test.G || verbose>0) cat("None of the parameters have a detectable effect. Increasing jitter.\n" )
       control$jitter[!offsets] <- control$jitter[!offsets]*2
     }
-    else if(test.G && any(ineffectual.pars)){
-      cat("Parameters",paste.and(p.names[!offsets][ineffectual.pars]),"do not have a detectable effect. Shifting jitter to them.\n" )
+    else if(any(ineffectual.pars)){
+      if(test.G) cat("Parameters",paste.and(p.names[!offsets][ineffectual.pars]),"do not have a detectable effect. Shifting jitter to them.\n" )
       control$jitter[!offsets] <- control$jitter[!offsets] * (ineffectual.pars+1/2) / mean(control$jitter[!offsets] * (ineffectual.pars+1/2))
     }
 
     ## Evaluate the dstat/dpar gradient matrix.
     G <- t(h.fit[-1,,drop=FALSE])
     if(test.G) G[!G.signif] <- 0
-    # Shrink the gradient estimate as a function of the collective "level of significance".
+    #else G <- G*(1-G.pvals)
     G[is.na(G)] <- 0
 
-    par.eff <- apply(sweep(G,1,sqrt(diag(v)),"/"),2,function(z)sum(z^2))
+    ## Adaptively scale the estimating equations so that none of the
+    ## parameters are "neglected".
+    par.eff <- apply(sweep(G,1,sqrt(diag(v)),"/"),2,function(z)mean(z^2))
     par.eff <- sqrt(par.eff)
 
     
@@ -120,11 +115,11 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     if(verbose>1){
       cat("Most recent parameters:\n")
       cat("Formation:\n")
-      print(state$eta.form)
+      for(state in states) print(state$eta.form)
       cat("Dissolution:\n")
-      print(state$eta.diss)
+      for(state in states) print(state$eta.diss)
       cat("Target differences (most recent):\n")
-      print(state$nw.diff)
+      for(state in states) print(state$nw.diff)
       cat("Target differences (last run):\n")
       print(colMeans(oh.last[,-(1:p),drop=FALSE]))
       cat("Approximate objective function (most recent):\n")
