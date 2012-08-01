@@ -1,60 +1,30 @@
-authors <- c("Mark S. Handcock", "David R. Hunter", "Carter T. Butts",
-             "Steven M. Goodreau", "Martina Morris")
-projhomepage <- "statnet.org"
+desc <- packageDescription("tergm")
 
-statnettitle <- "statnet: Software Tools for the Statistical Modeling of Network Data"
-statnetversion <- "2.0"
-statnetyear <- "2003"
+projhomepage <- "http://www.statnet.org"
 
-ergmtitle <- "ergm: A Package to Fit, Simulate and Diagnose Exponential-Family Models for Networks"
-ergmdesc <- packageDescription("ergm")
-ergmversion <- ergmdesc$Version
-ergmdate <- ergmdesc$Date
-s <- regexpr("20[0-9][0-9]", ergmdate)
-ergmyear <- ifelse (s==-1, "2003", substr(ergmdate, s, s+3))
-ergmauthors <- c(authors, "Pavel N. Krivitsky")[c(1:4,6,5)]
 
-citHeader(
-   "'ergm' is part of the statnet suite of packages.  ",
-   'Please read the license using license.statnet("ergm").\n\n',
-   "If you are using the 'ergm' package for research that will be published, ",
-   "we request that you acknowledge this by citing 'statnet' as shown below.\n\n",
-   "To cite the individual package 'ergm', please use the second citation below.\n\n",
-   'For BibTeX format, use toBibtex(citation("ergm")).',
-   sep="")
-   
-citEntry(entry = "Manual",
-         textVersion = paste(paste(authors, collapse=", "), " (", statnetyear,
-                             "). ", statnettitle, ". Version ", statnetversion,
-                             ". Project home page at ", projhomepage, 
-                             ". URL CRAN.R-project.org/package=statnet.",
-                             sep=""),
-         title = statnettitle, 
-         author = authors, 
-         year = statnetyear,
-         note = paste("Version ", statnetversion, ". Project home page at ",
-                      "\\ url{", projhomepage, "}", sep=""),
-         address = "Seattle, WA",
-         url = "CRAN.R-project.org/package=statnet")
 
-citEntry(entry="Manual",
-         author = ergmauthors,
-         title = ergmtitle,
-         year         = ergmyear,
-         note         = paste("Version ", ergmversion,
-                        ".  Project home page at \\ url{", projhomepage, "}", 
+auts <- eval(parse(text=desc$`Authors@R`))
+auts <- auts[sapply(auts, function(aut) "aut" %in% aut$role)]
+
+bibentry("Manual",
+         header = paste("`",desc$Package,"` is part of the Statnet suite of packages.  ",
+   "If you are using the `",desc$Package,"` package for research that will be published, ",
+   "we request that you acknowledge this by it as shown below.\n\n",
+   'For BibTeX format, use toBibtex(citation("tergm")).',
+   sep=""),
+         footer = citFooter("We have invested a lot of time and effort in creating the",
+          "Statnet suite of packages for use by other researchers.",
+          "Please cite it in all papers where it is used."),
+         author = auts,
+         title = desc$Title,
+         year         = substr(desc$Date,1,4),
+         note         = paste("Version ", desc$Version,
+                        ".  Project home page at \\url{", projhomepage, "}", 
                         sep=""),
          address      = "Seattle, WA",
-         url          = "CRAN.R-project.org/package=ergm",
-         textVersion = paste(paste(ergmauthors, collapse=", "), " (", ergmyear,
-               "), ", ergmtitle, ". Version ", ergmversion,
-               ". Project home page at ", projhomepage,
-               ". URL CRAN.R-project.org/package=ergm.",
-               sep="")
+         url          = paste("CRAN.R-project.org/package=",desc$Package,sep="")
          )
 
          
-citFooter("We have invested a lot of time and effort in creating the",
-          "'statnet' suite of packages for use by other researchers.",
-          "Please cite it in all papers where it is used.")
           

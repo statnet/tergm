@@ -1,17 +1,19 @@
 Package: tergm
-Version: 3.1-11581-11588.1-2012.07.30-16.30.29
-Date: 2012-07-30
-Title:  Fit, Simulate and Diagnose Exponential-Family Models for Networks
-Author: Pavel N. Krivitsky <krivitsky@stat.psu.edu>,
-        Mark S. Handcock <handcock@stat.ucla.edu>,
-        David R. Hunter <dhunter@stat.psu.edu>,
-        Carter T. Butts <buttsc@uci.edu>,
-        Steven M. Goodreau <goodreau@u.washington.edu>,
-        Martina Morris <morrism@u.washington.edu>
-Maintainer: Pavel N. Krivitsky <krivitsky@stat.psu.edu>
+Version: 3.1-11581-11589.1-2012.08.01-15.41.40
+Date: 2012-08-01
+Title:  Fit, Simulate and Diagnose Models for Network Evoluation based on Exponential-Family Random Graph Models
+Authors@R:c(
+	person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="krivitsky@stat.psu.edu"),
+        person("Mark S.", "Handcock", role=c("aut","ths"), email="handcock@stat.ucla.edu"),
+        person("David R.", "Hunter", role=c("ctb"), email="dhunter@stat.psu.edu"),
+        person("Steven M.", "Goodreau", role=c("ctb","ths"), email="goodreau@u.washington.edu"),
+        person("Martina", "Morris", role=c("ctb","ths"), email="morrism@u.washington.edu"),
+	person("Nicole Bohme", "Carnegie", role=c("ctb"), email="nicole.carnegie@nyu.edu"),
+        person("Carter T.", "Butts", role=c("ctb"), email="buttsc@uci.edu"),
+	person("Ayn", "Leslie-Cook", role=c("ctb"), email="aynlc3@uw.edu"))
 LinkingTo: ergm
-Depends: ergm, network (>= 1.7-1), robustbase, Matrix, nlme, coda, networkDynamic
+Depends: ergm, robustbase, nlme, networkDynamic
 Suggests: lattice
-Description: An integrated set of tools to analyze and simulate networks based on exponential-family random graph models (ERGM). "ergm" is a part of the "statnet" suite of packages for network analysis.
+Description: An integrated set of extensions to the `ergm` package to analyze and simulate network evolution based on exponential-family random graph models (ERGM). "tergm" is a part of the "statnet" suite of packages for network analysis.
 License: GPL-3 + file LICENSE
-URL: statnet.org
+URL: http://www.statnet.org
