@@ -212,8 +212,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       }else do.restart <- FALSE
       control <- out$control
 
-      if(mean(!out$ineffectual.pars)>=0.5 && all(!out$bad.fits)){
-        cat("At least half the parameter has some effect and all statistics are moving. Proceeding to Phase 2.\n")
+      if(all(!out$ineffectual.pars) && all(!out$bad.fits)){
+        cat("All parameters have some effect and all statistics are moving. Proceeding to Phase 2.\n")
         break
       }
       if(try==control$SA.phase1.tries) stop("The optimizer was unable to find a reasonable configuration: one or more statistics are still stuck after multiple tries, and one or more parameters do not appear to have any robust effect.")
