@@ -7,6 +7,7 @@
 \alias{mean.age}
 \alias{edges.ageinterval}
 \alias{edgecov.ages}
+\alias{edgecov.mean.age}
 \docType{methods}
 \title{Temporally-Sensitive Terms used in Exponential Family Random Graph Models}
 \description{
