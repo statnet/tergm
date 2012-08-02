@@ -65,9 +65,13 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     h.pvals[,!bad.fits] <- 2*pnorm(abs(h.tvals[,!bad.fits,drop=FALSE]),0,1,lower.tail=FALSE)
     
     G.pvals <- t(h.pvals[-1,,drop=FALSE])
+
+    G.pvall <- sort(ifelse(is.na(c(G.pvals)),1,c(G.pvals)))
     
+    p.max <- max(G.pvall[G.pvall<=seq_along(G.pvall)/length(G.pvall)*control$SA.phase1.max.q],0)
     
-    G.signif <- t(G.pvals < 1-(1-control$SA.phase1.max.p)^(1/(p*q)))
+    G.signif <- G.pvals <= p.max
+    
     G.signif[is.na(G.signif)] <- FALSE
 
     ## Compute the variances (robustly) and the statistic weights.
@@ -98,7 +102,8 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
     ## Evaluate the dstat/dpar gradient matrix.
     G <- t(h.fit[-1,,drop=FALSE])
-    if(test.G) G[!G.signif] <- 0
+    if(test.G)
+      G[!G.signif] <- 0
     #else G <- G*(1-G.pvals)
     G[is.na(G)] <- 0
 
