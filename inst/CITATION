@@ -1,30 +1,3 @@
-desc <- packageDescription("tergm")
-
-projhomepage <- "http://www.statnet.org"
-
-
-
-auts <- eval(parse(text=desc$`Authors@R`))
-auts <- auts[sapply(auts, function(aut) "aut" %in% aut$role)]
-
-bibentry("Manual",
-         header = paste("`",desc$Package,"` is part of the Statnet suite of packages.  ",
-   "If you are using the `",desc$Package,"` package for research that will be published, ",
-   "we request that you acknowledge this by it as shown below.\n\n",
-   'For BibTeX format, use toBibtex(citation("tergm")).',
-   sep=""),
-         footer = citFooter("We have invested a lot of time and effort in creating the",
-          "Statnet suite of packages for use by other researchers.",
-          "Please cite it in all papers where it is used."),
-         author = auts,
-         title = desc$Title,
-         year         = substr(desc$Date,1,4),
-         note         = paste("Version ", desc$Version,
-                        ".  Project home page at \\url{", projhomepage, "}", 
-                        sep=""),
-         address      = "Seattle, WA",
-         url          = paste("CRAN.R-project.org/package=",desc$Package,sep="")
-         )
-
-         
-          
+statnet.cite.head("tergm")
+statnet.cite.pkg("tergm")
+statnet.cite.foot("tergm")
