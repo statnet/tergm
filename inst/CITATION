@@ -1,3 +1,4 @@
+library(statnet.common)
 statnet.cite.head("tergm")
 statnet.cite.pkg("tergm")
 statnet.cite.foot("tergm")
