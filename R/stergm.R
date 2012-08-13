@@ -2,7 +2,7 @@
 # stergm --- fit Separable Temporal ERGMs.
 ################################################################################
 
-stergm <- function(nw, formation, dissolution, estimate, times=NULL, offset.coef.form=NULL, offset.coef.diss=NULL,
+stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times=NULL, offset.coef.form=NULL, offset.coef.diss=NULL,
                    targets=NULL, target.stats=NULL,
                    eval.loglik=FALSE,
                  control=control.stergm(),
@@ -31,10 +31,11 @@ stergm <- function(nw, formation, dissolution, estimate, times=NULL, offset.coef
 
   out <- switch(estimate,
                 CMLE=,
-                CMPLE=stergm.CMLE(nw, formation, dissolution,
+                CMPLE=stergm.CMLE(nw, formation, dissolution, constraints,
                   times, offset.coef.form, offset.coef.diss, eval.loglik,
                   estimate, control, verbose),
-                EGMME=stergm.EGMME(nw, formation, dissolution, offset.coef.form, offset.coef.diss,
+                EGMME=stergm.EGMME(nw, formation, dissolution, constraints,
+                  offset.coef.form, offset.coef.diss,
                   targets, target.stats, estimate, control, verbose)
                   )
 

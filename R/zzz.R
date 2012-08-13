@@ -14,6 +14,16 @@
   ergm.MHP.table("c", "Bernoulli", "atmost+bd",  0, "random", "dissolutionMLE")
   ergm.MHP.table("c", "Bernoulli", "atleast+observed",  0, "random", "formationNonObservedMLE")
   ergm.MHP.table("c", "Bernoulli", "atmost+observed",  0, "random", "dissolutionNonObservedMLE")
+
+  ergm.MHP.table("c", "Bernoulli", "atleast+blockdiag",  0, "random", "formationMLEblockdiag")
+  ergm.MHP.table("c", "Bernoulli", "atleast+bd+blockdiag",  0, "random", "formationMLEblockdiag")
+  ergm.MHP.table("c", "Bernoulli", "atleast+blockdiag",  1, "TNT", "formationMLEblockdiagTNT")
+  ergm.MHP.table("c", "Bernoulli", "atleast+bd+blockdiag",  1, "TNT", "formationMLEblockdiagTNT")
+  ergm.MHP.table("c", "Bernoulli", "atmost+blockdiag",  0, "random", "dissolutionMLE")
+  ergm.MHP.table("c", "Bernoulli", "atmost+bd+blockdiag",  0, "random", "dissolutionMLE")
+  ergm.MHP.table("c", "Bernoulli", "atleast+blockdiag+observed",  0, "random", "formationNonObservedMLEblockdiag")
+  ergm.MHP.table("c", "Bernoulli", "atmost+blockdiag+observed",  0, "random", "dissolutionNonObservedMLEblockdiag")
+
   ergm.MHP.table("f", "Bernoulli", "",  0, "random", "formation")
   ergm.MHP.table("f", "Bernoulli", "bd",  0, "random", "formation")
   ergm.MHP.table("f", "Bernoulli", "",  1, "TNT", "formationTNT")

@@ -69,12 +69,13 @@
 #
 ################################################################################
 
-stergm.EGMME <- function(nw, formation, dissolution,  offset.coef.form, offset.coef.diss,
+stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.form, offset.coef.diss,
                    targets, target.stats, estimate,
                  control,
                  verbose) {
 
   if(!is.network(nw)) stop("Argument nw must be a network.")
+  if(constraints!=~.) stop("Constraints are not supported for STERGM EGGME at this time.")
    
   # Allow the user to specify targets as copied from formation or dissolution formula.
   if(is.character(targets)){
