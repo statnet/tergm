@@ -56,45 +56,6 @@ void MH_FormationMLE (MHproposal *MHp, Network *nwp)
 }
 
 /********************
-   void MH_DissolutionMLE
-   Propose ONLY edges not in the reference graph
-***********************/
-void MH_DissolutionMLE (MHproposal *MHp, Network *nwp) 
-{  
-  unsigned int trytoggle;
-  static Edge nedges0;
-
-  if(MHp->ntoggles == 0) { /* Initialize */
-    MHp->ntoggles=1;
-    nedges0 = MHp->inputs[0];
-    return;
-  }
-  
-  if(nedges0==0){ /* Attempting dissolution on a complete graph. */
-    Mtail[0]=MH_FAILED;
-    Mhead[0]=MH_IMPOSSIBLE;
-    return;
-  }
-
-  for(trytoggle=0;trytoggle<MAX_TRIES;trytoggle++){
-    /* Select a dyad at random that is in the reference graph. (We
-       have a convenient sampling frame.) */
-    /* Generate. */
-    Edge rane = 1 + unif_rand() * nedges0;
-    Mtail[0]=MHp->inputs[rane];
-    Mhead[0]=MHp->inputs[nedges0+rane];
-    
-    if(CheckTogglesValid(MHp, nwp)) break;
-  }
-
-  /* If no valid proposal found, signal a failed proposal. */
-  if(trytoggle>=MAX_TRIES) {
-    Mtail[0]=MH_FAILED;
-    Mhead[0]=MH_UNSUCCESSFUL;
-  }
-}
-
-/********************
    void MH_FormationMLE
    Propose ONLY edges not in the reference graph
 ***********************/

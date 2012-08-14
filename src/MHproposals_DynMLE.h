@@ -7,8 +7,6 @@
 #include "MHproposal.h"
 
 void MH_FormationMLE(MHproposal *MHp, Network *nwp);
-void MH_DissolutionMLE(MHproposal *MHp, Network *nwp);
-
 void MH_FormationMLETNT(MHproposal *MHp, Network *nwp);
 
 #endif 

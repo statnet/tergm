@@ -81,7 +81,7 @@ InitMHP.formationNonObservedMLEblockdiag <- function(arguments, nw) {
   el <- el[a[el[,1]]==a[el[,2]],,drop=FALSE]
 
   ## Given the list of toggleable dyads, no formation-specific proposal function is needed:
-  MHproposal <- list(name = "randomtoggleNonObserved", inputs=ergm.Cprepare.el(el), package="ergm")
+  MHproposal <- list(name = "randomtoggleList", inputs=ergm.Cprepare.el(el), package="ergm")
   MHproposal
 }
 
@@ -103,7 +103,7 @@ InitMHP.dissolutionNonObservedMLEblockdiag <- function(arguments, nw) {
 
   
   ## Given the list of toggleable dyads, no formation-specific proposal function is needed:
-  MHproposal <- list(name = "randomtoggleNonObserved", inputs=ercm.Cprepare.el(el), package="ergm")
+  MHproposal <- list(name = "randomtoggleList", inputs=ercm.Cprepare.el(el), package="ergm")
   MHproposal
 }
 
