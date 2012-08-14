@@ -28,7 +28,7 @@ InitConstraint.atleast<-function(conlist, lhs.nw, nw=NULL, ...){
   conlist$atleast<-list(nw=nw)
 
   conlist$atleast$free.dyads <- function(){
-    !nw
+    standardize.network(invert.network(nw))
   }
 
   conlist
@@ -41,7 +41,7 @@ InitConstraint.atmost<-function(conlist, lhs.nw, nw=NULL, ...){
   conlist$atmost<-list(nw=nw)
 
   conlist$atmost$free.dyads <- function(){
-    nw
+    standardize.network(nw)
   }
 
   conlist
