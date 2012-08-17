@@ -17,12 +17,12 @@ diss.mle<-function(y0,y1){
 do.run <- function(dir){
 y0<-network.initialize(n,dir=dir)
 set.seed(321)
-y0<-simulate(y0~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2))
+y0<-standardize.network(simulate(y0~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))
 
 cat("Complete data:\n")
 
 set.seed(432)
-y1<-simulate(y0~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2))
+y1<-standardize.network(simulate(y0~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))
 
 # Force CMPLE
 set.seed(543)
@@ -36,7 +36,7 @@ stopifnot(all.equal(diss.mle(y0,y1), coef(fit$dissolution.fit), tolerance=tolera
 set.seed(543)
 fit<-stergm(list(y0,y1), formation=~edges, dissolution=~edges, estimate="CMLE")
 
-stopifnot(fit$estimate=="CMLE", is.na(fit$formation.fit$sample), is.na(fit$dissolution.fit$sample))
+stopifnot(fit$estimate=="CMLE", is.null(fit$formation.fit$sample), is.null(fit$dissolution.fit$sample))
 stopifnot(all.equal(form.mle(y0,y1), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
 stopifnot(all.equal(diss.mle(y0,y1), coef(fit$dissolution.fit), tolerance=tolerance, check.attributes=FALSE))
 
@@ -51,7 +51,7 @@ stopifnot(all.equal(diss.mle(y0,y1), coef(fit$dissolution.fit), tolerance=tolera
 cat("Missing data:\n")
 
 y1m<-network.copy(y1)
-set.seed(654)
+set.seed(765)
 y1m[as.edgelist(simulate(y0~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))]<-NA
 
 # Force CMPLE
@@ -66,7 +66,7 @@ stopifnot(all.equal(diss.mle(y0,y1m), coef(fit$dissolution.fit), tolerance=toler
 set.seed(765)
 fit<-stergm(list(y0,y1m), formation=~edges, dissolution=~edges, estimate="CMLE")
 
-stopifnot(fit$estimate=="CMLE", is.na(fit$formation.fit$sample), is.na(fit$dissolution.fit$sample))
+stopifnot(fit$estimate=="CMLE", is.null(fit$formation.fit$sample), is.null(fit$dissolution.fit$sample))
 stopifnot(all.equal(form.mle(y0,y1m), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
 stopifnot(all.equal(diss.mle(y0,y1m), coef(fit$dissolution.fit), tolerance=tolerance, check.attributes=FALSE))
 

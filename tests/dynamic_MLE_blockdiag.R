@@ -43,7 +43,7 @@ stopifnot(all.equal(diss.mle(y0,y1), coef(fit$dissolution.fit), tolerance=tolera
 set.seed(543)
 fit<-stergm(list(y0,y1), formation=~edges, dissolution=~edges, constraints=~blockdiag("a"), estimate="CMLE")
 
-stopifnot(fit$estimate=="CMLE", is.na(fit$formation.fit$sample), is.na(fit$dissolution.fit$sample))
+stopifnot(fit$estimate=="CMLE", is.null(fit$formation.fit$sample), is.null(fit$dissolution.fit$sample))
 stopifnot(all.equal(form.mle(y0,y1), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
 stopifnot(all.equal(diss.mle(y0,y1), coef(fit$dissolution.fit), tolerance=tolerance, check.attributes=FALSE))
 
@@ -73,7 +73,7 @@ stopifnot(all.equal(diss.mle(y0,y1m), coef(fit$dissolution.fit), tolerance=toler
 set.seed(765)
 fit<-stergm(list(y0,y1m), formation=~edges, dissolution=~edges, constraints=~blockdiag("a"), estimate="CMLE")
 
-stopifnot(fit$estimate=="CMLE", is.na(fit$formation.fit$sample), is.na(fit$dissolution.fit$sample))
+stopifnot(fit$estimate=="CMLE", is.null(fit$formation.fit$sample), is.null(fit$dissolution.fit$sample))
 stopifnot(all.equal(form.mle(y0,y1m), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
 stopifnot(all.equal(diss.mle(y0,y1m), coef(fit$dissolution.fit), tolerance=tolerance, check.attributes=FALSE))
 

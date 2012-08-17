@@ -32,6 +32,11 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   # Construct the formation and dissolution networks; the
   # network.update cannot be used to copy attributes from y0 to y.form and
   # y.diss, since NA edges will be lost.
+
+  # We are about to do logical operations on networks, so make sure
+  # tail-head orderings match up.
+  y0 <- standardize.network(y0)
+  y1 <- standardize.network(y1)
   
   y.form <- y0 | y1
   y.form <- nvattr.copy.network(y.form, y0)
