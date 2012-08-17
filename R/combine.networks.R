@@ -10,6 +10,7 @@ combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper",
   if(any(diff(sapply(nwl, is.directed)))) stop("All networks must have the same directedness.")
   
 
+  nwl <- lapply(nwl, standardize.network)
   ns <- sapply(nwl, network.size)
   blks <- c(0, cumsum(ns))
 
@@ -57,7 +58,6 @@ combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper",
   for(b in seq_along(nwl)){
     el <- rbind(as.edgelist(nwl[[b]]),as.edgelist(is.na(nwl[[b]])))
     eids <- apply(el, 1, function(e) get.edgeIDs(nwl[[b]], e[1], e[2], na.omit=FALSE))
-    
 
     vals <- lapply(nwl[[b]]$mel,"[[","atl")[eids]
     names <- lapply(vals, names)
