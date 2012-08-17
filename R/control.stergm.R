@@ -14,15 +14,12 @@ control.stergm<-function(init.form=NULL,
                          MCMC.init.maxchanges=20000,
                          MCMC.packagenames=c("tergm","ergm"),
                          # Number of proposals within each time step.
-                         MCMC.burnin=1000,
+                         MCMC.burnin=10000,
+                         MCMC.interval=100,
 
-                         # The reason MCMC.interval=MCMC.burnin is
-                         # that both represent the number of MH
-                         # proposals between approximately independent
-                         # draws.
                          CMLE.control=NULL,
-                         CMLE.control.form=control.ergm(init=init.form, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, MCMC.interval=MCMC.burnin, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
-                         CMLE.control.diss=control.ergm(init=init.diss, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, MCMC.interval=MCMC.burnin, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.control.form=control.ergm(init=init.form, MCMC.burnin=MCMC.burnin, MCMC.interval=MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.control.diss=control.ergm(init=init.diss, MCMC.burnin=MCMC.burnin, MCMC.interval=MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
 
                          EGMME.main.method=c("Gradient-Descent"),
                          
