@@ -1,10 +1,14 @@
 \name{logLik.stergm}
 \alias{logLik.stergm}
+\alias{logLikNull.stergm}
 \title{
   A \code{\link{logLik}} method for \code{\link[=ergm.object]{stergm}}.
 }
 \description{
-A function to return the log-likelihood associated with a \code{\link[=stergm.object]{stergm}} CMLE fit, evaluating it if necessary.
+Functions to return the log-likelihood associated with a
+\code{\link[=stergm.object]{stergm}} CMLE fit, evaluating it if
+necessary. See \code{\link[ergm]{logLik.ergm}} documentation for details
+and caveats.
 }
 \usage{
 
@@ -14,6 +18,10 @@ A function to return the log-likelihood associated with a \code{\link[=stergm.ob
                       eval.loglik=add || force.reeval, 
                       control=control.logLik.stergm(), 
                       \dots)
+
+\method{logLikNull}{stergm}(object, control=control.logLik.stergm(),
+                    ...)
+
 }
 \arguments{
   \item{object}{
@@ -43,9 +51,11 @@ A function to return the log-likelihood associated with a \code{\link[=stergm.ob
   produces an error unless \code{eval.loglik=TRUE}
 }
 \value{
-  If \code{add=FALSE} (the default), a \code{\link{logLik}} object. If
+  For \code{logLik.stergm}, \code{add=FALSE} (the default), a \code{\link{logLik}} object. If
   \code{add=TRUE} (the default), an \code{\link[=ergm.object]{ergm}}
-  object or a \code{\link[=stergm.object]{stergm}} object with the log-likelihood set.
+  object or a \code{\link[=stergm.object]{stergm}} object with the
+  log-likelihood set. For \code{logLikNull.stergm}, a
+  \code{\link{logLik}} object.
 }
 \references{
   Hunter, D. R. and Handcock, M. S. (2006)
