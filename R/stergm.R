@@ -4,7 +4,7 @@
 
 stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times=NULL, offset.coef.form=NULL, offset.coef.diss=NULL,
                    targets=NULL, target.stats=NULL,
-                   eval.loglik=FALSE,
+                   eval.loglik=TRUE,
                  control=control.stergm(),
                  verbose=FALSE, ...) {
   check.control.class()
