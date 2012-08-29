@@ -18,7 +18,7 @@ print.summary.stergm <- function(x, ...){
   print(f, showEnv=FALSE)
   cat("\n")
 
-  print.summary.ergm(x$formation, ..., print.header=FALSE, print.formula=FALSE, print.degeneracy=FALSE, print.drop=FALSE, print.deviances=FALSE)
+  print.summary.ergm(x$formation, ..., print.header=FALSE, print.formula=FALSE, print.degeneracy=FALSE, print.drop=FALSE, print.deviances=x$formation$estimate!="EGMME")
 
   cat("\n================================\n")
     cat("Summary of dissolution model fit\n")
@@ -30,6 +30,6 @@ print.summary.stergm <- function(x, ...){
   print(f, showEnv=FALSE)
   cat("\n")
 
-  print.summary.ergm(x$dissolution, ..., print.header=FALSE, print.formula=FALSE, print.degeneracy=FALSE, print.drop=FALSE, print.deviances=FALSE)
+  print.summary.ergm(x$dissolution, ..., print.header=FALSE, print.formula=FALSE, print.degeneracy=FALSE, print.drop=FALSE, print.deviances=x$formation$estimate!="EGMME")
 
 }
