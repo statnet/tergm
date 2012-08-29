@@ -105,6 +105,10 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     c(solve(t(x)%*%w%*%x)%*%t(x)%*%w%*%y)
   }
 
+  V.sandwich <- function(w, G, V.stat=robust.inverse(w)){
+    solve(t(G)%*%w%*%G)%*%t(G)%*%w%*%V.stat%*%w%*%G%*%solve(t(G)%*%w%*%G)
+  }
+
   best.states <- function(){
     w <- robust.inverse(cov(oh.all[,-(1:p),drop=FALSE]))
     best.i <- which.min(mahalanobis((oh.all[-1,-(1:p),drop=FALSE]+oh.all[-nrow(oh.all),-(1:p),drop=FALSE])/2,0,w,inverted=TRUE))
@@ -256,38 +260,54 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
           break
         }else do.restart <- FALSE
         control <- out$control
-        
-        ## If the optimization appears to be actively reducing the objective function, keep
-        ## going, without reducing the gain.
-        
+
+        ## Run two tests here:
+        ## 1) Are the estimating equations, on average, 0?
+        ## 2) Does there appear to be a trend in their sum of squares?
+
+        # Calculate the approximate estimating equations:
+        ys <- oh[,-(1:p),drop=FALSE]%*%out$w%*%out$G
+
+        # This test is fast, so no need to thin.
+        p.val.1 <- try(approx.hotelling.diff.test(ys)$p.value)
+
+        # Thin the data to keep from bogging down.
         x <- unique(round(seq(from=1,to=NROW(oh),length.out=control$SA.stepdown.maxn)))
-        ys <- oh[x,-(1:p),drop=FALSE]
-        y <- mahalanobis(ys,0,robust.inverse(cov(ys)),inverted=TRUE)
+        y <- mahalanobis(ys,0,robust.inverse(cov(ys)),inverted=TRUE)[x]
         i <- ind[x]
         t <- tid[x]
+
+        fit.2 <- try(summary(gls(y~x,correlation=corAR1(form=~i|t)))$tTable[2,c(1,4)])
         
-        fit <- try(summary(gls(y~x,correlation=corAR1(form=~i|t)))$tTable[2,c(1,4)])
-        if(!inherits(fit, "try-error")){
-          p.val <- fit[2]/2 # We are interested in one-sided decline here.
-          est <- fit[1]
-          if(est>0) p.val <- 1-p.val # If it's actually getting worse one-sided p-value is thus.
+        if(!inherits(p.val.1, "try-error") && !inherits(p.val.1, "try-error")){
+          p.val.2 <- fit.2[2]/2 # We are interested in one-sided decline here.
+          est.2 <- fit.2[1]
+          if(est.2>0) p.val.2 <- 1-p.val.2 # If it's actually getting worse one-sided p-value is thus.
+          
           if(verbose){
-            cat("Trend in the objective function p-value:",p.val,". ")
+            cat("Estimating equations = 0 p-value:",p.val.1,", trending:", p.val.2, ". ")
           }
-          if(p.val>control$SA.stepdown.p){
+          if(min(p.val.1,p.val.2)>1-(1-control$SA.stepdown.p)^(1/2)){
             stepdown.count <- stepdown.count - 1
             if(stepdown.count<=0){
-              if(verbose) cat("No trend in objective function detected. Reducing gain.\n")
+              if(verbose) cat("Estimating equations do not significantly differ from 0 and do not exhibit a significant trend. Reducing gain.\n")
+              else cat("\\")
               stepdown.count <- control$SA.stepdown.ct.base + round((subphase+1)*control$SA.stepdown.ct.subphase)
               if(!verbose) cat("\n")
               break
-            }else if(verbose) cat("No trend in objective function detected.",stepdown.count,"to go.\n")
+            }else{
+              if(verbose) cat("Estimating equations do not significantly differ from 0 and do not exhibit a significant trend.",stepdown.count,"to go.\n")
+              else cat("\\")
+            }
           }else{
             stepdown.count <- control$SA.stepdown.ct.base + round(subphase*control$SA.stepdown.ct.subphase)
-            if(verbose) cat("Trend in objective function detected. Resetting counter.\n")
+            if(verbose) cat("Estimating equations significantly differ from 0 or exhibit a significant trend. Resetting counter.\n")
+            else cat("/")
           }
         }else{
-          if(verbose) cat("Problem testing trend in objective function detected. Continuing with current gain.\n")
+          if(verbose) cat("Problem testing estimating equations. Continuing with current gain.\n")
+          else cat("!/")
+
         }
         if(do.restart) break
       }
@@ -297,12 +317,18 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         apply(h,2,sd)/sqrt(effectiveSize(h))
       }
 
+      sandwich.se <- sqrt(diag(V.sandwich(out$w,out$G,out$v)))
+
       if(verbose){
-        cat("Approximate precision of the estimate:\n")
+        cat("Approximate standard error of the estimate:\n")
+        print(sandwich.se)        
+        cat("Approximate Monte-Carlo error of the estimate:\n")
         print(mc.se)
+        cat("MC err.^2 / total variation^2:\n")
+        print(mc.se^2/(sandwich.se^2+mc.se^2))
       }
 
-      if(all(mc.se < control$SA.phase2.max.mc.se)){
+      if(all(mc.se^2/(sandwich.se^2+mc.se^2) < control$SA.phase2.max.mc.se)){
         if(verbose) cat("EGMME appears to be estimated to the desired precision level. Stopping.\n")
         break
       }
@@ -355,7 +381,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     if(verbose)cat("Finished.\n")
     V.stat<-cov(sm.mon)
     V.par<-matrix(NA,p,p)
-    V.par[!offsets,!offsets]<-solve(t(G)%*%w%*%G)%*%t(G)%*%w%*%V.stat%*%w%*%G%*%solve(t(G)%*%w%*%G)
+    V.par[!offsets,!offsets]<-V.sandwich(w,G,V.stat)
     sm.mon <- do.call(mcmc.list, lapply(sm.mons, mcmc, start=control$SA.burnin, thin=control$SA.interval))
   }else{
     V.par <- NULL

@@ -48,7 +48,7 @@ control.stergm<-function(init.form=NULL,
                          # Initial gain --- if the process initially goes
                          # crazy beyond recovery, lower this.
                          SA.init.gain=0.01,
-                         SA.gain.decay=0.7, # Gain decay factor.
+                         SA.gain.decay=0.5, # Gain decay factor.
                          
                          SA.runlength=25, # Number of jumps per .C call.
 
@@ -67,7 +67,7 @@ control.stergm<-function(init.form=NULL,
                          SA.phase1.max.q=0.1, # FDR q-value for considering a gradient to be significant.
                          SA.phase1.backoff.rat=1.05, # If a run produces this relative increase in the objective function, it will be backed off.
                          SA.phase2.levels=10, # Number of gain levels to go through.
-                         SA.phase2.max.mc.se=0, # Maximum standard error of the parameter estimates.
+                         SA.phase2.max.mc.se=0.01, # Maximum Monte-Carlo variation error of the parameter estimates as a fraction of total variation.
                          SA.phase2.repeats=400, # Maximum number of times gain a subphase can be repeated if the optimization is "going somewhere".
                          SA.stepdown.maxn=100, # Thin the draws for trend detection to get this many.
                          SA.stepdown.p=0.05, # If the combined p-value for the trend in the parameters is less than this, reset the subphase counter.
