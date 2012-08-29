@@ -78,7 +78,8 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     v <- matrix(NA, q,q)
     v[!bad.fits,!bad.fits] <- if(control$SA.robust) covMcd(h.resid[,!bad.fits,drop=FALSE])$cov else cov(h.resid[,!bad.fits,drop=FALSE])
     v[is.na(v)] <- 0
-
+    v <- v*(nrow(h.resid)-1)/(nrow(h.resid)-p.free-1)
+    
     w <- robust.inverse(v)
     
     ## Adjust the number of time steps between jumps.
