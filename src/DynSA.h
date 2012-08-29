@@ -28,7 +28,7 @@ void MCMCDynSArun_wrapper(// Observed network.
 			     int *attribs, int *maxout, int *maxin, int *minout,
 			     int *minin, int *condAllDegExact, int *attriblength,
 			     // MCMC settings.
-			     int *SA_burnin, int *SA_interval, int *MH_interval,
+			     int *SA_burnin, int *SA_interval, int *max_MH_interval,
 			     // Space for output.
 			     int *maxedges, int *maxchanges,
 			     int *newnetworktail, int *newnetworkhead, 
@@ -55,7 +55,7 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 			      Vertex *difftime, Vertex *difftail, Vertex *diffhead,
 			      double *opt_history,
 			      // MCMC settings.
-			      unsigned int SA_burnin, unsigned int SA_interval, unsigned int MH_interval,
+			      unsigned int SA_burnin, unsigned int SA_interval, unsigned int max_MH_interval,
 			      // Verbosity.
 			      int fVerbose);
 #endif

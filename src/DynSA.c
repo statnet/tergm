@@ -24,7 +24,7 @@ void MCMCDynSArun_wrapper(// Observed network.
 			     int *attribs, int *maxout, int *maxin, int *minout,
 			     int *minin, int *condAllDegExact, int *attriblength,
 			     // MCMC settings.
-			     int *SA_burnin, int *SA_interval, int *MH_interval,
+			     int *SA_burnin, int *SA_interval, int *max_MH_interval,
 			     // Space for output.
 			     int *maxedges, int *maxchanges,
 			     int *newnetworktail, int *newnetworkhead, 
@@ -70,7 +70,7 @@ void MCMCDynSArun_wrapper(// Observed network.
 			 difftime, difftail, diffhead,
 			 opt_history,
 			 
-			 *SA_burnin, *SA_interval, *MH_interval, 
+			 *SA_burnin, *SA_interval, *max_MH_interval, 
 			 *fVerbose);
   
   /* record the final network to pass back to R */
@@ -109,7 +109,7 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 			      Vertex *difftime, Vertex *difftail, Vertex *diffhead,
 			      double *opt_history,
 			      // MCMC settings.
-			      unsigned int SA_burnin, unsigned int SA_interval, unsigned int MH_interval,
+			      unsigned int SA_burnin, unsigned int SA_interval, unsigned int max_MH_interval,
 			      // Verbosity.
 			      int fVerbose){
   Edge nextdiffedge=1;
@@ -140,7 +140,7 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 					  NULL, NULL, dev,
 					  maxchanges, &nextdiffedge,
 					  difftime, difftail, diffhead,
-					  MH_interval,
+					  max_MH_interval,
 					  fVerbose);
 
       if(status==MCMCDyn_TOO_MANY_CHANGES)
