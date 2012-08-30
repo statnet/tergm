@@ -4,13 +4,27 @@ stergm.EGMME.initialfit<-function(init.form, init.diss, nw, model.form, model.di
     init.diss[is.na(init.diss)]<-0
   }else if(!any(is.na(init.form)) && !any(is.na(init.diss))){
     # Don't need to do anything.
-  }else if(all(model.form$formula[c(1,3)]==model.mon$formula[c(1,3)])
-           && all(model.diss$etamap$offsettheta)
+  }else if(all(model.form$coef.names %in% model.mon$coef.names)
+           && (
+                all(model.diss$etamap$offsettheta)
+                || (
+                     model.diss$coef.names == "edges"
+                     && "mean.age" %in% model.mon$coef.names
+                    )
+                )
            && all(model.diss$coef.names %in% model.form$coef.names)
            && is.dyad.independent(model.diss$formula)){
-    if(verbose) cat("Formation statistics are analogous to targeted statistics, dissolution is fixed, dissolution terms appear to have formation analogs, and dissolution process is dyad-independent, so using Carnegie-Krivitsky-Hunter-Goodreau approximation.\n")
+    if(verbose) cat("Formation statistics are analogous to targeted statistics, dissolution is fixed or is edges with a mean.age target, dissolution terms appear to have formation analogs, and dissolution process is dyad-independent, so using Carnegie-Krivitsky-Hunter-Goodreau approximation.\n")
+
+    if(!all(model.diss$etamap$offsettheta)){ # This must mean that the two provisos above are satisfied.
+      mean.age <- model.mon$target.stats[model.mon$coef.names=="mean.age"]
+      init.diss <- log(mean.age+1)
+      names(init.diss) <- "edges"
+    }
+    
     # Fit an ERGM to the formation terms:
-    init.form<-coef(ergm(model.form$formula,control=control.ergm(init=init.form), eval.loglik=FALSE))
+    form.targets <- model.mon$target.stats[match(model.form$coef.names,model.mon$coef.names)]
+    init.form<-coef(ergm(model.form$formula,control=control.ergm(init=init.form), target.stats=form.targets, eval.loglik=FALSE))
     # Now, match up non-offset formation terms with dissolution terms.
     # In case it's not obvious (it's not to me) what the following
     # does, it takes non-offset elements of init.form, then, from
