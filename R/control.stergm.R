@@ -21,6 +21,8 @@ control.stergm<-function(init.form=NULL,
                          CMLE.control.form=control.ergm(init=init.form, MCMC.burnin=MCMC.burnin, MCMC.interval=MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
                          CMLE.control.diss=control.ergm(init=init.diss, MCMC.burnin=MCMC.burnin, MCMC.interval=MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
 
+                         CMLE.NA.impute=c("stop", "previous", "majority", "0", "1"),
+                         
                          EGMME.main.method=c("Gradient-Descent"),
                          
                          SAN.maxit=10,
@@ -67,7 +69,7 @@ control.stergm<-function(init.form=NULL,
                          SA.phase1.max.q=0.1, # FDR q-value for considering a gradient to be significant.
                          SA.phase1.backoff.rat=1.05, # If a run produces this relative increase in the objective function, it will be backed off.
                          SA.phase2.levels=10, # Number of gain levels to go through.
-                         SA.phase2.max.mc.se=0.01, # Maximum Monte-Carlo variation error of the parameter estimates as a fraction of total variation.
+                         SA.phase2.max.mc.se=0.1, # Maximum Monte-Carlo variation error of the parameter estimates as a fraction of total variation.
                          SA.phase2.repeats=400, # Maximum number of times gain a subphase can be repeated if the optimization is "going somewhere".
                          SA.stepdown.maxn=100, # Thin the draws for trend detection to get this many.
                          SA.stepdown.p=0.05, # If the combined p-value for the trend in the parameters is less than this, reset the subphase counter.
@@ -94,7 +96,7 @@ control.stergm<-function(init.form=NULL,
                          parallel.type=NULL,
                          parallel.version.check=TRUE){
   
-  match.arg.pars=c("EGMME.main.method","SA.refine")
+  match.arg.pars=c("EGMME.main.method","SA.refine","CMLE.NA.impute")
 
   if(!is.null(CMLE.control)) CMLE.control.form <- CMLE.control.diss <- CMLE.control
   

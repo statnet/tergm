@@ -235,7 +235,6 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       stepdown.count <- control$SA.stepdown.ct.base + round(control$SA.stepdown.ct.subphase*subphase)
       
       for(regain in 1:control$SA.phase2.repeats){
-        if(verbose==0) cat(".")
         states <- try(do.optimization(states, control), silent=!verbose)
         if(inherits(states, "try-error") || all(apply(oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
           cat("Something went very wrong. Restarting with smaller gain.\n")
@@ -278,19 +277,33 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         t <- tid[x]
 
         fit.2 <- try(summary(gls(y~x,correlation=corAR1(form=~i|t)))$tTable[2,c(1,4)])
+
+        p.val.3 <- try(apply(oh[x,1:p,drop=FALSE][,!offsets,drop=FALSE], 2, function(z)
+                           summary(gls(z~x,correlation=corAR1(form=~i|t)))$tTable[2,4]
+                           ))
         
-        if(!inherits(p.val.1, "try-error") && !inherits(p.val.1, "try-error")){
+        if(!inherits(p.val.1, "try-error") && !inherits(fit.2, "try-error") && !inherits(p.val.3, "try-error")){
           p.val.2 <- fit.2[2]/2 # We are interested in one-sided decline here.
           est.2 <- fit.2[1]
           if(est.2>0) p.val.2 <- 1-p.val.2 # If it's actually getting worse one-sided p-value is thus.
           
           if(verbose){
-            cat("Estimating equations = 0 p-value:",p.val.1,", trending:", p.val.2, ". ")
+            cat("Estimating equations = 0 p-value:",p.val.1,", trending:", p.val.2, ".\n")
+            cat("Parameter trend p-values:\n")
+            print(p.val.3)
           }
-          if(min(p.val.1,p.val.2)>1-(1-control$SA.stepdown.p)^(1/2)){
+
+          p.vals <- c(p.val.1,p.val.2,p.val.3)
+
+          fisher.pval <- function(p.vals){
+            p.vals <- unlist(p.vals)
+            df  <- 2*length(p.vals)
+            pchisq(-2*sum(log(p.vals)), df, lower.tail=FALSE)
+          }
+          if(fisher.pval(p.vals)>control$SA.stepdown.p){
             stepdown.count <- stepdown.count - 1
             if(stepdown.count<=0){
-              if(verbose) cat("Estimating equations do not significantly differ from 0 and do not exhibit a significant trend. Reducing gain.\n")
+              if(verbose) cat("Estimating equations do not significantly differ from 0 and neither they nor the parameters exhibit a significant trend. Reducing gain.\n")
               else cat("\\")
               stepdown.count <- control$SA.stepdown.ct.base + round((subphase+1)*control$SA.stepdown.ct.subphase)
               if(!verbose) cat("\n")
@@ -312,9 +325,9 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         if(do.restart) break
       }
 
-      mc.se <- {
+      par.sd <- {
         h <- oh[,1:p,drop=FALSE][,!offsets,drop=FALSE]
-        apply(h,2,sd)/sqrt(effectiveSize(h))
+        apply(h,2,sd)
       }
 
       sandwich.se <- sqrt(diag(V.sandwich(out$w,out$G,out$v)))
@@ -322,13 +335,13 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       if(verbose){
         cat("Approximate standard error of the estimate:\n")
         print(sandwich.se)        
-        cat("Approximate Monte-Carlo error of the estimate:\n")
-        print(mc.se)
-        cat("MC err.^2 / total variation^2:\n")
-        print(mc.se^2/(sandwich.se^2+mc.se^2))
+        cat("Approximate standard deviation of recent parameters:\n")
+        print(par.sd)
+        cat("par. sd. / std. err.:\n")
+        print(par.sd/sandwich.se)
       }
 
-      if(all(mc.se^2/(sandwich.se^2+mc.se^2) < control$SA.phase2.max.mc.se)){
+      if(all(par.sd/sandwich.se < control$SA.phase2.max.mc.se)){
         if(verbose) cat("EGMME appears to be estimated to the desired precision level. Stopping.\n")
         break
       }
