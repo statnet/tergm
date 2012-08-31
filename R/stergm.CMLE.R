@@ -6,37 +6,99 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
 
   if(is.null(times)){
     if(inherits(nw, "network.list") || is.list(nw)){
-      times  <- c(1,2)
-      warning("Time points not specified for a list. Modeling transition from the first to the second network. This behavior may change in the future.")
+      times  <- seq_along(nw)
+      warning("Time points not specified for a list. Modeling transition from the between successive networks jointly. This behavior may change in the future.")
     }else if(inherits(nw,"networkDynamic")){
       times  <- c(0,1)
       warning("Time points not specified for a networkDynamic. Modeling transition from time 0 to 1.")
     }
   }
   
-  if(length(times)<2) stop("Time points whose transition is to be modeled was not specified.")
-  if(length(times)>2) stop("Only two time points (one transition) are supported at this time.")
+  if(length(times)<2) stop("Time points whose transition is to be modeled was not specified.")  
 
+
+  # Construct a list of "from" networks and a list of "to" networks.
   if(inherits(nw, "network.list") || is.list(nw)){
-    y0 <- nw[[times[1]]]
-    y1 <- nw[[times[2]]]
+    y0s <- lapply(nw[times[-length(times)]],standardize.network)
+    y1s <- lapply(nw[times[-1]],standardize.network)
+
+    if(!all(sapply(c(y0s,y1s),is.network))) stop("nw must be a networkDynamic, a network.list, or a list of networks.")
   }else if(inherits(nw,"networkDynamic")){
     require(networkDynamic) # This is needed for the "%t%.network" function
-    y0 <- nw %t% times[1]
-    y1 <- nw %t% times[2]
+    y0s <- lapply(lapply(times[-length(times)], function(t) nw %t% t),standardize.network)
+    y1s <- lapply(lapply(times[-1], function(t) nw %t% t),standardize.network)
   }
 
-  if(!is.network(y0) || !is.network(y1)) stop("nw must be a networkDynamic, a network.list, or a list of networks.")
-  
+  y0s.NA <- sapply(y0s, network.naedgecount)>0
+  if(any(y0s.NA)){    
+    y0s <- switch(control$CMLE.NA.impute,
+                  stop = stop("Transitioned-from network(s) at time(s) ", paste.and(times[y0s.NA]), " has missing dyads. Fix or choose an imputation option via CMLE.NA.impute control parameter."),
+                  previous = {
+                    if(y0s.NA[1]) stop("Imputation option `previous' cannot impute dyads of the first network in the series.")
+                    for(t in seq_along(y0s)[-1])
+                      if(y0s.NA[t]){
+                        # Workaround for a bug in network (Ticket #80 in Trac)
+                        na.el <-as.edgelist(is.na(y0s[[t]]))
+                        na.eids <- apply(na.el, 1, function(e) get.edgeIDs(y0s[[t]], e[1],e[2], na.omit=FALSE))
+                        y0s[[t]] <- delete.edges(y0s[[t]], na.eids)
+                        y0s[[t]][na.el] <- y0s[[t-1]][na.el]
+                      }
+                    y0s
+                  },
+                  majority = {
+                    lapply(y0s, function(y){
+                      # Workaround for a bug in network (Ticket #80 in Trac)
+                      na.el <-as.edgelist(is.na(y))
+                      na.eids <- apply(na.el, 1, function(e) get.edgeIDs(y, e[1],e[2], na.omit=FALSE))
+                      impute <- if(network.edgecount(y,na.omit=TRUE)/network.dyadcount(y,na.omit=TRUE)>0.5) 1 else 0
+                      y <- delete.edges(y, na.eids)
+                      y[na.el] <- impute
+                      y
+                    })
+                  },
+                  `0` = {
+                    lapply(y0s, function(y){
+                      # Workaround for a bug in network (Ticket #80 in Trac)
+                      na.el <-as.edgelist(is.na(y))
+                      na.eids <- apply(na.el, 1, function(e) get.edgeIDs(y, e[1],e[2], na.omit=FALSE))
+                      y <- delete.edges(y, na.eids)
+                    })
+                  },
+                  `1` = {
+                    lapply(y0s, function(y){
+                      # Workaround for a bug in network (Ticket #80 in Trac)
+                      na.el <-as.edgelist(is.na(y))
+                      na.eids <- apply(na.el, 1, function(e) get.edgeIDs(y, e[1],e[2], na.omit=FALSE))
+                      y <- delete.edges(y, na.eids)
+                      y[na.el] <- 1
+                      y
+                    })
+                  }
+                  
+                  )
+  }
+
+  if(length(times)>2){
+    y0 <- combine.networks(y0s, standardized=TRUE)
+    y1 <- combine.networks(y1s, standardized=TRUE)
+
+    # Check that these networks can be combined for this model.
+    bad.stat <-
+      !((apply(sapply(y0s, function(nw) summary(ergm.update.formula(formation,nw~.))),1,sum)==summary(ergm.update.formula(formation,y0~.))) &
+        (apply(sapply(y0s, function(nw) summary(ergm.update.formula(dissolution,nw~.))),1,sum)==summary(ergm.update.formula(dissolution,y0~.))) &
+        (apply(sapply(y1s, function(nw) summary(ergm.update.formula(formation,nw~.))),1,sum)==summary(ergm.update.formula(formation,y1~.))) &
+        (apply(sapply(y1s, function(nw) summary(ergm.update.formula(dissolution,nw~.))),1,sum)==summary(ergm.update.formula(dissolution,y1~.))))
+    if(any(bad.stat)) stop("Fitting the terms ", paste.and(names(bad.stat)[bad.stat]), " over multiple network transitions is not supported at this time.")
+  }else{
+    # We are about to do logical operations on networks, so make sure
+    # tail-head orderings match up.
+    y0 <- standardize.network(y0)
+    y1 <- standardize.network(y1)
+  }
   
   # Construct the formation and dissolution networks; the
   # network.update cannot be used to copy attributes from y0 to y.form and
   # y.diss, since NA edges will be lost.
-
-  # We are about to do logical operations on networks, so make sure
-  # tail-head orderings match up.
-  y0 <- standardize.network(y0)
-  y1 <- standardize.network(y1)
   
   y.form <- y0 | y1
   y.form <- nvattr.copy.network(y.form, y0)
