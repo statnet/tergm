@@ -92,8 +92,8 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   }else{
     # We are about to do logical operations on networks, so make sure
     # tail-head orderings match up.
-    y0 <- standardize.network(y0)
-    y1 <- standardize.network(y1)
+    y0 <- standardize.network(y0s[[1]])
+    y1 <- standardize.network(y1s[[1]])
   }
   
   # Construct the formation and dissolution networks; the
