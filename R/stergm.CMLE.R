@@ -79,8 +79,8 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   }
 
   if(length(times)>2){
-    y0 <- combine.networks(y0s, standardized=TRUE)
-    y1 <- combine.networks(y1s, standardized=TRUE)
+    y0 <- combine.networks(y0s, standardized=TRUE,blockname=".stergm.CMLE.time.index")
+    y1 <- combine.networks(y1s, standardized=TRUE,blockname=".stergm.CMLE.time.index")
 
     # Check that these networks can be combined for this model.
     bad.stat <-
@@ -111,7 +111,10 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   # Construct new constraints
 
   constraints.form <- if(constraints==~.) ~atleast(y0) else ergm.update.formula(constraints, ~.+atleast(y0))
+  constraints.form <- if(length(times)>2) ergm.update.formula(constraints.form, ~.+blockdiag(".stergm.CMLE.time.index"))
+  
   constraints.diss <- if(constraints==~.) ~atmost(y0) else ergm.update.formula(constraints, ~.+atmost(y0))
+  constraints.diss <- if(length(times)>2) ergm.update.formula(constraints.diss, ~.+blockdiag(".stergm.CMLE.time.index"))
   
   # Apply initial values passed to control.stergm() the separate controls, if necessary.
   if(is.null(control$CMLE.control.form$init)) control$CMLE.control.form$init <- control$init.form
