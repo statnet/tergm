@@ -39,8 +39,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     for(i in seq_along(states)){
 
       # Extend the observation index and thread id vectors.
-      ind.all <- c(ind.all, sum(tid.all==i) + 1:control$SA.runlength)
-      tid.all <- c(tid.all, rep(i, control$SA.runlength))
+      ind.all <- c(ind.all, sum(tid.all==i) + 1:(control$SA.runlength*control$SA.interval))
+      tid.all <- c(tid.all, rep(i, control$SA.runlength*control$SA.interval))
       
       # Extract and store the history of jitters.
       jitters.all <- rbind(jitters.all,zs[[i]]$opt.history[,p+1:p,drop=FALSE])
@@ -57,8 +57,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     assign("jitters.all",jitters.all,envir=parent.frame())
     assign("oh.all",oh.all,envir=parent.frame())
 
-    min.ind.last <- max(ind.all) - control$SA.runlength + 1
-    min.ind.keep <- max(ind.all) - max(max(ind.all)*control$SA.keep.oh,min(control$SA.runlength*control$SA.keep.min*length(states),max(ind.all))) + 1
+    min.ind.last <- max(ind.all) - control$SA.runlength*control$SA.interval + 1
+    min.ind.keep <- max(ind.all) - max(max(ind.all)*control$SA.keep.oh,min(control$SA.runlength*control$SA.interval*control$SA.keep.min*length(states),max(ind.all))) + 1
     
     # Extract and store subhistories of interest.
     
@@ -187,7 +187,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     ## Adjust the number of time steps between jumps using burn-in.
     edge.ages <- unlist(sapply(states, function(state) state$nw%n%"time"-ergm.el.lasttoggle(state$nw)[,3]+1))
-    control$SA.interval<- min(control$SA.max.interval, max(control$SA.min.interval, if(length(edge.ages)>0) control$SA.interval.mul*mean(edge.ages)))
+    control$SA.burnin<-control$SA.interval<- round(min(control$SA.max.interval, max(control$SA.min.interval, if(length(edge.ages)>0) control$SA.interval.mul*mean(edge.ages)))/2)
     if(verbose>1){
       cat("New interval:",control$SA.interval ,"\n")
     }  
@@ -228,11 +228,11 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     cat('========  Phase 2: Find and refine the estimate. ========\n',sep="")
     
-    for(subphase in 1:control$SA.phase2.levels){
+    for(subphase in 1:control$SA.phase2.levels.max){
       if(verbose) cat('======== Subphase ',subphase,' ========\n',sep="") else cat('Subphase 2.',subphase,' ',sep="")
       
       control$gain <- control$SA.init.gain*control$SA.gain.decay^(subphase-1)
-      stepdown.count <- control$SA.stepdown.ct.base + round(control$SA.stepdown.ct.subphase*subphase)
+      stepdown.count <- control$SA.stepdown.ct
       
       for(regain in 1:control$SA.phase2.repeats){
         states <- try(do.optimization(states, control), silent=!verbose)
@@ -250,7 +250,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
           cat("Dissolution:\n")
           for(state in states) print(state$eta.diss)
         }
-        
+
+        ## Get updated gain and other values
         out <- if(control$SA.restart.on.err) try(eval.optpars(FALSE,TRUE,TRUE), silent=!verbose) else eval.optpars(FALSE,TRUE,TRUE)
         if(inherits(out, "try-error") || all(apply(oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
           cat("Something went very wrong. Restarting with smaller gain.\n")
@@ -264,7 +265,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         ## 1) Are the estimating equations, on average, 0?
         ## 2) Does there appear to be a trend in their sum of squares?
 
-        # Calculate the approximate estimating equations:
+        # Calculate the approximate estimating equation values:
         ys <- oh[,-(1:p),drop=FALSE]%*%out$w%*%out$G
 
         # This test is fast, so no need to thin.
@@ -272,28 +273,24 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
         # Thin the data to keep from bogging down.
         x <- unique(round(seq(from=1,to=NROW(oh),length.out=control$SA.stepdown.maxn)))
-        y <- mahalanobis(ys,0,robust.inverse(cov(ys)),inverted=TRUE)[x]
+        y <- sqrt(mahalanobis(ys,0,robust.inverse(cov(ys)),inverted=TRUE)[x])
         i <- ind[x]
         t <- tid[x]
 
+        for(thread in unique(t)) i[t==thread] <- rank(i[t==thread])
+
         fit.2 <- try(summary(gls(y~x,correlation=corAR1(form=~i|t)))$tTable[2,c(1,4)])
 
-        p.val.3 <- try(apply(oh[x,1:p,drop=FALSE][,!offsets,drop=FALSE], 2, function(z)
-                           summary(gls(z~x,correlation=corAR1(form=~i|t)))$tTable[2,4]
-                           ))
-        
-        if(!inherits(p.val.1, "try-error") && !inherits(fit.2, "try-error") && !inherits(p.val.3, "try-error")){
+         if(!inherits(p.val.1, "try-error") && !inherits(fit.2, "try-error")){
           p.val.2 <- fit.2[2]/2 # We are interested in one-sided decline here.
           est.2 <- fit.2[1]
           if(est.2>0) p.val.2 <- 1-p.val.2 # If it's actually getting worse one-sided p-value is thus.
           
           if(verbose){
             cat("Estimating equations = 0 p-value:",p.val.1,", trending:", p.val.2, ".\n")
-            cat("Parameter trend p-values:\n")
-            print(p.val.3)
           }
 
-          p.vals <- c(p.val.1,p.val.2,p.val.3)
+          p.vals <- c(p.val.1,p.val.2)
 
           fisher.pval <- function(p.vals){
             p.vals <- unlist(p.vals)
@@ -305,15 +302,15 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
             if(stepdown.count<=0){
               if(verbose) cat("Estimating equations do not significantly differ from 0 and neither they nor the parameters exhibit a significant trend. Reducing gain.\n")
               else cat("\\")
-              stepdown.count <- control$SA.stepdown.ct.base + round((subphase+1)*control$SA.stepdown.ct.subphase)
+              stepdown.count <- control$SA.stepdown.ct
               if(!verbose) cat("\n")
               break
             }else{
-              if(verbose) cat("Estimating equations do not significantly differ from 0 and do not exhibit a significant trend.",stepdown.count,"to go.\n")
+              if(verbose) cat("Estimating equations do not significantly differ from 0 and do not exhibit a significant trend. ",stepdown.count,"/",control$SA.stepdown.ct," to go.\n")
               else cat("\\")
             }
           }else{
-            stepdown.count <- control$SA.stepdown.ct.base + round(subphase*control$SA.stepdown.ct.subphase)
+            stepdown.count <- control$SA.stepdown.ct
             if(verbose) cat("Estimating equations significantly differ from 0 or exhibit a significant trend. Resetting counter.\n")
             else cat("/")
           }
@@ -325,9 +322,21 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         if(do.restart) break
       }
 
-      par.sd <- {
+      #### Decide whether to stop.
+
+      ## Run through minimal number of phases.
+      if(subphase<control$SA.phase2.levels.min) next
+      
+      ## Run three tests here:
+      ## 1) Is the stochastic approximation estimate of the GMM sufficiently precise?
+      ## 2) Is there strong evidence of nonlinearity?
+      ## 3) Does there appear to be a trend in parameter values?
+
+      # Test 1:
+      
+      par.se <- {
         h <- oh[,1:p,drop=FALSE][,!offsets,drop=FALSE]
-        apply(h,2,sd)
+        apply(h,2,function(x) sd(x)/sqrt(effectiveSize(x)))
       }
 
       sandwich.se <- sqrt(diag(V.sandwich(out$w,out$G,out$v)))
@@ -335,14 +344,35 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       if(verbose){
         cat("Approximate standard error of the estimate:\n")
         print(sandwich.se)        
-        cat("Approximate standard deviation of recent parameters:\n")
-        print(par.sd)
-        cat("par. sd. / std. err.:\n")
-        print(par.sd/sandwich.se)
+        cat("Approximate standard error of window means:\n")
+        print(par.se)
+        cat("par. var. / (std. var. + par. var.):\n")
+        print(par.se^2/(sandwich.se^2+par.se^2))
       }
+      
+      # Test 2:
 
-      if(all(par.sd/sandwich.se < control$SA.phase2.max.mc.se)){
-        if(verbose) cat("EGMME appears to be estimated to the desired precision level. Stopping.\n")
+      ys <- oh[, -(1:p), drop=FALSE]
+      xs <- oh[, 1:p, drop=FALSE][,!offsets,drop=FALSE]
+
+      nlin.totest <- rep(c(FALSE,TRUE),c(p.free+1, p.free*2))
+      
+      nlin.fit <- lm(ys~xs+I(xs^2)+I(xs^3))
+      nlin.nfs <- matrix(apply(cbind(resid(nlin.fit)),2,function(x) sum(tapply(x,list(tid),length))/sum(tapply(x,list(tid),effectiveSize))), nrow=1+p.free*3, ncol=q, byrow=TRUE)
+      nlin.coef <- cbind(coef(nlin.fit))
+      nlin.vcov <- vcov(nlin.fit)
+      
+      drop <- apply(is.na(nlin.coef),1,any)
+      nlin.coef <- nlin.coef[nlin.totest & !drop,,drop=FALSE]
+      nlin.nfs <- nlin.nfs[nlin.totest & !drop,,drop=FALSE]
+      nlin.vcov <- t(nlin.vcov[nlin.totest[!drop],nlin.totest[!drop],drop=FALSE]*sqrt(c(nlin.nfs)))*sqrt(c(nlin.nfs))
+      chi2 <- mahalanobis(c(nlin.coef),0,robust.inverse(nlin.vcov),inverted=TRUE)
+
+      p.val.1 <- pchisq(chi2, length(nlin.coef), lower.tail=FALSE)
+      if(verbose) cat("Local nonlinearity p-value:",p.val.1,"\n")
+      
+      if(all(par.se^2/(sandwich.se^2+par.se^2) < control$SA.phase2.max.mc.se && p.val.1 > control$SA.stop.p )){
+        if(verbose) cat("EGMME appears to be estimated to the desired precision level and there is little evidence of local nonlinearity. Stopping.\n")
         break
       }
       
@@ -373,7 +403,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     print(eta.diss)
   }
 
-
+  ## Sample to estimate
   if(control$SA.se){
     G <- out$G
     w <- out$w
@@ -400,13 +430,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     V.par <- NULL
     sm.mon <- NULL
   }
-  
-  #ve<-with(z,list(coef=eta,sample=s$statsmatrix.form,sample.obs=NULL))
-  
-  #endrun <- control$MCMC.burnin+control$MCMC.interval*(ve$samplesize-1)
-  #attr(ve$sample, "mcpar") <- c(control$MCMC.burnin+1, endrun, control$MCMC.interval)
-  #attr(ve$sample, "class") <- "mcmc"
-  
+    
   list(newnetwork=if(control$SA.se) zs[[1]]$newnetwork else states[[1]]$nw,
        newnetworks=if(control$SA.se) lapply(zs,"[[","newnetwork") else lapply(states,"[[","nw"),
        init.form=theta.form0,
@@ -469,7 +493,7 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
             as.integer(maxedges),
             as.integer(maxchanges),
             newnwtails = integer(maxedges), newnwheads = integer(maxedges), 
-            opt.history=double(((Clist.form$nstats+Clist.diss$nstats)*2+Clist.mon$nstats)*control$SA.runlength),
+            opt.history=double(((Clist.form$nstats+Clist.diss$nstats)*2+Clist.mon$nstats)*control$SA.runlength*control$SA.interval),
             # Verbosity.
             as.integer(max(verbose-1,0)),
             status = integer(1), # 0 = OK, MCMCDyn_TOO_MANY_EDGES = 1, MCMCDyn_MH_FAILED = 2, MCMCDyn_TOO_MANY_CHANGES = 3

@@ -131,6 +131,27 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
       }else last_jitter[j] = 0;
     }
 
+    // Burn in
+    for(unsigned int j=0;j < SA_burnin;j++){
+      MCMCDynStatus status = MCMCDyn1Step(nwp,
+					  F_m, F_MH, eta,
+					  D_m, D_MH, eta+F_m->n_stats,
+					  M_m,
+					  0,
+					  NULL, NULL, dev,
+					  maxchanges, &nextdiffedge,
+					  difftime, difftail, diffhead,
+					  max_MH_interval,
+					  fVerbose);
+
+      if(status==MCMCDyn_TOO_MANY_CHANGES)
+        return MCMCDyn_TOO_MANY_CHANGES;
+      
+      if(nwp->nedges >= maxedges-1)
+	return MCMCDyn_TOO_MANY_EDGES;
+    }
+
+    // Sampling run
     for(unsigned int j=0;j < SA_interval;j++){
       MCMCDynStatus status = MCMCDyn1Step(nwp,
 					  F_m, F_MH, eta,
@@ -148,10 +169,10 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
       
       if(nwp->nedges >= maxedges-1)
 	return MCMCDyn_TOO_MANY_EDGES;
-
+    
       for(unsigned int k=0;k<M_m->n_stats; k++){
-	meandev[k]+=dev[k]*j;
-	n+=j;
+	meandev[k]+=dev[k]*1;
+	n+=1;
       }
       if (fVerbose>2){
 	for(unsigned int k=0; k<p; k++){
@@ -163,6 +184,18 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 
 	Rprintf("\n");
       }
+
+      // Record configurations and estimating equation values.
+      for(unsigned int j=0; j<p; j++){
+	opt_history[hist_pos*rowsize+j] = eta[j];
+      }
+      for(unsigned int j=0; j<p; j++){
+	opt_history[hist_pos*rowsize+p+j] = last_jitter[j];
+      }
+      for(unsigned int j=0; j<M_m->n_stats; j++){
+	opt_history[hist_pos*rowsize+p+p+j] = dev[j];
+      }
+      hist_pos++;
     }
     
     if(fVerbose>1){
@@ -181,20 +214,6 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
       meandev[j]/=n;
     }
     
-    // Record configurations and estimating equation values.
- 
-    
-    for(unsigned int j=0; j<p; j++){
-      opt_history[hist_pos*rowsize+j] = eta[j];
-    }
-    for(unsigned int j=0; j<p; j++){
-      opt_history[hist_pos*rowsize+p+j] = last_jitter[j];
-    }
-    for(unsigned int j=0; j<M_m->n_stats; j++){
-      opt_history[hist_pos*rowsize+p+p+j] = meandev[j];
-    }
-    hist_pos++;
-
     // If the statistics are getting worse by too much, stop updating eta and collect data for the rest of the run.
     for(unsigned int j=0; j<M_m->n_stats; j++){
       if(fabs(meandev[j]) > dev_guard[j]){
@@ -225,7 +244,7 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
       }
     }
 
-        // If a parameter has moved suspiciously far, keep it from moving any farther.
+    // If a parameter has moved suspiciously far, keep it from moving any farther.
     for(unsigned int j=0; j<p; j++){
       double change = eta[j] - init_eta[j];
       if(fabs(change) > par_guard[j]){

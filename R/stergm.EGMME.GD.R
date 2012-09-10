@@ -17,25 +17,19 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     x<-h[,1:p,drop=FALSE][,!offsets,drop=FALSE] # #$%^$ gls() doesn't respect I()...
     ys <- h[,-(1:p),drop=FALSE]
     
-    x2 <- sweep(x,2,apply(x,2,median),"-")^2
-    x3 <- sweep(x,2,apply(x,2,median),"-")^3
-
-
     h.fits <-
       if(!is.null(cl)){
         clusterApplyLB(cl, 1:q,
                        function(i){
                          y<-ys[,i]
-                         if(control$SA.robust) suppressWarnings(try(lmrob(y~x), silent=TRUE))
-                         else suppressWarnings(try(lm(y~x), silent=TRUE))
+                         suppressWarnings(try(lm(y~x), silent=TRUE))
                        })
       }else{
-        sapply(1:q,
+        lapply(1:q,
                function(i){
                  y<-ys[,i]
-                 if(control$SA.robust) suppressWarnings(try(lmrob(y~x), silent=TRUE))
-                 else suppressWarnings(try(lm(y~x), silent=TRUE))
-               },simplify=FALSE)
+                 suppressWarnings(try(lm(y~x), silent=TRUE))
+               })
       }
     
     bad.fits <- sapply(h.fits, inherits, "try-error")
@@ -58,7 +52,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
     h.tvals[,!bad.fits] <- sapply(h.fits[!bad.fits],function(fit) summary(fit)$coefficients[seq_len(p.free+1),3])
 
-    h.nfs[,!bad.fits] <- apply(h.resid[,!bad.fits,drop=FALSE],2,function(x) sum(tapply(x,list(tid),length)/tapply(x,list(tid),effectiveSize)))
+    h.nfs[,!bad.fits] <- matrix(apply(h.resid[,!bad.fits,drop=FALSE],2,function(x) sum(tapply(x,list(tid),length))/sum(tapply(x,list(tid),effectiveSize))), nrow=p.free+1, ncol=sum(!bad.fits), byrow=TRUE)
 
     h.tvals[,!bad.fits] <- h.tvals[,!bad.fits,drop=FALSE]/sqrt(h.nfs[,!bad.fits,drop=FALSE])
 
@@ -74,6 +68,12 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     G.signif[is.na(G.signif)] <- FALSE
 
+    ## Test for nonlinearity
+    sapply(seq_along(h.fits)[!bad.fits],function(i){
+      h.fit <- h.fits[[i]]
+      NROW(ys)/h.nfs[i,]
+    })
+    
     ## Compute the variances (robustly) and the statistic weights.
     v <- matrix(NA, q,q)
     v[!bad.fits,!bad.fits] <- if(control$SA.robust) covMcd(h.resid[,!bad.fits,drop=FALSE])$cov else cov(h.resid[,!bad.fits,drop=FALSE])
@@ -84,7 +84,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     ## Adjust the number of time steps between jumps.
     edge.ages <- unlist(sapply(states, function(state) state$nw%n%"time"-ergm.el.lasttoggle(state$nw)[,3]+1))
-    control$SA.interval<- min(control$SA.max.interval, max(control$SA.min.interval, if(length(edge.ages)>0) control$SA.interval.mul*mean(edge.ages)))
+    control$SA.burnin<-control$SA.interval<- round(min(control$SA.max.interval, max(control$SA.min.interval, if(length(edge.ages)>0) control$SA.interval.mul*mean(edge.ages)))/2)
     if(verbose>1){
       cat("New interval:",control$SA.interval ,"\n")
     }
@@ -200,7 +200,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       print(control$dev.guard)
     }
 
-    control$par.guard <- apply(abs(diff(oh[,1:p,drop=FALSE],lag=control$SA.runlength-1)),2,median) * control$SA.guard.mul
+    control$par.guard <- apply(abs(diff(oh[,1:p,drop=FALSE],lag=control$SA.runlength*control$SA.interval-1)),2,median) * control$SA.guard.mul
     if(verbose>1){
       cat("New parameter guard values:\n")
       print(control$par.guard)
