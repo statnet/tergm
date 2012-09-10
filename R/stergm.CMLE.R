@@ -18,16 +18,19 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
 
 
   # Construct a list of "from" networks and a list of "to" networks.
-  if(inherits(nw, "network.list") || is.list(nw)){
-    y0s <- lapply(nw[times[-length(times)]],standardize.network)
-    y1s <- lapply(nw[times[-1]],standardize.network)
-
-    if(!all(sapply(c(y0s,y1s),is.network))) stop("nw must be a networkDynamic, a network.list, or a list of networks.")
-  }else if(inherits(nw,"networkDynamic")){
+   if(inherits(nw,"networkDynamic")){
     require(networkDynamic) # This is needed for the "%t%.network" function
-    y0s <- lapply(lapply(times[-length(times)], function(t) nw %t% t),standardize.network)
-    y1s <- lapply(lapply(times[-1], function(t) nw %t% t),standardize.network)
+    y0s <- lapply(times[-length(times)], function(t) nw %t% t)
+    y1s <- lapply(times[-1], function(t) nw %t% t)
+  }else if(inherits(nw, "network.list") || is.list(nw)){
+    y0s <- nw[times[-length(times)]]
+    y1s <- nw[times[-1]]
+    
+    if(!all(sapply(c(y0s,y1s),is.network))) stop("nw must be a networkDynamic, a network.list, or a list of networks.")
   }
+
+  y0s <- lapply(y0s,standardize.network)
+  y1s <- lapply(y1s,standardize.network)
 
   y0s.NA <- sapply(y0s, network.naedgecount)>0
   if(any(y0s.NA)){    
