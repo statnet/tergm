@@ -1,0 +1,636 @@
+\documentclass[11pt]{article}
+
+\SweaveOpts{echo=true}
+\SweaveOpts{keep.source=TRUE}
+
+\usepackage{color}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{url}
+
+\newcommand{\notes}[1]{\textcolor{red}{#1}}
+\newcommand{\adjmat}{\mathbf{Y}}
+\newcommand{\obsadj}{\mathbf{y}}
+\newcommand{\grphSpace}{\mathcal{Y}}
+\newcommand{\dyadSpace}{\mathbb{Y}}
+\newcommand{\form}{^+}
+\newcommand{\diss}{^-}
+\newcommand{\paramVec}{\theta}
+\newcommand{\covmat}{\mathbf{X}}
+
+<<echo=false>>=
+options(width=60)
+@
+
+<<echo=false>>=
+options(continue=" ")
+@
+
+
+\begin{document}
+
+\title{NIMD 2012 - STERGM labs}
+\maketitle
+
+\tableofcontents
+
+
+\section{Notes on model specification and syntax}
+Within \emph{statnet}, an ERGM involves one network and one set of network statistics, so these are specified together using R's formula notation:
+
+\begin{center}
+\texttt{my.network $\sim$ my.vector.of.g.statistics}
+\end{center}
+
+For a call to \texttt{stergm}, there is still one network, but two formulas. These are now passed as three separate arguments: the network (argument \texttt{nw}), the formation formula (argument \texttt{formation}), 
+and the dissolution formula (argument \texttt{dissolution}).  The latter two both take the form of a one-sided formula.  E.g.:
+
+\begin{verbatim}
+        stergm(my.network,
+            formation= ~edges+kstar(2),
+            dissolution= ~edges+triangle
+        )
+\end{verbatim}
+
+There are other features of a call to either \texttt{ergm} or \texttt{stergm} that will be important for us here. 
+We list the features here; each is illustrated in one or more examples below.
+
+\begin{enumerate}
+
+\item{To fix the coefficient for a particular network statistic, one uses offset notation.  
+For instance, to fix a dissolution model with only an edges term with parameter value 4.2, the dissolution formula woud be:
+
+\begin{center}
+\texttt{dissolution= $\sim$offset(edges)}
+\end{center}
+
+and the corresponding argument for passing the parameter value would be:
+
+\begin{center}
+\texttt{offset.coef.diss = 4.2}
+\end{center}
+
+}
+
+\item{In parallel with \texttt{ergm}, any information used to specify the nature of the fitting algorithm is passed by specifying a vector called \texttt{control.stergm} 
+to the \texttt{control} argument. For example:
+	
+\begin{center}
+\texttt{control=control.stergm(MCMC.burnin=10000)}
+\end{center}
+
+For a list of options, type \texttt{?control.stergm}
+}
+  
+\item{Another argument that the user must supply is \texttt{estimate}, which controls the estimation method. 
+Unlike with cross-sectional ERGMs, there is not necessarily an obvious default here, as different scenarios are best fit with different approaches.
+The most important for the new user to recognize are \texttt{EGMME} (equilibrium generalized method of moments estimation) and \texttt{CMLE} (conditional maximum likelihood estimation). 
+A good rule of thumb is that when fitting to two networks, one should use \texttt{estimate="CMLE"} while when fitting to a single cross-section with some duration information, 
+use \texttt{estimate="EGMME"}.
+}
+
+\item{For cross-sectional ERGMs, the model is by default fit using the sufficient statistics present in the cross-sectional network.  
+For STERGMs, the presence of multiple models makes the default less clear.  Thus, the user is required to supply this information via the \texttt{targets} argument.  
+This can take a one-sided formula listing the terms to be fit; or, if the formula is identical to either the formation or dissolution model, 
+the user can simply pass the string \texttt{"formation"} or \texttt{"dissolution"}, respectively. If one is specifying
+targets=``formation'', dissolution should be an offset, and vice versa.
+If the values to be targeted for those terms are anything other than the sufficient statistics present in the cross-sectional network, 
+then those values can be passed with the argument \texttt{target.stats}.
+
+}
+
+\end{enumerate}
+
+
+\section{Example 1: Estimation with two network cross-sections}
+
+We begin with an example whose structure and syntax bears the most resemblance to the ERGMs that we are used to. 
+This is the case where we have two observations of network structure at two or more points in time on the same node set.  
+Many classic network studies were of this type, and data of this form continue to be collected and analyzed in many fields.
+
+Let us consider the first two time points in the famous Sampson monastery data:
+
+<<>>=
+data(samplk)
+ls(pattern="samp*")
+@
+
+To pass them into \texttt{stergm}, we need to combine them into a list:
+<<>>=
+samp <- list()
+samp[[1]] <- samplk1
+
+samp[[2]] <- samplk2
+
+@
+
+
+
+Now we must decide on a model to fit to them.  Plotting one network:
+
+
+
+\begin{center}
+
+<<fig=TRUE>>=
+
+plot(samplk1)
+
+@
+
+\end{center}
+
+
+
+\noindent we might get the idea to consider mutuality as a predictor of a directed edge.  Also, since this is a directed network, 
+
+and there appear to be a considerable number of triadic relations, it might be worth investigating the role of cyclic vs. transitive triads in the network.
+
+Of course, since we have two network snapshots, and we have separate formation and dissolution models, 
+
+we can estimate the degree to which closing a mutual dyad or closing a triad of each type predicts the creation of a tie, 
+
+and also estimate the degree to which maintaining a mutual dyad or maintaining a triad of each type predicts the persistence of an existing tie. 
+
+We might see different phenomena at work in each case; or the same phenomena, but with different coefficients.
+
+
+<<results=hide>>=
+
+stergm.fit.3 <- stergm(samp,
+
+	formation= ~edges+mutual+ctriad+ttriad,
+
+	dissolution = ~edges+mutual+ctriad+ttriad,
+
+	estimate = "CMLE"
+
+	)
+
+@
+
+
+
+\texttt{Fitting formation:}\\
+
+\texttt{Iteration 1 of at most 20:}\\
+
+$\Rightarrow$ Lots of output snipped. $\Leftarrow$\\
+
+\texttt{Time points not specified for a list. Modeling transition from the first to the second network. This behavior may change in the future.}\\
+
+
+
+And the results:
+
+
+
+<<>>=
+
+#summary(stergm.fit.3)
+
+@
+
+
+
+So, a relationship is more likely than chance to form if it will close a mutual pair. 
+
+And it is also more likely than chance to persist if it will retain a mutual pair, although the coefficient is smaller.
+
+A relationship is more likely than chance to form if it will close a transitive triad, and more likely to persist if it 
+
+sustains a transitive triad, although these effects appear to be less clearly significant. 
+
+
+
+\section{Example 2: STERGM estimation and simulation}
+
+Let us imagine that we have observed two things: a cross-sectional network, and a mean relational duration. 
+Let us say the cross-sectional network is a data set called flobusiness, and the mean relational duration we have witnessed is 10 time steps. 
+Furthermore, we are willing to (for reasons of theory or convenience) assume a purely homogeneous dissolution process 
+(that is, every existing relationship has the same probability of dissolving as all others, and at all times).  
+For a cross-sectional ERGM, a purely homogeneous model is one with just a single term in it for an edge count. 
+The same is true for either of the two formulas in a STERGM.  
+
+First, take a lok at the data:
+<<>>=
+data(florentine)
+ls()
+flobusiness
+@
+
+
+The steps we will go through are:
+
+\begin{enumerate}
+
+\item Specify formation and dissolution models (\texttt{formation} and \texttt{dissolution}).
+
+We will begin by assuming a formation model identical to the model we fit in the cross-sectional case:
+\begin{center}
+\texttt{formation = $\sim$edges+gwesp(0,fixed=T)}
+\end{center}
+
+Analogously to cross-sectional ERGMs, our assumption of completely homogeneous dissolution corresponds to a model with only an edgecount term in it.  In STERGM notation this is:
+
+\begin{center}
+\texttt{dissolution = $\sim$edges}
+\end{center}
+
+\item Calculate \texttt{theta.diss}.
+
+Because this is a discrete memoryless process, durations are geometric; symbolizing mean relational duration as $d$, we have $d = \frac{1}{q}$, and thus:
+\begin{equation}
+\theta = \ln{(d-1)}
+\end{equation}
+So, for our dissolution model, theta.diss = $\ln{(10-1)}$ = $\ln{9}$ = $2.197$:
+
+<<>>=
+theta.diss <- log(9)
+@
+
+In short, because our dissolution model is dyadic independent, we can calculate it using a (rather simple) closed form solution.
+
+\item Estimate the formation model, conditional on the dissolution model.
+We put it all together for our first call to \texttt{stergm}, adding in one additional control argument that helps immensely with monitoring model convergence (and is just plain cool): 
+plotting the progress of the coefficient estimates and the simulated sufficient statistics in real time.
+
+<<results=hide>>=
+
+stergm.fit.1 <- stergm(flobusiness,
+	formation= ~edges+gwesp(0,fixed=T),
+	dissolution = ~offset(edges),
+	targets="formation",
+	offset.coef.diss = theta.diss,
+	estimate = "EGMME",
+	control=control.stergm(SA.plot.progress=TRUE,
+		SA.phase2.levels.max=1)
+)
+@
+\texttt{Iteration 1 of at most 20:}\\
+$\Rightarrow$ Lots of output snipped. $\Leftarrow$ \\
+\texttt{== Phase 3: Simulate from the fit and estimate standard errors.==}
+
+First, we should double-check to make sure the fitting went well:
+<<fit1diag, include=FALSE, fig=TRUE, results=hide>>=
+mcmc.diagnostics(stergm.fit.1)
+@
+
+\begin{verbatim}
+==========================
+EGMME diagnostics
+==========================
+\end{verbatim}
+
+$\Rightarrow$ Lots of output snipped. $\Leftarrow$\\
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[height=3in]{STERGM-fit1diag}
+\end{center}
+\end{figure}
+
+Since those look good, we can next query the object in a variety of ways to see what we have:
+<<>>=
+stergm.fit.1
+names(stergm.fit.1)
+stergm.fit.1$formation
+stergm.fit.1$formation.fit
+summary(stergm.fit.1) # CHECK WITH PAVEL
+@
+\end{enumerate}
+
+We have now obtained estimates for the coefficients of a formation model that, 
+conditional on the stated dissolution model, yields simulated targets that matched those observed.
+Something very useful we have also gained in the process is the ability to simulate networks with the 
+desired cross-sectional structure and mean relational duration.  This ability serves us well for any application 
+areas that requires us to simulate phenomena on dynamic networks, whether they entail the diffusion of information or disease, or some other process.  
+
+<<>>=
+stergm.sim.1 <- simulate.stergm(stergm.fit.1, nsim=1, 
+    time.slices = 1000)
+@
+
+\section{networkDynamic}
+
+In \emph{statnet}, cross-sectional networks are stored using objects of class \emph{network}.  
+Tools to create, edit, and query network objects are in the package \emph{network}. Dynamic networks 
+are now stored as objects with two classes (\emph{network} and \emph{networkDynamic}).
+They can thus be edited or queried using standard functions from the \emph{network} package, or using additional 
+functions tailored specifically to the case of dynamic networks in the package \emph{networkDynamic}.
+
+To illustrate, let us begin with the network that we just created:
+
+<<results=hide>>=
+stergm.sim.1
+@
+
+\texttt{networkDynamic with 985 distinct change times:}\\
+$\Rightarrow$ Lots of output snipped. $\Leftarrow$
+\begin{verbatim}
+ Network attributes:
+  vertices = 16 
+  directed = FALSE 
+  hyper = FALSE 
+  loops = FALSE 
+  multiple = FALSE 
+  bipartite = FALSE 
+  total edges= 120 
+    missing edges= 0 
+    non-missing edges= 120 
+
+ Vertex attribute names: 
+    priorates totalties vertex.names wealth 
+\end{verbatim}
+
+We can deduce from the number of edges that this likely represents the cumulative network---that is, the union of all edges that exist at any point in time over the course of the simulation.  
+What does the network look like at different time points? The function \texttt{network.extract} allows us to pull out the network at an instantanoues time point (with the argument \texttt{at}),
+or over any given spell (with the arguments \texttt{onset} and \texttt{terminus}).
+
+<<>>=
+net <- network.extract(stergm.sim.1,at=429)
+net
+@
+
+For any one of these time points, we can look at the network structure:
+
+<<simex, include=FALSE, fig=TRUE>>=
+plot(network.extract(stergm.sim.1,at=882))
+@
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[height=3in]{STERGM-simex}
+\end{center}
+\end{figure}
+
+
+How well do the cross-sectional networks within our simulated dynamic network fit the probability distribution implied by our model?  
+We can check by considering the summary statistics for our observed network, and those for our cross-sectional networks.
+
+<<>>=
+summary(flobusiness~edges+gwesp(0,fixed=T))
+colMeans(attributes(stergm.sim.1)$stats)
+@
+
+And we can also easily look at a time series and histogram for each statistic:
+
+<<statsform1, include=FALSE, fig=TRUE>>=
+plot(attributes(stergm.sim.1)$stats)
+@
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[height=3in]{STERGM-statsform1}
+\end{center}
+\end{figure}
+
+We should also check to make sure that our mean duration is what we expect (10 time steps). This requires knowing an additional function: \texttt{as.data.frame}, 
+which, when applied to an object of class \texttt{networkDynamic}, generates a timed edgelist. 
+Although right-censoring is present for some edges in our simulation, with a mean duration of 10 time steps and a simulation 1000 time steps long, 
+its effect on our observed mean duration should be trivial.
+
+<<>>=
+stergm.sim.1.dm <- as.data.frame(stergm.sim.1)
+names(stergm.sim.1.dm)
+mean(stergm.sim.1.dm$duration)
+@
+
+The information on when an edge is active and when it is inactive is stored within our \texttt{network} object as the edge attribute \texttt{active}.  
+Vertices, too, are capable of becoming active and inactive within \texttt{networkDynamic}, and this information is stored as a vertex attribute.
+Most of the time, users should access this information indirectly, through functions like \texttt{network.extract} or \texttt{as.data.frame}.  
+Additional functions to query or set activity include \texttt{is.active}, \texttt{activate.vertex}, \texttt{deactivate.vertex}, \texttt{activate.edge},
+and \texttt{deactivate.edge}, all documented in \texttt{help(package="networkDynamic")}.
+
+For those who want to look under the hood, they can see the activity spells directly.  For a single edge, say, edge number 25, use:
+
+<<>>=
+get.edge.value(stergm.sim.1, "active", unlist=FALSE)[[25]]
+@
+
+Note that \texttt{networkDynamic} stores spells in the form [onset,terminus), meaning that the spell is inclusive of the onset and exclusive of the terminus.  
+So a spell of 3,7 means the edge begins at time point 3 and ends just before time point 7.  networkDynamic can handle continuous-time spell information.  
+However, since STERGMs are discrete-time with integer steps, what this means for STERGM is that the edge is inactive up through time step 2;
+ active at time steps 3, 4, 5, and 6; and inactive again at time step 7 and on. Its duration is thus 4 time steps.
+
+\section{Example 3: Long durations and the Carnegie approximation}
+
+Let us reconsider Example 2, with a mean relational duration of 100 time steps.
+
+<<>>=
+theta.diss.100 <- log(99)
+@
+
+First, we treat the formation process as if it were a stand-alone cross-sectional model, and estimate it using a standard cross-sectional ERGM. 
+We did, in fact, fit this cross-sectional model earlier:
+
+<<>>=
+fit1 <- ergm(flobusiness~edges+gwesp(0,fixed=T))
+summary(fit1)
+theta.form <- fit1$coef 
+theta.form
+@
+
+Then, we subtract the values of the dissolution $\theta$ from each of the corresponding values in the formation model. 
+In this example, the dissolution model contains only an edges term, so this coefficient should be subtracted from the starting value for the edges term in the formation model. 
+
+<<>>=
+theta.form[1] <- theta.form[1] - theta.diss.100
+@
+
+How well does this approximation do in capturing our desired dynamic network properties? First, we can simulate from it:
+
+<<>>=
+stergm.sim.2 <- simulate(flobusiness,
+	formation=~edges+gwesp(0,fixed=T),
+	dissolution=~edges,
+	monitor="all",
+	coef.form=theta.form,
+	coef.diss=theta.diss.100,
+	time.slices=10000)
+@
+
+Then check the results in terms of cross-sectional network structure and mean relational duration?
+
+<<simform, include=FALSE, fig=TRUE>>=
+summary(flobusiness~edges+gwesp(0,fixed=T))
+colMeans(attributes(stergm.sim.2)$stats)
+stergm.sim.dm.2 <- as.data.frame(stergm.sim.2)
+mean(stergm.sim.dm.2$duration)
+plot(attributes(stergm.sim.2)$stats)
+@
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[height=3in]{STERGM-simform}
+\end{center}
+\end{figure}
+
+
+
+
+\section{Example 4: Estimation and simulation driven by egocentric data}
+
+For example, imagine that you want to model HIV transmission among a population of gay men in steady partnerships. 50\% of the men are White and 50\% are Black. 
+You collect egocentric partnership data from a random (ha! ha!) sample of these men. Your data say:
+
+\begin{enumerate}
+\item{There are no significant differences in the distribution of momentary degree (the number of ongoing partnerships at one point in time) 
+reported by White vs. Black men. The mean is 0.90, and the overall distribution is:}
+\begin{enumerate}
+\item{36\% degree 0}
+\item{46\% degree 1}
+\item{18\% degree 2+}
+\end{enumerate}
+\item{83.3\% of relationships are racially homogeneous}
+\end{enumerate}
+
+We also have data (from these same men, or elsewhere) that tell us that the mean duration for a racially homogenous relationship is 10 months, 
+while for a racially mixed one it is 20 months.  
+(Perhaps this is because the social pressure against cross-race ties makes it such that those who are willing to enter them are a select group, 
+more committed to their relationships).
+
+Before we model the disease transmission, we need a dynamic network that possesses each of thse features to simulate it on. 
+
+Our first step is to create a 500-node undirected network, and assign the first 250 nodes to race 0 and the second to race 1. The choice of 500 nodes is arbitary.
+
+<<>>=
+msm.net <- network.initialize(500, directed=F)	
+msm.net %v% 'race' <- c(rep(0,250),rep(1,250))
+msm.net
+@
+
+ERGM and STERGM have functionality that allow us to simply state what the target statistics are that we want to match; we do not actually need to generate 
+a network that has them.  The formation formula and target statistics that we need are:
+
+<<>>=
+msm.form.formula <- ~edges+nodematch('race')+degree(0)+
+    concurrent
+msm.target.stats <- c(225,187,180,90)
+@
+
+Why don't we specify \texttt{degree(1)} as well?
+How did we get those values?
+
+Now let us turn to dissolution. We are back to the case where we can solve these explicitly, 
+although this is complicated slightly by the fact that our disslution probabilities differ by the race composition of the members.  
+One dissolution formula for representing this is:
+
+<<>>=
+msm.diss.formula <- ~offset(edges)+offset(nodematch("race"))
+@
+
+These two model statistics means that there will be two model coefficients.  Let us call them $\theta_1$ and $\theta_2$ for the edges and nodematch terms, respectively. 
+Let us also refer to the change statistics for actor pair $i,j$ for each of these as $\delta_1(y_{ij})$ and $\delta_2(y_{ij})$, respectively.
+
+Thus the log-odds expression for dissolution that we saw earlier would here be expressed as:
+\begin{equation}\label{disslogit}
+\ln{\frac{P(Y_{ij,t+1}=1 \mid Y_{ij,t}=1)}{P(Y_{ij,t+1}=0\mid Y_{ij,t}=1)}} = \theta_1\delta_1(y_{ij})+\theta_2\delta_2(y_{ij})
+\end{equation}
+Note that $\delta_1(y_{ij})$ would equal 1 for all actor pairs, while $\delta_2(y_{ij})$ would equal 1 for race homophilous pairs and 0 for others.  
+That means that the log-odds of tie persistence will equal $\theta_1$ for mixed-race couples and $\theta_1 + \theta_2$ for race-homophilous couples.  
+This suggests that we should be able to calculate $\theta_1$ directly, and subsequently calculate $\theta_2$.
+
+Following the logic we saw in the Example 1, we can see that:
+\begin{equation}
+\theta_1 = \ln{d_{mixed}-1}
+\end{equation}
+and therefore $\theta_1 = \ln{(20-1)} = \ln{19} = 2.944$.
+
+Furthermore, 
+\begin{equation}
+\theta_1 + \theta_2 = \ln{d_{homoph}-1}
+\end{equation}
+and therefore $\theta_2 = \ln{(d_{homoph}-1)}-\theta_1 = \ln{(10-1)} - 2.944 = -0.747$.
+
+So, we have:
+
+<<>>=
+msm.theta.diss <- c(2.944, -0.747) 
+@
+
+We add in one additional control parameter---\texttt{SA.init.gain}---giving it a small value (the default is 0.1).  
+As the help page for \texttt{control.stergm} sagely advises, ``If the process initially goes crazy beyond recovery, lower this value.''
+This slows down estimation, but also makes it more stable. 
+From trial and error, we know that this model, fit to this relatively large network, does better with this smaller value.
+
+Putting it all together gives us:
+
+<<results=hide>>=
+set.seed(0)
+msm.fit <- stergm(msm.net,
+	formation= msm.form.formula,
+	dissolution= msm.diss.formula,
+	targets="formation",
+	target.stats= msm.target.stats,
+	offset.coef.diss = msm.theta.diss,
+	estimate = "EGMME",
+	control=control.stergm(SA.plot.progress=TRUE,
+		SA.phase2.levels.max=1)
+)
+@
+
+\texttt{Iteration 1 of at most 20:}\\
+$\Rightarrow$ Lots of output snipped. $\Leftarrow$ \\
+\texttt{========  Phase 3: Simulate from the fit and estimate standard errors. ========}\\
+
+Let's first check to make sure it fit well:
+
+<<msmdiag, include=FALSE, fig=TRUE, results=hide>>=
+mcmc.diagnostics(msm.fit)
+@
+$\Rightarrow$ Lots of output snipped. $\Leftarrow$\\
+\begin{figure}[h]
+\begin{center}
+\includegraphics[height=3in]{STERGM-msmdiag}
+\end{center}
+\end{figure}
+
+and see what the results tell us:
+
+<<>>=
+summary(msm.fit)
+@
+
+Now, we simulate a dynamic network:
+
+<<>>=
+msm.sim <- simulate(msm.fit,time.slices=1000)
+@
+
+and compare the outputs to what we expect, in terms of cross-sectional structure:
+
+<<>>=
+colMeans(attributes(msm.sim)$stats)
+msm.target.stats
+@
+
+Here's another interesting way to look at one aspect of the network structure:
+
+<<msmht, include=FALSE, fig=TRUE>>=
+msm.sim.dm <- as.data.frame(msm.sim)
+plot(msm.sim.dm$head,msm.sim.dm$tail)
+@
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[height=3in]{STERGM-msmht}
+\end{center}
+\end{figure}
+ 
+And relationship length:
+
+<<>>=
+names(msm.sim.dm)
+msm.sim.dm$race1 <- msm.sim.dm$head>250
+msm.sim.dm$race2 <- msm.sim.dm$tail>250
+msm.sim.dm$homoph <- msm.sim.dm$race1 == msm.sim.dm$race2
+mean(msm.sim.dm$duration[msm.sim.dm$homoph==T & 
+  msm.sim.dm$left.censored==F & msm.sim.dm$right.censored==F ])
+mean(msm.sim.dm$duration[msm.sim.dm$homoph==F & 
+  msm.sim.dm$left.censored==F & msm.sim.dm$right.censored==F ])
+@
+
+
+\end{document}
