@@ -21,6 +21,7 @@
 
 <<echo=false>>=
 options(width=60)
+library(tergm)
 @
 
 <<echo=false>>=
