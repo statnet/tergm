@@ -112,7 +112,8 @@ Let us consider the first two time points in the famous Sampson monastery data:
 > ls(pattern="samp*")
 \end{Sinput}
 \begin{Soutput}
-[1] "samp"    "samplk1" "samplk2" "samplk3"
+[1] "samp"            "samp.stergm.fit" "samplk1"        
+[4] "samplk2"         "samplk3"        
 \end{Soutput}
 \end{Schunk}
 
@@ -126,62 +127,40 @@ To pass them into \texttt{stergm}, we need to combine them into a list:
 \end{Sinput}
 \end{Schunk}
 
-
-
 Now we must decide on a model to fit to them.  Plotting one network:
 
-
-
 \begin{center}
-
 \begin{Schunk}
 \begin{Sinput}
 > plot(samplk1)
-> 
 \end{Sinput}
 \end{Schunk}
 \includegraphics{STERGM-005}
-
 \end{center}
 
 
 
 \noindent we might get the idea to consider mutuality as a predictor of a directed edge.  Also, since this is a directed network, 
-
 and there appear to be a considerable number of triadic relations, it might be worth investigating the role of cyclic vs. transitive triads in the network.
-
 Of course, since we have two network snapshots, and we have separate formation and dissolution models, 
-
 we can estimate the degree to which closing a mutual dyad or closing a triad of each type predicts the creation of a tie, 
-
 and also estimate the degree to which maintaining a mutual dyad or maintaining a triad of each type predicts the persistence of an existing tie. 
-
 We might see different phenomena at work in each case; or the same phenomena, but with different coefficients.
 
 
 \begin{Schunk}
 \begin{Sinput}
-> stergm.fit.3 <- stergm(samp,
- 
+> samp.stergm.fit <- stergm(samp,
  	formation= ~edges+mutual+ctriad+ttriad,
- 
  	dissolution = ~edges+mutual+ctriad+ttriad,
- 
  	estimate = "CMLE"
- 
  	)
-> 
 \end{Sinput}
 \end{Schunk}
 
-
-
 \texttt{Fitting formation:}\\
-
 \texttt{Iteration 1 of at most 20:}\\
-
 $\Rightarrow$ Lots of output snipped. $\Leftarrow$\\
-
 \texttt{Time points not specified for a list. Modeling transition from the first to the second network. This behavior may change in the future.}\\
 
 
@@ -192,8 +171,54 @@ And the results:
 
 \begin{Schunk}
 \begin{Sinput}
-> 
-> #summary(stergm.fit.3)
+> summary(samp.stergm.fit)
+\end{Sinput}
+\begin{Soutput}
+==============================
+Summary of formation model fit 
+==============================
+
+Formula:   ~edges + mutual + ctriad + ttriad
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+        Estimate Std. Error MCMC % p-value    
+edges    -3.5554     0.4643      4 < 1e-04 ***
+mutual    2.2509     0.5895      1 0.00017 ***
+ctriple  -0.4956     0.3676      0 0.17880    
+ttriple   0.2929     0.1288      2 0.02385 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+
+     Null Deviance:    0  on 251  degrees of freedom
+ Residual Deviance: -219  on 247  degrees of freedom
+ 
+AIC: -211    BIC: -196.9    (Smaller is better.) 
+
+================================
+Summary of dissolution model fit
+================================
+
+Formula:   ~edges + mutual + ctriad + ttriad
+
+Iterations:  20 
+
+Monte Carlo MLE Results:
+        Estimate Std. Error MCMC % p-value  
+edges    -0.1253     0.4293      0  0.7716  
+mutual    1.5773     0.7841      0  0.0496 *
+ctriple  -1.7017     1.2156      0  0.1676  
+ttriple   0.6931     0.3724      0  0.0685 .
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+
+     Null Deviance:   0.00  on 55  degrees of freedom
+ Residual Deviance: -10.51  on 51  degrees of freedom
+ 
+AIC: -2.507    BIC: 5.522    (Smaller is better.) 
+\end{Soutput}
+\begin{Sinput}
 > 
 \end{Sinput}
 \end{Schunk}
@@ -201,19 +226,16 @@ And the results:
 
 
 So, a relationship is more likely than chance to form if it will close a mutual pair. 
-
 And it is also more likely than chance to persist if it will retain a mutual pair, although the coefficient is smaller.
-
 A relationship is more likely than chance to form if it will close a transitive triad, and more likely to persist if it 
-
 sustains a transitive triad, although these effects appear to be less clearly significant. 
 
 
 
-\section{Example 2: STERGM estimation and simulation}
+\section{Example 2: Estimation and simulation with a cross-sectional network and durational information}
 
 Let us imagine that we have observed two things: a cross-sectional network, and a mean relational duration. 
-Let us say the cross-sectional network is a data set called flobusiness, and the mean relational duration we have witnessed is 10 time steps. 
+For the network, we will use Padgett's well-known ``flobusiness'' data set.  And we will assume that we have somehow measured a mean relational duration of 10 time steps. 
 Furthermore, we are willing to (for reasons of theory or convenience) assume a purely homogeneous dissolution process 
 (that is, every existing relationship has the same probability of dissolving as all others, and at all times).  
 For a cross-sectional ERGM, a purely homogeneous model is one with just a single term in it for an edge count. 
@@ -226,9 +248,9 @@ First, take a lok at the data:
 > ls()
 \end{Sinput}
 \begin{Soutput}
-[1] "flobusiness"  "flomarriage"  "samp"        
-[4] "samplk1"      "samplk2"      "samplk3"     
-[7] "stergm.fit.3"
+[1] "flo.stergm.fit"  "flobusiness"     "flomarriage"    
+[4] "samp"            "samp.stergm.fit" "samplk1"        
+[7] "samplk2"         "samplk3"         "theta.diss"     
 \end{Soutput}
 \begin{Sinput}
 > flobusiness
@@ -250,6 +272,14 @@ First, take a lok at the data:
 \end{Soutput}
 \end{Schunk}
 
+\begin{center}
+\begin{Schunk}
+\begin{Sinput}
+> plot(flobusiness)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{STERGM-009}
+\end{center}
 
 The steps we will go through are:
 
@@ -257,7 +287,9 @@ The steps we will go through are:
 
 \item Specify formation and dissolution models (\texttt{formation} and \texttt{dissolution}).
 
-We will begin by assuming a formation model identical to the model we fit in the cross-sectional case:
+We will begin by assuming a formation model.  From looking at the visualization of the data, it certianly appears as if some triangle-level clustering is occurring. 
+We can aim to capture that by using a \texttt{gwesp} term.
+
 \begin{center}
 \texttt{formation = $\sim$edges+gwesp(0,fixed=T)}
 \end{center}
@@ -270,7 +302,7 @@ Analogously to cross-sectional ERGMs, our assumption of completely homogeneous d
 
 \item Calculate \texttt{theta.diss}.
 
-Because this is a discrete memoryless process, durations are geometric; symbolizing mean relational duration as $d$, we have $d = \frac{1}{q}$, and thus:
+Because this is a discrete memoryless process, we have the relationship:
 \begin{equation}
 \theta = \ln{(d-1)}
 \end{equation}
@@ -290,14 +322,13 @@ plotting the progress of the coefficient estimates and the simulated sufficient 
 
 \begin{Schunk}
 \begin{Sinput}
-> stergm.fit.1 <- stergm(flobusiness,
+> flo.stergm.fit <- stergm(flobusiness,
  	formation= ~edges+gwesp(0,fixed=T),
  	dissolution = ~offset(edges),
  	targets="formation",
  	offset.coef.diss = theta.diss,
  	estimate = "EGMME",
- 	control=control.stergm(SA.plot.progress=TRUE,
- 		SA.phase2.levels.max=1)
+ 	control=control.stergm(SA.plot.progress=TRUE)
  )
 \end{Sinput}
 \end{Schunk}
@@ -308,7 +339,7 @@ $\Rightarrow$ Lots of output snipped. $\Leftarrow$ \\
 First, we should double-check to make sure the fitting went well:
 \begin{Schunk}
 \begin{Sinput}
-> mcmc.diagnostics(stergm.fit.1)
+> mcmc.diagnostics(flo.stergm.fit)
 \end{Sinput}
 \end{Schunk}
 
@@ -329,18 +360,18 @@ $\Rightarrow$ Lots of output snipped. $\Leftarrow$\\
 Since those look good, we can next query the object in a variety of ways to see what we have:
 \begin{Schunk}
 \begin{Sinput}
-> stergm.fit.1
+> flo.stergm.fit
 \end{Sinput}
 \begin{Soutput}
 Formation Coefficients:
         edges  gwesp.fixed.0  
-       -6.648          2.424  
+       -6.491          2.344  
 Dissolution Coefficients:
 edges  
 2.197  
 \end{Soutput}
 \begin{Sinput}
-> names(stergm.fit.1)
+> names(flo.stergm.fit)
 \end{Sinput}
 \begin{Soutput}
  [1] "network"         "formation"       "dissolution"    
@@ -350,21 +381,21 @@ edges
 [13] "formation.fit"   "dissolution.fit"
 \end{Soutput}
 \begin{Sinput}
-> stergm.fit.1$formation
+> flo.stergm.fit$formation
 \end{Sinput}
 \begin{Soutput}
 ~edges + gwesp(0, fixed = T)
 \end{Soutput}
 \begin{Sinput}
-> stergm.fit.1$formation.fit
+> flo.stergm.fit$formation.fit
 \end{Sinput}
 \begin{Soutput}
 MLE Coefficients:
         edges  gwesp.fixed.0  
-       -6.648          2.424  
+       -6.491          2.344  
 \end{Soutput}
 \begin{Sinput}
-> summary(stergm.fit.1) # CHECK WITH PAVEL
+> summary(flo.stergm.fit)
 \end{Sinput}
 \begin{Soutput}
 ==============================
@@ -376,9 +407,9 @@ Formula:   ~edges + gwesp(0, fixed = T)
 Iterations:  NA 
 
 Equilibrium Generalized Method of Moments Results:
-              Estimate Std. Error MCMC % p-value    
-edges          -6.6484     1.2301     NA < 1e-04 ***
-gwesp.fixed.0   2.4243     0.8876     NA 0.00728 ** 
+              Estimate Std. Error MCMC %  p-value    
+edges          -6.4913     0.5342     NA  < 1e-04 ***
+gwesp.fixed.0   2.3440     0.6067     NA 0.000183 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
@@ -414,10 +445,12 @@ areas that requires us to simulate phenomena on dynamic networks, whether they e
 
 \begin{Schunk}
 \begin{Sinput}
-> stergm.sim.1 <- simulate.stergm(stergm.fit.1, nsim=1, 
+> flo.stergm.sim <- simulate.stergm(flo.stergm.fit, nsim=1, 
      time.slices = 1000)
 \end{Sinput}
 \end{Schunk}
+
+In order to undestand the results, we must have a brief tutorial in objects of class \texttt{networkDynamic} and the \emph{networkDynamic} package.
 
 \section{networkDynamic}
 
@@ -431,13 +464,9 @@ To illustrate, let us begin with the network that we just created:
 
 \begin{Schunk}
 \begin{Sinput}
-> stergm.sim.1
+> flo.stergm.sim
 \end{Sinput}
-\end{Schunk}
-
-\texttt{networkDynamic with 985 distinct change times:}\\
-$\Rightarrow$ Lots of output snipped. $\Leftarrow$
-\begin{verbatim}
+\begin{Soutput}
  Network attributes:
   vertices = 16 
   directed = FALSE 
@@ -451,7 +480,8 @@ $\Rightarrow$ Lots of output snipped. $\Leftarrow$
 
  Vertex attribute names: 
     priorates totalties vertex.names wealth 
-\end{verbatim}
+\end{Soutput}
+\end{Schunk}
 
 We can deduce from the number of edges that this likely represents the cumulative network---that is, the union of all edges that exist at any point in time over the course of the simulation.  
 What does the network look like at different time points? The function \texttt{network.extract} allows us to pull out the network at an instantanoues time point (with the argument \texttt{at}),
@@ -459,7 +489,7 @@ or over any given spell (with the arguments \texttt{onset} and \texttt{terminus}
 
 \begin{Schunk}
 \begin{Sinput}
-> net <- network.extract(stergm.sim.1,at=429)
+> net <- network.extract(flo.stergm.sim,at=429)
 > net
 \end{Sinput}
 \begin{Soutput}
@@ -470,9 +500,9 @@ or over any given spell (with the arguments \texttt{onset} and \texttt{terminus}
   loops = FALSE 
   multiple = FALSE 
   bipartite = FALSE 
-  total edges= 7 
+  total edges= 23 
     missing edges= 0 
-    non-missing edges= 7 
+    non-missing edges= 23 
 
  Vertex attribute names: 
     priorates totalties vertex.names wealth 
@@ -483,7 +513,7 @@ For any one of these time points, we can look at the network structure:
 
 \begin{Schunk}
 \begin{Sinput}
-> plot(network.extract(stergm.sim.1,at=882))
+> plot(network.extract(flo.stergm.sim,at=882))
 \end{Sinput}
 \end{Schunk}
 
@@ -506,11 +536,11 @@ We can check by considering the summary statistics for our observed network, and
            15            12 
 \end{Soutput}
 \begin{Sinput}
-> colMeans(attributes(stergm.sim.1)$stats)
+> colMeans(attributes(flo.stergm.sim)$stats)
 \end{Sinput}
 \begin{Soutput}
         edges gwesp.fixed.0 
-       13.764        10.898 
+       18.134        14.756 
 \end{Soutput}
 \end{Schunk}
 
@@ -518,7 +548,7 @@ And we can also easily look at a time series and histogram for each statistic:
 
 \begin{Schunk}
 \begin{Sinput}
-> plot(attributes(stergm.sim.1)$stats)
+> plot(attributes(flo.stergm.sim)$stats)
 \end{Sinput}
 \end{Schunk}
 
@@ -535,8 +565,8 @@ its effect on our observed mean duration should be trivial.
 
 \begin{Schunk}
 \begin{Sinput}
-> stergm.sim.1.dm <- as.data.frame(stergm.sim.1)
-> names(stergm.sim.1.dm)
+> flo.stergm.sim.dm <- as.data.frame(flo.stergm.sim)
+> names(flo.stergm.sim.dm)
 \end{Sinput}
 \begin{Soutput}
 [1] "start"          "end"            "tail"          
@@ -544,10 +574,10 @@ its effect on our observed mean duration should be trivial.
 [7] "duration"      
 \end{Soutput}
 \begin{Sinput}
-> mean(stergm.sim.1.dm$duration)
+> mean(flo.stergm.sim.dm$duration)
 \end{Sinput}
 \begin{Soutput}
-[1] 10.03717
+[1] 9.999449
 \end{Soutput}
 \end{Schunk}
 
@@ -561,23 +591,21 @@ For those who want to look under the hood, they can see the activity spells dire
 
 \begin{Schunk}
 \begin{Sinput}
-> get.edge.value(stergm.sim.1, "active", unlist=FALSE)[[25]]
+> get.edge.value(flo.stergm.sim, "active", unlist=FALSE)[[25]]
 \end{Sinput}
 \begin{Soutput}
       [,1] [,2]
- [1,] -Inf    7
- [2,]    8   11
- [3,]   12   25
- [4,]   85  106
- [5,]  118  121
- [6,]  144  147
- [7,]  148  158
- [8,]  511  514
- [9,]  617  622
-[10,]  626  634
-[11,]  641  670
-[12,]  692  693
-[13,]  846  853
+ [1,] -Inf   11
+ [2,]   12   33
+ [3,]  326  336
+ [4,]  341  343
+ [5,]  432  436
+ [6,]  458  464
+ [7,]  489  492
+ [8,]  727  736
+ [9,]  737  742
+[10,]  743  755
+[11,]  913  915
 \end{Soutput}
 \end{Schunk}
 
@@ -601,30 +629,36 @@ We did, in fact, fit this cross-sectional model earlier:
 
 \begin{Schunk}
 \begin{Sinput}
-> fit1 <- ergm(flobusiness~edges+gwesp(0,fixed=T))
+> flo.stergm.approx <- ergm(flobusiness~edges+gwesp(0,fixed=T))
 \end{Sinput}
 \begin{Soutput}
 Iteration 1 of at most 20: 
-Convergence test P-value: 4.3e-275 
-The log-likelihood improved by 0.06965 
+Convergence test P-value: 9.9e-259 
+The log-likelihood improved by 0.07519 
 Iteration 2 of at most 20: 
-Convergence test P-value: 2.2e-45 
-The log-likelihood improved by 0.01671 
+Convergence test P-value: 1.4e-41 
+The log-likelihood improved by 0.01319 
 Iteration 3 of at most 20: 
-Convergence test P-value: 2.9e-09 
-The log-likelihood improved by 0.003245 
+Convergence test P-value: 2.2e-08 
+The log-likelihood improved by 0.003 
 Iteration 4 of at most 20: 
-Convergence test P-value: 3.6e-03 
-The log-likelihood improved by 0.0008916 
+Convergence test P-value: 3.3e-03 
+The log-likelihood improved by 0.001035 
 Iteration 5 of at most 20: 
-Convergence test P-value: 5e-01 
+Convergence test P-value: 1.9e-01 
+The log-likelihood improved by 0.0003084 
+Iteration 6 of at most 20: 
+Convergence test P-value: 4.8e-01 
+The log-likelihood improved by 0.0001593 
+Iteration 7 of at most 20: 
+Convergence test P-value: 5.9e-01 
 Convergence detected. Stopping.
-The log-likelihood improved by 0.0001261 
+The log-likelihood improved by < 0.0001 
 
 This model was fit using MCMC.  To examine model diagnostics and check for degeneracy, use the mcmc.diagnostics() function.
 \end{Soutput}
 \begin{Sinput}
-> summary(fit1)
+> summary(flo.stergm.approx)
 \end{Sinput}
 \begin{Soutput}
 ==========================
@@ -637,23 +671,23 @@ Iterations:  20
 
 Monte Carlo MLE Results:
               Estimate Std. Error MCMC % p-value    
-edges          -3.3671     0.6124      0 < 1e-04 ***
-gwesp.fixed.0   1.5670     0.5816      0 0.00808 ** 
+edges          -3.3674     0.6058      0 < 1e-04 ***
+gwesp.fixed.0   1.5703     0.5752      0 0.00731 ** 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
      Null Deviance:   0.00  on 120  degrees of freedom
- Residual Deviance: -87.96  on 118  degrees of freedom
+ Residual Deviance: -88.07  on 118  degrees of freedom
  
-AIC: -83.96    BIC: -78.38    (Smaller is better.) 
+AIC: -84.07    BIC: -78.49    (Smaller is better.) 
 \end{Soutput}
 \begin{Sinput}
-> theta.form <- fit1$coef 
+> theta.form <- flo.stergm.approx$coef 
 > theta.form
 \end{Sinput}
 \begin{Soutput}
         edges gwesp.fixed.0 
-    -3.367092      1.566976 
+    -3.367363      1.570276 
 \end{Soutput}
 \end{Schunk}
 
@@ -670,7 +704,7 @@ How well does this approximation do in capturing our desired dynamic network pro
 
 \begin{Schunk}
 \begin{Sinput}
-> stergm.sim.2 <- simulate(flobusiness,
+> flo.stergm.sim.2 <- simulate(flobusiness,
  	formation=~edges+gwesp(0,fixed=T),
  	dissolution=~edges,
  	monitor="all",
@@ -691,21 +725,21 @@ Then check the results in terms of cross-sectional network structure and mean re
            15            12 
 \end{Soutput}
 \begin{Sinput}
-> colMeans(attributes(stergm.sim.2)$stats)
+> colMeans(attributes(flo.stergm.sim.2)$stats)
 \end{Sinput}
 \begin{Soutput}
         edges gwesp.fixed.0 
-      15.5592       12.2951 
+      13.7348       10.9880 
 \end{Soutput}
 \begin{Sinput}
-> stergm.sim.dm.2 <- as.data.frame(stergm.sim.2)
+> stergm.sim.dm.2 <- as.data.frame(flo.stergm.sim.2)
 > mean(stergm.sim.dm.2$duration)
 \end{Sinput}
 \begin{Soutput}
-[1] 96.16873
+[1] 98.03426
 \end{Soutput}
 \begin{Sinput}
-> plot(attributes(stergm.sim.2)$stats)
+> plot(attributes(flo.stergm.sim.2)$stats)
 \end{Sinput}
 \end{Schunk}
 
@@ -715,12 +749,11 @@ Then check the results in terms of cross-sectional network structure and mean re
 \end{center}
 \end{figure}
 
-
-
-
 \section{Example 4: Estimation and simulation driven by egocentric data}
 
-For example, imagine that you want to model HIV transmission among a population of gay men in steady partnerships. 50\% of the men are White and 50\% are Black. 
+Just like we saw with ergms, stergms can be modeled using only target statistics.  
+For example, imagine that you want to model HIV transmission among a population of gay men in steady partnerships. 
+50\% of the men are White and 50\% are Black. 
 You collect egocentric partnership data from a random (ha! ha!) sample of these men. Your data say:
 
 \begin{enumerate}
@@ -821,11 +854,6 @@ So, we have:
 \end{Sinput}
 \end{Schunk}
 
-We add in one additional control parameter---\texttt{SA.init.gain}---giving it a small value (the default is 0.1).  
-As the help page for \texttt{control.stergm} sagely advises, ``If the process initially goes crazy beyond recovery, lower this value.''
-This slows down estimation, but also makes it more stable. 
-From trial and error, we know that this model, fit to this relatively large network, does better with this smaller value.
-
 Putting it all together gives us:
 
 \begin{Schunk}
@@ -838,8 +866,8 @@ Putting it all together gives us:
  	target.stats= msm.target.stats,
  	offset.coef.diss = msm.theta.diss,
  	estimate = "EGMME",
- 	control=control.stergm(SA.plot.progress=TRUE,
- 		SA.phase2.levels.max=1)
+ 	control=control.stergm(SA.plot.progress=TRUE)
+ #		SA.phase2.levels.max=1)
  )
 \end{Sinput}
 \end{Schunk}
@@ -878,11 +906,11 @@ Formula:   ~edges + nodematch("race") + degree(0) + concurrent
 Iterations:  NA 
 
 Equilibrium Generalized Method of Moments Results:
-               Estimate Std. Error MCMC % p-value    
-edges           -9.9390     0.5113     NA < 1e-04 ***
-nodematch.race   2.2812     0.1605     NA < 1e-04 ***
-degree0         -0.1963     0.3842     NA 0.60929    
-concurrent      -0.8274     0.2966     NA 0.00527 ** 
+               Estimate Std. Error MCMC %  p-value    
+edges           -9.9659     0.2241     NA  < 1e-04 ***
+nodematch.race   2.3013     0.2208     NA  < 1e-04 ***
+degree0         -0.2068     0.1194     NA 0.083200 .  
+concurrent      -0.8263     0.2357     NA 0.000455 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
@@ -926,7 +954,7 @@ and compare the outputs to what we expect, in terms of cross-sectional structure
 \end{Sinput}
 \begin{Soutput}
          edges nodematch.race        degree0     concurrent 
-       221.718        183.297        181.943         87.190 
+       224.766        187.786        178.786         89.063 
 \end{Soutput}
 \begin{Sinput}
 > msm.target.stats
@@ -970,14 +998,14 @@ And relationship length:
    msm.sim.dm$left.censored==F & msm.sim.dm$right.censored==F ])
 \end{Sinput}
 \begin{Soutput}
-[1] 9.876573
+[1] 9.942613
 \end{Soutput}
 \begin{Sinput}
 > mean(msm.sim.dm$duration[msm.sim.dm$homoph==F & 
    msm.sim.dm$left.censored==F & msm.sim.dm$right.censored==F ])
 \end{Sinput}
 \begin{Soutput}
-[1] 19.95166
+[1] 19.25297
 \end{Soutput}
 \end{Schunk}
 
