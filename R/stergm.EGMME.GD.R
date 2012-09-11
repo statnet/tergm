@@ -2,20 +2,33 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
                             control, MHproposal.form, MHproposal.diss, cl=NULL,
                             verbose=FALSE){
 
-  eval.optpars <- function(test.G,window,update.jitter){
-    for(name in ls(pos=parent.frame())) assign(name, get(name, parent.frame()))
-    
+  
+  ###### Set the constants and convenience variables. ######
+  offsets <- c(model.form$etamap$offsettheta, model.diss$etamap$offsettheta) # which parameters are offsets?
+  p.form.free <- sum(!model.form$etamap$offsettheta) # number of free formation parameters
+  p.form <- length(model.form$etamap$offsettheta) # total number of formation parameters
+  p.diss.free <- sum(!model.diss$etamap$offsettheta) # number of free dissolution parameters
+  p.diss <- length(model.diss$etamap$offsettheta) # total number of dissolution parameters
+  p.free <- p.form.free+p.diss.free  # number of free parameters (formation and dissolution)
+  p <- p.form+p.diss # total number of parameters (free and offset)
+  p.names<-c(paste("f.(",model.form$coef.names,")",sep=""),paste("d.(",model.diss$coef.names,")",sep=""))
+  
+  q <- length(model.mon$etamap$offsettheta) # number of target statistics
+  q.names<-model.mon$coef.names
+
+  # Define the function to set optimization parameters.  
+  eval.optpars <- function(states, history, control, test.G,window,update.jitter){
     ## Regress statistics on parameters.
     # This uses GLS to account for serial correlation in statistics,
     # since we want p-values. First row is the intercept.
 
-    h <- get(if(window) "oh" else "oh.all")
-    ind <- get(if(window) "ind" else "ind.all")
-    tid <- get(if(window) "tid" else "tid.all")
-    control <- get("control")
-    states <- get("states")
-    x<-h[,1:p,drop=FALSE][,!offsets,drop=FALSE] # #$%^$ gls() doesn't respect I()...
-    ys <- h[,-(1:p),drop=FALSE]
+    oh <- if(window) history$oh else history$oh.all
+    oh.last <- history$oh.last
+    ind <- if(window) history$ind else history$ind.all
+    tid <- if(window) history$tid else history$tid.all
+
+    x<-oh[,1:p,drop=FALSE][,!offsets,drop=FALSE] # #$%^$ gls() doesn't respect I()...
+    ys <- oh[,-(1:p),drop=FALSE]
     
     h.fits <-
       if(!is.null(cl)){
@@ -185,7 +198,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     }
 
     if(update.jitter){
-      control$jitter[!offsets] <- apply(oh[,1:p,drop=FALSE][,!offsets,drop=FALSE]-jitters[,!offsets,drop=FALSE],2,sd)*control$SA.phase2.jitter.mul
+      control$jitter[!offsets] <- apply(oh[,1:p,drop=FALSE][,!offsets,drop=FALSE]-history$jitters[,!offsets,drop=FALSE],2,sd)*control$SA.phase2.jitter.mul
       names(control$jitter) <- p.names
     }
     
@@ -194,7 +207,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       print(control$jitter)
     }
 
-    control$dev.guard <- apply(h[,-(1:p),drop=FALSE],2,function(x) quantile(abs(x),.9)) * control$SA.guard.mul
+    control$dev.guard <- apply(oh[,-(1:p),drop=FALSE],2,function(x) quantile(abs(x),.9)) * control$SA.guard.mul
     if(verbose>1){
       cat("New deviation guard values:\n")
       print(control$dev.guard)
@@ -207,10 +220,10 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     }
     
     list(control=control,
-         G=G, w=w, v=v, oh.fit=h.fit, ineffectual.pars=ineffectual.pars, bad.fits=bad.fits, state=state)
+         G=G, w=w, v=v, oh.fit=h.fit, ineffectual.pars=ineffectual.pars, bad.fits=bad.fits)
   }
-
-    stergm.EGMME.SA(theta.form0, theta.diss0, nw, model.form, model.diss, model.mon,
-                            control, MHproposal.form, MHproposal.diss, eval.optpars, cl=cl,
-                            verbose)
+  
+  stergm.EGMME.SA(theta.form0, theta.diss0, nw, model.form, model.diss, model.mon,
+                  control, MHproposal.form, MHproposal.diss, eval.optpars, cl=cl,
+                  verbose)
 }

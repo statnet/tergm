@@ -1,6 +1,6 @@
 Package: tergm
-Version: 3.1-11692-11704.1-2012.09.10-03.01.51
-Date: 2012-09-10
+Version: 3.1-11710-11711.1-2012.09.11-00.11.47
+Date: 2012-09-11
 Title:  Fit, Simulate and Diagnose Models for Network Evoluation based on Exponential-Family Random Graph Models
 Authors@R:c(
 	person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="krivitsky@stat.psu.edu"),

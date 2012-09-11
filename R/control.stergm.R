@@ -68,17 +68,18 @@ control.stergm<-function(init.form=NULL,
                          SA.phase1.jitter=0.1, # Initial jitter sd of each parameter..
                          SA.phase1.max.q=0.1, # FDR q-value for considering a gradient to be significant.
                          SA.phase1.backoff.rat=1.05, # If a run produces this relative increase in the objective function, it will be backed off.
-                         SA.phase2.levels.max=20, # Maximum number of gain levels to go through.
+                         SA.phase2.levels.max=40, # Maximum number of gain levels to go through.
                          SA.phase2.levels.min=4, # Minimum number of gain levels to go through.
                          SA.phase2.max.mc.se=0.001, # Maximum Monte-Carlo variation error of the parameter estimates as a fraction of total variation.
                          SA.phase2.repeats=400, # Maximum number of times gain a subphase can be repeated if the optimization is "going somewhere".
-                         SA.stepdown.maxn=100, # Thin the draws for trend detection to get this many.
+                         SA.stepdown.maxn=200, # Thin the draws for trend detection to get this many.
                          SA.stepdown.p=0.05, # If the combined p-value for the trend in the parameters is less than this, reset the subphase counter.
-                         SA.stop.p=0.5, # If the combined p-value of the stopping tests exceeds this, finish the optimization.
+                         SA.stop.p=0.1, # If the combined p-value of the stopping tests exceeds this, finish the optimization.
                          SA.stepdown.ct=5, # Baseline number of times in a row the p-value must be above SA.stepdown.p to reduce gain.
                          SA.phase2.backoff.rat=1.1, # If a run produces this relative increase in the objective function, it will be backed off.
                          SA.keep.oh=0.5, # Fraction of optimization history that is used for gradient and covariance calculation.
-                         SA.keep.min=8, # Minimum number of runs that are used for gradient and covariance calculation.
+                         SA.keep.min.runs=8, # Minimum number of runs that are used for gradient and covariance calculation.
+                         SA.keep.min=0, # Minimum number of observations that are used for gradient and covariance calculation.
                          SA.phase2.jitter.mul=0.2, # The jitter standard deviation of each parameter is this times its standard deviation sans jitter.
                          SA.phase2.maxreljump=4, # Maximum jump per run, relative to the magnitude of other jumps in the history.
                          SA.phase2.refine.every=0, # Use linear interpolation every this many runs to refine the estimate after. (0 = never.)
@@ -86,10 +87,10 @@ control.stergm<-function(init.form=NULL,
                          SA.robust = FALSE, # Should the (slower) robust linear regression and covariance estimation be used?
                          
 
-                         SA.refine=c("linear","mean","none"), # Method, if any, used to refine the point estimate: linear interpolation, average, and none for the last value.
+                         SA.refine=c("mean","linear","none"), # Method, if any, used to refine the point estimate: linear interpolation, average, and none for the last value.
                          
                          SA.se=TRUE, # Whether to run Phase 3 to compute the standard errors.
-                         SA.phase3.samplesize=1000, # This times the interval is the number of steps to estimate the standard errors.
+                         SA.phase3.samplesize.runs=10, # This times the interval is the number of steps to estimate the standard errors.
                          SA.restart.on.err=TRUE, # Whether to wrap certain routines in try() statements so that they that an error is handled gracefully. Set to FALSE to debug errors in those routines.
 
                          seed=NULL,

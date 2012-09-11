@@ -2,8 +2,6 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
                             control, MHproposal.form, MHproposal.diss, eval.optpars, cl=cl,
                             verbose=FALSE){
 
-  if(verbose) cat("Starting optimization with with coef_F_0 = (",theta.form0, ") and coef_D_0 = (",theta.diss0,")\n" )
-  
   ###### Set the constants and convenience variables. ######
   offsets <- c(model.form$etamap$offsettheta, model.diss$etamap$offsettheta) # which parameters are offsets?
   p.form.free <- sum(!model.form$etamap$offsettheta) # number of free formation parameters
@@ -16,14 +14,15 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
   
   q <- length(model.mon$etamap$offsettheta) # number of target statistics
   q.names<-model.mon$coef.names
-
+  
+  if(verbose) cat("Starting optimization with with coef_F_0 = (",theta.form0, ") and coef_D_0 = (",theta.diss0,")\n" )
   ###### Define the optimization run function. ######
   
-  do.optimization<-function(states, control){
-    ind.all <- get("ind.all",parent.frame())
-    tid.all <- get("tid.all",parent.frame())
-    oh.all <- get("oh.all",parent.frame())
-    jitters.all <- get("jitters.all",parent.frame())
+  do.optimization<-function(states, history, control){
+    ind.all <- history$ind.all
+    tid.all <- history$tid.all
+    oh.all <- history$oh.all
+    jitters.all <- history$jitters.all
     
     if(verbose) cat("Running stochastic optimization... ")
     zs <- if(!is.null(cl)){
@@ -35,7 +34,6 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       list(stergm.EGMME.SA.Phase2.C(states[[1]], model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, control, verbose=verbose))
     }
     if(verbose) cat("Finished. Extracting.\n")
-    
     for(i in seq_along(states)){
 
       # Extend the observation index and thread id vectors.
@@ -52,25 +50,33 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       colnames(oh.all) <- c(p.names,q.names)
     }
 
-    assign("ind.all",ind.all,envir=parent.frame())
-    assign("tid.all",tid.all,envir=parent.frame())
-    assign("jitters.all",jitters.all,envir=parent.frame())
-    assign("oh.all",oh.all,envir=parent.frame())
+    history$ind.all <- ind.all
+    history$tid.all <- tid.all
+    history$jitters.all <- jitters.all
+    history$oh.all <- oh.all
 
     min.ind.last <- max(ind.all) - control$SA.runlength*control$SA.interval + 1
-    min.ind.keep <- max(ind.all) - max(max(ind.all)*control$SA.keep.oh,min(control$SA.runlength*control$SA.interval*control$SA.keep.min*length(states),max(ind.all))) + 1
+    min.ind.keep <- max(ind.all) - max(
+                                     max(ind.all)*control$SA.keep.oh,
+                                     min(
+                                       max(
+                                         control$SA.runlength*control$SA.interval*control$SA.keep.min.runs*length(states),
+                                         control$SA.keep.min*length(states)
+                                         ),
+                                       max(ind.all)
+                                       )
+                                     ) + 1
     
     # Extract and store subhistories of interest.
     
-    assign("ind",ind.all[ind.all>=min.ind.keep],envir=parent.frame())
-    assign("tid",tid.all[ind.all>=min.ind.keep],envir=parent.frame())
-    assign("ind.last",ind.all[ind.all>=min.ind.last],envir=parent.frame())
-    assign("tid.last",tid.all[ind.all>=min.ind.last],envir=parent.frame())
-    assign("oh",oh.all[ind.all>=min.ind.keep,,drop=FALSE],envir=parent.frame())
-    assign("oh.last",oh.all[ind.all>=min.ind.last,,drop=FALSE],envir=parent.frame())
-    assign("jitters",jitters.all[ind.all>=min.ind.keep,,drop=FALSE],envir=parent.frame())
-    assign("jitters.last",jitters.all[ind.all>=min.ind.last,,drop=FALSE],envir=parent.frame())      
-    
+    history$ind <- ind <- ind.all[ind.all>=min.ind.keep]
+    history$tid <- tid <-tid.all[ind.all>=min.ind.keep]
+    history$ind.last <- ind.last <-ind.all[ind.all>=min.ind.last]
+    history$tid.last <- tid.last <- tid.all[ind.all>=min.ind.last]
+    history$oh <- oh <- oh.all[ind.all>=min.ind.keep,,drop=FALSE]
+    history$oh.last <- oh.last <- oh.all[ind.all>=min.ind.last,,drop=FALSE]
+    history$jitters <- jitters <- jitters.all[ind.all>=min.ind.keep,,drop=FALSE]
+    history$jitters.last <- jitters.last <- jitters.all[ind.all>=min.ind.last,,drop=FALSE]      
 
     # Plot if requested.
     if(control$SA.plot.progress){
@@ -90,12 +96,39 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         }
     }
     
-    # Extract and return the "state".
-    lapply(zs, function(z) list(nw = z$newnetwork,
-                                nw.diff = z$nw.diff,
-                                eta.form = z$eta.form,
-                                eta.diss = z$eta.diss)
-           )
+    # Extract and return the "states" and the "history".
+    list(states = lapply(zs, function(z) list(nw = z$newnetwork,
+           nw.diff = z$nw.diff,
+           eta.form = z$eta.form,
+           eta.diss = z$eta.diss)
+           ),
+         history = history)
+  }
+
+  # This function essentially runs the chain forward with gradient etc. set to 0.
+  do.dummy.run <- function(states, history, control, burnin, steps, eta.form=NULL, eta.diss=NULL){
+        control$GainM <- matrix(0, nrow=p, ncol=q)
+        control$dejitter <- matrix(0, nrow=p, ncol=p) # Dejitter tries to cancel the effect of jitter on the optimizer.
+        control$par.guard <- control$jitter<-rep(0,p)
+        control$dev.guard <- rep(0,q)
+        control$dev.guard[] <- 1e10 # A huge value
+        control$par.guard[!offsets] <- 1e10
+
+        
+        control$SA.keep.min.runs <- 0
+
+        control$SA.runlength <- 1
+        control$SA.burnin <- burnin
+        control$SA.interval <- steps
+
+
+        
+        for(i in seq_along(states)){
+          if(!is.null(eta.form)) states[[i]]$eta.form <- eta.form
+          if(!is.null(eta.diss)) states[[i]]$eta.diss <- eta.diss
+        }
+
+        do.optimization(states,history,control)
   }
   
   interpolate.par <- function(h.fit, w=diag(1,nrow=ncol(h.fit))){
@@ -109,10 +142,10 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     solve(t(G)%*%w%*%G)%*%t(G)%*%w%*%V.stat%*%w%*%G%*%solve(t(G)%*%w%*%G)
   }
 
-  best.states <- function(){
-    w <- robust.inverse(cov(oh.all[,-(1:p),drop=FALSE]))
-    best.i <- which.min(mahalanobis((oh.all[-1,-(1:p),drop=FALSE]+oh.all[-nrow(oh.all),-(1:p),drop=FALSE])/2,0,w,inverted=TRUE))
-    best.par <- oh.all[best.i,1:p][!offsets]
+  best.states <- function(states, history){
+    w <- robust.inverse(cov(history$oh.all[,-(1:p),drop=FALSE]))
+    best.i <- which.min(mahalanobis((history$oh.all[-1,-(1:p),drop=FALSE]+history$oh.all[-nrow(history$oh.all),-(1:p),drop=FALSE])/2,0,w,inverted=TRUE))
+    best.par <- history$oh.all[best.i,1:p][!offsets]
 
     lapply(states, function(state){
       if(p.form.free) state$eta.form[!model.form$etamap$offsettheta] <- best.par[seq_len(p.form.free)]
@@ -125,7 +158,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
   
   ##### Construct the initial state. ######
 
-  ind.all <- tid.all <- oh.all <- jitters.all <- state <- NULL
+  history <- list()
+  history$ind.all <- history$tid.all <- history$oh.all <- history$jitters.all <- state <- NULL
 
   for(restart in 1:control$SA.restarts){
   
@@ -180,9 +214,10 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     control$GainM <- matrix(0, nrow=p, ncol=q)
     control$dejitter <- matrix(0, nrow=p, ncol=p) # Dejitter tries to cancel the effect of jitter on the optimizer.
     
-    control$dev.guard <- control$par.guard <- control$jitter<-rep(0,p)
+    control$par.guard <- control$jitter<-rep(0,p)
+    control$dev.guard <- rep(0,q)
     control$jitter[!offsets] <- control$SA.phase1.jitter
-    control$dev.guard[!offsets] <- 1e10 # A huge value
+    control$dev.guard[] <- 1e10 # A huge value
     control$par.guard[!offsets] <- control$SA.phase1.jitter * 4
     
     ## Adjust the number of time steps between jumps using burn-in.
@@ -195,8 +230,10 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     for(try in 1:control$SA.phase1.tries){
       if(verbose) cat('======== Attempt ',try,' ========\n',sep="") else cat('Attempt',try,':\n')
       for(run in 1:control$SA.phase1.minruns){
-        states <- try(do.optimization(states, control), silent=!verbose)
-        if(inherits(states, "try-error") || all(apply(oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
+        tmp <- try(do.optimization(states, history, control), silent=!verbose)
+        states <- tmp$states
+        history <- tmp$history
+        if(inherits(states, "try-error") || all(apply(history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
           cat("Something went very wrong. Restarting with smaller gain.\n")
           control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
           do.restart <- TRUE
@@ -204,11 +241,11 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         }else do.restart <- FALSE
       }
 
-      states <- best.states()
+      states <- best.states(states, history)
 
       control$gain <- control$SA.init.gain
-      out <- if(control$SA.restart.on.err) try(eval.optpars(TRUE,restart>1,FALSE), silent=!verbose) else eval.optpars(TRUE,restart>1,FALSE)
-      if(inherits(out, "try-error") || all(apply(oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
+      out <- if(control$SA.restart.on.err) try(eval.optpars(states, history, control, TRUE,restart>1,FALSE), silent=!verbose) else eval.optpars(states, history, control, TRUE,restart>1,FALSE)
+      if(inherits(out, "try-error") || all(apply(history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
         cat("Something went very wrong. Restarting with smaller gain.\n")
         control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
         do.restart <- TRUE
@@ -235,8 +272,10 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       stepdown.count <- control$SA.stepdown.ct
       
       for(regain in 1:control$SA.phase2.repeats){
-        states <- try(do.optimization(states, control), silent=!verbose)
-        if(inherits(states, "try-error") || all(apply(oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
+        tmp <- try(do.optimization(states, history, control), silent=!verbose)
+        states <- tmp$states
+        history <- tmp$history
+        if(inherits(states, "try-error") || all(apply(history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
           cat("Something went very wrong. Restarting with smaller gain.\n")
           control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
           do.restart <- TRUE
@@ -252,8 +291,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         }
 
         ## Get updated gain and other values
-        out <- if(control$SA.restart.on.err) try(eval.optpars(FALSE,TRUE,TRUE), silent=!verbose) else eval.optpars(FALSE,TRUE,TRUE)
-        if(inherits(out, "try-error") || all(apply(oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
+        out <- if(control$SA.restart.on.err) try(eval.optpars(states, history, control, FALSE,TRUE,TRUE), silent=!verbose) else eval.optpars(states, history, control, FALSE,TRUE,TRUE)
+        if(inherits(out, "try-error") || all(apply(history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
           cat("Something went very wrong. Restarting with smaller gain.\n")
           control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
           do.restart <- TRUE
@@ -266,16 +305,16 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         ## 2) Does there appear to be a trend in their sum of squares?
 
         # Calculate the approximate estimating equation values:
-        ys <- oh[,-(1:p),drop=FALSE]%*%out$w%*%out$G
+        ys <- history$oh[,-(1:p),drop=FALSE]%*%out$w%*%out$G
 
         # This test is fast, so no need to thin.
         p.val.1 <- try(approx.hotelling.diff.test(ys)$p.value)
 
         # Thin the data to keep from bogging down.
-        x <- unique(round(seq(from=1,to=NROW(oh),length.out=control$SA.stepdown.maxn)))
+        x <- unique(round(seq(from=1,to=NROW(history$oh),length.out=control$SA.stepdown.maxn)))
         y <- sqrt(mahalanobis(ys,0,robust.inverse(cov(ys)),inverted=TRUE)[x])
-        i <- ind[x]
-        t <- tid[x]
+        i <- history$ind[x]
+        t <- history$tid[x]
 
         for(thread in unique(t)) i[t==thread] <- rank(i[t==thread])
 
@@ -322,6 +361,9 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         if(do.restart) break
       }
 
+      if(do.restart) break      
+
+      
       #### Decide whether to stop.
 
       ## Run through minimal number of phases.
@@ -335,7 +377,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       # Test 1:
       
       par.se <- {
-        h <- oh[,1:p,drop=FALSE][,!offsets,drop=FALSE]
+        h <- history$oh[,1:p,drop=FALSE][,!offsets,drop=FALSE]
         apply(h,2,function(x) sd(x)/sqrt(effectiveSize(x)))
       }
 
@@ -352,13 +394,13 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       
       # Test 2:
 
-      ys <- oh[, -(1:p), drop=FALSE]
-      xs <- oh[, 1:p, drop=FALSE][,!offsets,drop=FALSE]
+      ys <- history$oh[, -(1:p), drop=FALSE]
+      xs <- history$oh[, 1:p, drop=FALSE][,!offsets,drop=FALSE]
 
       nlin.totest <- rep(c(FALSE,TRUE),c(p.free+1, p.free*2))
       
       nlin.fit <- lm(ys~xs+I(xs^2)+I(xs^3))
-      nlin.nfs <- matrix(apply(cbind(resid(nlin.fit)),2,function(x) sum(tapply(x,list(tid),length))/sum(tapply(x,list(tid),effectiveSize))), nrow=1+p.free*3, ncol=q, byrow=TRUE)
+      nlin.nfs <- matrix(apply(cbind(resid(nlin.fit)),2,function(x) sum(tapply(x,list(history$tid),length))/sum(tapply(x,list(history$tid),effectiveSize))), nrow=1+p.free*3, ncol=q, byrow=TRUE)
       nlin.coef <- cbind(coef(nlin.fit))
       nlin.vcov <- vcov(nlin.fit)
       
@@ -370,66 +412,99 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
       p.val.1 <- pchisq(chi2, length(nlin.coef), lower.tail=FALSE)
       if(verbose) cat("Local nonlinearity p-value:",p.val.1,"\n")
+
+      if(subphase == control$SA.phase2.levels.max){
+        if(verbose) cat("Maximum number of gain levels exceeded. Stopping.")
+      }else{
+        if(all(par.se^2/(sandwich.se^2+par.se^2) > control$SA.phase2.max.mc.se)){
+          if(verbose) cat("EGMME does not appear to be estimated with sufficient prescision. Continuing.\n")
+          next
+        }
+        
+        if(p.val.1 < control$SA.stop.p){
+          if(verbose) cat("There is evidence of local nonlinearity. Continuing.\n")
+          next
+        }
+      }
+
+      ###### If we've gotten this far, proceed to Part 3. ######
+
+      ## Refine the estimate.
+      if(inherits(state, "try-error")) stop("Something went wrong too many times. Try better starting values or reducing control$SA.init.gain.") 
       
-      if(all(par.se^2/(sandwich.se^2+par.se^2) < control$SA.phase2.max.mc.se && p.val.1 > control$SA.stop.p )){
-        if(verbose) cat("EGMME appears to be estimated to the desired precision level and there is little evidence of local nonlinearity. Stopping.\n")
-        break
+      eta.form <- states[[1]]$eta.form
+      eta.diss <- states[[1]]$eta.diss
+      
+      eta.free <- switch(control$SA.refine,
+                         mean = colMeans(history$oh[,1:p,drop=FALSE][,!offsets,drop=FALSE]),
+                         linear = interpolate.par(out$oh.fit,out$w),
+                         none = if(is.null(cl)) c(eta.form,eta.diss)[!offsets] else stop("No interpolation does not make sense with multithreaded fitting."))
+      if(p.form.free) eta.form[!model.form$etamap$offsettheta] <- eta.free[seq_len(p.form.free)]
+      if(p.diss.free) eta.diss[!model.diss$etamap$offsettheta] <- eta.free[p.form.free+seq_len(p.diss.free)]
+      
+      if(verbose){
+        cat("Refining the estimate using the", control$SA.refine,"method. New estimate:\n")
+        cat("Formation:\n")
+        print(eta.form)
+        cat("Dissolution:\n")
+        print(eta.diss)
       }
       
-      if(do.restart) break      
+      ## Sample to estimate standard error and test if we've actually arrived.
+      G <- out$G
+      w <- out$w
+      V.par<-matrix(NA,p,p)
+      if(control$SA.se){
+        cat('========  Phase 3: Simulate from the fit and estimate standard errors. ========\n',sep="")
+        
+        if(verbose)cat("Evaluating target statistics at the estimate.\n")
+
+        # This is to avoid the latest sample "pushing out" everything else.
+        control$SA.keep.min <- round(nrow(history$oh)/length(states))+control$SA.phase3.samplesize.runs*control$SA.runlength*control$SA.interval
+        tmp <- do.dummy.run(states, history, control, control$SA.burnin, control$SA.phase3.samplesize.runs*control$SA.runlength*control$SA.interval, eta.form=eta.form, eta.diss=eta.diss)
+        if(verbose)cat("Finished.\n")
+        states <- tmp$states
+        history <- tmp$history
+
+        min.ind.se <- max(history$ind.all)-control$SA.phase3.samplesize.runs*control$SA.runlength*control$SA.interval + 1
+        sm.mon <- history$oh.all[history$ind.all>=min.ind.se,-(1:p),drop=FALSE]
+        sm.tid <- history$tid.all[history$ind.all>=min.ind.se]
+
+        V.stat<-cov(sm.mon)
+        ee <- sm.mon %*% robust.inverse(V.stat) %*% G
+        p.val.1 <- approx.hotelling.diff.test(ee)$p.value
+
+        if(verbose) cat("Estimating equation = 0 p-value:",p.val.1,"\n")
+
+        if(subphase == control$SA.phase2.levels.max){
+          if(verbose) cat("Maximum number of gain levels exceeded. Stopping.")
+        }else{
+          if(p.val.1 < control$SA.stop.p){
+            if(verbose) cat("Simulated values of estimating equations are not centered around 0. Continuing.\n")
+            next
+          }else{
+            if(verbose) cat("Simulated values of estimating equations are centered around 0. Stopping.\n")          
+          }
+        }
+        
+        V.par[!offsets,!offsets]<-V.sandwich(w,G,V.stat)
+        sm.mons <- lapply(unique(sm.tid), function(t) sm.mon[sm.tid==t,,drop=FALSE])
+        sm.mon <- do.call(mcmc.list, lapply(sm.mons, mcmc, start=control$SA.burnin))
+      }else{
+        V.par[!offsets,!offsets]<-V.sandwich(w,G,out$v)
+        sm.mon <- NULL
+      }
+
+      mc.se <- rep(NA, p)
+      mc.se[!offsets] <- par.se
+      mc.se.form <- mc.se[1:p.form]
+      mc.se.diss <- mc.se[-(1:p.form)]
+
+      break
     }
-    if(!do.restart) break # If We've gotten this far, no restart conditions have been triggered, so we are good.
+    if(!do.restart) break # If we've gotten this far, no restart conditions have been triggered, so we are good.
   }
   
-  ## Refine the estimate.
-
-  if(inherits(state, "try-error")) stop("Something went wrong too many times. Try better starting values or reducing control$SA.init.gain.") 
-  
-  eta.form <- states[[1]]$eta.form
-  eta.diss <- states[[1]]$eta.diss
-
-  eta.free <- switch(control$SA.refine,
-                     mean = colMeans(oh[,1:p,drop=FALSE][,!offsets,drop=FALSE]),
-                     linear = interpolate.par(out$oh.fit,out$w),
-                     none = if(is.null(cl)) c(eta.form,eta.diss)[!offsets] else stop("No interpolation does not make sense with multithreaded fitting."))
-  if(p.form.free) eta.form[!model.form$etamap$offsettheta] <- eta.free[seq_len(p.form.free)]
-  if(p.diss.free) eta.diss[!model.diss$etamap$offsettheta] <- eta.free[p.form.free+seq_len(p.diss.free)]
-
-  if(verbose){
-    cat("Refining the estimate using the", control$SA.refine,"method. New estimate:\n")
-    cat("Formation:\n")
-    print(eta.form)
-    cat("Dissolution:\n")
-    print(eta.diss)
-  }
-
-  ## Sample to estimate
-  if(control$SA.se){
-    G <- out$G
-    w <- out$w
-    
-    control.phase3<-control
-    control.phase3$time.burnin <- control$SA.burnin
-    control.phase3$time.samplesize <- control$SA.phase3.samplesize
-    control.phase3$time.interval <- control$SA.interval
-    
-    ## Estimate standard errors.
-    cat('========  Phase 3: Simulate from the fit and estimate standard errors. ========\n',sep="")
-    zs <-
-      if(!is.null(cl)) clusterApply(cl,states,function(state) stergm.getMCMCsample(state$nw, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, eta.form, eta.diss, control.phase3, verbose))
-      else list(stergm.getMCMCsample(states[[1]]$nw, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, eta.form, eta.diss, control.phase3, verbose))
-    
-    sm.mons <- lapply(seq_along(zs), function(i) sweep(zs[[i]]$statsmatrix.mon,2,states[[i]]$nw.diff,"+"))
-    sm.mon <- do.call(rbind, sm.mons)
-    if(verbose)cat("Finished.\n")
-    V.stat<-cov(sm.mon)
-    V.par<-matrix(NA,p,p)
-    V.par[!offsets,!offsets]<-V.sandwich(w,G,V.stat)
-    sm.mon <- do.call(mcmc.list, lapply(sm.mons, mcmc, start=control$SA.burnin, thin=control$SA.interval))
-  }else{
-    V.par <- NULL
-    sm.mon <- NULL
-  }
     
   list(newnetwork=if(control$SA.se) zs[[1]]$newnetwork else states[[1]]$nw,
        newnetworks=if(control$SA.se) lapply(zs,"[[","newnetwork") else lapply(states,"[[","nw"),
@@ -438,9 +513,12 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
        covar=V.par,
        covar.form=V.par[seq_len(p.form),seq_len(p.form),drop=FALSE],
        covar.diss=V.par[p.form+seq_len(p.diss),p.form+seq_len(p.diss),drop=FALSE],
+       mc.se = mc.se,
+       mc.se.form = mc.se.form,
+       mc.se.diss = mc.se.diss,
        eta.form=eta.form,
        eta.diss=eta.diss,
-       opt.history=oh.all,
+       opt.history=history$oh.all,
        sample=sm.mon,
        network=nw)
 }
