@@ -70,6 +70,7 @@
 
 simulate.stergm<-function(object, nsim=1, seed=NULL,
                           coef.form=object$formation.fit$coef,coef.diss=object$dissolution.fit$coef,
+                          constraints = object$constraints,
                           monitor = object$targets,
                           time.slices, time.burnin=0, time.interval=1,
                           control=control.simulate.stergm(),
@@ -86,7 +87,7 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
 
   control <- set.control.class("control.simulate.network")
   
-  simulate.network(object$network,formation=object$formation,dissolution=object$dissolution,nsim=nsim,coef.form=coef.form, coef.diss=coef.diss, monitor=monitor, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, statsonly=statsonly, stats.form = stats.form, stats.diss = stats.diss, verbose=verbose,...)
+  simulate.network(object$network,formation=object$formation,dissolution=object$dissolution,nsim=nsim,coef.form=coef.form, coef.diss=coef.diss, constraints=constraints, monitor=monitor, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, statsonly=statsonly, stats.form = stats.form, stats.diss = stats.diss, verbose=verbose,...)
 }
 
 
@@ -95,6 +96,7 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
 simulate.network <- function(object, nsim=1, seed=NULL,
                              formation, dissolution,
                              coef.form,coef.diss,
+                             constraints = ~.,
                              monitor = NULL,
                              time.slices, time.burnin=0, time.interval=1,
                              control=control.simulate.network(),
@@ -161,9 +163,9 @@ simulate.network <- function(object, nsim=1, seed=NULL,
     control$toggles<-FALSE
   }
     
-  MHproposal.form <- MHproposal(~.,control$MCMC.prop.args.form,nw,
+  MHproposal.form <- MHproposal(constraints,control$MCMC.prop.args.form,nw,
                                 weights=control$MCMC.prop.weights.form,class="f")
-  MHproposal.diss <- MHproposal(~.,control$MCMC.prop.args.diss,nw,
+  MHproposal.diss <- MHproposal(constraints,control$MCMC.prop.args.diss,nw,
                                 weights=control$MCMC.prop.weights.diss,class="d")
 
   eta.form <- ergm.eta(coef.form, model.form$etamap)

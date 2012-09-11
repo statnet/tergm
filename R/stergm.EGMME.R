@@ -75,7 +75,6 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
                  verbose) {
 
   if(!is.network(nw)) stop("Argument nw must be a network.")
-  if(constraints!=~.) stop("Constraints are not supported for STERGM EGGME at this time.")
    
   # Allow the user to specify targets as copied from formation or dissolution formula.
   if(is.character(targets)){
@@ -132,8 +131,12 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
   }
 
   if (verbose) cat("Initializing Metropolis-Hastings proposals.\n")
-  MHproposal.form <- MHproposal(~., weights=control$MCMC.prop.weights.form, control$MCMC.prop.args.form, nw, class="f")
-  MHproposal.diss <- MHproposal(~., weights=control$MCMC.prop.weights.diss, control$MCMC.prop.args.diss, nw, class="d")
+  MHproposal.form <- MHproposal(constraints, weights=control$MCMC.prop.weights.form, control$MCMC.prop.args.form, nw, class="f")
+  MHproposal.diss <- MHproposal(constraints, weights=control$MCMC.prop.weights.diss, control$MCMC.prop.args.diss, nw, class="d")
+
+  if(!is.dyad.independent(MHproposal.form$arguments$constraints) || !is.dyad.independent(MHproposal.diss$arguments$constraints)){
+    warning("Dyad-dependent constraint imposed. Note that the constraint is applied to the post-formation and post-dissolution networks y+ and y-, not the next time-step's network. This behavior may change in the future.")
+  }
   
   model.form <- ergm.getmodel(formation, nw, expanded=TRUE, role="formation")
   model.diss <- ergm.getmodel(dissolution, nw, expanded=TRUE, role="dissolution")
@@ -193,9 +196,9 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
 
   if(!is.null(cl)) ergm.stopCluster(cl)
 
-  out <- list(network = nw, formation = formation, dissolution = dissolution, targets = targets, target.stats=model.mon$target.stats, estimate=estimate, covar = Cout$covar, opt.history=Cout$opt.history, sample=Cout$sample, sample.obs=NULL, control=control, reference = "Bernoulli", mc.se = Cout$mc.se,
-              formation.fit = with(Cout, list(network=nw, formula=formation, coef = eta.form, covar=covar.form, etamap = model.form$etamap, offset = model.form$etamap$offsettheta, constraints=~., estimate=estimate, control=control, reference = "Bernoulli", mc.se = mc.se.form)),
-              dissolution.fit = with(Cout, list(network=nw, formula=dissolution, coef = eta.diss, covar=covar.diss, etamap = model.diss$etamap, offset = model.diss$etamap$offsettheta, constraints=~., estimate=estimate, control=control, reference = "Bernoulli", mc.se = mc.se.diss))
+  out <- list(network = nw, formation = formation, dissolution = dissolution, targets = targets, target.stats=model.mon$target.stats, estimate=estimate, covar = Cout$covar, opt.history=Cout$opt.history, sample=Cout$sample, sample.obs=NULL, control=control, reference = "Bernoulli", mc.se = Cout$mc.se, constraints = constraints,
+              formation.fit = with(Cout, list(network=nw, formula=formation, coef = eta.form, covar=covar.form, etamap = model.form$etamap, offset = model.form$etamap$offsettheta, constraints=constraints, estimate=estimate, control=control, reference = "Bernoulli", mc.se = mc.se.form)),
+              dissolution.fit = with(Cout, list(network=nw, formula=dissolution, coef = eta.diss, covar=covar.diss, etamap = model.diss$etamap, offset = model.diss$etamap$offsettheta, constraints=constraints, estimate=estimate, control=control, reference = "Bernoulli", mc.se = mc.se.diss))
               )
   class(out$formation.fit)<-class(out$dissolution.fit)<-"ergm"
   
