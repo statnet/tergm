@@ -87,10 +87,10 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
 
     # Check that these networks can be combined for this model.
     bad.stat <-
-      !((apply(sapply(y0s, function(nw) summary(ergm.update.formula(formation,nw~.))),1,sum)==summary(ergm.update.formula(formation,y0~.))) &
-        (apply(sapply(y0s, function(nw) summary(ergm.update.formula(dissolution,nw~.))),1,sum)==summary(ergm.update.formula(dissolution,y0~.))) &
-        (apply(sapply(y1s, function(nw) summary(ergm.update.formula(formation,nw~.))),1,sum)==summary(ergm.update.formula(formation,y1~.))) &
-        (apply(sapply(y1s, function(nw) summary(ergm.update.formula(dissolution,nw~.))),1,sum)==summary(ergm.update.formula(dissolution,y1~.))))
+      !((apply(rbind(sapply(y0s, function(nw) summary(ergm.update.formula(formation,nw~.)))),1,sum)==summary(ergm.update.formula(formation,y0~.))) &
+        (apply(rbind(sapply(y0s, function(nw) summary(ergm.update.formula(dissolution,nw~.)))),1,sum)==summary(ergm.update.formula(dissolution,y0~.))) &
+        (apply(rbind(sapply(y1s, function(nw) summary(ergm.update.formula(formation,nw~.)))),1,sum)==summary(ergm.update.formula(formation,y1~.))) &
+        (apply(rbind(sapply(y1s, function(nw) summary(ergm.update.formula(dissolution,nw~.)))),1,sum)==summary(ergm.update.formula(dissolution,y1~.))))
     if(any(bad.stat)) stop("Fitting the terms ", paste.and(names(bad.stat)[bad.stat]), " over multiple network transitions is not supported at this time.")
   }else{
     # We are about to do logical operations on networks, so make sure
