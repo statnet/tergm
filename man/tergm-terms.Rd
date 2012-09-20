@@ -8,6 +8,10 @@
 \alias{edges.ageinterval}
 \alias{edgecov.ages}
 \alias{edgecov.mean.age}
+\alias{InitErgmTerm.edge.ages}
+\alias{InitErgmTerm.edgecov}
+\alias{InitErgmTerm.edgecov.ages}
+\alias{InitErgmTerm.edges.ageinterval}
 \docType{methods}
 \title{Temporally-Sensitive Terms used in Exponential Family Random Graph Models}
 \description{

@@ -1,14 +1,6 @@
 \name{stergm-internal}
 \title{Internal stergm Objects}
 
-\alias{InitConstraint.atleast}
-\alias{InitConstraint.atmost}
-
-\alias{InitErgmTerm.edge.ages}
-\alias{InitErgmTerm.edgecov}
-\alias{InitErgmTerm.edgecov.ages}
-\alias{InitErgmTerm.edges.ageinterval}
-
 \alias{InitMHP.dissolution}
 \alias{InitMHP.dissolutionMLE}
 \alias{InitMHP.dissolutionNonObservedMLE}
