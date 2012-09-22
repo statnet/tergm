@@ -9,9 +9,6 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
                  verbose=FALSE, ...) {
   check.control.class()
   
-  current.warn <- options()$warn
-  on.exit(options(warn=current.warn), add=TRUE)
-  options(warn=0)
   if(!is.null(control$seed))  set.seed(as.integer(control$seed))
 
   estimate <- match.arg(estimate,c("CMLE","CMPLE","EGMME"))
