@@ -127,5 +127,5 @@ CRAN.R-project.org/package=ergm>.
   2012(2012-02). \url{http://stat.psu.edu/Research/2012-technical-reports}
   }
 }
-\seealso{\code{\link[ergm:ergm-terms]{ergm-terms} (from the \code{\link[=ergm-package]{ergm}} package), \code{\link{ergm}}, \code{\link{network}}, \code{\link{\%v\%}}, \code{\link{\%n\%}}}
+\seealso{\code{\link[ergm:ergm-terms]{ergm-terms}} (from the \code{\link[=ergm-package]{ergm}} package), \code{\link{ergm}}, \code{\link{network}}, \code{\link{\%v\%}}, \code{\link{\%n\%}}}
 \keyword{models}
