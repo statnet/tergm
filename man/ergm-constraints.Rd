@@ -3,10 +3,6 @@
 \alias{constraints-ergm}
 \alias{ergm.constraints}
 \alias{constraints.ergm}
-\alias{tergm-constraints}
-\alias{constraints-tergm}
-\alias{tergm.constraints}
-\alias{constraints.tergm}
 
 \alias{InitConstraint.atleat}
 \alias{InitConstraint.atmost}
@@ -15,23 +11,13 @@
 
 \title{Formation and Dissolution Constraints for Exponential Family Random Graph Models}
 \description{
-  \code{\link{ergm}} is used to fit linear exponential random graph
-  models (ERGMs), in which
-  the probability of a given network, \eqn{y}, on a set of nodes is 
-  \eqn{h(y) \exp\{\eta(\theta) \cdot
-    g(y)\}/c(\theta)}, where
-  \eqn{h(y)} is the reference measure (usually \eqn{h(y)=1}),
-  \eqn{g(y)} is a vector of network statistics for \eqn{y},
-  \eqn{\eta(\theta)} is a natural parameter vector of the same 
-  length (with \eqn{\eta(\theta)=\theta} for most terms), and \eqn{c(\theta)} is the
-  normalizing constant for the distribution.
-
-  This page describes the constraints (the networks \eqn{y} for which \eqn{h(y)>0}) 
+  This page describes the network sample space constraints
   that are included with the
-  \code{\link[=tergm-package]{tergm}} package.
+  \code{\link[=tergm-package]{tergm}} package. For more information, and
+  instructions for using constraints, see
+  \code{\link[ergm]{ergm-constraints} and \code{\link{ergm}}.
 }
-\section{Possible network constraints}{
-  The constraint terms currently implemented are 
+\section{Constraints implemented in  the \code{\link[=tergm-package]{tergm}} package}{
   \describe{
     \item{\code{atleast(nw)}}{\emph{The Formation Constraint:}
       Preserve all ties in network \code{nw}. Only dyads that are not
