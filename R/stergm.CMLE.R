@@ -115,9 +115,13 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
 
   constraints.form <- if(constraints==~.) ~atleast(y0) else ergm.update.formula(constraints, ~.+atleast(y0))
   if(length(times)>2) constraints.form <- ergm.update.formula(constraints.form, ~.+blockdiag(".stergm.CMLE.time.index"))
+  # TODO: Some unlucky variable names can break this. We need to figure out a way around this.
+  environment(constraints.form) <- environment()
   
   constraints.diss <- if(constraints==~.) ~atmost(y0) else ergm.update.formula(constraints, ~.+atmost(y0))
   if(length(times)>2) constraints.diss <- ergm.update.formula(constraints.diss, ~.+blockdiag(".stergm.CMLE.time.index"))
+  # TODO: Some unlucky variable names can break this. We need to figure out a way around this.
+  environment(constraints.diss) <- environment()
   
   # Apply initial values passed to control.stergm() the separate controls, if necessary.
   if(is.null(control$CMLE.control.form$init)) control$CMLE.control.form$init <- control$init.form
