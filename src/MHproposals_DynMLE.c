@@ -12,7 +12,6 @@
 void MH_FormationMLE (MHproposal *MHp, Network *nwp) 
 {  
   static Vertex nnodes;
-  unsigned int trytoggle;
   static Edge ndyads, nedges0;
 
   if(MHp->ntoggles == 0) { /* Initialize */
@@ -29,30 +28,11 @@ void MH_FormationMLE (MHproposal *MHp, Network *nwp)
     return;
   }
 
-  for(trytoggle=0;trytoggle<MAX_TRIES;trytoggle++){
+  BD_COND_LOOP({
     /* Keep trying dyads until a one that is not an edge in the reference network is found. */
     /* Generate. */
-    do{
-      Mhead[0] = 1 + unif_rand() * nnodes;
-      Mtail[0] = 1 + unif_rand() * nnodes;
-    }while(Mtail[0]==Mhead[0]);
-    
-    /* If undirected, reorder. */
-    if(!nwp->directed_flag && Mhead[0]<Mtail[0]){
-      Vertex tmp=Mhead[0];
-      Mhead[0]=Mtail[0];
-      Mtail[0]=tmp;
-    }
-      
-    if(!dEdgeListSearch(Mtail[0],Mhead[0],MHp->inputs) &&
-	    CheckTogglesValid(MHp, nwp)) break;
-  }
-
-  /* If no valid proposal found, signal a failed proposal. */
-  if(trytoggle>=MAX_TRIES) {
-    Mtail[0]=MH_FAILED;
-    Mhead[0]=MH_UNSUCCESSFUL;
-  }
+      GetRandDyad(Mtail, Mhead, nwp);
+    }, !dEdgeListSearch(Mtail[0],Mhead[0],MHp->inputs), 2);
 }
 
 /********************
@@ -62,7 +42,6 @@ void MH_FormationMLE (MHproposal *MHp, Network *nwp)
 void MH_FormationMLETNT(MHproposal *MHp, Network *nwp) 
 {  
   static Vertex nnodes;
-  unsigned int trytoggle;
   Vertex tail,head;
   static Edge ndyads;
   static double comp=0.5, odds;
@@ -72,7 +51,7 @@ void MH_FormationMLETNT(MHproposal *MHp, Network *nwp)
     MHp->ntoggles=1;
     nnodes = nwp->nnodes;
     odds = comp/(1.0-comp);
-    ndyads = DYADCOUNT(nnodes, 0, nwp[0].directed_flag);
+    ndyads = DYADCOUNT(nnodes, nwp->bipartite, nwp[0].directed_flag);
 
     Edge nedges0 = MHp->inputs[0];
     MHp->discord = (Network**) calloc(2,sizeof(Network*)); // A space for the sentinel NULL pointer.
@@ -81,7 +60,7 @@ void MH_FormationMLETNT(MHproposal *MHp, Network *nwp)
    
     for(Edge i=0; i<nwp->nedges; i++){
       FindithEdge(&tail, &head, i+1, nwp);
-      ToggleEdge(tail,head,&discord);
+      ToggleEdge(tail,head, &discord);
     }
     
     return;
@@ -96,43 +75,19 @@ void MH_FormationMLETNT(MHproposal *MHp, Network *nwp)
     return;
   }
 
-  for(trytoggle=0;trytoggle<MAX_TRIES*2;trytoggle++){
+  BD_LOOP({
     if(ndedges != 0 && unif_rand() < comp) { /* Select a discordant dyad at random */
-      GetRandEdge(&tail, &head, &discord);
+      GetRandEdge(Mtail, Mhead, &discord);
       
       MHp->logratio += log(ndedges / ((double)nempty + 1)/comp * ((ndedges==1)? 1 : (1-comp)));
     }else{ /* select an empty dyad in nwp[0] at random */
-      do{ /* Keep trying dyads as long as it's an edge in nwp */
-        head = 1 + unif_rand() * nnodes;
-        tail = 1 + unif_rand() * (nnodes-1);
-        if(tail>=head) tail++;
-        trytoggle++;
-      }while(((tail > head && !nwp->directed_flag) || 
-	      EdgetreeSearch(tail,head,nwp->outedges)) && trytoggle<MAX_TRIES);
-      
-      /* Proposal failed after trying */
-      if(trytoggle >= MAX_TRIES*2){
-        Mtail[0]=MH_FAILED;
-        Mhead[0]=MH_UNSUCCESSFUL; 
-        return;
-      }
-      
+      GetRandNonedge(Mtail, Mhead, nwp);
+
       if(ndedges==0){
         MHp->logratio += log(nempty*comp);
       }else{
         MHp->logratio += log(((double)nempty)/(ndedges+1) *odds);
       }
     }
-    
-    Mtail[0]=tail;
-    Mhead[0]=head;
-    
-    if(CheckTogglesValid(MHp, nwp)) break;
-  }
-
-  /* If no valid proposal found, signal a failed proposal. */
-  if(trytoggle>=MAX_TRIES*2) {
-    Mtail[0]=MH_FAILED;
-    Mhead[0]=MH_UNSUCCESSFUL;
-  }
+    });
 }

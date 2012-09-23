@@ -11,8 +11,6 @@
 ***********************/
 void MH_FormationMLEblockdiag (MHproposal *MHp, Network *nwp) 
 {  
-  static Vertex nnodes;
-  unsigned int trytoggle;
   static Edge ndyads, nedges0;
 
   static Vertex blks;
@@ -20,7 +18,6 @@ void MH_FormationMLEblockdiag (MHproposal *MHp, Network *nwp)
 
   if(MHp->ntoggles == 0) { /* Initialize */
     MHp->ntoggles=1;
-    nnodes = nwp[0].nnodes;
     nedges0 = MHp->inputs[0];
     blkinfo = MHp->inputs+1+nedges0*2;
     ndyads = blkinfo[0];
@@ -36,7 +33,7 @@ void MH_FormationMLEblockdiag (MHproposal *MHp, Network *nwp)
     return;
   }
 
-  for(trytoggle=0;trytoggle<MAX_TRIES;trytoggle++){
+  BD_COND_LOOP({
     /* Keep trying dyads until a one that is not an edge in the reference network is found. */
     /* Generate. */
     double r = unif_rand();
@@ -52,16 +49,7 @@ void MH_FormationMLEblockdiag (MHproposal *MHp, Network *nwp)
       Mhead[0]=Mtail[0];
       Mtail[0]=tmp;
     }
-      
-    if(!dEdgeListSearch(Mtail[0],Mhead[0],MHp->inputs) &&
-	    CheckTogglesValid(MHp, nwp)) break;
-  }
-
-  /* If no valid proposal found, signal a failed proposal. */
-  if(trytoggle>=MAX_TRIES) {
-    Mtail[0]=MH_FAILED;
-    Mhead[0]=MH_UNSUCCESSFUL;
-  }
+    },!dEdgeListSearch(Mtail[0],Mhead[0],MHp->inputs), 2); 
 }
 
 /********************
@@ -75,7 +63,6 @@ void MH_FormationMLEblockdiag (MHproposal *MHp, Network *nwp)
 void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp) 
 {  
   static Vertex nnodes, blks;
-  unsigned int trytoggle;
   Vertex tail,head;
   static Edge ndyads;
   static double comp=0.5, odds;
@@ -113,7 +100,7 @@ void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp)
     return;
   }
 
-  for(trytoggle=0;trytoggle<MAX_TRIES*2;trytoggle++){
+  BD_LOOP({
     if(ndedges != 0 && unif_rand() < comp) { /* Select a discordant dyad at random */
       GetRandEdge(&tail, &head, &discord);
       
@@ -126,16 +113,15 @@ void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp)
 	while(r>blkcwt[blk-1]) blk++;
 	tail = blkpos[blk-1]+1 + unif_rand() * (blkpos[blk]-blkpos[blk-1]);
 	while ((head = blkpos[blk-1]+1 + unif_rand() * (blkpos[blk]-blkpos[blk-1])) == tail);
-        trytoggle++;
-      }while(((tail > head && !nwp->directed_flag) || 
-	      EdgetreeSearch(tail,head,nwp->outedges)) && trytoggle<MAX_TRIES);
-      
-      /* Proposal failed after trying */
-      if(trytoggle >= MAX_TRIES*2){
-        Mtail[0]=MH_FAILED;
-        Mhead[0]=MH_UNSUCCESSFUL; 
-        return;
-      }
+
+	/* If undirected, reorder. */
+	if(!nwp->directed_flag && head<tail){
+	  Vertex tmp=head;
+	  head=tail;
+	  tail=tmp;
+	}
+	// FIXME: This is not guaranteed to terminate in a reasonable amount of time.
+      }while(EdgetreeSearch(tail,head,nwp->outedges));
       
       if(ndedges==0){
         MHp->logratio += log(nempty*comp);
@@ -147,12 +133,5 @@ void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp)
     Mtail[0]=tail;
     Mhead[0]=head;
     
-    if(CheckTogglesValid(MHp, nwp)) break;
-  }
-
-  /* If no valid proposal found, signal a failed proposal. */
-  if(trytoggle>=MAX_TRIES*2) {
-    Mtail[0]=MH_FAILED;
-    Mhead[0]=MH_UNSUCCESSFUL;
-  }
+    });
 }
