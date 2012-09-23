@@ -100,6 +100,16 @@ static int (*fun)(Vertex *,Vertex *,Network *) = NULL;
 if(fun==NULL) fun = (int (*)(Vertex *,Vertex *,Network *)) R_FindSymbol("GetRandEdge", "ergm", NULL);
 return fun(tail,head,nwp);
 }
+int FindithNondge(Vertex *tail, Vertex *head, Edge i, Network *nwp){
+static int (*fun)(Vertex *,Vertex *,Edge,Network *) = NULL;
+if(fun==NULL) fun = (int (*)(Vertex *,Vertex *,Edge,Network *)) R_FindSymbol("FindithNondge", "ergm", NULL);
+return fun(tail,head,i,nwp);
+}
+int GetRandNonedge(Vertex *tail, Vertex *head, Network *nwp){
+static int (*fun)(Vertex *,Vertex *,Network *) = NULL;
+if(fun==NULL) fun = (int (*)(Vertex *,Vertex *,Network *)) R_FindSymbol("GetRandNonedge", "ergm", NULL);
+return fun(tail,head,nwp);
+}
 void printedge(Edge e, TreeNode *edges){
 static void (*fun)(Edge,TreeNode *) = NULL;
 if(fun==NULL) fun = (void (*)(Edge,TreeNode *)) R_FindSymbol("printedge", "ergm", NULL);
