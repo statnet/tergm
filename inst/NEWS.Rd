@@ -1,5 +1,5 @@
 \name{NEWS}
-\title{NEWS file for the \code{\link[=ergm-package]{ergm}} package}
+\title{NEWS file for the \code{\link[=tergm-package]{tergm}} package}
 \encoding{UTF-8}
 
 % When a release is forked, copy the sections to a new release and
@@ -7,11 +7,13 @@
 \section{Changes in version 3.1}{
 
   \subsection{THIS IS AN INITIAL RELEASE}{
-    This package consists of the dynamic network modeling code that has been
-    split out of the \code{\link[=ergm-package]{ergm}} package.
-
-    Changes listed in the following sections are relative to
-    \code{\link[=ergm-package]{ergm}} version 3.0. 
+    \itemize{
+      \item This package consists of the dynamic network modeling code that has been
+      split out of the \code{\link[=ergm-package]{ergm}} package.
+      
+      \item Changes listed in the following sections are relative to
+      \code{\link[=ergm-package]{ergm}} version 3.0.
+      }
   }
   
   \subsection{NEW FEATURES}{
@@ -31,8 +33,20 @@
       now plot the estimated gradient matrix and the matrix of
       correlations among the target statistics.
 
+      \item EGMME fitting is now more adaptive when determining when to
+      stop the optimization and return the result.
+
       \item EGMME fitting can now take advantage of multiple CPUs,
       cores, or cluster nodes for faster and more robust fitting.
+
+      \item EGMME and CMLE fitting can now accommodate a
+      \code{constraints} argument. However, note that the constraints
+      apply to post-formation (\eqn{y^+=y^0\cup\y^1}) and
+      post-dissolution (\eqn{y^-=y^0\cap\y^1}) networks, not to the
+      final network (\eqn{y^1}). This may change in the future.
+
+      \item CMLE can now be fit to more than two networks. (Not all ERGM
+      terms and constraints can be used in this mode, however.)
       
     } }
   
