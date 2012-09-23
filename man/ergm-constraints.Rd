@@ -15,7 +15,7 @@
   that are included with the
   \code{\link[=tergm-package]{tergm}} package. For more information, and
   instructions for using constraints, see
-  \code{\link[ergm]{ergm-constraints} and \code{\link{ergm}}.
+  \code{\link[ergm]{ergm-constraints}} and \code{\link{ergm}}.
 }
 \section{Constraints implemented in  the \code{\link[=tergm-package]{tergm}} package}{
   \describe{
