@@ -15,6 +15,7 @@ control.stergm<-function(init.form=NULL,
                          MCMC.packagenames=c("tergm","ergm"),
                          # Number of proposals within each time step.
                          MCMC.burnin=10000,
+                         MCMC.burnin.mul=7,
                          MCMC.interval=100,
 
                          CMLE.control=NULL,

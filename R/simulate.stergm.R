@@ -80,7 +80,7 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
                           verbose=FALSE, ...){
   check.control.class(c("simulate.stergm","simulate.network"))
   
-  control.transfer <- c("MCMC.burnin", "MCMC.prop.weights", "MCMC.prop.args", "MCMC.packagenames", "MCMC.init.maxedges", "MCMC.init.maxchanges")
+  control.transfer <- c("MCMC.burnin", "MCMC.burnin.mul", "MCMC.prop.weights", "MCMC.prop.args", "MCMC.packagenames", "MCMC.init.maxedges", "MCMC.init.maxchanges")
   for(arg in control.transfer)
     if(is.null(control[[arg]]))
       control[arg] <- list(object$control[[arg]])

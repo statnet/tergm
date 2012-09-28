@@ -33,6 +33,7 @@
 #########################################################################
 
 control.simulate.network<-function(MCMC.burnin=1000,
+                                   MCMC.burnin.mul=7,
                                    MCMC.prop.weights.form="default",MCMC.prop.args.form=NULL,
                                    MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,                                  
                                    MCMC.init.maxedges=20000,
@@ -47,6 +48,7 @@ control.simulate.network<-function(MCMC.burnin=1000,
   }
 
 control.simulate.stergm<-function(MCMC.burnin=NULL,
+                                  MCMC.burnin.mul=NULL,
                                   MCMC.prop.weights.form=NULL,MCMC.prop.args.form=NULL,
                                   MCMC.prop.weights.diss=NULL,MCMC.prop.args.diss=NULL,                                  
                                   MCMC.init.maxedges=NULL,
