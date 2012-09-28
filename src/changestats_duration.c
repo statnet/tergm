@@ -8,15 +8,15 @@
 *****************/
 D_CHANGESTAT_FN(d_edges_ageinterval){
   int i;
-  Vertex tail, head;
-  int nintervals = INPUT_PARAM[0];
   
   ZERO_ALL_CHANGESTATS(i);
+
   FOR_EACH_TOGGLE(i){
+    Vertex tail, head;
     int age = ElapsedTime(tail=TAIL(i),head=HEAD(i),nwp);
     // Only count if the age is in [from,to). ( to=0 ==> to=Inf )
-    for(unsigned int j=0; j<nintervals; j++){
-      unsigned int from = INPUT_PARAM[j*2+1], to = INPUT_PARAM[j*2+2];
+    for(unsigned int j=0; j<N_CHANGE_STATS; j++){
+      unsigned int from = INPUT_PARAM[j*2], to = INPUT_PARAM[j*2+1];
       if(from<=age && (to==0 || age<to)){
 	unsigned int edgeflag = IS_OUTEDGE(tail, head);
 	CHANGE_STAT[j] += edgeflag ? - 1 : 1;
@@ -29,27 +29,27 @@ D_CHANGESTAT_FN(d_edges_ageinterval){
 
 D_CHANGESTAT_FN(d_edges_ageinterval_mon){
   int i;
-  Vertex tail, head;
-  int nintervals = INPUT_PARAM[0];
+
   ZERO_ALL_CHANGESTATS(i);
 
   for(Edge k=1; k <= N_EDGES; k++){
     Vertex tail, head;
     FindithEdge(&tail, &head, k, nwp);
     int age = ElapsedTime(tail,head,nwp); // Every tie "starts out" at age 1.
-    for(unsigned int j=0; j<nintervals; j++){
-      unsigned int from = INPUT_PARAM[j*2+1], to = INPUT_PARAM[j*2+2];
+    for(unsigned int j=0; j<N_CHANGE_STATS; j++){
+      unsigned int from = INPUT_PARAM[j*2], to = INPUT_PARAM[j*2+1];
       if(age+1 == from) CHANGE_STAT[j]++; // The tie "ages" into the interval.
       if(to!=0 && age+1 == to) CHANGE_STAT[j]--; // The tie "ages" out of the interval.
     }
   }
 
   FOR_EACH_TOGGLE(i){
+    Vertex tail, head;
     int age = ElapsedTime(tail=TAIL(i),head=HEAD(i),nwp);
     // Only count if the age is in [from,to). ( to=0 ==> to=Inf )
 
-    for(unsigned int j=0; j<nintervals; j++){
-      unsigned int from = INPUT_PARAM[j*2+1], to = INPUT_PARAM[j*2+2];
+    for(unsigned int j=0; j<N_CHANGE_STATS; j++){
+      unsigned int from = INPUT_PARAM[j*2], to = INPUT_PARAM[j*2+1];
       if(IS_OUTEDGE(tail, head)){ // If already an edge, we are dissolving.
 	if(from<=age+1 && (to==0 || age+1<to)) CHANGE_STAT[j]--; // Statistic only changes if it's in the interval.
       }else{ // If not already an edge, we are forming.
@@ -60,13 +60,16 @@ D_CHANGESTAT_FN(d_edges_ageinterval_mon){
 }
 
 S_CHANGESTAT_FN(s_edges_ageinterval_mon){
-  int from=INPUT_PARAM[0], to=INPUT_PARAM[1];
-  CHANGE_STAT[0] = 0;
+  int i;
+  ZERO_ALL_CHANGESTATS(i);
   for (Edge k=1; k <= N_EDGES; k++){
     Vertex tail, head;
     FindithEdge(&tail, &head, k, nwp);
     int age = ElapsedTime(tail,head,nwp);
-    if(from<=age && (to==0 || age<to)) CHANGE_STAT[0]++;
+    for(unsigned int j=0; j<N_CHANGE_STATS; j++){
+      unsigned int from = INPUT_PARAM[j*2], to = INPUT_PARAM[j*2+1];
+      if(from<=age && (to==0 || age<to)) CHANGE_STAT[0]++;
+    }
   }
 }
 

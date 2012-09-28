@@ -17,7 +17,7 @@ else if(any(from>=to)) stop("Term edges.ageinterval must have from<to.")
   if(any(from<1)) stop("An extant edge cannot have an \"age\" of less than 1.")
   list(name=if(role=="target") "edges_ageinterval_mon" else "edges_ageinterval",
        coef.names = paste("edges","age",from,"to",to,sep="."),
-       inputs=c(length(from), rbind(from, ifelse(to==Inf, 0, to))),
+       inputs=c(rbind(from, ifelse(to==Inf, 0, to))),
        pkgname="tergm",
        dependence=FALSE)
 }
