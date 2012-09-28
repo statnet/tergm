@@ -26,8 +26,8 @@
   \code{targets=} or \code{monitor=} formulas of
   \code{\link{stergm}}, \code{\link{simulate.stergm}}, or
   \code{\link[ergm]{summary}} (with an ERGM formula), but they may
-  not appear in their \code{\link{formation=}} and
-  \code{\link{dissolution=}} formulas. These terms are marked with
+  not appear in their \code{\link[=stergm]{formation=}} and
+  \code{\link[=stergm]{dissolution=}} formulas. These terms are marked with
   "(target-only)".
 
   All terms listed here are binary.
@@ -37,12 +37,19 @@
   \code{\link[=tergm-package]{tergm}} pacakge}{
   \describe{
 
-    \item{\code{edges.ageinterval(from, to=+Inf)}}{\emph{Number of edges
+    \item{\code{edges.ageinterval(from, to=+Inf)} (dissolution- and target-only)}{\emph{Number of edges
       with age falling into a specified range:}
-      This term adds one statistic equaling the number of edges for
+      This term counts the number of edges in the network for
       which the time elapsed since formation is greater than or equal to
       \code{from} but strictly less than \code{to}. In other words, it
-      is in the semiopen interval \code{[from, to)}.}
+      is in the semiopen interval \code{[from, to)}. \code{from} and
+      \code{to} may be scalars, vectors of the same length, or one of
+      them must have length one, in which case it is recycled.
+
+      When used in the dissolution formula of a STERGM, it can be used
+      to model a non-Markovian dissolution process, controling the
+      hazard function in the interval directly.
+    }
 
     \item{\code{edge.ages} (target-only)}{\emph{Sum of ages of extant
 	ties:} 

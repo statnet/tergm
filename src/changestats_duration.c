@@ -7,17 +7,20 @@
  (time steps spent in the current state) in the interval [inputparams0,inputparams1).
 *****************/
 D_CHANGESTAT_FN(d_edges_ageinterval){
-  int edgeflag, i;
+  int i;
   Vertex tail, head;
-  int from = INPUT_PARAM[0], to = INPUT_PARAM[1];
+  int nintervals = INPUT_PARAM[0];
   
   ZERO_ALL_CHANGESTATS(i);
   FOR_EACH_TOGGLE(i){
     int age = ElapsedTime(tail=TAIL(i),head=HEAD(i),nwp);
     // Only count if the age is in [from,to). ( to=0 ==> to=Inf )
-    if(from<=age && (to==0 || age<to)){
-      edgeflag = IS_OUTEDGE(tail, head);
-      CHANGE_STAT[0] += edgeflag ? - 1 : 1;
+    for(unsigned int j=0; j<nintervals; j++){
+      unsigned int from = INPUT_PARAM[j*2+1], to = INPUT_PARAM[j*2+2];
+      if(from<=age && (to==0 || age<to)){
+	unsigned int edgeflag = IS_OUTEDGE(tail, head);
+	CHANGE_STAT[j] += edgeflag ? - 1 : 1;
+      }
     }
     TOGGLE_IF_MORE_TO_COME(i);
   }
@@ -25,26 +28,33 @@ D_CHANGESTAT_FN(d_edges_ageinterval){
 }
 
 D_CHANGESTAT_FN(d_edges_ageinterval_mon){
-  int edgeflag, i;
+  int i;
   Vertex tail, head;
-  int from = INPUT_PARAM[0], to = INPUT_PARAM[1];
-    
+  int nintervals = INPUT_PARAM[0];
   ZERO_ALL_CHANGESTATS(i);
 
   for(Edge k=1; k <= N_EDGES; k++){
     Vertex tail, head;
     FindithEdge(&tail, &head, k, nwp);
     int age = ElapsedTime(tail,head,nwp); // Every tie "starts out" at age 1.
-    if(age+1 == from) CHANGE_STAT[0]++; // The tie "ages" into the interval.
-    if(to!=0 && age+1 == to) CHANGE_STAT[0]--; // The tie "ages" out of the interval.
+    for(unsigned int j=0; j<nintervals; j++){
+      unsigned int from = INPUT_PARAM[j*2+1], to = INPUT_PARAM[j*2+2];
+      if(age+1 == from) CHANGE_STAT[j]++; // The tie "ages" into the interval.
+      if(to!=0 && age+1 == to) CHANGE_STAT[j]--; // The tie "ages" out of the interval.
+    }
   }
 
   FOR_EACH_TOGGLE(i){
     int age = ElapsedTime(tail=TAIL(i),head=HEAD(i),nwp);
     // Only count if the age is in [from,to). ( to=0 ==> to=Inf )
-    if(from<=age+1 && (to==0 || age+1<to)){
-      edgeflag = IS_OUTEDGE(tail, head);
-      CHANGE_STAT[0] += edgeflag ? - 1 : +1;
+
+    for(unsigned int j=0; j<nintervals; j++){
+      unsigned int from = INPUT_PARAM[j*2+1], to = INPUT_PARAM[j*2+2];
+      if(IS_OUTEDGE(tail, head)){ // If already an edge, we are dissolving.
+	if(from<=age+1 && (to==0 || age+1<to)) CHANGE_STAT[j]--; // Statistic only changes if it's in the interval.
+      }else{ // If not already an edge, we are forming.
+	if(from==1) CHANGE_STAT[j]++; // Statistic only changes if it starts at just-formed edges.
+      }
     }
   }
 }
@@ -102,8 +112,7 @@ S_CHANGESTAT_FN(s_edge_ages_mon){
 /*****************
  void d_edgecov_ages
 
- Weighted sum of ages of all extant ties. This quantity changes when the clock
- advances, so it needs a t_??? function.
+ Weighted sum of ages of all extant ties.
 
 *****************/
 
@@ -159,8 +168,7 @@ S_CHANGESTAT_FN(s_edgecov_ages_mon){
 /*****************
  void d_mean_age
 
- Mean of ages of all extant ties. This quantity changes when the clock
- advances, so it needs a t_??? function.
+ Mean of ages of all extant ties.
 
  The mean_ages of an empty network is defined to be emptyval.
 
@@ -218,8 +226,7 @@ S_CHANGESTAT_FN(s_mean_age_mon){
 /*****************
  void d_edgecov_mean_age
 
- Weigted mean of ages of all extant ties. This quantity changes when the clock
- advances, so it needs a t_??? function.
+ Weigted mean of ages of all extant ties.
 
  The edgecov_mean_ages of an empty network is defined to be emptyval.
 

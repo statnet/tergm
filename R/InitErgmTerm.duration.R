@@ -9,10 +9,15 @@ InitErgmTerm.edges.ageinterval<-function(nw, arglist, role, ...) {
   from<-a$from
   to<-a$to
 
-  if(from<1) stop("An extant edge cannot have an \"age\" of less than 1.")
+  if(length(to)==1 && length(from)>1) to <- rep(to, length(from))
+  else if(length(from)==1 && length(to)>1) from <- rep(from, length(to))
+  else if(length(from)!=length(to)) stop("The arguments of term edges.ageinterval must have arguments either of the same length, or one of them must have length 1.")
+else if(any(from>=to)) stop("Term edges.ageinterval must have from<to.")
+
+  if(any(from<1)) stop("An extant edge cannot have an \"age\" of less than 1.")
   list(name=if(role=="target") "edges_ageinterval_mon" else "edges_ageinterval",
        coef.names = paste("edges","age",from,"to",to,sep="."),
-       inputs=c(from, if(to==Inf) 0 else to),
+       inputs=c(length(from), rbind(from, ifelse(to==Inf, 0, to))),
        pkgname="tergm",
        dependence=FALSE)
 }
