@@ -48,7 +48,6 @@ void MH_Formation (MHproposal *MHp, Network *nwp)
 ***********************/
 void MH_FormationTNT (MHproposal *MHp, Network *nwp) 
 {  
-  Vertex tail, head;
   Edge nedges, ndedges, nempty;
   static double comp=0.5, odds;
   static Edge ndyads;
