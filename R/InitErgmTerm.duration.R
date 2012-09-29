@@ -78,7 +78,7 @@ InitErgmTerm.edgecov.mean.age<-function(nw, arglist, role, ...) {
   }
   inputs <- c(a$emptyval, NCOL(xm), as.double(xm))
   attr(inputs, "ParamsBeforeCov") <- 2
-  list(name="edgecov_mean_age_mon", coef.names = cn, inputs = inputs, pkgname="tergm", dependence=FALSE
+  list(name="edgecov_mean_age_mon", coef.names = cn, inputs = inputs, pkgname="tergm", dependence=FALSE, emptynwstats = a$emptyval
        )
 }
 
@@ -113,4 +113,48 @@ InitErgmTerm.edgecov.ages<-function(nw, arglist, role, ...) {
   attr(inputs, "ParamsBeforeCov") <- 1
   list(name="edgecov_ages_mon", coef.names = cn, inputs = inputs, pkgname="tergm", dependence=FALSE
        )
+}
+
+################################################################################
+InitErgmTerm.degree.mean.age<-function(nw, arglist, role, ...) {
+  if(role!="target") stop("Term degree.mean.age can only be used as a target statistic.")
+  a <- check.ErgmTerm(nw, arglist, directed=FALSE,
+                      varnames = c("d", "byarg", "emptyval"),
+                      vartypes = c("numeric", "character", "numeric"),
+                      defaultvalues = list(NULL, NULL, 0),
+                      required = c(TRUE, FALSE, FALSE))
+  d<-a$d; byarg <- a$byarg
+  if(!is.null(byarg)) {
+    nodecov <- get.node.attr(nw, byarg, "degree.mean.age")
+    u<-sort(unique(nodecov))
+    if(any(is.na(nodecov))){u<-c(u,NA)}
+    nodecov <- match(nodecov,u) # Recode to numeric
+    if (length(u)==1)
+         stop ("Attribute given to degree.mean.age() has only one value", call.=FALSE)
+  }
+  if(!is.null(byarg)) {
+    # Combine degree and u into 2xk matrix, where k=length(d)*length(u)
+    lu <- length(u)
+    du <- rbind(rep(d,lu), rep(1:lu, rep(length(d), lu)))
+    if (any(du[1,]==0)) {
+      stop("Age of ties incident on nodes with degree 0 is meaningless.")
+    }
+  }
+  
+  if(is.null(byarg)) {
+    if(length(d)==0){return(NULL)}
+    coef.names <- paste("degree",d,".mean.age",sep="")
+    name <- "degree_mean_age_mon"
+    inputs <- c(d)
+  } else {
+    if(ncol(du)==0) {return(NULL)}
+    #  No covariates here, so "ParamsBeforeCov" unnecessary
+    # See comment in d_degree_by_attr function
+    coef.names <- paste("deg", du[1,], ".", byarg,u[du[2,]],".mean.age", sep="")
+    name <- "degree_by_attr_mean_age_mon"
+    inputs <- c(as.vector(du), nodecov)
+  }
+  list(name=name,coef.names=coef.names, inputs=c(a$emptyval,inputs),
+       emptynwstats=rep(a$emptyval,length(coef.names)), dependence=TRUE,
+       pkgname="tergm")
 }

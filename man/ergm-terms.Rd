@@ -8,10 +8,14 @@
 \alias{edges.ageinterval}
 \alias{edgecov.ages}
 \alias{edgecov.mean.age}
+\alias{degree.mean.age}
 \alias{InitErgmTerm.edge.ages}
 \alias{InitErgmTerm.edgecov}
 \alias{InitErgmTerm.edgecov.ages}
 \alias{InitErgmTerm.edges.ageinterval}
+\alias{InitErgmTerm.mean.age}
+\alias{InitErgmTerm.edgecov.mean.age}
+\alias{InitErgmTerm.degree.mean.age}
 \docType{methods}
 \title{Temporally-Sensitive Terms used in Exponential Family Random Graph Models}
 \description{
@@ -37,6 +41,28 @@
   \code{\link[=tergm-package]{tergm}} pacakge}{
   \describe{
 
+    \item{\code{degree.mean.age(d, by=NULL,
+	emptyval=0)} (target-only)}{\emph{Average age of ties incident
+	on nodes having a given degree:}
+      The \code{d} argument is a vector of distinct integers. This term adds one
+      network statistic to the model for each element in \code{d}; the \eqn{i}th
+      such statistic equals the average, among all ties incident on nodes
+      with degree exactly \code{d[i]}, of the amount of time elapsed
+      since the tie's formation. The optional argument
+      \code{by} is a character string giving the name of an attribute in the
+      network's vertex attribute list. If specified, then separate degree 
+      statistics are calculated for nodes having each separate
+      value of the attribute.
+      
+      Because this average is undefined for a network that does not have
+      any actors with degree \code{d[i]}, the
+      argument \code{emptyval} can be used to specify the value returned
+      if this is the case. This is, technically, an arbitrary value, but it should
+      not have a substantial effect unless a non-negligible fraction of
+      networks at the parameter configuration of interest has no actors
+      with specified degree.  }
+
+    
     \item{\code{edges.ageinterval(from, to=+Inf)} (dissolution- and target-only)}{\emph{Number of edges
       with age falling into a specified range:}
       This term counts the number of edges in the network for
@@ -68,7 +94,7 @@
       This term adds one statistic equaling sum, over all ties
       present in the network, of the amount of time elapsed since
       formation, multiplied by a dyadic covariate. See the help for the
-      \code{\link[=ergm-terms]{edgecov}} term for details for
+      \code{\link[ergm:ergm-terms]{edgecov}} term for details for
       specifying the covariate.
       
       "Weights" can be negative.
@@ -85,7 +111,7 @@
       This term adds one statistic equaling the average, over all ties
       present in the network, of the amount of time elapsed since
       formation, weighted by a (nonnegative) dyadic covariate. See the help for the
-      \code{\link[=ergm-terms]{edgecov}} term for details for
+      \code{\link[ergm:ergm-terms]{edgecov}} term for details for
       specifying the covariate.
       
       The behavior when there are negative weights is undefined.
