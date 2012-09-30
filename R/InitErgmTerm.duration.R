@@ -16,7 +16,7 @@ else if(any(from>=to)) stop("Term edges.ageinterval must have from<to.")
 
   if(any(from<1)) stop("An extant edge cannot have an \"age\" of less than 1.")
   list(name=if(role=="target") "edges_ageinterval_mon" else "edges_ageinterval",
-       coef.names = paste("edges","age",from,"to",to,sep="."),
+       coef.names = paste("edges.age",from,"to",to,sep=""),
        inputs=c(rbind(from, ifelse(to==Inf, 0, to))),
        pkgname="tergm",
        dependence=FALSE)
@@ -158,3 +158,59 @@ InitErgmTerm.degree.mean.age<-function(nw, arglist, role, ...) {
        emptynwstats=rep(a$emptyval,length(coef.names)), dependence=TRUE,
        pkgname="tergm")
 }
+
+################################################################################
+InitErgmTerm.degrange.mean.age<-function(nw, arglist, role, ...) {
+  if(role!="target") stop("Term degrange.mean.age can only be used as a target statistic.")
+  a <- check.ErgmTerm(nw, arglist, directed=FALSE,
+                      varnames = c("from", "to", "byarg", "emptyval"),
+                      vartypes = c("numeric", "numeric", "character", "numeric"),
+                      defaultvalues = list(NULL, Inf, NULL, 0),
+                      required = c(TRUE, FALSE, FALSE, FALSE))
+  from<-a$from; to<-a$to; byarg <- a$byarg
+  to <- ifelse(to==Inf, network.size(nw)+1, to)
+
+  if(length(to)==1 && length(from)>1) to <- rep(to, length(from))
+  else if(length(from)==1 && length(to)>1) from <- rep(from, length(to))
+  else if(length(from)!=length(to)) stop("The arguments of term edges.ageinterval must have arguments either of the same length, or one of them must have length 1.")
+  else if(any(from>=to)) stop("Term degrange.mean.age must have from<to.")
+  
+  if(!is.null(byarg)) {
+    nodecov <- get.node.attr(nw, byarg, "degrange.mean.age")
+    u<-sort(unique(nodecov))
+    if(any(is.na(nodecov))){u<-c(u,NA)}
+    nodecov <- match(nodecov,u) # Recode to numeric
+    if (length(u)==1)
+         stop ("Attribute given to degrange.mean.age() has only one value", call.=FALSE)
+  }
+  if(!is.null(byarg)) {
+    # Combine degree and u into 3xk matrix, where k=length(from)*length(u)
+    lu <- length(u)
+    du <- rbind(rep(from,lu), rep(to,lu), rep(1:lu, rep(length(from), lu)))
+    if (any(du[1,]==0)) {
+      stop("Age of ties incident on nodes with degree 0 is meaningless.")
+    }
+  }
+  
+  if(is.null(byarg)) {
+    if(length(from)==0){return(NULL)}
+    coef.names <- ifelse(to>=network.size(nw)+1,
+                         paste("deg",from,"+",".mean.age",sep=""),
+                         paste("deg",from,"to",to,".mean.age",sep=""))
+    name <- "degrange_mean_age_mon"
+    inputs <- c(rbind(from,to))
+  } else {
+    if(ncol(du)==0) {return(NULL)}
+    #  No covariates here, so "ParamsBeforeCov" unnecessary
+    # See comment in d_degrange_by_attr function
+    coef.names <- ifelse(du[2,]==network.size(nw)+1,
+                         paste("deg", du[1,], "+.", byarg, u[du[3,]],".mean.age", sep=""),
+                         paste("deg", du[1,], "to", du[2,], ".", byarg, u[du[3,]],".mean.age", sep=""))
+    name <- "degrange_by_attr_mean_age_mon"
+    inputs <- c(as.vector(du), nodecov)
+  }
+  list(name=name,coef.names=coef.names, inputs=c(a$emptyval,inputs),
+       emptynwstats=rep(a$emptyval,length(coef.names)), dependence=TRUE,
+       pkgname="tergm")
+}
+

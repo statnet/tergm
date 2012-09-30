@@ -41,6 +41,30 @@
   \code{\link[=tergm-package]{tergm}} pacakge}{
   \describe{
 
+    \item{\code{degrange(from, to=+Inf, by=NULL, homophily=FALSE)}
+      (binary)}{\emph{Degree range:} 
+      The \code{from} and \code{to} arguments are vectors of distinct
+      integtegers or \code{+Inf}, for \code{to}. If one of the vectors has
+      length 1, it is recycled to the length of the other. Otherwise, they
+      must have the same length. This term adds one
+      network statistic to the model for each element of \code{from} (or \code{to}); the \eqn{i}th
+      such statistic equals  the average, among all ties incident on nodes
+      with degree greater than or equal to 
+      \code{from[i]} but strictly less than \code{to[i]}, of the amount of time elapsed
+      since the tie's formation. The optional argument
+      \code{by} is a character string giving the name of an attribute in the
+      network's vertex attribute list. If specified, then separate degree 
+      statistics are calculated for nodes having each separate
+      value of the attribute.
+      
+      Because this average is undefined for a network that does not have
+      any actors with degree in the specified range, the
+      argument \code{emptyval} can be used to specify the value returned
+      if this is the case. This is, technically, an arbitrary value, but it should
+      not have a substantial effect unless a non-negligible fraction of
+      networks at the parameter configuration of interest has no actors
+      with specified degree. }
+
     \item{\code{degree.mean.age(d, by=NULL,
 	emptyval=0)} (target-only)}{\emph{Average age of ties incident
 	on nodes having a given degree:}

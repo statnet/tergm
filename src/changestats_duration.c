@@ -673,3 +673,410 @@ S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon){
     else CHANGE_STAT[j] = zeroval;
   }
 }
+
+
+/*****************
+ void d_degrange_mean_age
+
+ Mean of ages of all extant ties with a particular degree range.
+
+ The degrange_mean_age of a network with no actors with degree of interest is defined to be emptyval.
+
+ *****************/
+
+// A macro indicating whether x is in [from,to)
+#define FROM_TO(x, from, to) ((x)>=(from) && (x)<(to))
+
+D_CHANGESTAT_FN(d_degrange_mean_age_mon){
+  int i;
+  Vertex *id=IN_DEG, *od=OUT_DEG;
+  double zeroval = INPUT_PARAM[0];
+  
+  for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
+    double s0 = 0, s1 = 0;
+    Edge e0 = 0, e1 = 0;
+
+    Vertex from = INPUT_PARAM[j*2+1], to = INPUT_PARAM[j*2+2];
+    
+    for (Edge k=1; k <= N_EDGES; k++){
+      Vertex tail, head;
+      FindithEdge(&tail, &head, k, nwp);
+      
+      unsigned int w = FROM_TO(od[tail]+id[tail],from,to) + FROM_TO(od[head]+id[head],from,to);
+      
+      if(w){
+	int et = ElapsedTime(tail,head,nwp);
+	s0 += et*w;
+	s1 += (et+1)*w;
+	e0+=w;
+	e1+=w;
+      }
+    }
+
+    FOR_EACH_TOGGLE(i){
+      Vertex tail, head;
+      int change = IS_OUTEDGE(tail=TAIL(i), head=HEAD(i)) ? -1 : +1;
+      // In the degree range case, it's possible to gain or lose a tie without entering or exiting a given degree range.
+      unsigned int tailin1 = FROM_TO(od[tail]+id[tail] + change, from, to),
+	tailin0 = FROM_TO(od[tail]+id[tail], from, to),
+	headin1 = FROM_TO(od[head]+id[head] + change, from, to),
+	headin0 = FROM_TO(od[head]+id[head], from, to);
+      
+      Edge e;
+      Vertex head1, tail1;
+
+      // This kludge is necessary because ElapsedTime will return the wrong result for a timestamp that hasn't been updated, which it hasn't been yet.
+#define TMP_SET_ET(t,h)							\
+      unsigned int just_formed = FALSE;					\
+      for(unsigned int l=0; l<i; l++){					\
+	if(t==TAIL(l) && h==HEAD(l)){					\
+	  just_formed = TRUE;						\
+	  break;							\
+	}								\
+      }									\
+      int et = just_formed ? 0 : ElapsedTime(t,h,nwp);
+      // TMP_SET_ET ends here.
+
+      if(tailin0 && !tailin1){ // tail was previously counted, but is no longer
+	STEP_THROUGH_OUTEDGES(tail, e, head1){
+	  TMP_SET_ET(tail,head1);
+	  s1 -= et+1;
+	  e1--;
+	}
+	STEP_THROUGH_INEDGES(tail, e, head1){
+	  TMP_SET_ET(head1,tail);
+	  s1 -= et+1;
+	  e1--;
+	}
+	// We don't need to do anything special for the focus dyad here:
+	// if it's formed, then it wasn't counted in the first place;
+	// if it's dissolved, then it will have been subtracted off by the previous two loops.
+      }else if(!tailin0 && tailin1){ // tail was previously not counted, but is now
+	STEP_THROUGH_OUTEDGES(tail, e, head1){
+	  TMP_SET_ET(tail,head1);
+	  s1 += et+1;
+	  e1++;
+	}
+	STEP_THROUGH_INEDGES(tail, e, head1){
+	  TMP_SET_ET(head1,tail);
+	  s1 += et+1;
+	  e1++;
+	}
+	// Here, we need to handle the focus dyad:
+	if(change==+1){// if it's formed, add 1 to s1
+	  s1 += 1;
+	  e1++;
+	}else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
+	  int et = ElapsedTime(tail,head,nwp);
+	  s1 -= et+1;
+	  e1--;
+	}
+      }else if(tailin0 && tailin1){ // tail was counted both times, but we need to handle the focus dyad
+	if(change==+1){// if it's formed, add 1 to s1
+	  s1 += 1;
+	  e1++;
+	}else{// if it's dissolved, it must be subtracted from s1
+	  int et = ElapsedTime(tail,head,nwp);
+	  s1 -= et+1;
+	  e1--;
+	}
+      }
+      // If !tailin0 && !tailin1, then it made no difference.
+      
+      if(headin0 && !headin1){ // head was previously counted, but is no longer
+	STEP_THROUGH_OUTEDGES(head, e, tail1){
+	  TMP_SET_ET(head,tail1);
+	  s1 -= et+1;
+	  e1--;
+	}
+	STEP_THROUGH_INEDGES(head, e, tail1){
+	  TMP_SET_ET(tail1,head);
+	  s1 -= et+1;
+	  e1--;
+	}
+	// We don't need to do anything special for the focus dyad here:
+	// if it's formed, then it wasn't counted in the first place;
+	// if it's dissolved, then it will have been subtracted off by the previous two loops.
+      }else if(!headin0 && headin1){ // head was previously not counted, but is now
+	STEP_THROUGH_OUTEDGES(head, e, tail1){
+	  TMP_SET_ET(head,tail1);
+	  s1 += et+1;
+	  e1++;
+	}
+	STEP_THROUGH_INEDGES(head, e, tail1){
+	  TMP_SET_ET(tail1,head);
+	  s1 += et+1;
+	  e1++;
+	}
+	// Here, we need to handle the focus dyad:
+	if(change==+1){// if it's formed, add 1 to s1
+	  s1 += 1;
+	  e1++;
+	}else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
+	  int et = ElapsedTime(tail,head,nwp);
+	  s1 -= et+1;
+	  e1--;
+	}
+      }else if(headin0 && headin1){ // tail was counted both times, but we need to handle the focus dyad
+	if(change==+1){// if it's formed, add 1 to s1
+	  s1 += 1;
+	  e1++;
+	}else{// if it's dissolved, it must be subtracted from s1
+	  int et = ElapsedTime(tail,head,nwp);
+	  s1 -= et+1;
+	  e1--;
+	}
+      }
+      // If !headin0 && !headin1, then it made no difference.
+#undef TMP_SET_ET
+      TOGGLE_IF_MORE_TO_COME(i);
+    }
+
+    UNDO_PREVIOUS_TOGGLES(i);
+  
+    CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+  }
+}
+
+
+S_CHANGESTAT_FN(s_degrange_mean_age_mon){
+  int i;
+  Vertex *id=IN_DEG, *od=OUT_DEG;
+  double zeroval = INPUT_PARAM[0];
+
+  ZERO_ALL_CHANGESTATS(i);
+
+  for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
+    Vertex from = INPUT_PARAM[j*2+1], to = INPUT_PARAM[j*2+2];
+    Edge e=0;
+
+    for (Edge k=1; k <= N_EDGES; k++){
+      Vertex tail, head;
+      FindithEdge(&tail, &head, k, nwp);
+      
+      unsigned int w = FROM_TO(od[tail]+id[tail],from,to) + FROM_TO(od[head]+id[head],from,to);
+      
+      if(w){
+	CHANGE_STAT[j] += ElapsedTime(tail,head,nwp)*w;
+	e+=w;
+      }
+    }
+    
+    if(e) CHANGE_STAT[j] /= e;
+    else CHANGE_STAT[j] = zeroval;
+  }
+}
+
+/*****************
+ void d_degrange_by_attr_mean_age
+
+ Mean of ages of all extant ties with a particular degree, by actor attribute.
+
+ The degrange_by_attr_mean_age of a network with no actors with degree of interest is defined to be emptyval.
+
+ *****************/
+
+D_CHANGESTAT_FN(d_degrange_by_attr_mean_age_mon){
+  int i;
+  Vertex *id=IN_DEG, *od=OUT_DEG;
+  double zeroval = INPUT_PARAM[0];
+  
+  for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
+    double s0 = 0, s1 = 0;
+    Edge e0 = 0, e1 = 0;
+
+    Vertex from = INPUT_PARAM[3*j+1], to = INPUT_PARAM[3*j+2];
+    int testattr = INPUT_PARAM[3*j+3];
+    
+    for (Edge k=1; k <= N_EDGES; k++){
+      Vertex tail, head;
+      FindithEdge(&tail, &head, k, nwp);
+      
+      Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
+      int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail]; 
+      int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head]; 
+
+      unsigned int w = (FROM_TO(taildeg, from, to) && tailattr==testattr) +
+	(FROM_TO(headdeg, from, to) && headattr==testattr);
+      
+      if(w){
+	int et = ElapsedTime(tail,head,nwp);
+	s0 += et*w;
+	s1 += (et+1)*w;
+	e0+=w;
+	e1+=w;
+      }
+    }
+
+    FOR_EACH_TOGGLE(i){
+      Vertex tail=TAIL(i), head=HEAD(i);
+      int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail]; 
+      int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head]; 
+
+      // If neither attribute matches, this toggle has no effect on the statistic.
+      if(tailattr!=testattr && headattr!=testattr){
+	TOGGLE_IF_MORE_TO_COME(i); // But don't forget to make it, so that it can be reversed later.
+	continue; 
+      }
+
+      int change = IS_OUTEDGE(tail, head) ? -1 : +1;
+      // In the degree range case, it's possible to gain or lose a tie without entering or exiting a given degree range.
+      unsigned int tailin1 = FROM_TO(od[tail]+id[tail] + change, from, to),
+	tailin0 = FROM_TO(od[tail]+id[tail], from, to),
+	headin1 = FROM_TO(od[head]+id[head] + change, from, to),
+	headin0 = FROM_TO(od[head]+id[head], from, to);
+
+      Edge e;
+      Vertex head1, tail1;
+
+      // This kludge is necessary because ElapsedTime will return the wrong result for toggle that already happened whose timestamp hasn't been updated.
+#define TMP_SET_ET(t,h)							\
+      unsigned int just_formed = FALSE;					\
+      for(unsigned int l=0; l<i; l++){					\
+	if(t==TAIL(l) && h==HEAD(l)){					\
+	  just_formed = TRUE;						\
+	  break;							\
+	}								\
+      }									\
+      int et = just_formed ? 0 : ElapsedTime(t,h,nwp);
+      
+      if(tailattr==testattr){
+	if(tailin0 && !tailin1){ // tail was previously counted, but is no longer
+	  STEP_THROUGH_OUTEDGES(tail, e, head1){
+	    TMP_SET_ET(tail,head1);
+	    s1 -= et+1;
+	    e1--;
+	  }
+	  STEP_THROUGH_INEDGES(tail, e, head1){
+	    TMP_SET_ET(head1,tail);
+	    s1 -= et+1;
+	    e1--;
+	  }
+	  // We don't need to do anything special for the focus dyad here:
+	  // if it's formed, then it wasn't counted in the first place;
+	  // if it's dissolved, then it will have been subtracted off by the previous two loops.
+	}else if(!tailin0 && tailin1){ // tail was previously not counted, but is now
+	  STEP_THROUGH_OUTEDGES(tail, e, head1){
+	    TMP_SET_ET(tail,head1);
+	    s1 += et+1;
+	    e1++;
+	  }
+	  STEP_THROUGH_INEDGES(tail, e, head1){
+	    TMP_SET_ET(head1,tail);
+	    s1 += et+1;
+	    e1++;
+	  }
+	  // Here, we need to handle the focus dyad:
+	  if(change==+1){// if it's formed, add 1 to s1
+	    s1 += 1;
+	    e1++;
+	  }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
+	    int et = ElapsedTime(tail,head,nwp);
+	    s1 -= et+1;
+	    e1--;
+	  }
+	}else if(tailin0 && tailin1){ // tail was counted both times, but we need to handle the focus dyad
+	  if(change==+1){// if it's formed, add 1 to s1
+	    s1 += 1;
+	    e1++;
+	  }else{// if it's dissolved, it must be subtracted from s1
+	    int et = ElapsedTime(tail,head,nwp);
+	    s1 -= et+1;
+	    e1--;
+	  }
+	}
+	// If !tailin0 && !tailin1, then it made no difference.
+      }
+      
+      if(headattr==testattr){
+	if(headin0 && !headin1){ // head was previously counted, but is no longer
+	  STEP_THROUGH_OUTEDGES(head, e, tail1){
+	    TMP_SET_ET(head,tail1);
+	    s1 -= et+1;
+	    e1--;
+	  }
+	  STEP_THROUGH_INEDGES(head, e, tail1){
+	    TMP_SET_ET(tail1,head);
+	    s1 -= et+1;
+	    e1--;
+	  }
+	  // We don't need to do anything special for the focus dyad here:
+	  // if it's formed, then it wasn't counted in the first place;
+	  // if it's dissolved, then it will have been subtracted off by the previous two loops.
+	}else if(!headin0 && headin1){ // head was previously not counted, but is now
+	  STEP_THROUGH_OUTEDGES(head, e, tail1){
+	    TMP_SET_ET(head,tail1);
+	    s1 += et+1;
+	    e1++;
+	  }
+	  STEP_THROUGH_INEDGES(head, e, tail1){
+	    TMP_SET_ET(tail1,head);
+	    s1 += et+1;
+	    e1++;
+	  }
+	  // Here, we need to handle the focus dyad:
+	  if(change==+1){// if it's formed, add 1 to s1
+	    s1 += 1;
+	    e1++;
+	  }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
+	    int et = ElapsedTime(tail,head,nwp);
+	    s1 -= et+1;
+	    e1--;
+	  }
+	}else if(headin0 && headin1){ // tail was counted both times, but we need to handle the focus dyad
+	  if(change==+1){// if it's formed, add 1 to s1
+	    s1 += 1;
+	    e1++;
+	  }else{// if it's dissolved, it must be subtracted from s1
+	    int et = ElapsedTime(tail,head,nwp);
+	    s1 -= et+1;
+	    e1--;
+	  }
+	}
+	// If !headin0 && !headin1, then it made no difference.
+      }
+#undef TMP_SET_ET
+      TOGGLE_IF_MORE_TO_COME(i);
+    }
+
+    UNDO_PREVIOUS_TOGGLES(i);
+  
+    CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+  }
+}
+
+S_CHANGESTAT_FN(s_degrange_by_attr_mean_age_mon){
+  int i;
+  Vertex *id=IN_DEG, *od=OUT_DEG;
+  double zeroval = INPUT_PARAM[0];
+
+  ZERO_ALL_CHANGESTATS(i);
+
+  for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
+    Edge e=0;
+
+    for (Edge k=1; k <= N_EDGES; k++){
+      Vertex tail, head;
+      FindithEdge(&tail, &head, k, nwp);
+      Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
+      int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail]; 
+      int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head]; 
+    
+      Vertex from = INPUT_PARAM[3*j+1], to = INPUT_PARAM[3*j+2];
+      int testattr = INPUT_PARAM[3*j+3];
+
+      unsigned int w = (FROM_TO(taildeg, from, to) && tailattr==testattr) +
+	(FROM_TO(headdeg, from, to) && headattr==testattr);
+      
+      if(w){
+	CHANGE_STAT[j] += ElapsedTime(tail,head,nwp)*w;
+	e+=w;
+      }
+    }
+    
+    if(e) CHANGE_STAT[j] /= e;
+    else CHANGE_STAT[j] = zeroval;
+  }
+}
+
+#undef FROM_TO
