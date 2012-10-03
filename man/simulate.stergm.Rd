@@ -1,6 +1,7 @@
 \name{simulate.stergm}
 \alias{simulate.stergm}
 \alias{simulate.network}
+\alias{simulate.networkDynamic}
 \title{
 Draw from the distribution of an Separable Temporal Exponential Family Random Graph Model
 }
