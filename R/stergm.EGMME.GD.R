@@ -36,16 +36,16 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
                        function(i){
                          y<-ys[,i]
                          suppressWarnings(try(
-                                            if(control$SA.robust) lm(y~x)
-                                            else lmrob(y~x), silent=TRUE))
+                                            if(control$SA.robust) lmrob(y~x)
+                                            else lm(y~x), silent=TRUE))
                        })
       }else{
         lapply(1:q,
                function(i){
                  y<-ys[,i]
                  suppressWarnings(try(
-                                    if(control$SA.robust) lm(y~x)
-                                    else lmrob(y~x), silent=TRUE))
+                                    if(control$SA.robust) lmrob(y~x)
+                                    else lm(y~x), silent=TRUE))
                })
       }
     
