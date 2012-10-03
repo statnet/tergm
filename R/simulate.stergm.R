@@ -191,7 +191,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   control$collect.diss <- stats.diss
   
   out <- replicate(nsim, {
-    if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(0, network.dyadcount(nw))
+    if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(round(-.Machine$integer.max/2), network.dyadcount(nw))
     if(is.null(nw %n% "time")) nw %n% "time" <- 0
     
     z <- stergm.getMCMCsample(nw, model.form, model.diss, model.mon,
@@ -317,7 +317,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   for(i in seq_along(ltlts))    
     if(ltlts[[i]]!=-Inf && vActives[lttails[[i]]] && vActives[ltheads[[i]]])
       m[vActives[lttails[[i]]],vActives[ltheads[[i]]]] <- ltlts[[i]]
-  m[m==-Inf] <- -.Machine$integer.max
+  m[m==-Inf] <- round(-.Machine$integer.max/2)
 
   nw %n% "time" <- start
   nw %n% "lasttoggle" <- to.lasttoggle.matrix(m, is.directed(nw), is.bipartite(nw))
@@ -340,8 +340,9 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   ## If all the user wants is statistics or a list of toggles, we are done.
   if(output!="networkDynamic") return(sim)
 
+  if(verbose) cat("Updating networkDynamic.")
+  
   ## Map the vertex IDs:
-
   sim[,"tail"] <- vActiveIDs[sim[,"tail"]]
   sim[,"head"] <- vActiveIDs[sim[,"head"]]
 
