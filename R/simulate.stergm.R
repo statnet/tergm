@@ -121,8 +121,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   # compute rather than just how to compute it, but it's convenient to
   # have it as a part of the control data structure.
   if((time.burnin!=0 || time.interval!=1) && output!="stats"){
-    warning("Burnin is present or interval isn't 1. Only network statistics will be returned.")
-    output <- "stats"
+    stop("Generating a networkDynamic or change list output is incompatible with a time.burnin!=1 or a time.interval!=1. Only network statistics can be returned with these settings.")
   }
   
   control$changes <- output != "stats"
@@ -215,9 +214,11 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                                          dissolution = dissolution,
                                          stats.form = stats.form,
                                          stats.diss = stats.diss,
+                                         monitor = monitor,
                                          stats = stats,
                                          coef.form=coef.form,
                                          coef.diss=coef.diss,
+                                         constraints=constraints,
                                          start = nw%n%"time" + 0,
                                          end = nw%n%"time" + time.slices,
                                          changes = z$changed))
@@ -230,6 +231,8 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                                              dissolution = dissolution,
                                              stats.form = stats.form,
                                              stats.diss = stats.diss,
+                                             monitor = monitor,
+                                             constraints = constraints,
                                              stats = stats,
                                              coef.form=coef.form,
                                              coef.diss=coef.diss,
@@ -276,4 +279,116 @@ simulate.network <- function(object, nsim=1, seed=NULL,
              out
            })
   }
+}
+
+simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
+                                    formation = attr(object, "formation"), dissolution = attr(object, "dissolution"),
+                                    coef.form = attr(object, "coef.form"), coef.diss = attr(object, "coef.diss"),
+                                    constraints = attr(object, "constraints"),
+                                    monitor = attr(object, "monitor"),
+                                    time.slices, time.burnin=0, time.interval=1,
+                                    control=control.simulate.network(),
+                                    statsonly=NULL,
+                                    output=c("networkDynamic", "stats", "changes"),
+                                    stats.form = FALSE,
+                                    stats.diss = FALSE,
+                                    verbose=FALSE, ...){
+  if(nsim>1) stop("Simulating more than one chain of networks is not supported at this time. If you want to simulate over multiple time steps, use the time.slices argument.")
+
+  start <- NVL(attr(object,"end"),0)
+  nw <- object %t% start
+  vActives <- is.active(object, at=start, v=seq_len(network.size(object)))
+  mode(vActives) <- "integer"
+  vActives[as.logical(vActives)] <- cumsum(vActives[as.logical(vActives)])
+  vActiveIDs<- which(as.logical(vActives))
+
+  # There is probably a more efficient way to do this:
+  
+  lttails <- lapply(object$mel, "[[", "outl")
+  ltheads <- lapply(object$mel, "[[", "inl")
+  # I.e., from the edge attribute list, grab the "active" matrix, and from it, extract the highest (most recent) timestamp that's not +Inf (terminus-censored).
+  # Note that if x[x!=+Inf] is empty, max(x[x!=+Inf]) returns -Inf, which is what we want.
+  ltlts <- lapply(lapply(lapply(object$mel, "[[", "atl"), "[[", "active"), function(x) suppressWarnings(max(x[x!=+Inf])))
+
+  ltm <-
+    if(is.bipartite(nw)) m <- matrix(-Inf, network.size(nw), nw%n%"bipartite")
+    else m <- matrix(-Inf, network.size(nw), network.size(nw))
+
+  for(i in seq_along(ltlts))    
+    if(ltlts[[i]]!=-Inf && vActives[lttails[[i]]] && vActives[ltheads[[i]]])
+      m[vActives[lttails[[i]]],vActives[ltheads[[i]]]] <- ltlts[[i]]
+  m[m==-Inf] <- -.Machine$integer.max
+
+  nw %n% "time" <- start
+  nw %n% "lasttoggle" <- to.lasttoggle.matrix(m, is.directed(nw), is.bipartite(nw))
+
+  
+  output <- match.arg(output)
+  
+  sim <- simulate.network(nw, nsim=1, seed=NULL,
+                          formation=formation, dissolutio=formation,
+                          coef.form=coef.form,coef.diss=coef.diss,
+                          constraints = constraints,
+                          monitor = monitor,
+                          time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,
+                          control=control,          
+                          output=switch(output, networkDynamic = "changes", output),
+                          stats.form = stats.form,
+                          stats.diss = stats.diss,
+                          verbose=verbose, ...)
+  
+  ## If all the user wants is statistics or a list of toggles, we are done.
+  if(output!="networkDynamic") return(sim)
+
+  ## Map the vertex IDs:
+
+  sim[,"tail"] <- vActiveIDs[sim[,"tail"]]
+  sim[,"head"] <- vActiveIDs[sim[,"head"]]
+
+  extant.edges <- as.edgelist(object)
+  changed.edges <- unique(sim[,c("tail","head")])
+  new.edges <- changed.edges[!(paste(changed.edges[,1],changed.edges[,2]) %in% paste(extant.edges[,1],extant.edges[,2])),]
+  object <- add.edges(object,as.list(new.edges[,1]),as.list(new.edges[,2]))
+
+  for(i in seq_len(nrow(sim))){
+    eID <- get.edgeIDs(object,sim[i,"tail"],sim[i,"head"])
+    # The following two lines are the "correct" way to do this, but
+    # since we know the direction, and since we can assume that
+    # everything after attr(object,"end") is "censored", we can do it
+    # faster.
+    #
+    # if(sim[i,"dir"]==-1) object <- deactivate.edges(object, onset=sim[i,"time"], terminus=+Inf, e=eID)
+    # if(sim[i,"dir"]==+1) object <- activate.edges(object, onset=sim[i,"time"], terminus=+Inf, e=eID)
+    
+    if(sim[i,"dir"]==-1){
+      # If we are dissolving a tie, we are changing the bottom-right
+      # cell in the spell matrix. However, we can't assume that a
+      # spell matrix exists for a given edge, so we need to check, and
+      # add a (-Inf,time) row if it doesn't.
+      am <- object$mel[[i]]$atl$active
+      if(is.null(am)) am <- rbind(c(-Inf,+Inf))
+      am[nrow(am),2] <- sim[i,"time"]
+      object$mel[[i]]$atl$active <- am
+    }
+    if(sim[i,"dir"]==+1){
+      # If we are forming a tie, we are adding a new row.
+      object$mel[[i]]$atl$active <- rbind(object$mel[[i]]$atl$active,c(sim[i,"time"],+Inf))
+    }
+  }
+
+  attributes(object) <- c(attributes(object), # Don't clobber existing attributes!
+                          list(formation = ergm.update.formula(formation,nw~.),
+                               dissolution = ergm.update.formula(dissolution,nw~.),
+                               stats.form = rbind(if(ergm.update.formula(formation,nw~.)==attr(object,"formation")) attr(object,"stats.form"),attr(sim,"stats.form")),
+                               stats.diss = rbind(if(ergm.update.formula(dissolution,nw~.)==attr(object,"dissolution")) attr(object,"stats.diss"),attr(sim,"stats.diss")),
+                               monitor = monitor,
+                               stats = rbind(if(!is.null(attr(object,"monitor")) && monitor==attr(object,"monitor")) attr(object,"stats"),attr(sim,"stats")),
+                               coef.form=coef.form,
+                               coef.diss=coef.diss,
+                               constraints=constraints,
+                               start = attr(object,"start") + 0,
+                               end = start + time.slices,
+                               changes = rbind(attr(object,"changes"),matrix(c(sim), nrow=nrow(sim),ncol=ncol(sim),dimnames=list(rownames(sim),colnames(sim))))
+                               ))
+  object
 }

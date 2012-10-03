@@ -10,30 +10,45 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   See \code{\link{stergm}} for more information on these models.
 }
 \usage{
-   \method{simulate}{stergm}(object, nsim=1, seed=NULL,
-                             coef.form=object$formation.fit$coef,coef.diss=object$dissolution.fit$coef,
-                             monitor = object$targets,
-                             time.slices, time.burnin=0, time.interval=1,
-                             control=control.simulate.stergm(),
-                             statsonly=NULL,
-                             output=c("networkDynamic", "stats", "changes"),
-                             stats.form = FALSE,
-                             stats.diss = FALSE,
-                             verbose=FALSE, 
-                             \dots)
-  \method{simulate}{network}(object, nsim=1, seed=NULL,
-                             formation, dissolution,
-                             coef.form,coef.diss,
-                             monitor = NULL,
-                             time.slices, time.burnin=0, time.interval=1,
-                             control=control.simulate.network(),
-                             statsonly=NULL,
-                             output=c("networkDynamic", "stats", "changes"),
-                             stats.form = FALSE,
-                             stats.diss = FALSE,
-                             verbose=FALSE,
-                             \dots)
-
+\method{simulate}{stergm}(object, nsim=1, seed=NULL,
+                          coef.form = object$formation.fit$coef,
+                          coef.diss = object$dissolution.fit$coef,
+                          monitor = object$targets,
+                          time.slices, time.burnin=0, time.interval=1,
+                          control=control.simulate.stergm(),
+                          statsonly=NULL,
+                          output=c("networkDynamic", "stats", "changes"),
+                          stats.form = FALSE,
+                          stats.diss = FALSE,
+                          verbose=FALSE, 
+                          \dots)
+\method{simulate}{network}(object, nsim=1, seed=NULL,
+                           formation, dissolution,
+                           coef.form, coef.diss,
+                           monitor = NULL,
+                           time.slices, time.burnin=0, time.interval=1,
+                           control=control.simulate.network(),
+                           statsonly=NULL,
+                           output=c("networkDynamic", "stats", "changes"),
+                           stats.form = FALSE,
+                           stats.diss = FALSE,
+                           verbose=FALSE,
+                           \dots)
+\method{simulate}{networkDynamic}(object, nsim=1, seed=NULL,
+                                  formation = attr(object, "formation"),
+                                  dissolution = attr(object, "dissolution"),
+                                  coef.form = attr(object, "coef.form"),
+                                  coef.diss = attr(object, "coef.diss"),
+                                  constraints = attr(object, "constraints"),
+                                  monitor = attr(object, "monitor"),
+                                  time.slices, time.burnin=0, time.interval=1,
+                                  control=control.simulate.network(),
+                                  statsonly=NULL,
+                                  output=c("networkDynamic", "stats", "changes"),
+                                  stats.form = FALSE,
+                                  stats.diss = FALSE,
+                                  verbose=FALSE,
+                                  \dots)
 }
 \arguments{
   \item{object}{an \R object of type \code{\link{stergm}} giving a model
@@ -45,7 +60,8 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   }
   
   \item{nsim}{Number of replications (separate chains of networks) of
-    the process to run and return.
+    the process to run and return. The \code{\link{networkDynamic}}
+    method only supports \code{nsim=1}.
   }
   \item{seed}{Random number integer seed.  
     See \code{\link[base]{set.seed}}.
@@ -93,7 +109,10 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   }
 }
 \details{
-  The dynamic process is run forward and the results are returned.
+  The dynamic process is run forward and the results are returned. For
+  the method for \code{\link{networkDynamic}}, the simulation is resumed
+  from the last generated time point of \code{object}, by default with
+  the same model and parameters.
 }
 \value{
   Depends on the \code{output} argument:
@@ -114,14 +133,16 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   \item{"networkDynamic"}{A \code{\link[networkDynamic]{networkDynamic}}
     object representing the simulated process, with ties present in the
     initial network having onset \code{-Inf} and ties present at the end
-    of the simulation having terminus \code{+Inf}.
+    of the simulation having terminus \code{+Inf}. The method for
+    \code{\link[networkDynamic]{networkDynamic}} returns the initial
+    \code{\link[networkDynamic]{networkDynamic}} with simulated changes
+    applied to it.
 
     Additionally, attributes (\code{\link{attr}}, not network
     attributes) are attached as follows:
     \describe{
-      \item{formation, dissolution:}{Formation and dissolution formulas
-	used in the simulation,
-	respectively.}
+      \item{formation, dissolution, monitor:}{Formation, dissolution,
+	and monitoring formulas	used in the simulation,	respectively.}
       \item{stats, stats.form, stats.diss:}{Network statistics as above.}
       \item{coef.form, coef.diss:}{Coefficients used in the simulation.}
       \item{start, end:}{Start and end times of the simulation.}
