@@ -15,7 +15,8 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
                              monitor = object$targets,
                              time.slices, time.burnin=0, time.interval=1,
                              control=control.simulate.stergm(),
-                             statsonly=time.burnin>0||time.interval>1,
+                             statsonly=NULL,
+                             output=c("networkDynamic", "stats", "changes"),
                              stats.form = FALSE,
                              stats.diss = FALSE,
                              verbose=FALSE, 
@@ -26,7 +27,8 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
                              monitor = NULL,
                              time.slices, time.burnin=0, time.interval=1,
                              control=control.simulate.network(),
-                             statsonly=time.burnin>0||time.interval>1,
+                             statsonly=NULL,
+                             output=c("networkDynamic", "stats", "changes"),
                              stats.form = FALSE,
                              stats.diss = FALSE,
                              verbose=FALSE,
@@ -75,10 +77,11 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
     A list of control parameters for algorithm
     tuning. Constructed using \code{\link{control.simulate.stergm}} or \code{\link{control.simulate.network}}.
   }
-  \item{statsonly}{Logical:  If TRUE, return only the network statistics, 
-    not the network(s) themselves. Defaults to FALSE if both
-    \code{time.burnin==0} and \code{time.interval==1},  and TRUE otherwise.
+  \item{statsonly}{Deprecated in favor of \code{output}.
   }
+  \item{output}{A character vector specifying output type: one of
+    "networkDynamic" (the default), "stats", and "changes", with partial
+    matching allowed. See Value section for details.}
   \item{stats.form, stats.diss}{Logical: Whether to return
     formation/dissolution model statistics. This is not the recommended
     method: use \code{monitor} argument instead.}
@@ -92,30 +95,54 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
 \details{
   The dynamic process is run forward and the results are returned.
 }
-\value{If \code{nsim>1}, 
-  
-  If \code{statsonly==TRUE}, then if \code{stats.form==FALSE} and
-  \code{stats.diss==FALSE}, returns an \code{\link{mcmc}} matrix with
-  monitored statistics, and if either of them is \code{TRUE}, returns a
-  list containing elements \code{stats} for statistics specified in the
-  \code{monitor} argument, and \code{stats.form} and \code{stats.diss}
-  for the respective formation and dissolution statistics. Finally, if
-  \code{nsim>1}, an \code{\link{mcmc.list}} (or list of them) of the
-  statistics is returned instead.
+\value{
+  Depends on the \code{output} argument:
+  \item{"stats"}{If \code{stats.form==FALSE} and
+    \code{stats.diss==FALSE}, an \code{\link{mcmc}} matrix with
+    monitored statistics, and if either of them is \code{TRUE}, a
+    list containing elements \code{stats} for statistics specified in the
+    \code{monitor} argument, and \code{stats.form} and \code{stats.diss}
+    for the respective formation and dissolution statistics.
 
-  If \code{statsonly==FALSE}, a \code{\link[networkDynamic]{networkDynamic}} object
-  representing the process, with ties present in the initial network
-  having onset \code{-Inf} and ties present at the end of the simulation
-  having terminus \code{+Inf}. Additionally, attributes
-  (\code{\link{attr}}, not network attributes) are attached as follows:
+    If \code{stats.form==FALSE} and
+    \code{stats.diss==FALSE} and no monitored statistics are specified,
+    an empty list is returned, with a warning.
 
-  \item{formation, dissolution}{Formation and dissolution formulas
-    used in the simulation,
-    respectively.}
-  \item{stats, stats.form, stats.diss}{Network statistics as above.}
-  \item{coef.form, coef.diss}{Coefficients used in the simulation.}
-  \item{start, end}{Start and end times of the simulation.}
+    When \code{nsim>1}, an \code{\link{mcmc.list}} (or list of them) of
+    the statistics is returned instead.}
 
+  \item{"networkDynamic"}{A \code{\link[networkDynamic]{networkDynamic}}
+    object representing the simulated process, with ties present in the
+    initial network having onset \code{-Inf} and ties present at the end
+    of the simulation having terminus \code{+Inf}.
+
+    Additionally, attributes (\code{\link{attr}}, not network
+    attributes) are attached as follows:
+    \describe{
+      \item{formation, dissolution:}{Formation and dissolution formulas
+	used in the simulation,
+	respectively.}
+      \item{stats, stats.form, stats.diss:}{Network statistics as above.}
+      \item{coef.form, coef.diss:}{Coefficients used in the simulation.}
+      \item{start, end:}{Start and end times of the simulation.}
+    }
+
+    When \code{nsim>1}, a \code{\link{network.list}} of these
+    \code{\link{networkDynamic}}s is returned.
+  }
   
-  
+  \item{"changes"}{An integer matrix with four columns (\code{time},
+      \code{tail}, \code{head}, and \code{dir}), giving the timestampled
+      changes relative to the initial network. \code{dir} is \code{+1}
+      if a tie was formed and \code{-1} if a tie was dissolved. The
+      convention for \code{time} is that it gives the time point during
+      which the change is effective. For example, a row
+      \code{c(1,2,3,+1)} indicates that between time \eqn{0} and
+      \eqn{1}, a tie from node \eqn{2} to node \eqn{3} was formed, so
+      that it is present at time point \eqn{1}.
+
+      Additionally, same attributes (\code{\link{attr}}, not network
+      attributes) as with \code{output=="networkDynamic"} are attached.
+
+      When \code{nsim>1}, a list of these change matrices is returned.}
 }

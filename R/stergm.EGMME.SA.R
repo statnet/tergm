@@ -182,7 +182,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     ###### Set up and run the burn-in. ######
 
-    control$toggles <- control$collect.form <- control$collect.diss <- FALSE
+    control$changes <- control$collect.form <- control$collect.diss <- FALSE
     control.phase1<-control
     control.phase1$time.samplesize <- 1
     control.phase1$time.burnin <- control$SA.burnin

@@ -110,7 +110,7 @@ void MCMCDyn_wrapper(// Starting network.
     diffdir = NULL;
   }
   
-  if(*burnin==0 && *interval==1){
+  if(*log_changes){
     memset(difftime,0,*maxchanges*sizeof(Vertex));
     memset(difftail,0,*maxchanges*sizeof(Vertex));
     memset(diffhead,0,*maxchanges*sizeof(Vertex));
@@ -132,7 +132,7 @@ void MCMCDyn_wrapper(// Starting network.
 			  F_m, &F_MH, F_eta,
 			  D_m, &D_MH, D_eta,
 			  M_m,
-			  *F_collect?F_sample:NULL, *D_collect?D_sample:NULL, M_m?M_sample:NULL, *maxedges, *maxchanges, difftime, difftail, diffhead, diffdir,
+			  *F_collect?F_sample:NULL, *D_collect?D_sample:NULL, M_m?M_sample:NULL, *maxedges, *maxchanges, *log_changes, difftime, difftail, diffhead, diffdir,
 			  *nsteps, *max_MH_interval, *MH_interval_mul, *burnin, *interval,
 			  *fVerbose);
    
@@ -178,6 +178,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 			    double *F_stats, double *D_stats, double *M_stats,
 			    Edge maxedges,
 			    Edge maxchanges,
+			    int log_changes,
 			    Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffdir,		    
 			    // MCMC settings.
 			    unsigned int nsteps, unsigned int max_MH_interval, double MH_interval_mul,
@@ -185,7 +186,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 			    // Verbosity.
 			    int fVerbose){
 
-  int i, j, log_changes = (burnin==0 && interval==1);
+  int i, j;
   Edge nextdiffedge=1;
 
 

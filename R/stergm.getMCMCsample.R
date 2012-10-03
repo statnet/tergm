@@ -28,7 +28,7 @@
 #                       process occurs to the 'nedeges'
 #      parallel      :  the number of threads in which to run sampling
 #      samplesize    :  the desired MCMC sample size
-#      toggles       :  whether to return the toggle matrix; non-NULL values
+#      changes       :  whether to return the toggle matrix; non-NULL values
 #                       will include 'changed' in the return list, NULL
 #                       will not
 #      MH.burnin     :  this is accepted as 'MH_interval' which determines
@@ -54,7 +54,7 @@
 #     changed         : a toggle matrix, where the first column is
 #                       the timestamp of the toggle and the 2nd and 3rd
 #                       columns are the head & tail of the toggle; this
-#                       is only returned if 'control'$toggles is not NULL
+#                       is only returned if 'control'$changes is not NULL
 #     maxchanges      : the "MCMC Dyn workspace"; see 'maxchanges' in the
 #                       input param list
 #
@@ -120,11 +120,11 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
             as.integer(maxedges),
             newnwtails = integer(maxchanges), newnwheads = integer(maxchanges), 
             as.integer(maxchanges),
-            as.integer(control$toggles),
-            diffnwtime = if(control$toggles) integer(maxchanges) else integer(0),
-            diffnwtails = if(control$toggles) integer(maxchanges) else integer(0),
-            diffnwheads = if(control$toggles) integer(maxchanges) else integer(0),
-            diffnwdirs = if(control$toggles) integer(maxchanges) else integer(0),
+            as.integer(control$changes),
+            diffnwtime = if(control$changes) integer(maxchanges) else integer(0),
+            diffnwtails = if(control$changes) integer(maxchanges) else integer(0),
+            diffnwheads = if(control$changes) integer(maxchanges) else integer(0),
+            diffnwdirs = if(control$changes) integer(maxchanges) else integer(0),
             as.integer(verbose),
             status = integer(1), # 0 = OK, MCMCDyn_TOO_MANY_EDGES = 1, MCMCDyn_MH_FAILED = 2, MCMCDyn_TOO_MANY_CHANGES = 3
             PACKAGE="tergm")
@@ -167,7 +167,7 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
   newnetwork %n% "time" <- z$time
   newnetwork %n% "lasttoggle" <- z$lasttoggle
 
-  diffedgelist<-if(control$toggles) {
+  diffedgelist<-if(control$changes) {
     if(z$diffnwtails[1]>0){
       tmp <- cbind(z$diffnwtime[2:(z$diffnwtime[1]+1)],z$diffnwtails[2:(z$diffnwtails[1]+1)],z$diffnwheads[2:(z$diffnwheads[1]+1)],z$diffnwdirs[2:(z$diffnwdirs[1]+1)])
       colnames(tmp) <- c("time","tail","head","dir")
@@ -180,6 +180,8 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
   }else{
     NULL
   }
+  mode(diffedgelist) <- "integer" # Might save some memory.
+  
 
   if(!is.null(statsmatrix.form)) colnames(statsmatrix.form) <- model.form$coef.names
   if(!is.null(statsmatrix.diss)) colnames(statsmatrix.diss) <- model.diss$coef.names

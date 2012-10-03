@@ -59,7 +59,7 @@
 #        changed    : a toggle matrix, where the first column is
 #                     the timestamp of the toggle and the 2nd and 3rd
 #                     columns are the head & tail of the toggle; this
-#                     is only returned if the input param 'toggles'
+#                     is only returned if the input param 'changes'
 #                     ends up being TRUE (see above) 
 #                    'changed' will also have 2 attributes:
 #            start  : 1
@@ -74,7 +74,8 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
                           monitor = object$targets,
                           time.slices, time.burnin=0, time.interval=1,
                           control=control.simulate.stergm(),
-                          statsonly=time.burnin>0||time.interval>1,
+                          statsonly=NULL,
+                          output=c("networkDynamic", "stats", "changes"),
                           stats.form = FALSE,
                           stats.diss = FALSE,
                           verbose=FALSE, ...){
@@ -86,8 +87,8 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
       control[arg] <- list(object$control[[arg]])
 
   control <- set.control.class("control.simulate.network")
-  
-  simulate.network(object$network,formation=object$formation,dissolution=object$dissolution,nsim=nsim,coef.form=coef.form, coef.diss=coef.diss, constraints=constraints, monitor=monitor, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, statsonly=statsonly, stats.form = stats.form, stats.diss = stats.diss, verbose=verbose,...)
+
+  simulate.network(object$network,formation=object$formation,dissolution=object$dissolution,nsim=nsim,coef.form=coef.form, coef.diss=coef.diss, constraints=constraints, monitor=monitor, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, statsonly=statsonly, output=output, stats.form = stats.form, stats.diss = stats.diss, verbose=verbose,...)
 }
 
 
@@ -100,19 +101,37 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                              monitor = NULL,
                              time.slices, time.burnin=0, time.interval=1,
                              control=control.simulate.network(),
-                             statsonly=time.burnin>0||time.interval>1,
+                             statsonly=NULL,
+                             output=c("networkDynamic", "stats", "changes"),
                              stats.form = FALSE,
                              stats.diss = FALSE,
                              verbose=FALSE, ...) {
   if(length(list(...))) stop("Unknown arguments: ",names(list(...)))
   check.control.class(myname="STERGM simulate.network")
+
+  if(!is.null(statsonly)){
+    warning("Argument `statsonly' for STERGM simulate() is deprecated and may be removed in a future version. Use `output' instead.")
+    output <- if(statsonly) "stats" else "networkDynamic"
+  }
+
+  output <- match.arg(output)
   
   if(!is.null(seed)) set.seed(as.integer(seed))
-  # Toggles is a "main call" parameter, since it affects what to
+  # output is a "main call" parameter, since it affects what to
   # compute rather than just how to compute it, but it's convenient to
   # have it as a part of the control data structure.
-  control$toggles <- !statsonly
+  if((time.burnin!=0 || time.interval!=1) && output!="stats"){
+    warning("Burnin is present or interval isn't 1. Only network statistics will be returned.")
+    output <- "stats"
+  }
+  
+  control$changes <- output != "stats"
 
+  if(output=="stats" && is.null(monitor) && !stats.form && !stats.diss){
+    warning("Requesting a statistics matrix as output, but there are no statistics to return (monitor is NULL, and stats.form and stats.diss are both FALSE). Output will be empty.")
+  }
+
+  
   nw <- as.network(object)
   if(!is.network(nw)){
     stop("A network object must be given")
@@ -157,11 +176,6 @@ simulate.network <- function(object, nsim=1, seed=NULL,
     coef.diss <- rep(0,length(model.diss$coef.names))
     warning("No parameter values given, using Bernoulli dissolution.\nThis means that every time step, half the ties get dissolved!\n")
   }
-
-  if((time.burnin!=0 || time.interval!=1) && control$toggles){
-    warning("Burnin is present or interval isn't 1. Toggle list will not be returned.")
-    control$toggles<-FALSE
-  }
     
   MHproposal.form <- MHproposal(constraints,control$MCMC.prop.args.form,nw,
                                 weights=control$MCMC.prop.weights.form,class="f")
@@ -176,7 +190,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   control$time.samplesize <- time.slices
   control$collect.form <- stats.form
   control$collect.diss <- stats.diss
-
+  
   out <- replicate(nsim, {
     if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(0, network.dyadcount(nw))
     if(is.null(nw %n% "time")) nw %n% "time" <- 0
@@ -188,53 +202,78 @@ simulate.network <- function(object, nsim=1, seed=NULL,
     stats.form <- if(control$collect.form) mcmc(sweep(z$statsmatrix.form,2,summary(formation),"+"),start=time.burnin+1,thin=time.interval)
     stats.diss <- if(control$collect.diss) mcmc(sweep(z$statsmatrix.diss,2,summary(dissolution),"+"),start=time.burnin+1,thin=time.interval)
     stats <- if(!is.null(model.mon)) mcmc(sweep(z$statsmatrix.mon,2,summary(monitor),"+"),start=time.burnin+1,thin=time.interval)
-    
-    if(control$toggles){
-      library(networkDynamic)
-      nwd <- as.networkDynamic(nw, toggles = z$changed[,-4], start = nw%n%"time" + 0, end = nw%n%"time" + time.slices)
-      nwd<-delete.network.attribute(nwd, "time")
-      nwd<-delete.network.attribute(nwd, "lasttoggle")
-      attributes(nwd) <- c(attributes(nwd), # Don't clobber existing attributes!
-                           list(formation = formation,
-                                dissolution = dissolution,
-                                stats.form = stats.form,
-                                stats.diss = stats.diss,
-                                stats = stats,
-                                coef.form=coef.form,
-                                coef.diss=coef.diss,
-                                start = nw%n%"time" + 0,
-                                end = nw%n%"time" + time.slices,
-                                toggles = z$changed))
-      nwd
-    }else
-    list(stats.form = stats.form,stats.diss = stats.diss, stats = stats)
+
+    out <-
+      switch(output,
+             networkDynamic = {
+               library(networkDynamic)
+               nwd <- as.networkDynamic(nw, toggles = z$changed[,-4], start = nw%n%"time" + 0, end = nw%n%"time" + time.slices)
+               nwd<-delete.network.attribute(nwd, "time")
+               nwd<-delete.network.attribute(nwd, "lasttoggle")
+               attributes(nwd) <- c(attributes(nwd), # Don't clobber existing attributes!
+                                    list(formation = formation,
+                                         dissolution = dissolution,
+                                         stats.form = stats.form,
+                                         stats.diss = stats.diss,
+                                         stats = stats,
+                                         coef.form=coef.form,
+                                         coef.diss=coef.diss,
+                                         start = nw%n%"time" + 0,
+                                         end = nw%n%"time" + time.slices,
+                                         changes = z$changed))
+               nwd
+             },
+             changes = {
+               changes <- z$changed
+               attributes(changes) <- c(attributes(changes), # Don't clobber existing attributes!
+                                        list(formation = formation,
+                                             dissolution = dissolution,
+                                             stats.form = stats.form,
+                                             stats.diss = stats.diss,
+                                             stats = stats,
+                                             coef.form=coef.form,
+                                             coef.diss=coef.diss,
+                                             start = nw%n%"time" + 0,
+                                             end = nw%n%"time" + time.slices))
+               changes
+             },
+             stats = {
+               list(stats.form = stats.form,stats.diss = stats.diss, stats = stats)
+             })
   },
                    simplify = FALSE)
+
   if(nsim==1){
     out<-out[[1]]
-    if(!control$toggles){
+    if(output == "stats"){
       for(name in names(out)) # Strip the unreturned stats matrices.
         if(is.null(out[[name]]))
           out[[name]] <- NULL
-      if(length(out))
+      if(length(out)==1)
         out <- out[[1]] # If there is only one, just return it.
     }
     out
   }else{
-    if(control$toggles){
-      # If we've returned a list of networkDynamics, then it's a network list.
-      class(out) <- "network.list"
-      out
-    }else{
-      # Otherwise, we can combine the simulation into mcmc.lists.
-      outl <- list()
-      for(name in names(out[[1]])){
-        if(!is.null(out[[1]][[name]]))
-          outl[[name]] <- do.call(mcmc.list, lapply(out, "[[", name))
-      }
-      if(length(outl))
-         outl <- outl[[1]] # If there is only one, just return it.
-      outl
-    }
+    switch(output,
+           networkDynamic = {
+             # If we've returned a list of networkDynamics, then it's a network list.
+             # FIXME: Should we reserve network.list for serial network data?
+             class(out) <- "network.list"
+             out
+           },
+           stats = {
+             # If we returned several mcmc() objects, merge them into mcmc.lists.
+             outl <- list()
+             for(name in names(out[[1]])){
+               if(!is.null(out[[1]][[name]]))
+                 outl[[name]] <- do.call(mcmc.list, lapply(out, "[[", name))
+             }
+             if(length(outl)==1)
+               outl <- outl[[1]] # If there is only one, just return it.
+             outl
+           },
+           changes = {
+             out
+           })
   }
 }

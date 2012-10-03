@@ -83,6 +83,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 			    double *F_stats, double *D_stats, double *M_stats,
 			    Edge maxedges,
 			    Edge maxchanges,
+			    int log_changes,
 			    Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffdir,		    
 			    // MCMC settings.
 			    unsigned int nsteps, unsigned int max_MH_interval, double MH_interval_mul,
