@@ -63,7 +63,8 @@ void MCMCDyn_wrapper(// Starting network.
 		     int *maxedges,
 		     int *newnetworktails, int *newnetworkheads, 
 		     int *maxchanges,
-		     int *diffnetworktime, int *diffnetworktail, int *diffnetworkhead, 
+		     int *log_changes,
+		     int *diffnetworktime, int *diffnetworktail, int *diffnetworkhead, int *diffnetworkdir, 
 		     // Verbosity.
 		     int *fVerbose,
 		     int *status);
@@ -82,7 +83,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 			    double *F_stats, double *D_stats, double *M_stats,
 			    Edge maxedges,
 			    Edge maxchanges,
-			    Vertex *difftime, Vertex *difftail, Vertex *diffhead,		    
+			    Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffdir,		    
 			    // MCMC settings.
 			    unsigned int nsteps, unsigned int max_MH_interval, double MH_interval_mul,
 			    unsigned int burnin, unsigned int interval, 
@@ -98,10 +99,10 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
 			   // Monitored statistics.
 			   Model *M_m,
 			   // Space for output.
-			   unsigned log_toggles,
+			   unsigned log_changes,
 			   double *F_stats, double *D_stats, double *M_stats,
 			   unsigned int maxchanges, Edge *nextdiffedge,
-			   Vertex *difftime, Vertex *difftail, Vertex *diffhead,
+			   Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffdir,
 			   // MCMC settings.
 			   unsigned int max_MH_interval, double MH_interval_mul,
 			   // Verbosity.

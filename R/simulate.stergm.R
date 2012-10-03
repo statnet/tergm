@@ -191,7 +191,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
     
     if(control$toggles){
       library(networkDynamic)
-      nwd <- as.networkDynamic(nw, toggles = z$changed, start = nw%n%"time" + 0, end = nw%n%"time" + time.slices)
+      nwd <- as.networkDynamic(nw, toggles = z$changed[,-4], start = nw%n%"time" + 0, end = nw%n%"time" + time.slices)
       nwd<-delete.network.attribute(nwd, "time")
       nwd<-delete.network.attribute(nwd, "lasttoggle")
       attributes(nwd) <- c(attributes(nwd), # Don't clobber existing attributes!

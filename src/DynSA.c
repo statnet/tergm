@@ -140,7 +140,7 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 					  0,
 					  NULL, NULL, dev,
 					  maxchanges, &nextdiffedge,
-					  difftime, difftail, diffhead,
+					  difftime, difftail, diffhead, NULL,
 					  max_MH_interval, MH_interval_mul,
 					  fVerbose);
 
@@ -160,7 +160,7 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 					  0,
 					  NULL, NULL, dev,
 					  maxchanges, &nextdiffedge,
-					  difftime, difftail, diffhead,
+					  difftime, difftail, diffhead, NULL,
 					  max_MH_interval, MH_interval_mul,
 					  fVerbose);
 

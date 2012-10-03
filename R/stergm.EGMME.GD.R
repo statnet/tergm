@@ -35,17 +35,22 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         clusterApplyLB(cl, 1:q,
                        function(i){
                          y<-ys[,i]
-                         suppressWarnings(try(lm(y~x), silent=TRUE))
+                         suppressWarnings(try(
+                                            if(control$SA.robust) lm(y~x)
+                                            else lmrob(y~x), silent=TRUE))
                        })
       }else{
         lapply(1:q,
                function(i){
                  y<-ys[,i]
-                 suppressWarnings(try(lm(y~x), silent=TRUE))
+                 suppressWarnings(try(
+                                    if(control$SA.robust) lm(y~x)
+                                    else lmrob(y~x), silent=TRUE))
                })
       }
     
-    bad.fits <- sapply(h.fits, inherits, "try-error")
+    bad.fits <- sapply(h.fits, inherits, "try-error") | apply(diff(ys)==0,2,all)
+    
 #    bad.fits <-     # Also, ignore fits where the statistics are too concentrated.    
 #      bad.fits | (apply(ys,2,function(y){
 #        freqs <- table(y)
@@ -81,12 +86,6 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     G.signif[is.na(G.signif)] <- FALSE
 
-    ## Test for nonlinearity
-    sapply(seq_along(h.fits)[!bad.fits],function(i){
-      h.fit <- h.fits[[i]]
-      NROW(ys)/h.nfs[i,]
-    })
-    
     ## Compute the variances (robustly) and the statistic weights.
     v <- matrix(NA, q,q)
     v[!bad.fits,!bad.fits] <- if(control$SA.robust) covMcd(h.resid[,!bad.fits,drop=FALSE])$cov else cov(h.resid[,!bad.fits,drop=FALSE])
@@ -123,7 +122,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
     ## Adaptively scale the estimating equations so that none of the
     ## parameters are "neglected".
-    par.eff <- apply(sweep(G,1,sqrt(diag(v)),"/"),2,function(z)mean(z^2))
+    par.eff <- apply(sweep(G,1,ifelse(bad.fits,1,sqrt(diag(v))),"/"),2,function(z)mean(z^2))
     par.eff <- sqrt(par.eff)
 
     

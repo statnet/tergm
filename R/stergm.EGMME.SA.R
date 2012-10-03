@@ -181,8 +181,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     cat('========  Phase 1: Burn in, get initial gradient values, and find a configuration under which all targets vary. ========\n',sep="")
     
     ###### Set up and run the burn-in. ######
-    
-    control$collect.form <- control$collect.diss <- FALSE
+
+    control$toggles <- control$collect.form <- control$collect.diss <- FALSE
     control.phase1<-control
     control.phase1$time.samplesize <- 1
     control.phase1$time.burnin <- control$SA.burnin
