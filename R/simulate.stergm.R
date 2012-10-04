@@ -340,7 +340,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   ## If all the user wants is statistics or a list of toggles, we are done.
   if(output!="networkDynamic") return(sim)
 
-  if(verbose) cat("Updating networkDynamic.")
+  if(verbose) cat("Updating networkDynamic.\n")
   
   ## Map the vertex IDs:
   sim[,"tail"] <- vActiveIDs[sim[,"tail"]]

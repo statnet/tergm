@@ -21,9 +21,7 @@
 \details{Automatically called when an object of class \code{\link{stergm}} is printed.
 }
 \value{The value returned is the \code{\link{stergm}} object itself.}
-\seealso{\code{\link{network}}, \code{\link{ergm}}}
-%\examples{
-%}
+\seealso{\code{\link{network}}, \code{\link{stergm}}}
 \keyword{models}
 
 

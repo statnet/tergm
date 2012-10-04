@@ -77,6 +77,4 @@
          \code{coda} package, 
          \code{\link{summary.ergm}}
         }
-\examples{
-}
 \keyword{models}
