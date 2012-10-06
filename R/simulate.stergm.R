@@ -346,6 +346,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   sim[,"tail"] <- vActiveIDs[sim[,"tail"]]
   sim[,"head"] <- vActiveIDs[sim[,"head"]]
 
+  ## Add edges that were never present in the initial network.
   extant.edges <- as.edgelist(object)
   changed.edges <- unique(sim[,c("tail","head")])
   new.edges <- changed.edges[!(paste(changed.edges[,1],changed.edges[,2]) %in% paste(extant.edges[,1],extant.edges[,2])),]
@@ -366,14 +367,14 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
       # cell in the spell matrix. However, we can't assume that a
       # spell matrix exists for a given edge, so we need to check, and
       # add a (-Inf,time) row if it doesn't.
-      am <- object$mel[[i]]$atl$active
+      am <- object$mel[[eID]]$atl$active
       if(is.null(am)) am <- rbind(c(-Inf,+Inf))
       am[nrow(am),2] <- sim[i,"time"]
-      object$mel[[i]]$atl$active <- am
+      object$mel[[eID]]$atl$active <- am
     }
     if(sim[i,"dir"]==+1){
       # If we are forming a tie, we are adding a new row.
-      object$mel[[i]]$atl$active <- rbind(object$mel[[i]]$atl$active,c(sim[i,"time"],+Inf))
+      object$mel[[eID]]$atl$active <- rbind(object$mel[[eID]]$atl$active,c(sim[i,"time"],+Inf))
     }
   }
 
