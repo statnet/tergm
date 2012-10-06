@@ -370,11 +370,11 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
       am <- object$mel[[eID]]$atl$active
       if(is.null(am)) am <- rbind(c(-Inf,+Inf))
       am[nrow(am),2] <- sim[i,"time"]
-      object$mel[[eID]]$atl$active <- am
+      object[["mel"]][[eID]]$atl$active <- am
     }
     if(sim[i,"dir"]==+1){
       # If we are forming a tie, we are adding a new row.
-      object$mel[[eID]]$atl$active <- rbind(object$mel[[eID]]$atl$active,c(sim[i,"time"],+Inf))
+      object[["mel"]][[eID]]$atl$active <- rbind(object$mel[[eID]]$atl$active,c(sim[i,"time"],+Inf))
     }
   }
 
