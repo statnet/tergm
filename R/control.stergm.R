@@ -12,7 +12,7 @@ control.stergm<-function(init.form=NULL,
                          MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,
                          MCMC.init.maxedges=20000,
                          MCMC.init.maxchanges=20000,
-                         MCMC.packagenames=c("tergm","ergm"),
+                         MCMC.packagenames=c(),
                          # Number of proposals within each time step.
                          MCMC.burnin=10000,
                          MCMC.burnin.mul=7,

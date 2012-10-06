@@ -18,7 +18,6 @@ else if(any(from>=to)) stop("Term edges.ageinterval must have from<to.")
   list(name=if(role=="target") "edges_ageinterval_mon" else "edges_ageinterval",
        coef.names = paste("edges.age",from,"to",to,sep=""),
        inputs=c(rbind(from, ifelse(to==Inf, 0, to))),
-       pkgname="tergm",
        dependence=FALSE)
 }
 
@@ -28,7 +27,6 @@ InitErgmTerm.edge.ages<-function(nw, arglist, role, ...) {
   
   list(name="edge_ages_mon",
        coef.names = "edge.ages",
-       pkgname="tergm",
        dependence=FALSE)
 }
 
@@ -43,7 +41,6 @@ InitErgmTerm.mean.age<-function(nw, arglist, role, ...) {
   
   list(name="mean_age_mon",
        coef.names = "mean.age",
-       pkgname = "tergm",
        inputs = a$emptyval,
        emptynwstats = a$emptyval,
        dependence=FALSE)
@@ -78,8 +75,7 @@ InitErgmTerm.edgecov.mean.age<-function(nw, arglist, role, ...) {
   }
   inputs <- c(a$emptyval, NCOL(xm), as.double(xm))
   attr(inputs, "ParamsBeforeCov") <- 2
-  list(name="edgecov_mean_age_mon", coef.names = cn, inputs = inputs, pkgname="tergm", dependence=FALSE, emptynwstats = a$emptyval
-       )
+  list(name="edgecov_mean_age_mon", coef.names = cn, inputs = inputs, dependence=FALSE, emptynwstats = a$emptyval)
 }
 
 InitErgmTerm.edgecov.ages<-function(nw, arglist, role, ...) {
@@ -111,8 +107,7 @@ InitErgmTerm.edgecov.ages<-function(nw, arglist, role, ...) {
   }
   inputs <- c(NCOL(xm), as.double(xm))
   attr(inputs, "ParamsBeforeCov") <- 1
-  list(name="edgecov_ages_mon", coef.names = cn, inputs = inputs, pkgname="tergm", dependence=FALSE
-       )
+  list(name="edgecov_ages_mon", coef.names = cn, inputs = inputs, dependence=FALSE)
 }
 
 ################################################################################
@@ -155,8 +150,7 @@ InitErgmTerm.degree.mean.age<-function(nw, arglist, role, ...) {
     inputs <- c(as.vector(du), nodecov)
   }
   list(name=name,coef.names=coef.names, inputs=c(a$emptyval,inputs),
-       emptynwstats=rep(a$emptyval,length(coef.names)), dependence=TRUE,
-       pkgname="tergm")
+       emptynwstats=rep(a$emptyval,length(coef.names)), dependence=TRUE)
 }
 
 ################################################################################
@@ -210,7 +204,6 @@ InitErgmTerm.degrange.mean.age<-function(nw, arglist, role, ...) {
     inputs <- c(as.vector(du), nodecov)
   }
   list(name=name,coef.names=coef.names, inputs=c(a$emptyval,inputs),
-       emptynwstats=rep(a$emptyval,length(coef.names)), dependence=TRUE,
-       pkgname="tergm")
+       emptynwstats=rep(a$emptyval,length(coef.names)), dependence=TRUE)
 }
 

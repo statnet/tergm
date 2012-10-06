@@ -7,16 +7,16 @@
 #===================================================================
 
 InitMHP.formation <- function(arguments, nw, model) {
-  MHproposal <- list(name = "Formation", inputs=NULL, package="tergm")
+  MHproposal <- list(name = "Formation", inputs=NULL)
   MHproposal
 }
 
 InitMHP.formationTNT <- function(arguments, nw, model) {
-  MHproposal <- list(name = "FormationTNT", inputs=NULL, package="tergm")
+  MHproposal <- list(name = "FormationTNT", inputs=NULL)
   MHproposal
 }
 
 InitMHP.dissolution <- function(arguments, nw, model) {
-  MHproposal <- list(name = "Dissolution", inputs=NULL, package="tergm")
+  MHproposal <- list(name = "Dissolution", inputs=NULL)
   MHproposal
 }

@@ -17,7 +17,7 @@ coef.diss <- c(2.944439)
 
 # Fit the model with very poor starting values.
 set.seed(1)
-dynfit<-stergm(g1,formation=~edges+degree(1),dissolution=~offset(edges), targets="formation", estimate="EGMME", offset.coef.diss=log(.95/.05),target.stats=target.stats,verbose=TRUE,control=control.stergm(SA.plot.progress=do.plot,init.form=c(-log(.95/.05),0)))
+dynfit<-stergm(g1,formation=~edges+degree(1),dissolution=~offset(edges), targets="formation", estimate="EGMME", offset.coef.diss=log(.95/.05),target.stats=target.stats,verbose=TRUE,control=control.stergm(SA.plot.progress=do.plot,SA.restart.on.err=FALSE,init.form=c(-log(.95/.05),0)))
 
 print(summary(dynfit))
 mcmc.diagnostics(dynfit)

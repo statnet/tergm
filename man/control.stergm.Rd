@@ -13,7 +13,7 @@
                          MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,
                          MCMC.init.maxedges=20000,
                          MCMC.init.maxchanges=20000,
-                         MCMC.packagenames="ergm",
+                         MCMC.packagenames=c(),
                          MCMC.burnin=1000,
                          CMLE.control=NULL,
                          CMLE.control.form=control.ergm(init=init.form, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, MCMC.interval=MCMC.burnin, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check),
@@ -109,8 +109,9 @@
   \item{MCMC.init.maxchanges}{Maximum number of changes in dynamic network
     simulation for which to allocate space.
   }
-  \item{MCMC.packagenames}{Names of packages in which change statistic
-    functions are found.
+  \item{MCMC.packagenames}{Names of packages in which to look for change statistic
+    functions in addition to those autodetected. This argument should not be
+    needed outside of very strange setups.
   }
   \item{MCMC.burnin}{Number of Metropolis-Hastings steps per phase
                         (formation and dissolution) per time step.

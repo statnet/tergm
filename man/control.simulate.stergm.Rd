@@ -17,7 +17,7 @@ control.simulate.network(MCMC.burnin=1000,
                         MCMC.prop.weights.form="default",MCMC.prop.args.form=NULL,
                         MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,
                         MCMC.init.maxedges=20000,
-                        MCMC.packagenames="ergm",
+                        MCMC.packagenames=c(),
                         MCMC.init.maxchanges=1000000)
 
 }
@@ -45,8 +45,9 @@ control.simulate.network(MCMC.burnin=1000,
   \item{MCMC.init.maxchanges}{Maximum number 
     of toggles changes for which to allocate space.
   }
-  \item{MCMC.packagenames}{Names of packages in which change statistic
-    functions are found.
+  \item{MCMC.packagenames}{Names of packages in which to look for change statistic
+    functions in addition to those autodetected. This argument should not be
+    needed outside of very strange setups.
   }
   \item{MCMC.init.maxedges}{Maximum number of edges expected in network.
   }

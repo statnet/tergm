@@ -542,11 +542,11 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
             as.integer(Clist.form$dir), as.integer(Clist.form$bipartite),
             # Formation terms and proposals. 
             as.integer(Clist.form$nterms), as.character(Clist.form$fnamestring), as.character(Clist.form$snamestring),
-            as.character(MHproposal.form$name), as.character(MHproposal.form$package),
+            as.character(MHproposal.form$name), as.character(MHproposal.form$pkgname),
             as.double(Clist.form$inputs),
             # Dissolution terms and proposals. 
             as.integer(Clist.diss$nterms), as.character(Clist.diss$fnamestring), as.character(Clist.diss$snamestring),
-            as.character(MHproposal.diss$name), as.character(MHproposal.diss$package),
+            as.character(MHproposal.diss$name), as.character(MHproposal.diss$pkgname),
             as.double(Clist.diss$inputs),
             # Parameter fitting.
             eta=as.double(c(state$eta.form,state$eta.diss)),

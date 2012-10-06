@@ -41,4 +41,6 @@ print(coef.diss)
 # Simulate from the fit.
 dynsim<-simulate(g1,formation=~edges,dissolution=~edges,coef.form=coef.form,coef.diss=coef.diss,time.slices=S,verbose=TRUE)
 
+dynsim2<-simulate(dynsim,formation=~edges,dissolution=~edges,coef.form=coef.form,coef.diss=coef.diss,time.slices=S,verbose=TRUE)
+
 #print.sim.stats(dynsim,target.stats,duration)

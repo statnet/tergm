@@ -43,7 +43,7 @@ InitMHP.formationMLEblockdiag <- function(arguments, nw) {
   w <- w/max(w)
   # Note that this automagically takes care of singleton blocks by giving them weight 0.
   
-  MHproposal <- list(name = "FormationMLEblockdiag", inputs=c(ergm.Cprepare.el(arguments$constraints$atleast$nw),nd,length(b)-1,b,w), package="tergm")
+  MHproposal <- list(name = "FormationMLEblockdiag", inputs=c(ergm.Cprepare.el(arguments$constraints$atleast$nw),nd,length(b)-1,b,w))
   MHproposal
 }
 
@@ -66,7 +66,7 @@ InitMHP.formationMLEblockdiagTNT <- function(arguments, nw) {
   w <- w/max(w)
   # Note that this automagically takes care of singleton blocks by giving them weight 0.
 
-  MHproposal <- list(name = "FormationMLEblockdiagTNT", inputs=c(ergm.Cprepare.el(arguments$constraints$atleast$nw),nd,length(b)-1,b,w), package="tergm")
+  MHproposal <- list(name = "FormationMLEblockdiagTNT", inputs=c(ergm.Cprepare.el(arguments$constraints$atleast$nw),nd,length(b)-1,b,w))
   MHproposal
 }
 
@@ -87,7 +87,7 @@ InitMHP.formationNonObservedMLEblockdiag <- function(arguments, nw) {
   el <- el[a[el[,1]]==a[el[,2]],,drop=FALSE]
 
   ## Given the list of toggleable dyads, no formation-specific proposal function is needed:
-  MHproposal <- list(name = "randomtoggleList", inputs=ergm.Cprepare.el(el), package="ergm")
+  MHproposal <- list(name = "randomtoggleList", inputs=ergm.Cprepare.el(el), pkgname="ergm")
   MHproposal
 }
 
@@ -109,7 +109,7 @@ InitMHP.dissolutionNonObservedMLEblockdiag <- function(arguments, nw) {
 
   
   ## Given the list of toggleable dyads, no formation-specific proposal function is needed:
-  MHproposal <- list(name = "randomtoggleList", inputs=ergm.Cprepare.el(el), package="ergm")
+  MHproposal <- list(name = "randomtoggleList", inputs=ergm.Cprepare.el(el), pkgname="ergm")
   MHproposal
 }
 
@@ -127,6 +127,6 @@ InitMHP.dissolutionMLEblockdiag <- function(arguments, nw) {
   el <- el[a[el[,1]]==a[el[,2]],,drop=FALSE]
 
   
-  MHproposal <- list(name = "randomtoggleList", inputs=ergm.Cprepare.el(el), package="ergm")
+  MHproposal <- list(name = "randomtoggleList", inputs=ergm.Cprepare.el(el), pkgname="ergm")
   MHproposal
 }
