@@ -34,9 +34,9 @@
 #                  default='object'$constraints for stergms, "~." for formulas
 #   control      : a list of control parameters for algorithm tuning;
 #                  default=<control.simulate.stergm>
-#   toggles      : whether 'changed', the toggle matrix of timestamps and
-#                  toggles, should be included in the return list (T or F);
-#                  'toggles' will be switched to FALSE if either of
+#   changes      : whether 'changed', the change matrix of timestamps and
+#                  changes, should be included in the return list (T or F);
+#                  'changes' will be switched to FALSE if either of
 #                  'time.burnin' or 'time.interval' do not have their default
 #                  values; default=TRUE
 #   verbose      : whether to print out information on the status of
@@ -284,7 +284,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
 simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     formation = attr(object, "formation"), dissolution = attr(object, "dissolution"),
                                     coef.form = attr(object, "coef.form"), coef.diss = attr(object, "coef.diss"),
-                                    constraints = attr(object, "constraints"),
+                                    constraints = NVL(attr(object, "constraints"),~.),
                                     monitor = attr(object, "monitor"),
                                     time.slices, time.burnin=0, time.interval=1,
                                     control=control.simulate.network(),
@@ -295,6 +295,12 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     verbose=FALSE, ...){
   if(nsim>1) stop("Simulating more than one chain of networks is not supported at this time. If you want to simulate over multiple time steps, use the time.slices argument.")
 
+  if(!is.null(statsonly)){
+    warning("Argument `statsonly' for STERGM simulate() is deprecated and may be removed in a future version. Use `output' instead.")
+    output <- if(statsonly) "stats" else "networkDynamic"
+  }
+
+  
   start <- NVL(attr(object,"end"),0)
   nw <- object %t% start
   vActives <- is.active(object, at=start, v=seq_len(network.size(object)))
@@ -311,12 +317,17 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   ltlts <- lapply(lapply(lapply(object$mel, "[[", "atl"), "[[", "active"), function(x) suppressWarnings(max(x[x!=+Inf])))
 
   ltm <-
-    if(is.bipartite(nw)) m <- matrix(-Inf, network.size(nw), nw%n%"bipartite")
+    if(is.bipartite(nw)) m <- matrix(-Inf, nw%n%"bipartite", network.size(nw) - nw%n%"bipartite")
     else m <- matrix(-Inf, network.size(nw), network.size(nw))
 
-  for(i in seq_along(ltlts))    
-    if(ltlts[[i]]!=-Inf && vActives[lttails[[i]]] && vActives[ltheads[[i]]])
-      m[vActives[lttails[[i]]],vActives[ltheads[[i]]]] <- ltlts[[i]]
+  for(i in seq_along(ltlts))
+    if(ltlts[[i]]!=-Inf){
+      e<-c(vActives[lttails[[i]]],vActives[ltheads[[i]]])
+      if(!all(e)) next
+      if(!is.directed(nw)) e <- c(min(e),max(e))
+      if(is.bipartite(nw)) e[2] <- e[2] - nw %n% "bipartite"
+      m[e[1],e[2]] <- ltlts[[i]]
+    }
   m[m==-Inf] <- round(-.Machine$integer.max/2)
 
   nw %n% "time" <- start
@@ -326,7 +337,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   output <- match.arg(output)
   
   sim <- simulate.network(nw, nsim=1, seed=NULL,
-                          formation=formation, dissolutio=formation,
+                          formation=formation, dissolution=dissolution,
                           coef.form=coef.form,coef.diss=coef.diss,
                           constraints = constraints,
                           monitor = monitor,
@@ -381,10 +392,10 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   attributes(object) <- c(attributes(object), # Don't clobber existing attributes!
                           list(formation = ergm.update.formula(formation,nw~.),
                                dissolution = ergm.update.formula(dissolution,nw~.),
-                               stats.form = rbind(if(ergm.update.formula(formation,nw~.)==attr(object,"formation")) attr(object,"stats.form"),attr(sim,"stats.form")),
-                               stats.diss = rbind(if(ergm.update.formula(dissolution,nw~.)==attr(object,"dissolution")) attr(object,"stats.diss"),attr(sim,"stats.diss")),
+                               stats.form = rbind(if(isTRUE(ergm.update.formula(formation,nw~.)==attr(object,"formation"))) attr(object,"stats.form"),attr(sim,"stats.form")),
+                               stats.diss = rbind(if(isTRUE(ergm.update.formula(dissolution,nw~.)==attr(object,"dissolution"))) attr(object,"stats.diss"),attr(sim,"stats.diss")),
                                monitor = monitor,
-                               stats = rbind(if(!is.null(attr(object,"monitor")) && monitor==attr(object,"monitor")) attr(object,"stats"),attr(sim,"stats")),
+                               stats = rbind(if(isTRUE(monitor==attr(object,"monitor"))) attr(object,"stats"),attr(sim,"stats")),
                                coef.form=coef.form,
                                coef.diss=coef.diss,
                                constraints=constraints,
