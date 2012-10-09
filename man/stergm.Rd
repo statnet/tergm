@@ -28,6 +28,9 @@
     \code{\link[networkDynamic]{networkDynamic}} object, a
     \code{\link{network.list}} object, or a \code{\link{list}}
     containing networks (for CMLE and CMPLE).
+
+    \code{simulate.network} understands the \code{\link{lasttoggle}}
+    "API".
   }
   \item{formation, dissolution}{
     One-sided \code{\link{ergm}}-style formulas for the formation and

@@ -72,7 +72,7 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
                           coef.form=object$formation.fit$coef,coef.diss=object$dissolution.fit$coef,
                           constraints = object$constraints,
                           monitor = object$targets,
-                          time.slices, time.burnin=0, time.interval=1,
+                          time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                           control=control.simulate.stergm(),
                           statsonly=NULL,
                           output=c("networkDynamic", "stats", "changes"),
@@ -88,7 +88,7 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
 
   control <- set.control.class("control.simulate.network")
 
-  simulate.network(object$network,formation=object$formation,dissolution=object$dissolution,nsim=nsim,coef.form=coef.form, coef.diss=coef.diss, constraints=constraints, monitor=monitor, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, statsonly=statsonly, output=output, stats.form = stats.form, stats.diss = stats.diss, verbose=verbose,...)
+  simulate.network(object$network,formation=object$formation,dissolution=object$dissolution,nsim=nsim,coef.form=coef.form, coef.diss=coef.diss, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, statsonly=statsonly, output=output, stats.form = stats.form, stats.diss = stats.diss, verbose=verbose,...)
 }
 
 
@@ -99,7 +99,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                              coef.form,coef.diss,
                              constraints = ~.,
                              monitor = NULL,
-                             time.slices, time.burnin=0, time.interval=1,
+                             time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                              control=control.simulate.network(),
                              statsonly=NULL,
                              output=c("networkDynamic", "stats", "changes"),
@@ -192,7 +192,15 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   
   out <- replicate(nsim, {
     if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(round(-.Machine$integer.max/2), network.dyadcount(nw))
-    if(is.null(nw %n% "time")) nw %n% "time" <- 0
+    nwtime <- nw %n% "time"
+
+    nw %n% "time" <- if(is.null(nwtime)) NVL(time.start,0) else{
+      if(!is.null(time.start)){
+        warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.")
+        time.start
+      }else nwtime
+    }
+    
     
     z <- stergm.getMCMCsample(nw, model.form, model.diss, model.mon,
                               MHproposal.form, MHproposal.diss,
@@ -286,7 +294,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     coef.form = attr(object, "coef.form"), coef.diss = attr(object, "coef.diss"),
                                     constraints = NVL(attr(object, "constraints"),~.),
                                     monitor = attr(object, "monitor"),
-                                    time.slices, time.burnin=0, time.interval=1,
+                                    time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                                     control=control.simulate.network(),
                                     statsonly=NULL,
                                     output=c("networkDynamic", "stats", "changes"),
@@ -300,8 +308,14 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
     output <- if(statsonly) "stats" else "networkDynamic"
   }
 
+  nwend <- attr(object,"end")
+  start <- if(is.null(nwend)) NVL(time.start,0) else{
+    if(!is.null(time.start)){
+      warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.")
+      time.start
+    }else nwend
+  }
   
-  start <- NVL(attr(object,"end"),0)
   nw <- object %t% start
   vActives <- is.active(object, at=start, v=seq_len(network.size(object)))
   mode(vActives) <- "integer"

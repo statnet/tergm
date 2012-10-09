@@ -15,7 +15,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
                           coef.form = object$formation.fit$coef,
                           coef.diss = object$dissolution.fit$coef,
                           monitor = object$targets,
-                          time.slices, time.burnin=0, time.interval=1,
+                          time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                           control=control.simulate.stergm(),
                           statsonly=NULL,
                           output=c("networkDynamic", "stats", "changes"),
@@ -42,7 +42,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
                                   coef.diss = attr(object, "coef.diss"),
                                   constraints = attr(object, "constraints"),
                                   monitor = attr(object, "monitor"),
-                                  time.slices, time.burnin=0, time.interval=1,
+                                  time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                                   control=control.simulate.network(),
                                   statsonly=NULL,
                                   output=c("networkDynamic", "stats", "changes"),
@@ -54,6 +54,9 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
 \arguments{
   \item{object}{an \R object of type \code{\link{stergm}} giving a model
     fit or of type \code{\link{network}} giving the initial network.
+
+    \code{simulate.network} understands the \code{\link{lasttoggle}}
+    "API".
   }
   \item{formation, dissolution}{
     One-sided \code{\link{ergm}}-style formulas for the formation and
@@ -81,7 +84,13 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   \item{time.slices}{
     Number of networks or network statistics to return from each replication of the dynamic process. See below for
     return types.
-    }
+  }
+
+  \item{time.start}{
+    An optional argument specifying the time point at which the
+    simulation is to start. See Details for further information.
+  }
+  
   \item{time.burnin}{
     Number of time steps to discard before starting to collect network
     statistics. Actual network will only be returned if \code{time.burnin==0}.
@@ -114,6 +123,24 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   the method for \code{\link{networkDynamic}}, the simulation is resumed
   from the last generated time point of \code{object}, by default with
   the same model and parameters.
+
+  The time index of the start of the simulation is determined as
+  follows:
+  \itemize{
+    \item{If \code{time.start} is specified, it is used as the initial
+      time index of the simulation.}
+    \item{If \code{time.start} is not specified (is \code{NULL}), then
+      if the \code{object} carries a time stamp from which to start
+      or resume the simulation, either in the form
+      of a \code{"time"} network attribute (for the
+      \code{\link{network}} method --- see the
+      \code{\link{lasttoggle}} "API") or
+      in the form of an \code{"end"} object attribute (for the
+      \code{\link{networkDynamic}} method), this attribute will be used. (If
+      specified, \code{time.start} will override it with a warning.)
+    }
+    \item{Othewise, the simulation starts at 0.}
+  }
 }
 \value{
   Depends on the \code{output} argument:
