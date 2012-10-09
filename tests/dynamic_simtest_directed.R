@@ -43,4 +43,6 @@ dynsim<-simulate(g1,formation=~edges,dissolution=~edges,coef.form=coef.form,coef
 
 dynsim2<-simulate(dynsim,formation=~edges,dissolution=~edges,coef.form=coef.form,coef.diss=coef.diss,time.slices=S,verbose=TRUE)
 
+dynsim3<-simulate(dynsim2,formation=~edges,dissolution=~edges,coef.form=coef.form,coef.diss=coef.diss,time.slices=S,verbose=TRUE)
+
 #print.sim.stats(dynsim,target.stats,duration)
