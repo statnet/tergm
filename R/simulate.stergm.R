@@ -196,7 +196,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
 
     nw %n% "time" <- if(is.null(nwtime)) NVL(time.start,0) else{
       if(!is.null(time.start)){
-        warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.")
+        if(time.start!=nwtime) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.")
         time.start
       }else nwtime
     }
@@ -311,7 +311,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   nwend <- attr(object,"end")
   start <- if(is.null(nwend)) NVL(time.start,0) else{
     if(!is.null(time.start)){
-      warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.")
+      if(time.start!=nwend) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.")
       time.start
     }else nwend
   }
