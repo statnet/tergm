@@ -161,11 +161,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
   history <- list()
   history$ind.all <- history$tid.all <- history$oh.all <- history$jitters.all <- state <- NULL
 
-  for(restart in 1:control$SA.restarts){
-  
-    if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(round(-.Machine$integer.max/2), network.dyadcount(nw))
-    if(is.null(nw %n% "time")) nw %n% "time" <- 0
-    
+  for(restart in 1:control$SA.restarts){    
     nw.diff <- model.mon$nw.stats - model.mon$target.stats  # nw.diff keeps track of the difference between the current network and the target statistics.
     
     states <- replicate(if(!is.null(cl)) control$parallel else 1,
