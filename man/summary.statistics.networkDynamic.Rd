@@ -30,7 +30,6 @@
   \item{basis}{
     An optional \code{\link{networkDynamic}} object relative to which
     the statistics should be calculated.}
-}
  \item{\dots}{
     Further arguments passed to or used by methods.
 }
