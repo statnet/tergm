@@ -68,7 +68,9 @@ network.extract.with.lasttoggle <- function(nwd, at){
       if(!all(e)) next
       if(!is.directed(nw)) e <- c(min(e),max(e))
       if(is.bipartite(nw)) e[2] <- e[2] - nw %n% "bipartite"
-      m[e[1],e[2]] <- ltlts[[i]]
+      # The -1 is important: lasttoggle is shifted by -1 relative to
+      # networkDynamic (at least for now).
+      m[e[1],e[2]] <- ltlts[[i]] - 1 
     }
   m[m==-Inf] <- round(-.Machine$integer.max/2)
   
@@ -86,7 +88,9 @@ to.networkDynamic.lasttoggle <- function(nw){
 
     lt.edges <- lt.edges[lt.edges[,3]>round(-.Machine$integer.max/2),,drop=FALSE] 
 
-    if(nrow(lt.edges)) nwd <- deactivate.edges(nwd, onset=-Inf, terminus=lt.edges[,3], e=apply(lt.edges[,1:2,drop=FALSE],1,function(e) get.edgeIDs(nw, e[1], e[2])))
+    # The +1 after lt.edges[,3] is important: lasttoggle is shifted by -1 relative to
+    # networkDynamic (at least for now).
+    if(nrow(lt.edges)) nwd <- deactivate.edges(nwd, onset=-Inf, terminus=lt.edges[,3]+1, e=apply(lt.edges[,1:2,drop=FALSE],1,function(e) get.edgeIDs(nw, e[1], e[2])))
   }
   nwd<-delete.network.attribute(nwd, "time")
   nwd<-delete.network.attribute(nwd, "lasttoggle")
@@ -100,7 +104,7 @@ networkDynamic.apply.changes <- function(nwd, changes){
   ## Add edges that were never present in the initial network.
   extant.edges <- as.edgelist(nwd)
   changed.edges <- unique(changes[,c("tail","head"),drop=FALSE])
-  new.edges <- changed.edges[!(paste(changed.edges[,1],changed.edges[,2]) %in% paste(extant.edges[,1],extant.edges[,2])),]
+  new.edges <- changed.edges[!(paste(changed.edges[,1],changed.edges[,2]) %in% paste(extant.edges[,1],extant.edges[,2])),,drop=FALSE]
   nwd <- add.edges(nwd,as.list(new.edges[,1]),as.list(new.edges[,2]))
   
   for(i in seq_len(nrow(changes))){
@@ -135,3 +139,45 @@ networkDynamic.apply.changes <- function(nwd, changes){
 
   nwd
 }
+
+### A potentially faster version, that might be worth refining later.
+
+## networkDynamic.apply.changes <- function(nwd, changes){
+##   ## Add edges that were never present in the initial network.
+##   extant.edges <- as.edgelist(nwd)
+##   changed.edges <- unique(changes[,c("tail","head"),drop=FALSE])
+##   new.edges <- changed.edges[!(paste(changed.edges[,1],changed.edges[,2]) %in% paste(extant.edges[,1],extant.edges[,2])),,drop=FALSE]
+##   nwd <- add.edges(nwd,as.list(new.edges[,1]),as.list(new.edges[,2]))
+
+##   changes <- changes[order(changes[,"tail"], changes[,"head"], changes[,"time"], changes[,"to"]),,drop=FALSE]
+##   edge.changes <- aggregate(as.data.frame(changes[,c("time","to")]),by=list(tail=changes[,"tail"],head=changes[,"head"]),FUN=identity)
+  
+##   for(i in seq_len(nrow(edge.changes))){
+##     eID <- get.edgeIDs(nwd,edge.changes[i,"tail"],edge.changes[i,"head"])
+##     times <- edge.changes[i,"time"][[1]]
+##     tos <- edge.changes[i,"to"][[1]]
+    
+##     if(!all(abs(diff(tos))==1)) stop("Problem with change matrix.")
+
+##     am <- nwd$mel[[eID]]$atl$active # Extant spells.
+    
+##     if(tos[1]==0){ # First change is a dissolution.
+##       # No spell matrix:
+##       if(is.null(am)) am <- rbind(c(-Inf,+Inf))
+
+##       am.new <- matrix(c(am[nrow(am),1],
+##                          times,
+##                          if(tos[length(tos)]==1) Inf # If ending with a formation, spell continues forever.
+##                          ),ncol=2,byrow=TRUE)
+      
+##       nwd$mel[[eID]]$atl$active <- rbind(am[-nrow(am),],am.new)
+##     }else if(tos[1]==1){
+##       am.new <- matrix(c(times,
+##                          if(tos[length(tos)]==1) Inf # If ending with a formation, spell continues forever.
+##                          ),ncol=2,byrow=TRUE)
+##       nwd$mel[[eID]]$atl$active <- rbind(am,am.new)
+##     }
+##   }
+
+##   nwd
+## }
