@@ -20,9 +20,9 @@ void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int 
 			 char *D_MHproposaltype, char *D_MHproposalpackage, MHproposal *D_MH,
 			 int fVerbose){
   
-  if(F_nterms) *F_m=ModelInitialize(F_funnames, F_sonames, &F_inputs, F_nterms);
-  if(D_nterms) *D_m=ModelInitialize(D_funnames, D_sonames, &D_inputs, D_nterms);
-  if(M_nterms) *M_m=ModelInitialize(M_funnames, M_sonames, &M_inputs, M_nterms); else *M_m=NULL;
+  if(F_nterms) *F_m=ModelInitialize(F_funnames, F_sonames, &F_inputs, F_nterms); else if(F_m && *F_m) *F_m=NULL;
+  if(D_nterms) *D_m=ModelInitialize(D_funnames, D_sonames, &D_inputs, D_nterms); else if(D_m && *D_m) *D_m=NULL;
+  if(M_nterms) *M_m=ModelInitialize(M_funnames, M_sonames, &M_inputs, M_nterms); else if(M_m && *M_m) *M_m=NULL;
 
   nw[0]=NetworkInitialize(tails, heads, n_edges, 
                           n_nodes, dflag, bipartite, 1, time, lasttoggle);
