@@ -106,78 +106,70 @@ networkDynamic.apply.changes <- function(nwd, changes){
   changed.edges <- unique(changes[,c("tail","head"),drop=FALSE])
   new.edges <- changed.edges[!(paste(changed.edges[,1],changed.edges[,2]) %in% paste(extant.edges[,1],extant.edges[,2])),,drop=FALSE]
   nwd <- add.edges(nwd,as.list(new.edges[,1]),as.list(new.edges[,2]))
+
+  changes <- changes[order(changes[,"tail"], changes[,"head"], changes[,"time"], changes[,"to"]),,drop=FALSE]
+
+  # Group changes by tail and head, resulting in a "data frame" with
+  # columns tail, head, time, and to, with time and to being columns
+  # of lists of changes for that dyad.
+  changes <- aggregate(as.data.frame(changes[,c("time","to")]),by=list(tail=changes[,"tail"],head=changes[,"head"]),FUN=list)
+
+  # Now, for each row in this "data frame", construct a list of lists,
+  # each containing elements eID, times, and tos.
+  changes <- apply(changes, 1, function(r)
+                   list(eID=get.edgeIDs(nwd,r[["tail"]],r[["head"]]),
+                        times=r[["time"]], tos=r[["to"]]))
   
-  for(i in seq_len(nrow(changes))){
-    eID <- get.edgeIDs(nwd,changes[i,"tail"],changes[i,"head"])
-    # The following two lines are the "correct" way to do this, but
-    # since we know the direction, and since we can assume that
-    # everything after attr(nwd,"end") is "censored", we can do it
-    # faster.
-    #
-    # if(changes[i,"to"]==0) nwd <- deactivate.edges(nwd, onset=changes[i,"time"], terminus=+Inf, e=eID)
-    # if(changes[i,"to"]==1) nwd <- activate.edges(nwd, onset=changes[i,"time"], terminus=+Inf, e=eID)
+  for(e in changes){
+    tos <- e$tos
+    times <- e$times
+    eID <- e$eID
     
-    if(changes[i,"to"]==0){
-      # If we are dissolving a tie, we are changing the bottom-right
-      # cell in the spell matrix. However, we can't assume that a
-      # spell matrix exists for a given edge, so we need to check, and
-      # add a (-Inf,time) row if it doesn't.
-      am <- nwd$mel[[eID]]$atl$active
+    if(!all(abs(diff(tos))==1)) stop("Problem with change matrix.")
+
+    am <- nwd$mel[[eID]]$atl$active # Extant spells.
+    
+    if(tos[1]==0){ # First change is a dissolution.
+      # No spell matrix:
       if(is.null(am)) am <- rbind(c(-Inf,+Inf))
-      am[nrow(am),2] <- changes[i,"time"]
-      nwd[["mel"]][[eID]]$atl$active <- am
-    }else if(changes[i,"to"]==1){
-      # If we are forming a tie, we are adding a new row.  If (and
-      # this shouldn't happen), there is a spell ending at the same
-      # time as we are trying to start it, merge it in instead.
-      am <- nwd[["mel"]][[eID]]$atl$active
-      if(!is.null(am) && am[nrow(am),2]==changes[i,"time"]) am[nrow(am),2] <- +Inf
-      else am <- rbind(am, c(changes[i,"time"],+Inf))
+
+      # If the last formation toggle is at the same time as the new
+      # dissolution toggle, the whole spell gets dissolved away, with
+      # the last row of am getting dropped below and not replaced by
+      # anything. (This should not, normally, happen for the
+      # simulate() functions.)
+      #
+      # Otherwise, prepend the onset of the extant tie.      
+      if(am[nrow(am),1]==times[1]) times <- times[-1]
+      else times <- c(am[nrow(am),1],times)
+
+      # If ending with a formation, spell continues forever.
+      if(tos[length(tos)]==1) times <- c(times, +Inf)
+
+      # Construct a new spell matrix. (If times is empty, it's NULL, which still works.)
+      am.new <- if(length(times)) matrix(times,ncol=2,byrow=TRUE)
+      
+      nwd[["mel"]][[eID]]$atl$active <- rbind(am[-nrow(am),],am.new)
+    }else if(tos[1]==1){ # First change is a formation.
+
+      # If the last dissolution toggle is at the same time as the new
+      # formation toggle, the spell resumes as if never
+      # dissolved. (This should not, normally, happen for the
+      # simulate() functions.)
+      if(!is.null(am) && am[nrow(am),2]==times[1]){
+        times[1] <- am[nrow(am),1]
+        am <- am[-nrow(am),,drop=FALSE]
+      }
+
+      # If ending with a formation, spell continues forever.
+      if(tos[length(tos)]==1) times <- c(times, +Inf)
+    
+      # Construct a new spell matrix. (If times is empty, it's NULL, which still works.)
+      am.new <- if(length(times)) matrix(times,ncol=2,byrow=TRUE)
+
+      nwd[["mel"]][[eID]]$atl$active <- rbind(am,am.new)
     }
-    nwd[["mel"]][[eID]]$atl$active <- am
   }
 
   nwd
 }
-
-### A potentially faster version, that might be worth refining later.
-
-## networkDynamic.apply.changes <- function(nwd, changes){
-##   ## Add edges that were never present in the initial network.
-##   extant.edges <- as.edgelist(nwd)
-##   changed.edges <- unique(changes[,c("tail","head"),drop=FALSE])
-##   new.edges <- changed.edges[!(paste(changed.edges[,1],changed.edges[,2]) %in% paste(extant.edges[,1],extant.edges[,2])),,drop=FALSE]
-##   nwd <- add.edges(nwd,as.list(new.edges[,1]),as.list(new.edges[,2]))
-
-##   changes <- changes[order(changes[,"tail"], changes[,"head"], changes[,"time"], changes[,"to"]),,drop=FALSE]
-##   edge.changes <- aggregate(as.data.frame(changes[,c("time","to")]),by=list(tail=changes[,"tail"],head=changes[,"head"]),FUN=identity)
-  
-##   for(i in seq_len(nrow(edge.changes))){
-##     eID <- get.edgeIDs(nwd,edge.changes[i,"tail"],edge.changes[i,"head"])
-##     times <- edge.changes[i,"time"][[1]]
-##     tos <- edge.changes[i,"to"][[1]]
-    
-##     if(!all(abs(diff(tos))==1)) stop("Problem with change matrix.")
-
-##     am <- nwd$mel[[eID]]$atl$active # Extant spells.
-    
-##     if(tos[1]==0){ # First change is a dissolution.
-##       # No spell matrix:
-##       if(is.null(am)) am <- rbind(c(-Inf,+Inf))
-
-##       am.new <- matrix(c(am[nrow(am),1],
-##                          times,
-##                          if(tos[length(tos)]==1) Inf # If ending with a formation, spell continues forever.
-##                          ),ncol=2,byrow=TRUE)
-      
-##       nwd$mel[[eID]]$atl$active <- rbind(am[-nrow(am),],am.new)
-##     }else if(tos[1]==1){
-##       am.new <- matrix(c(times,
-##                          if(tos[length(tos)]==1) Inf # If ending with a formation, spell continues forever.
-##                          ),ncol=2,byrow=TRUE)
-##       nwd$mel[[eID]]$atl$active <- rbind(am,am.new)
-##     }
-##   }
-
-##   nwd
-## }
