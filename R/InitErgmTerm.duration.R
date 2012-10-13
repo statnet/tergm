@@ -51,7 +51,7 @@ InitErgmTerm.edgecov.mean.age<-function(nw, arglist, role, ...) {
 
   a <- check.ErgmTerm(nw, arglist, 
                       varnames = c("x", "attrname", "emptyval"),
-                      vartypes = c("matrix,network", "character", "numeric"),
+                      vartypes = c("matrix,network,character", "character", "numeric"),
                       defaultvalues = list(NULL, NULL, 0),
                       required = c(TRUE, FALSE, FALSE))
   
@@ -83,7 +83,7 @@ InitErgmTerm.edgecov.ages<-function(nw, arglist, role, ...) {
 
   a <- check.ErgmTerm(nw, arglist, 
                       varnames = c("x", "attrname"),
-                      vartypes = c("matrix,network", "character"),
+                      vartypes = c("matrix,network,character", "character"),
                       defaultvalues = list(NULL, NULL),
                       required = c(TRUE, FALSE))
   
