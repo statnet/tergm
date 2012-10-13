@@ -54,71 +54,127 @@
 #
 ############################################################################
 
-ergm.godfather <- function(formula, timestamps=NULL, toggles=NULL, sim=NULL,
+tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALSE],
                            start=NULL, end=NULL,
-                           accumulate=FALSE,
-                           final.network=FALSE,
+                           end.network=FALSE,
+                           stats.start=FALSE,
                            verbose=FALSE,
-                           control=control.godfather()) {
-  check.control.class("godfather")
-  
-  if(is.null(sim)){
-    if(is.null(timestamps) | is.null(toggles)){
-      stop("Both 'timestamps' and 'toggle' are required arguments if 'sim' ",
-           "is not given.")
-    }
-    if(is.null(start)) start<-min(timestamps)
-    if(is.null(end)) end<-max(timestamps)
-  }else{
-    if(nrow(sim$changed)==0){
-      stop("There are no changes (or too many changes) to compute!")
-    }else{
-      timestamps <- sim$changed[,1]
-      toggles <- sim$changed[,2:3]
-      start <- attr(sim$changed,"start")
-      end <- attr(sim$changed,"end")
-    }
-  }
+                           control=control.tergm.godfather()){
+  check.control.class("tergm.godfather")
 
   nw <- ergm.getnetwork(formula)
-  m <- ergm.getmodel(formula, nw, initialfit=TRUE)
+  
+  if(is.networkDynamic(nw)){
+    if(!is.null(toggles)) stop("Network passed already contains change or toggle information.")
+
+    toggles <- do.call(rbind, lapply(nw$mel, function(e) if(length(c(e$atl$active)[is.finite(c(e$atl$active))])) cbind(c(e$atl$active)[is.finite(c(e$atl$active))], e$outl,e$inl) else NULL))
+    toggles[,1] <- ceiling(toggles[,1]) # Fractional times take effect at the end of the time step.
+   
+    start <- NVL(start,
+                 attr(nw, "start"),
+                 suppressWarnings(min(toggles[,1]))-1
+                 )
+    if(start==Inf) stop("networkDynamic passed contains no change events or attributes. You must specify start explicitly.")
+
+    end <- NVL(end,
+               attr(nw, "end"),
+               suppressWarnings(max(toggles[,1]))
+               )
+    if(end==-Inf) stop("networkDynamic passed contains no change events or attributes. You must specify end explicitly.")
+
+    # The reason why it's > start is that the toggles that took effect
+    # at start have already been applied to the network. Conversely,
+    # it's <= end because we do "observe" the network at end, so we
+    # need to apply the toggles that take effect then.
+    toggles <- toggles[toggles[,1]>start & toggles[,1]<=end,,drop=FALSE]
+
+    # This is important, since end is inclusive, but terminus is exclusive.
+    if(!all(is.active(nw, onset=start, terminus=end+.Machine$double.eps*end*2, v=seq_len(network.size(nw)), rule="any")
+            ==is.active(nw, onset=start, terminus=end+.Machine$double.eps*end*2, v=seq_len(network.size(nw)), rule="all")))
+      stop("Network size and/or composition appears to change in the interval between start and end. This is not supported by ergm.godfather() at this time.")
+
+    # Finally, we are ready to extract the network.
+    nw <- network.extract.with.lasttoggle(nw, start)
+    
+  }else{
+    if(is.null(toggles)) stop("Either pass a networkDynamic, or provide change or toggle information.")
+      
+    start <- NVL(start,
+                 attr(toggles, "start"),
+                 min(toggles[,1])-1
+                 )
+    end <- NVL(end,
+               attr(toggles, "end"),
+               max(toggles[,1])
+               )
+
+    # The reason why it's > start is that the toggles that took effect
+    # at start have already been applied to the network. Conversely,
+    # it's <= end because we do "observe" the network at end, so we
+    # need to apply the toggles that take effect then.
+    toggles <- toggles[toggles[,1]>start & toggles[,1]<=end,,drop=FALSE]
+    
+    if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(round(-.Machine$integer.max/2), network.dyadcount(nw))
+    nw %n% "time" <- start
+  }
+
+  if(!is.directed(nw)) toggles[,2:3] <- t(apply(toggles[,2:3,drop=FALSE], 1, sort))
+  toggles <- toggles[order(toggles[,1],toggles[,2],toggles[,3]),,drop=FALSE]
+
+  formula <- ergm.update.formula(formula, nw~.)
+  m <- ergm.getmodel(formula, nw, expanded=TRUE, role="target")
   Clist <- ergm.Cprepare(nw, m)
   m$obs <- summary(m$formula)
-  ots <- order(timestamps)
-  toggles <- matrix(toggles[ots,],ncol=2)
-  timestamps <- timestamps[ots]
-  mincol = apply(toggles,1,which.min)
-  toggles[mincol==2,] <- toggles[mincol==2,2:1] # make sure col1 < col2
-  maxedges <- final.network * max(control$GF.init.maxedges, 5*Clist$nedges)
-  obsstat <- summary(formula)  
-  z <- .C("godfather_wrapper",
-          as.integer(Clist$tails), as.integer(Clist$heads), 
-          as.integer(Clist$nedges),
-          as.integer(Clist$n),
-          as.integer(Clist$dir), as.integer(Clist$bipartite),
-          as.integer(Clist$nterms), 
-          as.character(Clist$fnamestring),
-          as.character(Clist$snamestring), 
-          as.integer(length(timestamps)), as.integer(timestamps),
-          as.integer(toggles[,1]), as.integer(toggles[,2]),
-          as.integer(start), as.integer(end),
-          as.double(Clist$inputs),
-          s = double((2+end-start) * Clist$nstats),
-          newnwtails = integer(maxedges+1),
-          newnwheads = integer(maxedges+1),
-          as.integer(accumulate),
-          as.integer(verbose),
-          as.integer(maxedges), 
-          PACKAGE="tergm")  
-  stats <- matrix(z$s + obsstat, ncol=Clist$nstats, byrow=TRUE)
-  colnames(stats) <- m$coef.names
-
-  out <- list(stats = stats, timestamps = c(NA, start:end))
-  if (final.network) { 
-    cat("Creating new network...\n")
-    out$newnetwork <- newnw.extract(nw,z)
+  if(end.network){
+    maxedges.sd <- sqrt(nrow(toggles)*0.25)*2 # I.e., if each toggle has probability 1/2 of being in a particular direction, this is the s.d. of the number of edges added.
+    maxedges <- Clist$nedges + maxedges.sd*control$GF.init.maxedges.mul
   }
-  out
+
+  if(verbose) cat("Applying changes...\n")
+  repeat{
+    z <- .C("godfather_wrapper",
+            as.integer(Clist$tails), as.integer(Clist$heads),
+            time = if(is.null(Clist$time)) as.integer(0) else as.integer(Clist$time),
+            lasttoggle = if(is.null(Clist$lasttoggle)) as.integer(NULL) else as.integer(Clist$lasttoggle),
+            as.integer(Clist$nedges),
+            as.integer(Clist$n),
+            as.integer(Clist$dir), as.integer(Clist$bipartite),
+            as.integer(Clist$nterms), 
+            as.character(Clist$fnamestring),
+            as.character(Clist$snamestring),
+            as.double(Clist$inputs),
+            as.integer(nrow(toggles)), as.integer(toggles[,1]),
+            as.integer(toggles[,2]), as.integer(toggles[,3]),
+            as.integer(start), as.integer(end),
+            s = double((1+end-start) * Clist$nstats),
+            if(end.network) as.integer(maxedges) else as.integer(0),
+            newnwtails = if(end.network) integer(maxedges+1) else integer(0),
+            newnwheads = if(end.network) integer(maxedges+1) else integer(0),
+            as.integer(verbose),
+            status = integer(1), # 0 = OK, MCMCDyn_TOO_MANY_EDGES = 1
+            PACKAGE="tergm")
+
+    if(z$status==0) break;
+    if(z$status==1){
+      maxedges <- 5*maxedges
+      message("Too many edges encountered in the simulation. Increasing capacity to ", maxedges)
+    }
+  }
+
+  stats <- matrix(z$s + m$obs, ncol=Clist$nstats, byrow=TRUE)
+  colnames(stats) <- m$coef.names
+  if(!stats.start) stats <- stats[-1,,drop=FALSE]
+  stats <- mcmc(stats, start=if(stats.start) start else start+1)
+  
+  if(end.network){ 
+    if(verbose) cat("Creating new network...\n")
+    newnetwork <- newnw.extract(nw,z)
+    newnetwork %n% "time" <- z$time
+    newnetwork %n% "lasttoggle" <- z$lasttoggle
+
+    attr(newnetwork,"stats")<-stats
+    newnetwork
+  }else stats
 }
 
 
@@ -141,7 +197,7 @@ ergm.godfather <- function(formula, timestamps=NULL, toggles=NULL, sim=NULL,
 #
 ####################################################################
 
-control.godfather<-function(GF.init.maxedges=100000
+control.tergm.godfather<-function(GF.init.maxedges.mul=5
               ){
     control<-list()
     for(arg in names(formals(sys.function())))
