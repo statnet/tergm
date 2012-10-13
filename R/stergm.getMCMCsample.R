@@ -168,12 +168,12 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
   newnetwork %n% "lasttoggle" <- z$lasttoggle
 
   diffedgelist<-if(control$changes) {
-    if(z$diffnwtails[1]>0){
+    if(z$diffnwtime[1]>0){
       tmp <- cbind(z$diffnwtime[2:(z$diffnwtime[1]+1)],z$diffnwtails[2:(z$diffnwtails[1]+1)],z$diffnwheads[2:(z$diffnwheads[1]+1)],z$diffnwdirs[2:(z$diffnwdirs[1]+1)])
       colnames(tmp) <- c("time","tail","head","to")
       tmp
     }else{
-      tmp <- matrix(0, ncol=3, nrow=0)
+      tmp <- matrix(0, ncol=4, nrow=0)
       colnames(tmp) <- c("time","tail","head","to")
       tmp
     }
