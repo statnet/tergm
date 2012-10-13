@@ -9,21 +9,31 @@
 \alias{InitMHP.formationMLETNT}
 \alias{InitMHP.formationNonObservedMLE}
 \alias{InitMHP.formationTNT}
+\alias{InitMHP.dissolutionMLEblockdiag}
+\alias{InitMHP.dissolutionNonObservedMLEblockdiag}
+\alias{InitMHP.formationMLEblockdiag}
+\alias{InitMHP.formationMLEblockdiagTNT}
+\alias{InitMHP.formationNonObservedMLEblockdiag}
 
-\alias{control.godfather}
+\alias{combine.networks}
+
+\alias{get.dev}
+
+\alias{network.extract.with.lasttoggle}
+\alias{networkDynamic.apply.changes}
+\alias{all.same}
+\alias{to.networkDynamic.lasttoggle}
+
+
 \alias{control.logLik.stergm}
-\alias{ergm.godfather}
-\alias{license.statnet}
-\alias{statnetShowDoc}
-\alias{statnetbrowseURL}
 \alias{stergm.CMLE}
 \alias{stergm.EGMME}
 \alias{stergm.EGMME.GD}
-\alias{stergm.EGMME.OS}
 \alias{stergm.EGMME.SA}
 \alias{stergm.EGMME.SA.Phase2.C}
 \alias{stergm.EGMME.initialfit}
 \alias{stergm.getMCMCsample}
+
 
 \description{
 Internal stergm functions.}

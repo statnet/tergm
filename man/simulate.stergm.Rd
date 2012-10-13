@@ -14,6 +14,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
 \method{simulate}{stergm}(object, nsim=1, seed=NULL,
                           coef.form = object$formation.fit$coef,
                           coef.diss = object$dissolution.fit$coef,
+                          constraints = object$constraints,
                           monitor = object$targets,
                           time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                           control=control.simulate.stergm(),
@@ -26,8 +27,9 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
 \method{simulate}{network}(object, nsim=1, seed=NULL,
                            formation, dissolution,
                            coef.form, coef.diss,
+                           constraints = ~.,
                            monitor = NULL,
-                           time.slices, time.burnin=0, time.interval=1,
+                           time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                            control=control.simulate.network(),
                            statsonly=NULL,
                            output=c("networkDynamic", "stats", "changes"),
@@ -40,7 +42,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
                                   dissolution = attr(object, "dissolution"),
                                   coef.form = attr(object, "coef.form"),
                                   coef.diss = attr(object, "coef.diss"),
-                                  constraints = attr(object, "constraints"),
+                                  constraints = NVL(attr(object, "constraints"), ~.),
                                   monitor = attr(object, "monitor"),
                                   time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                                   control=control.simulate.network(),
@@ -76,6 +78,36 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   }
   \item{coef.diss}{As \code{coef.form}, but for the post-dissolution network.
   }
+
+  \item{constraints}{A one-sided formula specifying one or more constraints
+    on the support of the distribution of the networks being modeled,
+    using syntax similar to the \code{formula} argument. Multiple constraints
+    may be given, separated by \dQuote{+} operators.
+    Together with the model terms in the formula and the reference measure, the constraints
+    define the distribution of networks being modeled.
+
+    It is also possible to specify a proposal function directly
+    by passing a string with the function's name. In that case,
+    arguments to the proposal should be specified through the
+    \code{prop.args} argument to \code{\link{control.ergm}}.
+
+    The default is \code{~.}, for an unconstrained model.
+
+    See the \link[=ergm-constraints]{ERGM constraints} documentation for
+    the constraints implemented in the \code{\link[=ergm-package]{ergm}}
+    package. Other packages may add their own constraints.
+
+    For STERGMs in particular, the constraints apply to the
+    post-formation and the post-dissolution network, rather than the
+    final network. This means, for example, that if the degree of all
+    vertices is constrained to be less than or equal to three, and a vertex
+    begins a time step with three edges, then, even if one of its edges
+    is dissolved during its time step, it won't be able to form another
+    edge until the next time step. This behavior may change in the future.
+    
+    Note that not all possible combinations of constraints are supported.
+  }
+  
   \item{monitor}{Either a one-sided formula specifying one or more terms whose
     value is to be monitored, or a string containing \code{"formation"} or
     \code{"dissolution"}, to monitor their respective terms, or

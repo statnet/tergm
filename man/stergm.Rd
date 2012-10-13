@@ -11,14 +11,15 @@
 \usage{
   stergm (nw, 
           formation, 
-          dissolution, 
+          dissolution,
+          constraints = ~.,
           estimate, 
           times=NULL, 
           offset.coef.form=NULL, 
           offset.coef.diss=NULL,
           targets=NULL, 
           target.stats=NULL,
-          eval.loglik=FALSE,
+          eval.loglik=TRUE,
           control=control.stergm(),
           verbose=FALSE, 
           \dots)
@@ -35,6 +36,35 @@
   \item{formation, dissolution}{
     One-sided \code{\link{ergm}}-style formulas for the formation and
     dissolution models, respectively.
+  }
+
+  \item{constraints}{A one-sided formula specifying one or more constraints
+    on the support of the distribution of the networks being modeled,
+    using syntax similar to the \code{formula} argument. Multiple constraints
+    may be given, separated by \dQuote{+} operators.
+    Together with the model terms in the formula and the reference measure, the constraints
+    define the distribution of networks being modeled.
+
+    It is also possible to specify a proposal function directly
+    by passing a string with the function's name. In that case,
+    arguments to the proposal should be specified through the
+    \code{prop.args} argument to \code{\link{control.ergm}}.
+
+    The default is \code{~.}, for an unconstrained model.
+
+    See the \link[=ergm-constraints]{ERGM constraints} documentation for
+    the constraints implemented in the \code{\link[=ergm-package]{ergm}}
+    package. Other packages may add their own constraints.
+
+    For STERGMs in particular, the constraints apply to the
+    post-formation and the post-dissolution network, rather than the
+    final network. This means, for example, that if the degree of all
+    vertices is constrained to be less than or equal to three, and a vertex
+    begins a time step with three edges, then, even if one of its edges
+    is dissolved during its time step, it won't be able to form another
+    edge until the next time step. This behavior may change in the future.
+    
+    Note that not all possible combinations of constraints are supported.
   }
   
   \item{estimate}{One of "EGMME" for Equilibrium Generalized Method

@@ -83,7 +83,6 @@ control.stergm<-function(init.form=NULL,
                          SA.keep.min=0, # Minimum number of observations that are used for gradient and covariance calculation.
                          SA.phase2.jitter.mul=0.2, # The jitter standard deviation of each parameter is this times its standard deviation sans jitter.
                          SA.phase2.maxreljump=4, # Maximum jump per run, relative to the magnitude of other jumps in the history.
-                         SA.phase2.refine.every=0, # Use linear interpolation every this many runs to refine the estimate after. (0 = never.)
                          SA.guard.mul = 4, # The multiplier for the range of parameter values to compute the guard width.
                          SA.robust = FALSE, # Should the (slower) robust linear regression and covariance estimation be used?
                          

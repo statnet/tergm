@@ -1,5 +1,6 @@
 \name{tergm.godfather}
 \alias{tergm.godfather}
+\alias{control.tergm.godfather}
 \title{
   A function to apply a given series of changes a the network.
 }
@@ -8,14 +9,14 @@
   statistics of the network, and, optionally, the final network.
 }
 \usage{
-tergm.godfather(formula, changes = NULL, toggles = changes[, -4], start = NULL, end = NULL, end.network = FALSE, start.stats = FALSE, verbose = FALSE, control = control.tergm.godfather())
+tergm.godfather(formula, changes = NULL, toggles = changes[, -4, drop = FALSE], start = NULL, end = NULL, end.network = FALSE, stats.start = FALSE, verbose = FALSE, control = control.tergm.godfather())
 }
 \arguments{
   \item{formula}{
     An \code{\link{summary.formula}}-style formula, with either a
     \code{\link{network}} or a \code{\link{networkDynamic}} as the LHS
     and statistics to be computed on the RHS. If LHS is a
-    \code{\link{networDynamic}}, it will be used to derive the changes
+    \code{\link{networkDynamic}}, it will be used to derive the changes
     to the network whose statistics are wanted. Otherwise, either \code{changes}
     or \code{toggles} must be specified, and the LHS
     \code{\link{network}} will be used as the starting network.
@@ -42,11 +43,11 @@ tergm.godfather(formula, changes = NULL, toggles = changes[, -4], start = NULL, 
   \item{end.network}{
     Whether to return a network that results. Defaults to \code{FALSE}.
   }
-  \item{start.stats}{
+  \item{stats.start}{
     Whether to return the network statistics at \code{start} (before any
     changes are applied) as the first row of the statistics
     matrix. Defaults to \code{FALSE}, to produce output similar to that
-    of \code{\link[simulate.stergm]{simulate}} for STERGMs when
+    of \code{\link[=simulate.stergm]{simulate}} for STERGMs when
     \code{output="stats"}, where initial network's statistics are not
     returned.
   }
@@ -61,16 +62,13 @@ tergm.godfather(formula, changes = NULL, toggles = changes[, -4], start = NULL, 
     adaptively, so should not be greater than \code{10}.
   }
 }
-\details{
-  
-}
 \value{
   If \code{end.network==FALSE} (the default), an \code{\link{mcmc}}
   object with the requested network statistics associed with the network series
   produced by applying the specified changes. Its \code{\link{mcmc}}
-  attributes encode the timing information: so \code{\link{start(out)}}
+  attributes encode the timing information: so \code{\link{start}(out)}
   gives the time point associated with the first row returned, and
-  \code{\link{end(out)}} out the last. The "thinning interval" is always 1.
+  \code{\link{end}(out)} out the last. The "thinning interval" is always 1.
 
   If \code{end.network==TRUE}, return a \code{\link{network}} object
   with \code{\link{lasttoggle}} "extension", representing the final
@@ -104,12 +102,14 @@ print(head(sim.stats))
 gf1.stats <- tergm.godfather(simnet~degree(1)+mean.age+degree.mean.age(1)+edge.ages+edgecov(dc)+edgecov.ages(dc), start=0, end=50)
 
 print(head(gf1.stats))
+gf1.stats <- as.matrix(gf1.stats)
 
 # Replay the simulation using the initial network + list of changes.
 gf2.stats <- tergm.godfather(g1~degree(1)+mean.age+degree.mean.age(1)+edge.ages+edgecov(dc)+edgecov.ages(dc),
 start=0, end=50, changes=attr(simnet,"changes"))
 
 print(head(gf2.stats))
+gf2.stats <- as.matrix(gf2.stats)
 
 # We can also compare them to the network statistics summarized.
 summ.stats <- summary(simnet~degree(1)+mean.age+degree.mean.age(1)+edge.ages+edgecov(dc)+edgecov.ages(dc), at=1:50)
@@ -118,8 +118,8 @@ print(head(summ.stats))
 
 tol <- sqrt(.Machine$double.eps)
 # If they aren't all identical, we are in trouble.
-stopifnot(all(sim.stats-gf1.stats<tol),
-          all(sim.stats-gf1.stats<tol),
-          all(sim.stats-summ.stats<tol))
+stopifnot(all.equal(sim.stats,gf1.stats),
+          all.equal(sim.stats,gf2.stats),
+          all.equal(sim.stats,summ.stats))
 
 }
