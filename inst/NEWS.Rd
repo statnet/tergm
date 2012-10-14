@@ -24,10 +24,12 @@
       one cannot fit both \code{\link{edges}} formation and
       \code{\link{edges}} dissolution with only one \code{\link{edges}}
       target statistic. Four new statistics have been added and
-      documented that focus on targeting observed duration:
+      documented that focus on targeting observed and hazard:
       \code{\link{mean.age}}, \code{\link{edgecov.mean.age}},
-      \code{\link{edge.ages}}, and \code{\link{edgecov.ages}}. This
-      allows jointly fitting formation and dissolution.
+      \code{\link{degree.mean.age}}, \code{\link{degrange.mean.age}},
+      \code{\link{edge.ages}}, \code{\link{edgecov.ages}}, and
+      \code{\link{edges.ageinterval}}. This allow jointly fitting
+      formation and dissolution.
 
       \item In addition to the progress plot, EGMME fitting routines can
       now plot the estimated gradient matrix and the matrix of
@@ -47,11 +49,27 @@
 
       \item CMLE can now be fit to more than two networks. (Not all ERGM
       terms and constraints can be used in this mode, however.)
+
+      \item A new (sort of) function, \code{\link{tergm.godfather}} has
+      been fixed and documented; it can be used to apply a specific set
+      of changes to a network, returning statistics of interest as it
+      evolves. In particular, it can be used to "retrace" the evolution
+      of a \code{\link{networkDynamic}}, calculating statistics at
+      discrete time points along the way.
+
+      \item \code{\link[=tergm-package]{tergm}} now implements a
+      formula-based \code{\link[=summary.networkDynamic]{summary}}
+      method for \code{\link{networkDynamic}} LHS, to compute dynamic
+      network statistics at specified time points.
+
       
     } }
   
   \subsection{OTHER USER-VISIBLE CHANGES}{
     \itemize{
+      \item \code{\link{stergm}} EGMME initial fitting code has been
+      vastly improved.      
+      
       \item The EGMME fitting algorithm has been vastly improved and is
       now a lot more adaptive and able to recover from problems. Many
       bugs have also been fixed.
@@ -87,6 +105,10 @@
     \itemize{
       \item A number of \code{\link{control.stergm}} parameters had been
       renamed and otherwise chaged.
+
+      \item Argument \code{statsonly} to the
+      \code{\link{simulate.stergm}} and related functions has been
+      deprecated in favor of \code{output}.
     }
   }
 
