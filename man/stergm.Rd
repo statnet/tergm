@@ -149,6 +149,7 @@
 }
 
 \examples{
+\donttest{
 # EGMME Example
 par(ask=FALSE)
 n<-30
@@ -165,7 +166,7 @@ dynfit<-stergm(g0,formation = ~edges+degree(1), dissolution = ~edges,
 par(ask=TRUE)
 mcmc.diagnostics(dynfit)
 summary(dynfit)
-
+}
 # CMLE Example
 data(samplk)
 

@@ -1,5 +1,5 @@
 library(tergm)
-
+opttest({
 n<-40
 do.plot <- TRUE
 g0<-network.initialize(n,dir=FALSE)
@@ -30,4 +30,4 @@ print(summary(dynfit2))
 mcmc.diagnostics(dynfit2)
 
 stopifnot(all.equal(c(coef.form,coef.diss),unlist(coef(dynfit2)),tol=0.05,check.attributes=FALSE))
-                    
+}, "EGMME")

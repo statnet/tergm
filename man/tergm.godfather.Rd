@@ -96,6 +96,7 @@ output="networkDynamic")
 sim.stats <- attr(simnet, "stats")
 
 print(head(sim.stats))
+sim.stats <- as.matrix(sim.stats)
 
 # Replay the simulation using a networkDynamic, monitoring a potentially different set of
 # statistics (but same in this case).
