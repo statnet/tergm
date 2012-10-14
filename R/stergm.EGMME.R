@@ -75,6 +75,9 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
                  verbose) {
 
   if(!is.network(nw)) stop("Argument nw must be a network.")
+
+  if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(round(-.Machine$integer.max/2), network.dyadcount(nw))
+  if(is.null(nw %n% "time")) nw %n% "time" <- 0
    
   # Allow the user to specify targets as copied from formation or dissolution formula.
   if(is.character(targets)){

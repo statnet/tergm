@@ -11,87 +11,79 @@
  find the changestats that result from starting from an empty network
  and then adding all of the edges to make up an observed network of interest.
 *****************/
-void godfather_wrapper (int *tails, int *heads, int *dnedges,
-			int *dn, int *dflag, int *bipartite, 
-			int *nterms, char **funnames,
-			char **sonames, 
-			int *totalntoggles, int *timestamps, 
-			int *toggletails, int *toggleheads,
-			int *dstart, int *dend,
-			double *inputs, 
-			double *changestats, 
-			int *newnetworktails, 
-			int *newnetworkheads, 
-			int *accumulate, 
-			int *fVerbose, 
-			int *maxedges) {
-  int directed_flag;
-  Vertex n_nodes, bip;
-  Edge j, n_edges, nmax, tnt;
+void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *n_edges,
+		       int *n_nodes, int *directed_flag, int *bipartite, 
+		       int *nterms, char **funnames, char **sonames, double *inputs,
+		       int *total_toggles, int *toggletimes, 
+		       int *toggletails, int *toggleheads,
+		       int *start_time, int *end_time,
+		       double *changestats, 
+		       int *maxedges,
+		       int *newnetworktails, 
+		       int *newnetworkheads, 
+		       int *fVerbose, 
+		       int *status){
   Network nw;
   Model *m;
-  int start=*dstart, end=*dend; 
-  
-  n_nodes = (Vertex)*dn; /* coerce double *dn to type Vertex */
-  n_edges = (Edge)*dnedges; /* coerce double *dnedges to type Vertex */
-  nmax = (Edge)*maxedges; /* coerce double *maxedges to type Edge */
-  bip = (Vertex)*bipartite; /* coerce double *bipartite to type Vertex */    
-  tnt = (Edge) *totalntoggles; /* coerce double *totalntoggles to type Edge */ 
-  directed_flag = *dflag;
 
-  m=ModelInitialize(*funnames, *sonames, &inputs, *nterms);
-  nw = NetworkInitialize(tails, heads, n_edges,
-                         n_nodes, directed_flag, bip, 1, 0, NULL);
-
-  /*  if (*fVerbose) {
-    Rprintf("Total m->n_stats is %i.\n",
-    m->n_stats);
-    Rprintf("maxedges = %ld, totalntoggles = %ld\n",
-    nmax, tnt);
-    }*/
+  MCMCDyn_init_common(tails, heads, *time, lasttoggle, *n_edges,
+		      *n_nodes, *directed_flag, *bipartite, &nw,
+		      0, NULL, NULL, NULL, NULL,
+		      0, NULL, NULL, NULL, NULL,
+		      *nterms, *funnames, *sonames, inputs, &m,
+		      NULL, NULL, NULL, NULL,
+		      NULL, 0, 0,
+		      NULL, NULL, NULL,
+		      NULL, NULL, NULL,
+		      *fVerbose);
   
   /*********************
   changestats are modified in groups of m->n_stats, and they
   reflect the CHANGE in the values of the statistics from the
-  original (observed) network.  Thus, when we begin, the initial 
+  original network.  Thus, when we begin, the initial 
   values of the first group of m->n_stats changestats should 
   all be zero
   *********************/
-  for (j=0; j < m->n_stats; j++)
-    changestats[j] = 0.0;
+  
+  memset(changestats, 0, m->n_stats*sizeof(double));
   
   /* Now start obtaining change statistics */
-  unsigned int pos=0;
-  for(unsigned int t=start;t<=end;t++){
+
+  unsigned int pos = 0;
+  // The reason it's = start_time but < end_time is that by the time t_stat arrives at end_time, the toggles for end_time will have already been applied.
+  for(unsigned int t_stat = *start_time; t_stat < *end_time; t_stat++){
     changestats += m->n_stats;
-    for (j=0; j<m->n_stats; j++){
-      changestats[j] = changestats[j-m->n_stats];
+    memcpy(changestats, changestats-m->n_stats, m->n_stats*sizeof(double));
+    
+    // If toggletimes[pos] is ahead of t_stat+1 (i.e., there are no toggles at current time), then n_toggles is never incremented.
+    unsigned int n_toggles=0;
+    while(pos < *total_toggles && toggletimes[pos]==t_stat+1){
+      n_toggles++;
+      pos++;
     }
-    for(;pos<tnt && timestamps[pos]==t;pos++){
-      ChangeStats(1, toggletails+pos, toggleheads+pos, &nw, m);
-      /* Accumulate change statistics */
-      for (j=0; j<m->n_stats; j++){
-        changestats[j] += m->workspace[j];
-      }
-	
-      /* Make proposed toggles (for real this time) */
-      //Obvious bug in next line, since i is uninitialized and j just finished loop:
-      //if (!(*accumulate) || EdgetreeSearch(toggletails[i-j], toggleheads[i-j], nw.outedges) == 0) { 
-      if (!(*accumulate)) { 
-        ToggleEdgeWithTimestamp(toggletails[pos], toggleheads[pos], &nw);
-      }
-    }
+    
+    // Now, pos is one past the end of the current time.
+    MCMCDyn1Step_advance(n_toggles, 
+			 toggletails+pos-n_toggles, toggleheads+pos-n_toggles,
+			 &nw, 
+			 NULL, NULL, 
+			 NULL, NULL,
+			 m, changestats);
+    
+
   }
 
-  if (nmax>0) {
-    /* record new generated network to pass back to R */
-    newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList(newnetworktails+1,newnetworkheads+1,&nw,nmax);
-    if (newnetworktails[0]>=nmax) { 
-      Rprintf("Error!  The value of maxedges was not set high enough in ergm.godfather\n");
-    }
+  if(*maxedges!=0 && nw.nedges >= *maxedges-1){
+    *status = MCMCDyn_TOO_MANY_EDGES;
   }
+
+  if(*status == MCMCDyn_OK && *maxedges>0){
+    newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList(newnetworktails+1,newnetworkheads+1,&nw,*maxedges-1);
+    *time = nw.duration_info.time;
+    memcpy(lasttoggle, nw.duration_info.lasttoggle, sizeof(int)*DYADCOUNT(*n_nodes, *bipartite, *directed_flag));
+  }
+
   /* Clean up and return */
-  ModelDestroy(m);
-  NetworkDestroy(&nw);
+  MCMCDyn_finish_common(&nw, NULL, NULL, m, NULL, NULL);
 }
 

@@ -4,7 +4,7 @@
 \alias{ergm.constraints}
 \alias{constraints.ergm}
 
-\alias{InitConstraint.atleat}
+\alias{InitConstraint.atleast}
 \alias{InitConstraint.atmost}
 
 \docType{methods}

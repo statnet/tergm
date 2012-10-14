@@ -1,4 +1,4 @@
-same <- function(x){
+all.same <- function(x){
   if(length(x)==0) return(TRUE)
   v0 <- x[1]
   for(v in x[-1]) if(!identical(v0,v)) return(FALSE)
@@ -28,7 +28,7 @@ combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper",
        && all(sapply(vl, is.matrix))
        && all(sapply(vl, nrow)==ns)
        && all(sapply(vl, ncol)==ns)
-       && same(sapply(vl, mode))){
+       && all.same(sapply(vl, mode))){
       
       m <- matrix(NA, sum(ns), sum(ns))
       mode(m) <- mode(vl[[1]])

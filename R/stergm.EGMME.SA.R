@@ -26,6 +26,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     if(verbose) cat("Running stochastic optimization... ")
     zs <- if(!is.null(cl)){
+      library(snow)
       # Conveniently, the first argument of stergm.EGMME.SA.Phase2.C
       # is the state of the optimization, so giving clusterApply a
       # list of states will call it for each thread's state.
@@ -161,11 +162,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
   history <- list()
   history$ind.all <- history$tid.all <- history$oh.all <- history$jitters.all <- state <- NULL
 
-  for(restart in 1:control$SA.restarts){
-  
-    if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(round(-.Machine$integer.max/2), network.dyadcount(nw))
-    if(is.null(nw %n% "time")) nw %n% "time" <- 0
-    
+  for(restart in 1:control$SA.restarts){    
     nw.diff <- model.mon$nw.stats - model.mon$target.stats  # nw.diff keeps track of the difference between the current network and the target statistics.
     
     states <- replicate(if(!is.null(cl)) control$parallel else 1,
@@ -191,6 +188,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     cat("Burning in... ")
     
     zs <- if(!is.null(cl)){
+      library(snow)
       clusterApply(cl, seq_along(states), function(i) stergm.getMCMCsample(states[[i]]$nw, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, states[[i]]$eta.form, states[[i]]$eta.diss, control.phase1, verbose))
     }else{
       list(stergm.getMCMCsample(states[[1]]$nw, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, states[[1]]$eta.form, states[[1]]$eta.diss, control.phase1, verbose))

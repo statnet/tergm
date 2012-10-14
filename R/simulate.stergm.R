@@ -72,7 +72,7 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
                           coef.form=object$formation.fit$coef,coef.diss=object$dissolution.fit$coef,
                           constraints = object$constraints,
                           monitor = object$targets,
-                          time.slices, time.burnin=0, time.interval=1,
+                          time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                           control=control.simulate.stergm(),
                           statsonly=NULL,
                           output=c("networkDynamic", "stats", "changes"),
@@ -88,7 +88,7 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
 
   control <- set.control.class("control.simulate.network")
 
-  simulate.network(object$network,formation=object$formation,dissolution=object$dissolution,nsim=nsim,coef.form=coef.form, coef.diss=coef.diss, constraints=constraints, monitor=monitor, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, statsonly=statsonly, output=output, stats.form = stats.form, stats.diss = stats.diss, verbose=verbose,...)
+  simulate.network(object$network,formation=object$formation,dissolution=object$dissolution,nsim=nsim,coef.form=coef.form, coef.diss=coef.diss, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, statsonly=statsonly, output=output, stats.form = stats.form, stats.diss = stats.diss, verbose=verbose,...)
 }
 
 
@@ -99,7 +99,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                              coef.form,coef.diss,
                              constraints = ~.,
                              monitor = NULL,
-                             time.slices, time.burnin=0, time.interval=1,
+                             time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                              control=control.simulate.network(),
                              statsonly=NULL,
                              output=c("networkDynamic", "stats", "changes"),
@@ -192,7 +192,15 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   
   out <- replicate(nsim, {
     if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(round(-.Machine$integer.max/2), network.dyadcount(nw))
-    if(is.null(nw %n% "time")) nw %n% "time" <- 0
+    nwtime <- nw %n% "time"
+
+    nw %n% "time" <- if(is.null(nwtime)) NVL(time.start,0) else{
+      if(!is.null(time.start)){
+        if(time.start!=nwtime) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.")
+        time.start
+      }else nwtime
+    }
+    
     
     z <- stergm.getMCMCsample(nw, model.form, model.diss, model.mon,
                               MHproposal.form, MHproposal.diss,
@@ -206,9 +214,8 @@ simulate.network <- function(object, nsim=1, seed=NULL,
       switch(output,
              networkDynamic = {
                library(networkDynamic)
-               nwd <- as.networkDynamic(nw, toggles = z$changed[,-4], start = nw%n%"time" + 0, end = nw%n%"time" + time.slices)
-               nwd<-delete.network.attribute(nwd, "time")
-               nwd<-delete.network.attribute(nwd, "lasttoggle")
+               nwd <- to.networkDynamic.lasttoggle(nw)
+               nwd <- networkDynamic.apply.changes(nwd,z$changed)
                attributes(nwd) <- c(attributes(nwd), # Don't clobber existing attributes!
                                     list(formation = formation,
                                          dissolution = dissolution,
@@ -286,7 +293,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     coef.form = attr(object, "coef.form"), coef.diss = attr(object, "coef.diss"),
                                     constraints = NVL(attr(object, "constraints"),~.),
                                     monitor = attr(object, "monitor"),
-                                    time.slices, time.burnin=0, time.interval=1,
+                                    time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                                     control=control.simulate.network(),
                                     statsonly=NULL,
                                     output=c("networkDynamic", "stats", "changes"),
@@ -300,40 +307,18 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
     output <- if(statsonly) "stats" else "networkDynamic"
   }
 
-  
-  start <- NVL(attr(object,"end"),0)
-  nw <- object %t% start
-  vActives <- is.active(object, at=start, v=seq_len(network.size(object)))
-  mode(vActives) <- "integer"
-  vActives[as.logical(vActives)] <- cumsum(vActives[as.logical(vActives)])
-  vActiveIDs<- which(as.logical(vActives))
+  nwend <- attr(object,"end")
+  start <- if(is.null(nwend)) NVL(time.start,0) else{
+    if(!is.null(time.start)){
+      if(time.start!=nwend) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.")
+      time.start
+    }else nwend
+  }
 
-  # There is probably a more efficient way to do this:
-  
-  lttails <- lapply(object$mel, "[[", "outl")
-  ltheads <- lapply(object$mel, "[[", "inl")
-  # I.e., from the edge attribute list, grab the "active" matrix, and from it, extract the highest (most recent) timestamp that's not +Inf (terminus-censored).
-  # Note that if x[x!=+Inf] is empty, max(x[x!=+Inf]) returns -Inf, which is what we want.
-  ltlts <- lapply(lapply(lapply(object$mel, "[[", "atl"), "[[", "active"), function(x) suppressWarnings(max(x[x!=+Inf])))
-
-  ltm <-
-    if(is.bipartite(nw)) m <- matrix(-Inf, nw%n%"bipartite", network.size(nw) - nw%n%"bipartite")
-    else m <- matrix(-Inf, network.size(nw), network.size(nw))
-
-  for(i in seq_along(ltlts))
-    if(ltlts[[i]]!=-Inf){
-      e<-c(vActives[lttails[[i]]],vActives[ltheads[[i]]])
-      if(!all(e)) next
-      if(!is.directed(nw)) e <- c(min(e),max(e))
-      if(is.bipartite(nw)) e[2] <- e[2] - nw %n% "bipartite"
-      m[e[1],e[2]] <- ltlts[[i]]
-    }
-  m[m==-Inf] <- round(-.Machine$integer.max/2)
-
-  nw %n% "time" <- start
-  nw %n% "lasttoggle" <- to.lasttoggle.matrix(m, is.directed(nw), is.bipartite(nw))
-
-  
+  nw <- network.extract.with.lasttoggle(object, start)
+  vActiveIDs <- nw %v% ".networkDynamicID"
+  delete.vertex.attribute(nw, ".networkDynamicID")
+ 
   output <- match.arg(output)
   
   sim <- simulate.network(nw, nsim=1, seed=NULL,
@@ -357,45 +342,15 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   sim[,"tail"] <- vActiveIDs[sim[,"tail"]]
   sim[,"head"] <- vActiveIDs[sim[,"head"]]
 
-  ## Add edges that were never present in the initial network.
-  extant.edges <- as.edgelist(object)
-  changed.edges <- unique(sim[,c("tail","head")])
-  new.edges <- changed.edges[!(paste(changed.edges[,1],changed.edges[,2]) %in% paste(extant.edges[,1],extant.edges[,2])),]
-  object <- add.edges(object,as.list(new.edges[,1]),as.list(new.edges[,2]))
-
-  for(i in seq_len(nrow(sim))){
-    eID <- get.edgeIDs(object,sim[i,"tail"],sim[i,"head"])
-    # The following two lines are the "correct" way to do this, but
-    # since we know the direction, and since we can assume that
-    # everything after attr(object,"end") is "censored", we can do it
-    # faster.
-    #
-    # if(sim[i,"dir"]==-1) object <- deactivate.edges(object, onset=sim[i,"time"], terminus=+Inf, e=eID)
-    # if(sim[i,"dir"]==+1) object <- activate.edges(object, onset=sim[i,"time"], terminus=+Inf, e=eID)
-    
-    if(sim[i,"dir"]==-1){
-      # If we are dissolving a tie, we are changing the bottom-right
-      # cell in the spell matrix. However, we can't assume that a
-      # spell matrix exists for a given edge, so we need to check, and
-      # add a (-Inf,time) row if it doesn't.
-      am <- object$mel[[eID]]$atl$active
-      if(is.null(am)) am <- rbind(c(-Inf,+Inf))
-      am[nrow(am),2] <- sim[i,"time"]
-      object[["mel"]][[eID]]$atl$active <- am
-    }
-    if(sim[i,"dir"]==+1){
-      # If we are forming a tie, we are adding a new row.
-      object[["mel"]][[eID]]$atl$active <- rbind(object$mel[[eID]]$atl$active,c(sim[i,"time"],+Inf))
-    }
-  }
+  object  <- networkDynamic.apply.changes(object, sim)
 
   attributes(object) <- c(attributes(object), # Don't clobber existing attributes!
                           list(formation = ergm.update.formula(formation,nw~.),
                                dissolution = ergm.update.formula(dissolution,nw~.),
-                               stats.form = rbind(if(isTRUE(ergm.update.formula(formation,nw~.)==attr(object,"formation"))) attr(object,"stats.form"),attr(sim,"stats.form")),
-                               stats.diss = rbind(if(isTRUE(ergm.update.formula(dissolution,nw~.)==attr(object,"dissolution"))) attr(object,"stats.diss"),attr(sim,"stats.diss")),
-                               monitor = monitor,
-                               stats = rbind(if(isTRUE(monitor==attr(object,"monitor"))) attr(object,"stats"),attr(sim,"stats")),
+                               stats.form = rbind(if(isTRUE(attr(sim,"formation")==attr(object,"formation"))) attr(object,"stats.form"),attr(sim,"stats.form")),
+                               stats.diss = rbind(if(isTRUE(attr(sim,"dissolution")==attr(object,"dissolution"))) attr(object,"stats.diss"),attr(sim,"stats.diss")),
+                               monitor = attr(sim,"monitor"),
+                               stats = rbind(if(isTRUE(attr(sim,"monitor")==attr(object,"monitor"))) attr(object,"stats"),attr(sim,"stats")),
                                coef.form=coef.form,
                                coef.diss=coef.diss,
                                constraints=constraints,

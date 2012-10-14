@@ -1,5 +1,5 @@
 library(tergm)
-library(coda)
+opttest({
 
 logit<-function(p)log(p/(1-p))
 
@@ -37,7 +37,7 @@ print(coef.form)
 print(coef.diss)
 
 # Simulate from the fit.
-dynsim<-simulate(g0,formation=~edges,dissolution=~edges,coef.form=coef.form,coef.diss=coef.diss,time.burnin=S, time.slices=S,verbose=TRUE,statsonly=TRUE,
+dynsim<-simulate(g0,formation=~edges,dissolution=~edges,coef.form=coef.form,coef.diss=coef.diss,time.burnin=S, time.slices=S,verbose=TRUE,output="stats",
                  monitor=~edges+mean.age+
                  degree.mean.age(1:3)+degrange.mean.age(1:2,3:4)+degrange.mean.age(1:2)+
                  degree.mean.age(1:3,"a")+degrange.mean.age(1:2,3:4,"a")+degrange.mean.age(1:2,by="a"))
@@ -57,3 +57,4 @@ if(test$p.value < 0.05){
 
 #print.sim.stats(dynsim,target.stats,duration)
 #dynsim<-simulate(g0,formation=~edges,dissolution=~edges,coef.form=coef.form,coef.diss=coef.diss,time.slices=S,verbose=TRUE,statsonly=TRUE,monitor=~degrange(0:2,2:4,"a"))
+}, "degree mean age terms simulation")

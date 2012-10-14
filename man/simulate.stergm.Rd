@@ -14,8 +14,9 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
 \method{simulate}{stergm}(object, nsim=1, seed=NULL,
                           coef.form = object$formation.fit$coef,
                           coef.diss = object$dissolution.fit$coef,
+                          constraints = object$constraints,
                           monitor = object$targets,
-                          time.slices, time.burnin=0, time.interval=1,
+                          time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                           control=control.simulate.stergm(),
                           statsonly=NULL,
                           output=c("networkDynamic", "stats", "changes"),
@@ -26,8 +27,9 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
 \method{simulate}{network}(object, nsim=1, seed=NULL,
                            formation, dissolution,
                            coef.form, coef.diss,
+                           constraints = ~.,
                            monitor = NULL,
-                           time.slices, time.burnin=0, time.interval=1,
+                           time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                            control=control.simulate.network(),
                            statsonly=NULL,
                            output=c("networkDynamic", "stats", "changes"),
@@ -40,9 +42,9 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
                                   dissolution = attr(object, "dissolution"),
                                   coef.form = attr(object, "coef.form"),
                                   coef.diss = attr(object, "coef.diss"),
-                                  constraints = attr(object, "constraints"),
+                                  constraints = NVL(attr(object, "constraints"), ~.),
                                   monitor = attr(object, "monitor"),
-                                  time.slices, time.burnin=0, time.interval=1,
+                                  time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                                   control=control.simulate.network(),
                                   statsonly=NULL,
                                   output=c("networkDynamic", "stats", "changes"),
@@ -54,6 +56,9 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
 \arguments{
   \item{object}{an \R object of type \code{\link{stergm}} giving a model
     fit or of type \code{\link{network}} giving the initial network.
+
+    \code{simulate.network} understands the \code{\link{lasttoggle}}
+    "API".
   }
   \item{formation, dissolution}{
     One-sided \code{\link{ergm}}-style formulas for the formation and
@@ -73,6 +78,36 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   }
   \item{coef.diss}{As \code{coef.form}, but for the post-dissolution network.
   }
+
+  \item{constraints}{A one-sided formula specifying one or more constraints
+    on the support of the distribution of the networks being modeled,
+    using syntax similar to the \code{formula} argument. Multiple constraints
+    may be given, separated by \dQuote{+} operators.
+    Together with the model terms in the formula and the reference measure, the constraints
+    define the distribution of networks being modeled.
+
+    It is also possible to specify a proposal function directly
+    by passing a string with the function's name. In that case,
+    arguments to the proposal should be specified through the
+    \code{prop.args} argument to \code{\link{control.ergm}}.
+
+    The default is \code{~.}, for an unconstrained model.
+
+    See the \link[=ergm-constraints]{ERGM constraints} documentation for
+    the constraints implemented in the \code{\link[=ergm-package]{ergm}}
+    package. Other packages may add their own constraints.
+
+    For STERGMs in particular, the constraints apply to the
+    post-formation and the post-dissolution network, rather than the
+    final network. This means, for example, that if the degree of all
+    vertices is constrained to be less than or equal to three, and a vertex
+    begins a time step with three edges, then, even if one of its edges
+    is dissolved during its time step, it won't be able to form another
+    edge until the next time step. This behavior may change in the future.
+    
+    Note that not all possible combinations of constraints are supported.
+  }
+  
   \item{monitor}{Either a one-sided formula specifying one or more terms whose
     value is to be monitored, or a string containing \code{"formation"} or
     \code{"dissolution"}, to monitor their respective terms, or
@@ -81,7 +116,13 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   \item{time.slices}{
     Number of networks or network statistics to return from each replication of the dynamic process. See below for
     return types.
-    }
+  }
+
+  \item{time.start}{
+    An optional argument specifying the time point at which the
+    simulation is to start. See Details for further information.
+  }
+  
   \item{time.burnin}{
     Number of time steps to discard before starting to collect network
     statistics. Actual network will only be returned if \code{time.burnin==0}.
@@ -114,6 +155,24 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   the method for \code{\link{networkDynamic}}, the simulation is resumed
   from the last generated time point of \code{object}, by default with
   the same model and parameters.
+
+  The time index of the start of the simulation is determined as
+  follows:
+  \itemize{
+    \item{If \code{time.start} is specified, it is used as the initial
+      time index of the simulation.}
+    \item{If \code{time.start} is not specified (is \code{NULL}), then
+      if the \code{object} carries a time stamp from which to start
+      or resume the simulation, either in the form
+      of a \code{"time"} network attribute (for the
+      \code{\link{network}} method --- see the
+      \code{\link{lasttoggle}} "API") or
+      in the form of an \code{"end"} object attribute (for the
+      \code{\link{networkDynamic}} method), this attribute will be used. (If
+      specified, \code{time.start} will override it with a warning.)
+    }
+    \item{Othewise, the simulation starts at 0.}
+  }
 }
 \value{
   Depends on the \code{output} argument:

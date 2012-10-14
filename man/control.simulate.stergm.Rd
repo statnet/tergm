@@ -6,14 +6,14 @@
   Auxiliary function as user interface for fine-tuning STERGM simulation.
 }
 \usage{
-control.simulate.stergm(MCMC.burnin=NULL,
+control.simulate.stergm(MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                         MCMC.prop.weights.form=NULL,MCMC.prop.args.form=NULL,
                         MCMC.prop.weights.diss=NULL,MCMC.prop.args.diss=NULL,
                         MCMC.init.maxedges=NULL,
                         MCMC.packagenames=NULL,
                         MCMC.init.maxchanges=NULL)
 
-control.simulate.network(MCMC.burnin=1000,
+control.simulate.network(MCMC.burnin=1000, MCMC.burnin.mul=7,
                         MCMC.prop.weights.form="default",MCMC.prop.args.form=NULL,
                         MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,
                         MCMC.init.maxedges=20000,
@@ -26,9 +26,19 @@ control.simulate.network(MCMC.burnin=1000,
     See the \code{usage} section in \code{\link{simulate.stergm}} for details.
 }
 \arguments{
-  \item{MCMC.burnin}{Number of Metropolis-Hastings steps per phase
-                        (formation and dissolution) per time step.
+  \item{MCMC.burnin}{Maximum number of Metropolis-Hastings steps per phase
+    (formation and dissolution) per time step.
   }
+  \item{MCMC.burnin.mul}{Multiplier for the number of "changeables" to
+    determine the Metropolis-Hastings steps per phase (formation and
+    dissolution) per time steps. (I.e., for formation, the number of
+    steps will be set to
+    \code{(network.dyadcount(nw0)-network.edgecount(nw0))*control$MCMC.burnin.mul},
+    while for dissolution, it will be set to
+    \code{network.edgecount(nw0)*control$MCMC.burnin.mul}, or
+    \code{control$MCMC.burnin}, whichever is smaller.)
+  }
+
   \item{MCMC.prop.weights.form, MCMC.prop.weights.diss}{Specifies the proposal distribution used in the MCMC
     Metropolis-Hastings algorithm for formation and dissolution, respectively. Possible choices are \code{"TNT"} or 
     \code{"random"}; the \code{"default"}.  
