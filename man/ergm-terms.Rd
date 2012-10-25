@@ -9,6 +9,7 @@
 \alias{edgecov.ages}
 \alias{edgecov.mean.age}
 \alias{degree.mean.age}
+\alias{degrange.mean.age}
 \alias{InitErgmTerm.edge.ages}
 \alias{InitErgmTerm.edgecov}
 \alias{InitErgmTerm.edgecov.ages}
@@ -39,13 +40,14 @@
 }
 
 \section{Terms to represent network statistics included in the
-  \code{\link[=tergm-package]{tergm}} pacakge}{
+  \code{\link[=tergm-package]{tergm}} package}{
   \describe{
 
-    \item{\code{degrange(from, to=+Inf, by=NULL, homophily=FALSE)}
-      (binary)}{\emph{Degree range:} 
+    \item{\code{degrange.mean.age(from, to=+Inf, byarg=NULL, emptyval=0)}
+      (target-only)}{\emph{Average age of ties incident on nodes having
+      degree in a given range:} 
       The \code{from} and \code{to} arguments are vectors of distinct
-      integtegers or \code{+Inf}, for \code{to}. If one of the vectors has
+      integers or \code{+Inf}, for \code{to}. If one of the vectors has
       length 1, it is recycled to the length of the other. Otherwise, they
       must have the same length. This term adds one
       network statistic to the model for each element of \code{from} (or \code{to}); the \eqn{i}th
@@ -98,7 +100,7 @@
       them must have length one, in which case it is recycled.
 
       When used in the dissolution formula of a STERGM, it can be used
-      to model a non-Markovian dissolution process, controling the
+      to model a non-Markovian dissolution process, controlling the
       hazard function in the interval directly.
     }
 
