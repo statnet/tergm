@@ -1,7 +1,7 @@
 #========================================================================
 # This file contains the following 2 functions for simulating stergms
 #           <simulate.stergm>
-#           <simulate.formula.stergm>
+#           <simulate.formula.stergm> (depricated)
 #========================================================================
 
 
