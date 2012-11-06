@@ -138,7 +138,10 @@
   \item{formation.fit, dissolution.fit}{For CMLE and CMPLE,
     \code{\link{ergm}} objects from fitting formation and dissolution,
     respectively. For EGMME, stripped down \code{\link{ergm}}-like lists.}
-  \item{network}{The original network.}
+  \item{network}{For \code{estimate=="EGMME"}, the original network; for
+    \code{estimate=="CMLE"} or \code{estimate=="CMPLE"}, a
+    \code{\link{network.list}} (a discrete series of networks) to which the
+    model was fit.}
   \item{control}{The control parameters used to fit the model.}
   
   See the method \code{\link{print.stergm}} for details on how
