@@ -1,7 +1,8 @@
 #========================================================================
-# This file contains the following 2 functions for simulating stergms
+# This file contains the following 3 functions for simulating stergms
 #           <simulate.stergm>
-#           <simulate.formula.stergm>
+#           <simulate.network>
+#           <simulate.networkDynamic>
 #========================================================================
 
 
@@ -75,7 +76,7 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
                           time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                           control=control.simulate.stergm(),
                           statsonly=NULL,
-                          output=c("networkDynamic", "stats", "changes"),
+                          output=c("networkDynamic", "stats", "changes", "final"),
                           stats.form = FALSE,
                           stats.diss = FALSE,
                           verbose=FALSE, ...){
@@ -102,7 +103,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                              time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                              control=control.simulate.network(),
                              statsonly=NULL,
-                             output=c("networkDynamic", "stats", "changes"),
+                             output=c("networkDynamic", "stats", "changes", "final"),
                              stats.form = FALSE,
                              stats.diss = FALSE,
                              verbose=FALSE, ...) {
@@ -249,6 +250,23 @@ simulate.network <- function(object, nsim=1, seed=NULL,
              },
              stats = {
                list(stats.form = stats.form,stats.diss = stats.diss, stats = stats)
+             },
+             final = {
+               newnw <- z$newnetwork
+               attributes(newnw) <- c(attributes(newnw), # Don't clobber existing attributes!
+                                      list(formation = formation,
+                                           dissolution = dissolution,
+                                           stats.form = stats.form,
+                                           stats.diss = stats.diss,
+                                           monitor = monitor,
+                                           stats = stats,
+                                           coef.form=coef.form,
+                                           coef.diss=coef.diss,
+                                           constraints=constraints,
+                                           start = nw%n%"time" + 0,
+                                           end = nw%n%"time" + time.slices,
+                                           changes = z$changed))
+               newnw
              })
   },
                    simplify = FALSE)
@@ -283,6 +301,12 @@ simulate.network <- function(object, nsim=1, seed=NULL,
              outl
            },
            changes = {
+             out
+           },
+           final = {
+             # If we've returned a list of networks, then it's a network list.
+             # FIXME: Should we reserve network.list for serial network data?
+             class(out) <- "network.list"
              out
            })
   }
