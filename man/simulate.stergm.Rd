@@ -19,7 +19,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
                           time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                           control=control.simulate.stergm(),
                           statsonly=NULL,
-                          output=c("networkDynamic", "stats", "changes"),
+                          output=c("networkDynamic", "stats", "changes", "final"),
                           stats.form = FALSE,
                           stats.diss = FALSE,
                           verbose=FALSE, 
@@ -32,7 +32,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
                            time.slices, time.start=NULL, time.burnin=0, time.interval=1,
                            control=control.simulate.network(),
                            statsonly=NULL,
-                           output=c("networkDynamic", "stats", "changes"),
+                           output=c("networkDynamic", "stats", "changes", "final"),
                            stats.form = FALSE,
                            stats.diss = FALSE,
                            verbose=FALSE,
@@ -206,6 +206,8 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
       \item{stats, stats.form, stats.diss:}{Network statistics as above.}
       \item{coef.form, coef.diss:}{Coefficients used in the simulation.}
       \item{start, end:}{Start and end times of the simulation.}
+      \item{changes}{A four-column matrix summarizing the changes in the
+	\code{"changes"} output. (This may be removed in the future.)}
     }
 
     When \code{nsim>1}, a \code{\link{network.list}} of these
@@ -226,6 +228,30 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
       attributes) as with \code{output=="networkDynamic"} are attached.
 
       When \code{nsim>1}, a list of these change matrices is returned.}
+
+    \item{"final"}{A \code{\link[network]{network}}
+    object representing the last network in the series generated. This
+    is not implemented in the method for
+    \code{\link[networkDynamic]{networkDynamic}}.
+
+    \code{\link{lasttoggle}} attributes are also included.
+
+    Additionally, attributes (\code{\link{attr}}, not network
+    attributes) are attached as follows:
+    \describe{
+      \item{formation, dissolution, monitor:}{Formation, dissolution,
+	and monitoring formulas	used in the simulation,	respectively.}
+      \item{stats, stats.form, stats.diss:}{Network statistics as above.}
+      \item{coef.form, coef.diss:}{Coefficients used in the simulation.}
+      \item{start, end:}{Start and end times of the simulation.}
+      \item{changes}{A four-column matrix summarizing the changes in the
+	\code{"changes"} output. (This may be removed in the future.)}
+    }
+
+    When \code{nsim>1}, a \code{\link{network.list}} of these
+    \code{\link{network}}s is returned.
+  }
+
 }
 
 \examples{
