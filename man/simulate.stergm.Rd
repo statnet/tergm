@@ -16,10 +16,11 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
                           coef.diss = object$dissolution.fit$coef,
                           constraints = object$constraints,
                           monitor = object$targets,
-                          time.slices, time.start=NULL, time.burnin=0, time.interval=1,
+                          time.slices=1, time.start=NULL, time.burnin=0, time.interval=1,
                           control=control.simulate.stergm(),
                           statsonly=NULL,
                           output=c("networkDynamic", "stats", "changes", "final"),
+                          nw.start = NULL,
                           stats.form = FALSE,
                           stats.diss = FALSE,
                           verbose=FALSE, 
@@ -29,7 +30,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
                            coef.form, coef.diss,
                            constraints = ~.,
                            monitor = NULL,
-                           time.slices, time.start=NULL, time.burnin=0, time.interval=1,
+                           time.slices=1, time.start=NULL, time.burnin=0, time.interval=1,
                            control=control.simulate.network(),
                            statsonly=NULL,
                            output=c("networkDynamic", "stats", "changes", "final"),
@@ -44,7 +45,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
                                   coef.diss = attr(object, "coef.diss"),
                                   constraints = NVL(attr(object, "constraints"), ~.),
                                   monitor = attr(object, "monitor"),
-                                  time.slices, time.start=NULL, time.burnin=0, time.interval=1,
+                                  time.slices=1, time.start=NULL, time.burnin=0, time.interval=1,
                                   control=control.simulate.network(),
                                   statsonly=NULL,
                                   output=c("networkDynamic", "stats", "changes"),
@@ -114,8 +115,10 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
     \code{"all"} to monitor distinct terms from both.
   }
   \item{time.slices}{
-    Number of networks or network statistics to return from each replication of the dynamic process. See below for
-    return types.
+    Number of time slices (or statistics) to return from each replication of the dynamic process. See below for
+    return types. Defaults to 1, which, if \code{time.burnin==0} and
+    \code{time.interval==1} (the defaults), advances the process one
+    time step.
   }
 
   \item{time.start}{
@@ -140,6 +143,25 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   \item{output}{A character vector specifying output type: one of
     "networkDynamic" (the default), "stats", and "changes", with partial
     matching allowed. See Value section for details.}
+
+  \item{nw.start}{A specification for the starting network to be used by
+    \code{simulate.stergm}, optional for EGMME fits, but required for
+    CMLE and CMPLE fits:
+    \describe{
+      \item{a numeric index \code{i}:}{use \code{i}th time-point's
+	network, where the first network in the series used to fit the
+	model is defined to be at the first time point;}
+      \item{strings \code{"first"} or \code{"last"}:}{the first or last
+	time point used in fitting the model; or}
+      \item{a \code{\link{network}} object:}{specify the network
+	directly.}
+    }
+    \code{\link{networkDynamic}}s cannot be used as starting networks
+    for \code{simulate.stergm} at this time. (They
+    can be used as starting networks for \code{simulate.networkDynamic},
+    of course.)
+  }
+  
   \item{stats.form, stats.diss}{Logical: Whether to return
     formation/dissolution model statistics. This is not the recommended
     method: use \code{monitor} argument instead.}
@@ -155,6 +177,10 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   the method for \code{\link{networkDynamic}}, the simulation is resumed
   from the last generated time point of \code{object}, by default with
   the same model and parameters.
+
+  The starting network for the \code{\link{stergm}} object method
+  (\code{simulate.stergm}) is determined by the \code{nw.start}
+  argument.
 
   The time index of the start of the simulation is determined as
   follows:

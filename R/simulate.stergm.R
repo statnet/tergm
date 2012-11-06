@@ -73,10 +73,11 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
                           coef.form=object$formation.fit$coef,coef.diss=object$dissolution.fit$coef,
                           constraints = object$constraints,
                           monitor = object$targets,
-                          time.slices, time.start=NULL, time.burnin=0, time.interval=1,
+                          time.slices = 1, time.start=NULL, time.burnin=0, time.interval=1,
                           control=control.simulate.stergm(),
                           statsonly=NULL,
                           output=c("networkDynamic", "stats", "changes", "final"),
+                          nw.start = NULL,
                           stats.form = FALSE,
                           stats.diss = FALSE,
                           verbose=FALSE, ...){
@@ -89,7 +90,22 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
 
   control <- set.control.class("control.simulate.network")
 
-  simulate.network(object$network,formation=object$formation,dissolution=object$dissolution,nsim=nsim,coef.form=coef.form, coef.diss=coef.diss, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, statsonly=statsonly, output=output, stats.form = stats.form, stats.diss = stats.diss, verbose=verbose,...)
+  if(is.null(nw.start)){
+    if(is.network(object$network)) nw.start <- object$network
+    else stop('Simulating from STERGM CMLE fit requires the starting network to be specified in the nw.start argument: "first", "last", a numeric index of the network in the series (with "first"==1), or a network (NOT networkDynamic at this time).')
+  }else if(is.numeric(nw.start)){
+    nw.start <- object$network[[nw.start]]
+    if(!is.network(nw.start)) stop("Invalid starting network specification.")
+  }else if(is.character(nw.start)){
+    nw.start <- switch(nw.start,
+                       first = object$network[[1]],
+                       last = object$network[[length(object$network)]],
+                       stop("Invalid starting network specification."))
+  }else if(is.networkDynamic(nw.start)){
+    stop("Using a networkDynamic to start a simulation from a STERGM is not supported at this time.")
+  }
+  
+  simulate.network(nw.start,formation=object$formation,dissolution=object$dissolution,nsim=nsim,coef.form=coef.form, coef.diss=coef.diss, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, statsonly=statsonly, output=output, stats.form = stats.form, stats.diss = stats.diss, verbose=verbose,...)
 }
 
 
@@ -100,7 +116,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                              coef.form,coef.diss,
                              constraints = ~.,
                              monitor = NULL,
-                             time.slices, time.start=NULL, time.burnin=0, time.interval=1,
+                             time.slices = 1, time.start=NULL, time.burnin=0, time.interval=1,
                              control=control.simulate.network(),
                              statsonly=NULL,
                              output=c("networkDynamic", "stats", "changes", "final"),
@@ -317,7 +333,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     coef.form = attr(object, "coef.form"), coef.diss = attr(object, "coef.diss"),
                                     constraints = NVL(attr(object, "constraints"),~.),
                                     monitor = attr(object, "monitor"),
-                                    time.slices, time.start=NULL, time.burnin=0, time.interval=1,
+                                    time.slices = 1, time.start=NULL, time.burnin=0, time.interval=1,
                                     control=control.simulate.network(),
                                     statsonly=NULL,
                                     output=c("networkDynamic", "stats", "changes"),

@@ -32,6 +32,9 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   y0s <- lapply(y0s,standardize.network)
   y1s <- lapply(y1s,standardize.network)
 
+  nwl <- c(y0s[1], y1s)
+  class(nwl) <- "network.list"
+  
   y0s.NA <- sapply(y0s, network.naedgecount)>0
   if(any(y0s.NA)){    
     y0s <- switch(control$CMLE.NA.impute,
@@ -166,5 +169,5 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
 
   # Construct the output list. Conveniently, this is mainly a list consisting of two ergms.
   
-  list(network=nw, times=times, formation=formation, dissolution=dissolution, formation.fit=fit.form, dissolution.fit=fit.diss, estimate=estimate)
+  list(network=nwl, times=times, formation=formation, dissolution=dissolution, constraints=constraints, formation.fit=fit.form, dissolution.fit=fit.diss, estimate=estimate)
 }
