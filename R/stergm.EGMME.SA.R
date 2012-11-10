@@ -51,11 +51,27 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       colnames(oh.all) <- c(p.names,q.names)
     }
 
+    # Limit the size of the full history.
+    # TODO: Store a thinned or summarized version of "forgotten" iterations.
+    # TODO: Add an option to log it to external storage.
+    if(max(ind.all)>control$SA.oh.memory){
+      remember.after.ind <- max(ind.all) - control$SA.oh.memory
+
+      # Cut the ind.all last!
+      tid.all <-tid.all[ind.all>remember.after.ind]
+      oh.all <- oh.all[ind.all>remember.after.ind,,drop=FALSE]
+      jitters.all <- jitters.all[ind.all>remember.after.ind,,drop=FALSE]
+      ind.all <- ind.all[ind.all>remember.after.ind]
+
+      # Shift the indices so that they would start at 1.
+      ind.all <- ind.all - remember.after.ind
+    }
+    
     history$ind.all <- ind.all
     history$tid.all <- tid.all
     history$jitters.all <- jitters.all
     history$oh.all <- oh.all
-
+   
     min.ind.last <- max(ind.all) - control$SA.runlength*control$SA.interval + 1
     min.ind.keep <- max(ind.all) - max(
                                      max(ind.all)*control$SA.keep.oh,
@@ -78,6 +94,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     history$oh.last <- oh.last <- oh.all[ind.all>=min.ind.last,,drop=FALSE]
     history$jitters <- jitters <- jitters.all[ind.all>=min.ind.keep,,drop=FALSE]
     history$jitters.last <- jitters.last <- jitters.all[ind.all>=min.ind.last,,drop=FALSE]      
+
+    rm(ind.all, tid.all, jitters.all, oh.all); gc()
 
     # Plot if requested.
     if(control$SA.plot.progress){
@@ -231,6 +249,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         tmp <- try(do.optimization(states, history, control), silent=!verbose)
         states <- tmp$states
         history <- tmp$history
+        rm(tmp); gc()
         if(inherits(states, "try-error") || all(apply(history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
           cat("Something went very wrong. Restarting with smaller gain.\n")
           control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
@@ -273,6 +292,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         tmp <- try(do.optimization(states, history, control), silent=!verbose)
         states <- tmp$states
         history <- tmp$history
+        rm(tmp); gc()
         if(inherits(states, "try-error") || all(apply(history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
           cat("Something went very wrong. Restarting with smaller gain.\n")
           control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
@@ -463,7 +483,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         if(verbose)cat("Finished.\n")
         states <- tmp$states
         history <- tmp$history
-
+        rm(tmp); gc()
+        
         min.ind.se <- max(history$ind.all)-control$SA.phase3.samplesize.runs*control$SA.runlength*control$SA.interval + 1
         sm.mon <- history$oh.all[history$ind.all>=min.ind.se,-(1:p),drop=FALSE]
         sm.tid <- history$tid.all[history$ind.all>=min.ind.se]

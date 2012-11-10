@@ -29,6 +29,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
     x<-oh[,1:p,drop=FALSE][,!offsets,drop=FALSE] # #$%^$ gls() doesn't respect I()...
     ys <- oh[,-(1:p),drop=FALSE]
+    n <- nrow(ys)
     
     h.fits <-
       if(!is.null(cl)){
@@ -49,15 +50,17 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
                                     else lm(y~x), silent=TRUE))
                })
       }
-    
+
     bad.fits <- sapply(h.fits, inherits, "try-error") | apply(diff(ys)==0,2,all)
-    
+
 #    bad.fits <-     # Also, ignore fits where the statistics are too concentrated.    
 #      bad.fits | (apply(ys,2,function(y){
 #        freqs <- table(y)
 #        sum(freqs[-which.max(freqs)])
 #      })<nrow(h)/2)
 
+    rm(x, ys); gc()
+    
     if(all(bad.fits)) stop("The optimization appears to be stuck. Try better starting parameters, lower SA.init.gain, etc.")
     
     ## Grab the coefficients, t-values, and residuals.
@@ -66,7 +69,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
     h.fit[,!bad.fits] <- sapply(h.fits[!bad.fits], coef)[seq_len(p.free+1),]
     
-    h.resid <- matrix(NA, nrow=NROW(ys), ncol=q)
+    h.resid <- matrix(NA, nrow=n, ncol=q)
     h.resid[,!bad.fits] <- sapply(h.fits[!bad.fits], resid)
 
     h.tvals[,!bad.fits] <- sapply(h.fits[!bad.fits],function(fit) summary(fit)$coefficients[seq_len(p.free+1),3])

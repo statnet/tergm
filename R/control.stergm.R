@@ -85,8 +85,8 @@ control.stergm<-function(init.form=NULL,
                          SA.phase2.maxreljump=4, # Maximum jump per run, relative to the magnitude of other jumps in the history.
                          SA.guard.mul = 4, # The multiplier for the range of parameter values to compute the guard width.
                          SA.robust = FALSE, # Should the (slower) robust linear regression and covariance estimation be used?
+                         SA.oh.memory = 100000, # Maximum number of jumps to store.
                          
-
                          SA.refine=c("mean","linear","none"), # Method, if any, used to refine the point estimate: linear interpolation, average, and none for the last value.
                          
                          SA.se=TRUE, # Whether to run Phase 3 to compute the standard errors.

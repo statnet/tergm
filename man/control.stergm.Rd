@@ -65,7 +65,8 @@
                          SA.phase2.jitter.mul=0.2, 
                          SA.phase2.maxreljump=4, 
                          SA.guard.mul = 4, 
-                         SA.robust = FALSE, 
+                         SA.robust = FALSE,
+                         SA.oh.memory = 100000,
                          SA.refine=c("mean","linear","none"), 
                          SA.se=TRUE, 
                          SA.phase3.samplesize.runs=10, 
@@ -311,6 +312,10 @@
   \item{SA.robust}{
     Whether to use robust linear regression (for gradients) and
     covariance estimation.
+  }
+
+  \item{SA.oh.memory}{
+    Absolute maximum number of data points per thread to store in the full optimization history.
   }
   
   \item{SA.refine}{Method, if any, used to 
