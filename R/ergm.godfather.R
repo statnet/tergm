@@ -121,7 +121,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
   if(!is.directed(nw)) toggles[,2:3] <- t(apply(toggles[,2:3,drop=FALSE], 1, sort))
   toggles <- toggles[order(toggles[,1],toggles[,2],toggles[,3]),,drop=FALSE]
 
-  formula <- ergm.update.formula(formula, nw~.)
+  formula <- ergm.update.formula(formula, nw~., from.new="nw")
   m <- ergm.getmodel(formula, nw, expanded=TRUE, role="target")
   Clist <- ergm.Cprepare(nw, m)
   m$obs <- summary(m$formula)

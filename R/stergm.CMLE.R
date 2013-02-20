@@ -90,10 +90,10 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
 
     # Check that these networks can be combined for this model.
     bad.stat <-
-      !((apply(rbind(sapply(y0s, function(nw) summary(ergm.update.formula(formation,nw~.)))),1,sum)==summary(ergm.update.formula(formation,y0~.))) &
-        (apply(rbind(sapply(y0s, function(nw) summary(ergm.update.formula(dissolution,nw~.)))),1,sum)==summary(ergm.update.formula(dissolution,y0~.))) &
-        (apply(rbind(sapply(y1s, function(nw) summary(ergm.update.formula(formation,nw~.)))),1,sum)==summary(ergm.update.formula(formation,y1~.))) &
-        (apply(rbind(sapply(y1s, function(nw) summary(ergm.update.formula(dissolution,nw~.)))),1,sum)==summary(ergm.update.formula(dissolution,y1~.))))
+      !((apply(rbind(sapply(y0s, function(nw) summary(ergm.update.formula(formation,nw~., from.new="nw")))),1,sum)==summary(ergm.update.formula(formation,y0~., from.new="y0"))) &
+        (apply(rbind(sapply(y0s, function(nw) summary(ergm.update.formula(dissolution,nw~., from.new="nw")))),1,sum)==summary(ergm.update.formula(dissolution,y0~., from.new="y0"))) &
+        (apply(rbind(sapply(y1s, function(nw) summary(ergm.update.formula(formation,nw~., from.new="nw")))),1,sum)==summary(ergm.update.formula(formation,y1~., from.new="y1"))) &
+        (apply(rbind(sapply(y1s, function(nw) summary(ergm.update.formula(dissolution,nw~., from.new="nw")))),1,sum)==summary(ergm.update.formula(dissolution,y1~., from.new="y1"))))
     if(any(bad.stat)) stop("Fitting the terms ", paste.and(names(bad.stat)[bad.stat]), " over multiple network transitions is not supported at this time.")
   }else{
     # We are about to do logical operations on networks, so make sure
@@ -108,20 +108,20 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   
   y.form <- y0 | y1
   y.form <- nvattr.copy.network(y.form, y0)
-  formation <- ergm.update.formula(formation, y.form~.)
+  formation <- ergm.update.formula(formation, y.form~., from.new="y.form")
 
   y.diss <- y0 & y1
   y.diss <- nvattr.copy.network(y.diss, y0)
-  dissolution <- ergm.update.formula(dissolution, y.diss~.)
+  dissolution <- ergm.update.formula(dissolution, y.diss~., from.new="y.diss")
 
   # Construct new constraints
 
-  constraints.form <- if(constraints==~.) ~atleast(y0) else ergm.update.formula(constraints, ~.+atleast(y0))
+  constraints.form <- if(constraints==~.) ~atleast(y0) else ergm.update.formula(constraints, ~.+atleast(y0), from.new="y0")
   if(length(times)>2) constraints.form <- ergm.update.formula(constraints.form, ~.+blockdiag(".stergm.CMLE.time.index"))
   # TODO: Some unlucky variable names can break this. We need to figure out a way around this.
   environment(constraints.form) <- environment()
   
-  constraints.diss <- if(constraints==~.) ~atmost(y0) else ergm.update.formula(constraints, ~.+atmost(y0))
+  constraints.diss <- if(constraints==~.) ~atmost(y0) else ergm.update.formula(constraints, ~.+atmost(y0), from.new="y0")
   if(length(times)>2) constraints.diss <- ergm.update.formula(constraints.diss, ~.+blockdiag(".stergm.CMLE.time.index"))
   # TODO: Some unlucky variable names can break this. We need to figure out a way around this.
   environment(constraints.diss) <- environment()

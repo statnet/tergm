@@ -91,9 +91,9 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
     targets <- targets[c(1,3)] # in a formula f<-y~x, f[1]=~, f[2]=y, and f[3]=x
   }
 
-  targets <- ergm.update.formula(targets,nw~.)
-  formation <- ergm.update.formula(formation,nw~.)
-  dissolution <- ergm.update.formula(dissolution,nw~.)
+  targets <- ergm.update.formula(targets,nw~., from.new="nw")
+  formation <- ergm.update.formula(formation,nw~., from.new="nw")
+  dissolution <- ergm.update.formula(dissolution,nw~., from.new="nw")
   
   if(!is.null(target.stats)){
     nw.stats<-summary(targets)
@@ -108,7 +108,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
         nw<-san(targets, target.stats=target.stats,
                 control=control$SAN.control,
                 verbose=verbose)
-        targets<-ergm.update.formula(targets,nw~.)
+        targets<-ergm.update.formula(targets,nw~., from.new="nw")
         nw.stats <- summary(targets)
         srun <- srun + 1
         if(verbose){
@@ -129,8 +129,8 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
     if(inherits(newnw,"try-error")){
       cat("SAN failed or is not applicable. Increase burn-in if there are problems.\n")
     }else nw <- newnw
-    formation <- ergm.update.formula(formation,nw~.)
-    dissolution <- ergm.update.formula(dissolution,nw~.)
+    formation <- ergm.update.formula(formation,nw~., from.new="nw")
+    dissolution <- ergm.update.formula(dissolution,nw~., from.new="nw")
   }
 
   if (verbose) cat("Initializing Metropolis-Hastings proposals.\n")
