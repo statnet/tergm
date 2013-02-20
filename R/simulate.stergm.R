@@ -153,8 +153,8 @@ simulate.network <- function(object, nsim=1, seed=NULL,
     stop("A network object must be given")
   }
 
-  formation<-ergm.update.formula(formation,nw~.)
-  dissolution<-ergm.update.formula(dissolution,nw~.)
+  formation<-ergm.update.formula(formation,nw~., from.new="nw")
+  dissolution<-ergm.update.formula(dissolution,nw~., from.new="nw")
 
   unset.offset.call <- function(object){
     if(inherits(object,"call") && object[[1]]=="offset")
@@ -171,7 +171,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                       )
   }
   
-  if(!is.null(monitor)) monitor<-ergm.update.formula(monitor,nw~.)
+  if(!is.null(monitor)) monitor<-ergm.update.formula(monitor,nw~., from.new="nw")
   
   model.form <- ergm.getmodel(formation, nw, role="formation")
   if(!missing(coef.form) && coef.length.model(model.form)!=length(coef.form)) stop("coef.form has ", length(coef.form), " elements, while the model requires ",coef.length.model(model.form)," parameters.")
@@ -385,8 +385,8 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   object  <- networkDynamic.apply.changes(object, sim)
 
   attributes(object) <- c(attributes(object), # Don't clobber existing attributes!
-                          list(formation = ergm.update.formula(formation,nw~.),
-                               dissolution = ergm.update.formula(dissolution,nw~.),
+                          list(formation = ergm.update.formula(formation,nw~., from.new="nw"),
+                               dissolution = ergm.update.formula(dissolution,nw~., from.new="nw"),
                                stats.form = rbind(if(isTRUE(attr(sim,"formation")==attr(object,"formation"))) attr(object,"stats.form"),attr(sim,"stats.form")),
                                stats.diss = rbind(if(isTRUE(attr(sim,"dissolution")==attr(object,"dissolution"))) attr(object,"stats.diss"),attr(sim,"stats.diss")),
                                monitor = attr(sim,"monitor"),
