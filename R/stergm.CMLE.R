@@ -34,13 +34,23 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
 
   nwl <- c(y0s[1], y1s)
   class(nwl) <- "network.list"
-  
-  y0s.NA <- sapply(y0s, network.naedgecount)>0
-  if(any(y0s.NA)){    
-    y0s <- switch(control$CMLE.NA.impute,
-                  stop = stop("Transitioned-from network(s) at time(s) ", paste.and(times[y0s.NA]), " has missing dyads. Fix or choose an imputation option via CMLE.NA.impute control parameter."),
+
+  # Impute missing dyads in initial networks, if needed.
+  IMPUTERS <- c("stop", "next", "previous", "majority", "0", "1")
+  imputers <- IMPUTERS[pmatch(control$CMLE.NA.impute,IMPUTERS)]
+  if(any(is.na(imputers))) stop("Unknown CMLE.NA.impute imputation option: ",sQuote(imputer),". CMLE.NA.impute must be a character vector containing one or more of ", dQuote("stop"),", ",dQuote("next"), ", ", dQuote("previous"), ", ", dQuote("majority"), ", ", dQuote("0"), ", and/or ", dQuote("1"), ".")
+
+  for(imputer in imputers){
+    last.imputer <- imputer==imputers[length(imputers)]
+    y0s.NA <- sapply(y0s, network.naedgecount)>0 # Update which networks have missing dyads.
+      
+    y0s <- switch(imputer,
+                  `stop` = {
+                    if(any(y0s.NA)) stop("Transitioned-from network(s) at time(s) ", paste.and(times[y0s.NA]), " has missing dyads. Fix or choose an imputation option via CMLE.NA.impute control parameter.")
+                    y0s
+                  },
                   previous = {
-                    if(y0s.NA[1]) stop("Imputation option `previous' cannot impute dyads of the first network in the series.")
+                    if(last.imputer && y0s.NA[1]) stop("Imputation option `previous' cannot impute dyads of the first network in the series. Use a different option or specify one or more fallbacks separated by commas (e.g., 'previous,next,majority').")
                     for(t in seq_along(y0s)[-1])
                       if(y0s.NA[t]){
                         # Workaround for a bug in network (Ticket #80 in Trac)
@@ -51,22 +61,44 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
                       }
                     y0s
                   },
+                  `next` = {
+                    # Add the last network in y1s to y0s to simplify the code, and update which networks have missing dyads.
+                    y0s <- c(y0s, y1s[length(y1s)])
+                    y0s.NA <- sapply(y0s, network.naedgecount)>0
+                    if(last.imputer && y0s.NA[length(y0s.NA)]) stop("Imputation option `next' cannot impute dyads of the last network in the series. Use a different option or specify one or more fallbacks separated by commas (e.g., 'next,previous,majority').")
+                    for(t in rev(seq_along(y0s)[-length(y0s)]))
+                      if(y0s.NA[t]){
+                        # Workaround for a bug in network (Ticket #80 in Trac)
+                        na.el <-as.edgelist(is.na(y0s[[t]]))
+                        na.eids <- apply(na.el, 1, function(e) get.edgeIDs(y0s[[t]], e[1],e[2], na.omit=FALSE))
+                        y0s[[t]] <- delete.edges(y0s[[t]], na.eids)
+                        y0s[[t]][na.el] <- y0s[[t+1]][na.el]
+                      }
+                    # Remove the attached network from y1s.
+                    y0s[-length(y0s)]
+                  },
                   majority = {
                     lapply(y0s, function(y){
                       # Workaround for a bug in network (Ticket #80 in Trac)
                       na.el <-as.edgelist(is.na(y))
                       na.eids <- apply(na.el, 1, function(e) get.edgeIDs(y, e[1],e[2], na.omit=FALSE))
-                      impute <- if(network.edgecount(y,na.omit=TRUE)/network.dyadcount(y,na.omit=TRUE)>0.5) 1 else 0
-                      y <- delete.edges(y, na.eids)
-                      y[na.el] <- impute
-                      y
+                      impute <- sign(network.edgecount(y,na.omit=TRUE)/network.dyadcount(y,na.omit=TRUE)-0.5)
+                      if(impute==0){# If exact tie, can't impute.
+                        if(last.imputer) stop("Imputation option `majority' encountered an exact tie. Use a different option or specify one or more fallbacks separated by commas (e.g., 'majority,0').")
+                        y
+                      }else{
+                        impute <- impute > 0
+                        y <- delete.edges(y, na.eids)
+                        y[na.el] <- impute
+                        y
+                      }
                     })
                   },
                   `0` = {
                     lapply(y0s, function(y){
                       # Workaround for a bug in network (Ticket #80 in Trac)
                       na.el <-as.edgelist(is.na(y))
-                      na.eids <- apply(na.el, 1, function(e) get.edgeIDs(y, e[1],e[2], na.omit=FALSE))
+                        na.eids <- apply(na.el, 1, function(e) get.edgeIDs(y, e[1],e[2], na.omit=FALSE))
                       y <- delete.edges(y, na.eids)
                     })
                   },
@@ -80,9 +112,9 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
                       y
                     })
                   }
-                  
                   )
   }
+  
 
   if(length(times)>2){
     y0 <- combine.networks(y0s, standardized=TRUE,blockname=".stergm.CMLE.time.index")
