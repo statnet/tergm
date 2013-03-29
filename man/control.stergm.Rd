@@ -21,7 +21,8 @@
                          CMLE.control=NULL,
                          CMLE.control.form=control.ergm(init=init.form, MCMC.burnin=MCMC.burnin, MCMC.interval=MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
                          CMLE.control.diss=control.ergm(init=init.diss, MCMC.burnin=MCMC.burnin, MCMC.interval=MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
-                         CMLE.NA.impute="stop",
+                         CMLE.NA.impute=c(),
+                         CMLE.term.check.override=FALSE,
                          EGMME.main.method=c("Gradient-Descent"),
                          SAN.maxit=10,
                          SAN.control=control.san(coef=init.form,
@@ -150,43 +151,26 @@
     fit the CMLE for the formation/dissolution ERGM.  See
     \code{\link{control.ergm}}.
   }
+  
   \item{CMLE.NA.impute}{In STERGM CMLE, missing dyads in transitioned-to
-    network can be accommodated using methods of Handcock and Gile
-    (2009), but transitioned-from network requires much more complex methods
-    that are not, currently, implemented. \code{CMLE.NA.impute} controls
-    the way in which missing dyads can be imputed:
-    \describe{
-      \item{\code{"stop"}}{If there are missing dyads in a
-	transitioned-from network stop with an error.}
-      \item{\code{"next"}}{Impute the state of the same dyad in the next
-	time step's network (or later, if that one is also missing). If
-	the last network has missing dyads (and no fallback option is
-	given), stop with an error. This imputation method is likely to
-	lead to an underestimation of the formation and dissolution
-	rates.}
-      \item{\code{"previous"}}{Impute the state of the same dyad in the
-	previous time step's network (or earlier, if that one is also
-	missing). If the first network has missing dyads (and no
-	fallback option is given), stop with an error.}
-      \item{\code{"majority"}}{Impute the missing dyad with the value of
-	the majority among the non-missing dyads in that time step's
-	network. If any of the networks has an exact tie (and no
-	fallback option is given), stop with an error.}
-      \item{\code{"0"}}{Assume missing dyads are all non-ties.}
-      \item{\code{"1"}}{Assume missing dyads are all ties.}
-    }
-
-    A vector of imputation options can be given, to apply the specified
-    imputation methods in succession. For example,
-    \code{CMLE.NA.impute=c("next","previous","majority","0")} would
-    first try to impute a missing dyad with the next time step's
-    value. If it, and all of the later values for that dyad are missing,
-    it will try to impute it with the previous time step's value. If it,
-    and all of the earlier values for that dyad are missing as well, it
-    will try to impute it with the value of the majority of non-missing
-    dyads for that time step. If there is an exact tie, it will impute
-    0.
+    networks are accommodated using methods of Handcock and Gile (2009),
+    but a similar approach to transitioned-from networks requires much
+    more complex methods that are not, currently, implemented.
+    \code{CMLE.NA.impute} controls how missing dyads in
+    transitioned-from networks are be imputed. See argument
+    \code{imputers} of \code{\link{impute.network.list}} for details.
     
+    By default, no imputation is performed, and the fitting stops with
+    an error if any transitioned-from networks have missing dyads.    
+  }
+
+  \item{CMLE.term.check.override}{ The method
+    \code{\link{stergm}{stergm}} uses at this time to fit a series of
+    more than two networks requires certain assumptions to be made about
+    the ERGM terms being used, which are tested before a fit is
+    attempted. This test sometimes fails despite the model being
+    amenable to fitting, so setting this option to \code{TRUE} overrides
+    the tests.
   }
     
   \item{EGMME.main.method}{Estimation method
