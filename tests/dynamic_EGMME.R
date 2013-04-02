@@ -1,5 +1,6 @@
-library(tergm)
+library(statnet.common)
 opttest({
+library(tergm)
 n<-40
 do.plot <- TRUE
 g0<-network.initialize(n,dir=FALSE)
