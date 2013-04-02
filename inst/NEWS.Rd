@@ -53,7 +53,7 @@
       \item A new (sort of) function, \code{\link{tergm.godfather}} has
       been fixed and documented; it can be used to apply a specific set
       of changes to a network, returning statistics of interest as it
-      evolves. In particular, it can be used to "retrace" the evolution
+      evolves. In particular, it can be used to \dQuote{retrace} the evolution
       of a \code{\link{networkDynamic}}, calculating statistics at
       discrete time points along the way.
 
@@ -62,8 +62,20 @@
       method for \code{\link{networkDynamic}} LHS, to compute dynamic
       network statistics at specified time points.
 
+      \item Fitting CMLE to network series with transitioned-from
+      networks having missing dyads is now possible, using automatic
+      imputation. See \code{\link{impute.network.list}} and
+      \code{\link{control.tergm}}.
+
+      STERGM \code{\link[=simulate.stergm]{simulate}} can now be used
+      for CMLE fits, takes a number of new arguments, and can be used to
+      \dQuote{resume} a simulation from a \code{\link{networkDynamic}}
+      object.
+
+      \code{\link{gof}} methods have been implemented for CMLE fits.      
       
-    } }
+    }
+  }
   
   \subsection{OTHER USER-VISIBLE CHANGES}{
     \itemize{
