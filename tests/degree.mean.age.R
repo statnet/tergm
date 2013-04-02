@@ -1,6 +1,7 @@
-library(tergm)
+library(statnet.common)
 opttest({
-
+library(tergm)
+set.seed(0)
 logit<-function(p)log(p/(1-p))
 
 # NB:  duration.matrix function no longer exists in ergm package
@@ -46,7 +47,7 @@ targets <- c(60,12,rep(12,21))
 
 test <- approx.hotelling.diff.test(dynsim,mu0=targets)
 
-if(test$p.value < 0.05){
+if(test$p.value < 0.001){
   print(test)
   stop("At least one statistic differs from target.")
 }
