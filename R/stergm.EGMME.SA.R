@@ -228,7 +228,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     for(try in 1:control$SA.phase1.tries){
       if(verbose) cat('======== Attempt ',try,' ========\n',sep="") else cat('Attempt',try,':\n')
       for(run in 1:control$SA.phase1.minruns){
-        tmp <- try(do.optimization(states, history, control), silent=!verbose)
+        tmp <- if(control$SA.restart.on.err) try(do.optimization(states, history, control), silent=!verbose) else do.optimization(states, history, control)
         if(inherits(tmp, "try-error") || all(apply(tmp$history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
           cat("Something went very wrong. Restarting with smaller gain.\n")
           control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
@@ -272,7 +272,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       stepdown.count <- control$SA.stepdown.ct
       
       for(regain in 1:control$SA.phase2.repeats){
-        tmp <- try(do.optimization(states, history, control), silent=!verbose)
+        tmp <- if(control$SA.restart.on.err) try(do.optimization(states, history, control), silent=!verbose) else do.optimization(states, history, control)
         if(inherits(tmp, "try-error") || all(apply(tmp$history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
           cat("Something went very wrong. Restarting with smaller gain.\n")
           control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
