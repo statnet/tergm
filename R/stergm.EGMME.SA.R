@@ -247,15 +247,16 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       if(verbose) cat('======== Attempt ',try,' ========\n',sep="") else cat('Attempt',try,':\n')
       for(run in 1:control$SA.phase1.minruns){
         tmp <- try(do.optimization(states, history, control), silent=!verbose)
-        states <- tmp$states
-        history <- tmp$history
-        rm(tmp); gc()
-        if(inherits(states, "try-error") || all(apply(history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
+        if(inherits(tmp, "try-error") || all(apply(tmp$history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
           cat("Something went very wrong. Restarting with smaller gain.\n")
           control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
           do.restart <- TRUE
           break
-        }else do.restart <- FALSE
+        }else{
+          states <- tmp$states
+          history <- tmp$history
+          do.restart <- FALSE
+        }
       }
 
       states <- best.states(states, history)
@@ -290,15 +291,16 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       
       for(regain in 1:control$SA.phase2.repeats){
         tmp <- try(do.optimization(states, history, control), silent=!verbose)
-        states <- tmp$states
-        history <- tmp$history
-        rm(tmp); gc()
-        if(inherits(states, "try-error") || all(apply(history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
+        if(inherits(tmp, "try-error") || all(apply(tmp$history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
           cat("Something went very wrong. Restarting with smaller gain.\n")
           control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
           do.restart <- TRUE
           break
-        }else do.restart <- FALSE
+        }else{
+          states <- tmp$states
+          history <- tmp$history
+          do.restart <- FALSE
+        }
         
         if(verbose){
           cat("New parameters:\n")
