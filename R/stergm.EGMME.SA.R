@@ -93,7 +93,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
           cols <- floor(sqrt(ncol(oh)))
           layout <- c(cols,ceiling(ncol(oh)/cols))
 
-          suppressWarnings(print(xyplot(do.call(mcmc.list,by(as.data.frame(oh),INDICES=list(tid=tid),mcmc,start=min.ind.keep)), panel = function(...) {panel.xyplot(...);panel.abline(0, 0)}, thin = thin, as.table = TRUE, layout = layout, xlab=NULL)))
+          suppressWarnings(print(xyplot(window(do.call(mcmc.list,by(as.data.frame(oh),INDICES=list(tid=tid),mcmc,start=min.ind.keep)), thin=thin), panel = function(...) {panel.xyplot(...);panel.abline(0, 0)}, as.table = TRUE, layout = layout, xlab=NULL)))
         }
     }
     
