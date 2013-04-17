@@ -1,3 +1,12 @@
+#  File R/stergm.EGMME.initialfit.R in package tergm, part of the Statnet suite
+#  of packages for network analysis, http://statnet.org .
+#
+#  This software is distributed under the GPL-3 license.  It is free,
+#  open source, and has the attribution requirements (GPL Section 7) at
+#  http://statnet.org/attribution
+#
+#  Copyright 2003-2013 Statnet Commons
+#######################################################################
 stergm.EGMME.initialfit<-function(init.form, init.diss, nw, model.form, model.diss, model.mon, control, verbose=FALSE){
   if(!is.null(control$init.method) && control$init.method == "zeros"){
     init.form[is.na(init.form)]<-0
