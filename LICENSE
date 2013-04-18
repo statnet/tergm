@@ -1,34 +1,25 @@
 --------------------------------------------------
-License for the 'statnet' component package 'ergm'
+License for the 'statnet' component package 'tergm'
 --------------------------------------------------
 
 This software is distributed under the GPL-3 license.  It is free,
 open source, and has the following attribution requirements
 (GPL Section 7):
 
-(a) you agree to retain in 'ergm' and any modifications to 'ergm'
+(a) you agree to retain in 'tergm' and any modifications to 'tergm'
     the copyright, author attribution and URL information as
     provided at statnet.org/attribution
-(b) you agree that 'ergm' and any modifications to 'ergm' will,
+(b) you agree that 'tergm' and any modifications to 'tergm' will,
     when used, display the attribution:
      Based on 'statnet' project software (statnet.org).
      For license and citation information see statnet.org/attribution
 --------------------------------------------------
 
---------------------------------------------------
-Source code incorporated from package 'coda'
---------------------------------------------------
-
-Several functions have been copied with modification from the R
-package 'coda', under the terms of GPL version 3. They are identified
-in the source code, along with copyright attribution.
-
-
 What does this mean?
 ====================
 
-If you are modifying 'ergm' or adopting any source code from
-'ergm' for use in another application, you must ensure that the
+If you are modifying 'tergm' or adopting any source code from
+'tergm' for use in another application, you must ensure that the
 copyright and attributions mentioned in the license above appear
 in the code of your modified version or application. These 
 attributions must also appear when the package is loaded
@@ -45,6 +36,6 @@ Martina Morris, University of Washington
 
 The 'statnet' development team
 
-Copyright 2008-2012
+Copyright 2008-2013
 
 
