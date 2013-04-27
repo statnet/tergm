@@ -1,3 +1,5 @@
+library(statnet.common)
+opttest({
 library(tergm)
 
 tolerance<-0.05
@@ -90,3 +92,5 @@ stopifnot(all.equal(diss.mle(y0,y1,y2m), coef(fit$dissolution.fit), tolerance=to
 do.run(TRUE)
 # Undirected test
 do.run(FALSE)
+
+}, "dynamic MLE with two transitions")

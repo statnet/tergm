@@ -1,3 +1,5 @@
+library(statnet.common)
+opttest({
 library(tergm)
 
 tolerance<-0.05
@@ -90,3 +92,4 @@ stopifnot(all.equal(diss.mle(y0,y1m), coef(fit$dissolution.fit), tolerance=toler
 do.run(TRUE)
 # Undirected test
 do.run(FALSE)
+}, "dynamic MLE with block-diagonal constraints")
