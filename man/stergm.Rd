@@ -178,7 +178,7 @@ dynfit<-stergm(g0,formation = ~edges+degree(1), dissolution = ~edges,
 par(ask=TRUE)
 mcmc.diagnostics(dynfit)
 summary(dynfit)
-}
+
 # CMLE Example
 data(samplk)
 
@@ -199,8 +199,7 @@ samplk123 <- stergm(list(samplk1, samplk2, samplk3),
 
 mcmc.diagnostics(samplk123)
 summary(samplk123)
-
-
+}
 }
 
 \references{
@@ -215,4 +214,4 @@ summary(samplk123)
 }
 }
 
-\seealso{network, \%v\%, \%n\%, \code{\link{ergm-terms}}}
+\seealso{ergm, network, \%v\%, \%n\%, \code{\link{ergm-terms}}}
