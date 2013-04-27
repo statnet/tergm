@@ -23,6 +23,11 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
   
   q <- length(model.mon$etamap$offsettheta) # number of target statistics
   q.names<-model.mon$coef.names
+
+  if(control$SA.plot.progress && !dev.interactive(TRUE)){
+    warning("Progress plot requested on a non-interactive graphics device. Ignoring.")
+    control$SA.plot.progress <- FALSE # So that we don't print a warning every step.
+  }
   
   if(verbose) cat("Starting optimization with with coef_F_0 = (",theta.form0, ") and coef_D_0 = (",theta.diss0,")\n" )
   ###### Define the optimization run function. ######
@@ -89,21 +94,16 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     history$jitters.last <- jitters.last <- jitters.all[ind.all>=min.ind.last,,drop=FALSE]      
 
     # Plot if requested.
-    if(control$SA.plot.progress){
-      if(!dev.interactive(TRUE)){
-        warning("Progress plot requested on a non-interactive graphics device. Ignoring.")
-        control$SA.plot.progress <- FALSE # So that we don't print a warning every step.
-      }else{
-          library(lattice)
-          
-          get.dev("progress.plot")
-          
-          thin <- (nrow(oh)-1)%/%(control$SA.max.plot.points/length(states)) + 1
-          cols <- floor(sqrt(ncol(oh)))
-          layout <- c(cols,ceiling(ncol(oh)/cols))
-
-          suppressWarnings(print(xyplot(window(do.call(mcmc.list,by(as.data.frame(oh),INDICES=list(tid=tid),mcmc,start=min.ind.keep)), thin=thin), panel = function(...) {panel.xyplot(...);panel.abline(0, 0)}, as.table = TRUE, layout = layout, xlab=NULL)))
-        }
+    if(control$SA.plot.progress && dev.interactive(TRUE)){
+      library(lattice)
+      
+      get.dev("progress.plot")
+      
+      thin <- (nrow(oh)-1)%/%(control$SA.max.plot.points/length(states)) + 1
+      cols <- floor(sqrt(ncol(oh)))
+      layout <- c(cols,ceiling(ncol(oh)/cols))
+      
+      suppressWarnings(print(xyplot(window(do.call(mcmc.list,by(as.data.frame(oh),INDICES=list(tid=tid),mcmc,start=min.ind.keep)), thin=thin), panel = function(...) {panel.xyplot(...);panel.abline(0, 0)}, as.table = TRUE, layout = layout, xlab=NULL)))
     }
     
     # Extract and return the "states" and the "history".

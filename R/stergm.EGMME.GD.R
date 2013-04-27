@@ -165,30 +165,24 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     }
 
     # Plot if requested.
-    if(control$SA.plot.stats){
-      if(!dev.interactive(TRUE)){
-        warning("Progress plot requested on a non-interactive graphics device. Ignoring.")
-        control$SA.plot.stats <- FALSE # So that we don't print a warning every step.
-      }else{
-        library(lattice)
-
-        try({
-          get.dev("gradients")
-          G.scl <- sweep(G, 1, apply(G, 1, function(x) sqrt(mean(x^2))), "/")
-          G.scl[is.nan(G.scl)] <- 0
-          G.scl <- sweep(G.scl, 2, apply(G.scl, 2, function(x) sqrt(mean(x^2))), "/")
-          G.scl[is.nan(G.scl)] <- 0
-          print(.my.levelplot(G.scl,main="Scaled Gradients"))
-        },silent=TRUE)
-            
-        suppressWarnings(try({
-          get.dev("correlations")
-          print(.my.levelplot(cov2cor(v),main="Correlations"))
-        },silent=TRUE))
-        
-      }
+    if(control$SA.plot.stats && dev.interactive(TRUE)){
+      library(lattice)
+      
+      try({
+        get.dev("gradients")
+        G.scl <- sweep(G, 1, apply(G, 1, function(x) sqrt(mean(x^2))), "/")
+        G.scl[is.nan(G.scl)] <- 0
+        G.scl <- sweep(G.scl, 2, apply(G.scl, 2, function(x) sqrt(mean(x^2))), "/")
+        G.scl[is.nan(G.scl)] <- 0
+        print(.my.levelplot(G.scl,main="Scaled Gradients"))
+      },silent=TRUE)
+      
+      suppressWarnings(try({
+        get.dev("correlations")
+        print(.my.levelplot(cov2cor(v),main="Correlations"))
+      },silent=TRUE))
     }
-
+    
     control$GainM <- matrix(0, nrow=p, ncol=q)
     control$GainM[!offsets,] <- t(sweep(G,2,par.eff,"/")) %*% w * control$gain
     control$GainM[!is.finite(control$GainM)] <- 0
