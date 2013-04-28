@@ -11,7 +11,7 @@ Exponential-Family Random Graph Models
   the \code{\link[=ergm-package]{ergm}} package to fit, diagnose, and
   simulate models for dynamic networks --- networks that evolve over
   time --- based on exponential-family random graph models (ERGMs). For
-  a list of functions type. For a list of functions type \code{help(package='tergm')}
+  a list of functions type \code{help(package='tergm')}
 
   When publishing results obtained using this package, please cite the
   original authors as described in \code{citation(package="tergm")}.
@@ -28,7 +28,7 @@ Exponential-Family Random Graph Models
   More recently, there has been a number of extensions of ERGMs to model
   evolution of networks, including the temporal ERGM (TERGM) of Hanneke
   et al. (2010) and the separable termporal ERGM (STERGM) of Krivitsky
-  and Handcock (2010). The latter mode allows familiar ERGM terms and
+  and Handcock (2013). The latter model allows familiar ERGM terms and
   statistics to be reused in a dynamic context, interpreted in terms of
   formation and dissolution of ties. Krivitsky (2012) suggested a method
   for fitting dyanmic models when only a cross-sectional network is
@@ -66,8 +66,9 @@ Exponential-Family Random Graph Models
   of Social Networks. \emph{Electronic Journal of Statistics}, 2010, 4,
   585-605. \href{http://dx.doi.org/10.1214/09-EJS548}{\code{doi:10.1214/09-EJS548}}
   
-  \item Krivitsky PN, Handcock MS (2010). A Separable Model for Dynamic
-  Networks. \url{http://arxiv.org/abs/1011.1937}
+  \item Krivitsky PN, Handcock MS (2013). A Separable Model for Dynamic
+  Networks. \emph{Journal of the Royal Statistical Society, Series B},
+  In Press. \url{http://arxiv.org/abs/1011.1937}
 
   \item Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
   Egocentric Data with Durational Information. \emph{Pennsylvania State

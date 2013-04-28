@@ -176,7 +176,7 @@
     
   \item{EGMME.main.method}{Estimation method
     used to find the Equilibrium Generalized Method of Moments
-    estimator.  Currently only "Robbins-Monro" is implemented.
+    estimator.  Currently only "Gradient-Descent" is implemented.
   }
   \item{SAN.maxit}{ When \code{target.stats} argument is passed to
   \code{\link{ergm}}, the maximum number of attempts to use
