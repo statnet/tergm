@@ -250,14 +250,17 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   }
   
   \item{"changes"}{An integer matrix with four columns (\code{time},
-      \code{tail}, \code{head}, and \code{dir}), giving the timestampled
-      changes relative to the initial network. \code{dir} is \code{+1}
-      if a tie was formed and \code{-1} if a tie was dissolved. The
+      \code{tail}, \code{head}, and \code{to}), giving the timestampled
+      changes relative to the current network. \code{to} is \code{1} if
+      a tie was formed and \code{0} if a tie was dissolved. The
       convention for \code{time} is that it gives the time point during
       which the change is effective. For example, a row
-      \code{c(1,2,3,+1)} indicates that between time \eqn{0} and
-      \eqn{1}, a tie from node \eqn{2} to node \eqn{3} was formed, so
-      that it is present at time point \eqn{1}.
+      \code{c(5,2,3,1)} indicates that between time \eqn{4} and \eqn{5},
+      a tie from node \eqn{2} to node \eqn{3} was formed, so that it was
+      absent at time ponit \eqn{4} and present at time point \eqn{5};
+      while a row \code{c(5,2,3,0)} indicates that in that time, that
+      tie was dissolved, so that it is was present at time point \eqn{4}
+      and absent at time point \eqn{5}.
 
       Additionally, same attributes (\code{\link{attr}}, not network
       attributes) as with \code{output=="networkDynamic"} are attached.
