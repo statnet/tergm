@@ -11,6 +11,11 @@
 \alias{coef.stergm}
 \alias{coefficients.stergm}
 \title{Extract Model Coefficients}
+\description{
+  \code{coef} is a Method which extracts model coefficients
+  from objects returned by the \code{\link{stergm}} function.  
+  \code{coefficients} is an \emph{alias} for it.
+}
 \usage{
 \method{coef}{stergm}(object, \dots)
 \method{coefficients}{stergm}(object, \dots)
@@ -21,18 +26,12 @@
 }
 \value{
   Coefficients extracted from \code{object} in the form of a list with
-  two elements: \verb{formation}, a vector of formation
-  coefficients and \verb{dissolution} , a vector of dissolution
+  two elements: \code{formation}, a vector of formation
+  coefficients and \code{dissolution}, a vector of dissolution
   coefficients.
-}
-\description{
-  \code{coef} is a Method which extracts model coefficients
-  from objects returned by the \code{\link{stergm}} function.  
-  \code{coefficients} is an \emph{alias} for it.
 }
 \seealso{
   \code{\link{stergm}} and  \code{\link{ergm}}
 }
-
 \keyword{regression}
 \keyword{models}
