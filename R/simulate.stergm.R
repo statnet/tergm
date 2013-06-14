@@ -243,9 +243,11 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                                          coef.form=coef.form,
                                          coef.diss=coef.diss,
                                          constraints=constraints,
-                                         start = nw%n%"time" + 0,
-                                         end = nw%n%"time" + time.slices,
                                          changes = z$changed))
+               # created a net.obs.period object to describe simulation period for other uses
+               net.obs.period<-list(observations=list(c(nw%n%"time" + 0,nw%n%"time"+time.slices)),mode="discrete",time.increment=1,time.unit="step")
+               nwd<-set.network.attribute(nwd,'net.obs.period',net.obs.period)
+               
                nwd
              },
              changes = {
@@ -346,8 +348,14 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
     warning("Argument `statsonly' for STERGM simulate() is deprecated and may be removed in a future version. Use `output' instead.")
     output <- if(statsonly) "stats" else "networkDynamic"
   }
+  
+  # get net.obs.period from object, if it exists
+  net.obs.period<-object%n%'net.obs.period'
+  nwend<-NULL
+  if (!is.null(net.obs.period)){
+    nwend<-max(unlist(net.obs.period$observations))
+  }
 
-  nwend <- attr(object,"end")
   start <- if(is.null(nwend)) NVL(time.start,0) else{
     if(!is.null(time.start)){
       if(time.start!=nwend) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.")
@@ -383,7 +391,16 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   sim[,"head"] <- vActiveIDs[sim[,"head"]]
 
   object  <- networkDynamic.apply.changes(object, sim)
-
+  
+  # set up net.obs.period list to describe time period simulated
+  # TODO: don't we need to account for interval?
+  if (is.null(net.obs.period)){
+    net.obs.period<-list(observations=list(c(start,start+time.slices)),mode="discrete",time.increment=1 ,time.unit="step")
+  } else {
+    # add another observation to the end
+    net.obs.period$observations<-c(net.obs.period$observations,list(c(start,start+time.slices)))
+  }
+  object<-set.network.attribute(object,'net.obs.period',net.obs.period)
   attributes(object) <- c(attributes(object), # Don't clobber existing attributes!
                           list(formation = ergm.update.formula(formation,nw~., from.new="nw"),
                                dissolution = ergm.update.formula(dissolution,nw~., from.new="nw"),
@@ -394,8 +411,6 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                coef.form=coef.form,
                                coef.diss=coef.diss,
                                constraints=constraints,
-                               start = attr(object,"start") + 0,
-                               end = start + time.slices,
                                changes = rbind(attr(object,"changes"),matrix(c(sim), nrow=nrow(sim),ncol=ncol(sim),dimnames=list(rownames(sim),colnames(sim))))
                                ))
   object
