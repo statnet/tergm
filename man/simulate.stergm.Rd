@@ -193,7 +193,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
       of a \code{"time"} network attribute (for the
       \code{\link{network}} method --- see the
       \code{\link{lasttoggle}} "API") or
-      in the form of an \code{"end"} object attribute (for the
+      in the form of an \code{\link{net.obs.period}} network attribute (for the
       \code{\link{networkDynamic}} method), this attribute will be used. (If
       specified, \code{time.start} will override it with a warning.)
     }
@@ -222,17 +222,18 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
     of the simulation having terminus \code{+Inf}. The method for
     \code{\link[networkDynamic]{networkDynamic}} returns the initial
     \code{\link[networkDynamic]{networkDynamic}} with simulated changes
-    applied to it.
+    applied to it. The \code{\link{net.obs.period}} network attribute is
+    updated (or added if not existing) to reflect the time period that was
+    simulated.
 
     Additionally, attributes (\code{\link{attr}}, not network
     attributes) are attached as follows:
     \describe{
-      \item{formation, dissolution, monitor:}{Formation, dissolution,
+      \item{\code{formation}, \code{dissolution}, \code{monitor}:}{Formation, dissolution,
 	and monitoring formulas	used in the simulation,	respectively.}
-      \item{stats, stats.form, stats.diss:}{Network statistics as above.}
-      \item{coef.form, coef.diss:}{Coefficients used in the simulation.}
-      \item{start, end:}{Start and end times of the simulation.}
-      \item{changes}{A four-column matrix summarizing the changes in the
+      \item{\code{stats}, \code{stats.form}, \code{stats.diss}:}{Network statistics as above.}
+      \item{\code{coef.form}, \code{coef.diss}:}{Coefficients used in the simulation.}
+      \item{\code{changes}:}{A four-column matrix summarizing the changes in the
 	\code{"changes"} output. (This may be removed in the future.)}
     }
 
@@ -272,7 +273,6 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
 	and monitoring formulas	used in the simulation,	respectively.}
       \item{stats, stats.form, stats.diss:}{Network statistics as above.}
       \item{coef.form, coef.diss:}{Coefficients used in the simulation.}
-      \item{start, end:}{Start and end times of the simulation.}
       \item{changes}{A four-column matrix summarizing the changes in the
 	\code{"changes"} output. (This may be removed in the future.)}
     }
