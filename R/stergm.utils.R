@@ -104,7 +104,7 @@ to.networkDynamic.lasttoggle <- function(nw){
   nwd<-delete.network.attribute(nwd, "time")
   nwd<-delete.network.attribute(nwd, "lasttoggle")
   class(nwd) <- c("networkDynamic","network")
-  attr(nwd,"end") <- nw %n% "time"
+  #attr(nwd,"end") <- nw %n% "time"
   
   nwd
 }
