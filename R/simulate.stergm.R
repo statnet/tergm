@@ -252,8 +252,6 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                                          coef.form=coef.form,
                                          coef.diss=coef.diss,
                                          constraints=constraints,
-                                         start = nw%n%"time" + 0,
-                                         end = nw%n%"time" + time.slices,
                                          changes = z$changed))
                # created a net.obs.period object to describe simulation period for other uses
                net.obs.period<-list(observations=list(c(nw%n%"time" + 0,nw%n%"time"+time.slices)),mode="discrete",time.increment=1,time.unit="step")
@@ -367,7 +365,6 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
     nwend<-max(unlist(net.obs.period$observations))
   }
 
-  nwend <- attr(object,"end")
   start <- if(is.null(nwend)) NVL(time.start,0) else{
     if(!is.null(time.start)){
       if(time.start!=nwend) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.")
@@ -423,8 +420,6 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                coef.form=coef.form,
                                coef.diss=coef.diss,
                                constraints=constraints,
-                               start = attr(object,"start") + 0,
-                               end = start + time.slices,
                                changes = rbind(attr(object,"changes"),matrix(c(sim), nrow=nrow(sim),ncol=ncol(sim),dimnames=list(rownames(sim),colnames(sim))))
                                ))
   object
