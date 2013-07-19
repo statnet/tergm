@@ -69,15 +69,25 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
 
     toggles <- do.call(rbind, lapply(nw$mel, function(e) if(length(c(e$atl$active)[is.finite(c(e$atl$active))])) cbind(c(e$atl$active)[is.finite(c(e$atl$active))], e$outl,e$inl) else NULL))
     toggles[,1] <- ceiling(toggles[,1]) # Fractional times take effect at the end of the time step.
+    
+    net.obs.period<-nw%n%'net.obs.period'
+    nwend<-NULL
+    nwstart<-NULL
+    if (!is.null(net.obs.period)){
+      nwend<-max(unlist(net.obs.period$observations))
+    }
+    if (!is.null(net.obs.period)){
+      start<-min(unlist(net.obs.period$observations))
+    }
    
     start <- NVL(start,
-                 attr(nw, "start"),
+                 nwstart,
                  suppressWarnings(min(toggles[,1]))-1
                  )
     if(start==Inf) stop("networkDynamic passed contains no change events or attributes. You must specify start explicitly.")
 
     end <- NVL(end,
-               attr(nw, "end"),
+               nwend,
                suppressWarnings(max(toggles[,1]))
                )
     if(end==-Inf) stop("networkDynamic passed contains no change events or attributes. You must specify end explicitly.")
