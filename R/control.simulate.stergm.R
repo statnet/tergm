@@ -32,7 +32,7 @@
 #
 #########################################################################
 
-control.simulate.network<-function(MCMC.burnin=1000,
+control.simulate.network<-function(MCMC.burnin=10000,
                                    MCMC.burnin.mul=7,
                                    MCMC.prop.weights.form="default",MCMC.prop.args.form=NULL,
                                    MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,                                  
