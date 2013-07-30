@@ -13,7 +13,7 @@ control.simulate.stergm(MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                         MCMC.packagenames=NULL,
                         MCMC.init.maxchanges=NULL)
 
-control.simulate.network(MCMC.burnin=1000, MCMC.burnin.mul=7,
+control.simulate.network(MCMC.burnin=10000, MCMC.burnin.mul=7,
                         MCMC.prop.weights.form="default",MCMC.prop.args.form=NULL,
                         MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,
                         MCMC.init.maxedges=20000,
