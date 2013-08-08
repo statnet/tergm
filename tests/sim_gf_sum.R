@@ -65,8 +65,8 @@ simtest <- function(S, edges, dur, n, dir=FALSE, bip=0){
 }
 
 cat("Undirected, unipartite:\n")
-simtest(20, 10, 10, 10, FALSE, 0)
+simtest(20, 10, 10, 10, FALSE, FALSE)
 cat("Directed, unipartite:\n")
-simtest(20, 10, 10, 10, TRUE, 0)
+simtest(20, 10, 10, 10, TRUE, FALSE)
 cat("Undirected, biipartite:\n")
 simtest(20, 10, 10, 10, FALSE, 3)
