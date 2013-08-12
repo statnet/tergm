@@ -10,13 +10,11 @@
 ***********************/
 void MH_Formation (MHproposal *MHp, Network *nwp) 
 {  
-  static Vertex nnodes;
   static Edge ndyads;
 
   if(MHp->ntoggles == 0) { /* Initialize */
     MHp->ntoggles=1;
-    nnodes = nwp[0].nnodes;
-    ndyads = DYADCOUNT(nnodes, 0, nwp[0].directed_flag);
+    ndyads = DYADCOUNT(nwp[0].nnodes, 0, nwp[0].directed_flag);
     return;
   }
   
@@ -51,13 +49,11 @@ void MH_FormationTNT (MHproposal *MHp, Network *nwp)
   Edge nedges, ndedges, nempty;
   static double comp=0.5, odds;
   static Edge ndyads;
-  static Edge nnodes;
   
   if(MHp->ntoggles == 0) { /* Initialize */
     MHp->ntoggles=1;
-    nnodes = nwp[0].nnodes;
     odds = comp/(1.0-comp);
-    ndyads = DYADCOUNT(nnodes, nwp->bipartite, nwp[0].directed_flag);
+    ndyads = DYADCOUNT(nwp[0].nnodes, nwp->bipartite, nwp[0].directed_flag);
     return;
   }
   
@@ -123,4 +119,51 @@ void MH_Dissolution (MHproposal *MHp, Network *nwp)
 	if(EdgetreeSearch(Mtail[0],Mhead[0],nwp[0].outedges)==0 && CheckTogglesValid(MHp, nwp)) break;
       }
     });
+}
+
+/********************
+   void MH_DissolutionTNT
+   Tie/no tie:  Gives at least 50% chance of
+   proposing a toggle of an existing (non-reference) edge, as opposed
+   to simple random toggles that rarely do so in sparse 
+   networks
+   Propose ONLY edges in the reference graph
+***********************/
+void MH_DissolutionTNT (MHproposal *MHp, Network *nwp) 
+{  
+  Edge nedges=nwp[0].nedges, ndedges=nwp[1].nedges;
+  static double comp=0.5, odds;
+  
+  if(MHp->ntoggles == 0) { /* Initialize */
+    MHp->ntoggles=1;
+    odds = comp/(1.0-comp);
+    return;
+  }
+
+  nedges  = nwp[0].nedges;
+  ndedges = nwp[1].nedges;
+
+  if(nedges==0 && ndedges==0){  /* Attempting dissolution on an empty graph. */
+    Mtail[0]=MH_FAILED;
+    Mhead[0]=MH_IMPOSSIBLE;
+    return;
+  }
+  
+  BD_LOOP({
+      if(ndedges != 0 && unif_rand() < comp) { /* Select a discordant dyad at random */
+	GetRandEdge(Mtail, Mhead, nwp+1);
+	
+	MHp->logratio += log(ndedges / ((double)nedges + 1)/comp * ((ndedges==1)? 1 : (1-comp)));
+      }else{ /* select an edge in nwp[0] at random */
+	GetRandEdge(Mtail, Mhead, nwp);
+	
+	if(ndedges==0){
+	  MHp->logratio += log(nedges*comp);
+	}else{
+	  MHp->logratio += log(((double)nedges)/(ndedges+1) *odds);
+	}
+      }
+    });
+  //   Rprintf("nedges %d reference nddyads %d h %d t %d MHp->ratio %f\n", 
+  //	    nwp[0].nedges, nwp[1].nedges, tail, head, MHp->ratio); 
 }

@@ -20,3 +20,8 @@ InitMHP.dissolution <- function(arguments, nw, model) {
   MHproposal <- list(name = "Dissolution", inputs=NULL)
   MHproposal
 }
+
+InitMHP.dissolutionTNT <- function(arguments, nw, model) {
+  MHproposal <- list(name = "DissolutionTNT", inputs=NULL)
+  MHproposal
+}

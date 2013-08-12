@@ -2,6 +2,7 @@
 \title{Internal stergm Objects}
 
 \alias{InitMHP.dissolution}
+\alias{InitMHP.dissolutionTNT}
 \alias{InitMHP.dissolutionMLE}
 \alias{InitMHP.dissolutionNonObservedMLE}
 \alias{InitMHP.formation}
