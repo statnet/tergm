@@ -7,8 +7,6 @@
 #include "MHproposal.h"
 
 void MH_FormationMLEblockdiag(MHproposal *MHp, Network *nwp);
-void MH_DissolutionMLEblockdiag(MHproposal *MHp, Network *nwp);
-
 void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp);
 
 #endif 

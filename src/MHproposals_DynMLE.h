@@ -8,6 +8,7 @@
 
 void MH_FormationMLE(MHproposal *MHp, Network *nwp);
 void MH_FormationMLETNT(MHproposal *MHp, Network *nwp);
+void MH_DissolutionMLETNT(MHproposal *MHp, Network *nwp);
 
 #endif 
 
