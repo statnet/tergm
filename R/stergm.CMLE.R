@@ -48,12 +48,16 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
 
     if(!control$CMLE.term.check.override){
       # Check that these networks can be combined for this model.
+
+      eql <- function(target, current, tolerance = .Machine$double.eps^0.5)
+          2*abs(target-current)/(abs(target)+abs(current))<tolerance # Some statistics don't give exact equality.
+        
       bad.stat <-
-        !((apply(rbind(sapply(y0s, function(nw) summary(ergm.update.formula(formation,nw~., from.new="nw")))),1,sum)==summary(ergm.update.formula(formation,y0~., from.new="y0"))) &
-          (apply(rbind(sapply(y0s, function(nw) summary(ergm.update.formula(dissolution,nw~., from.new="nw")))),1,sum)==summary(ergm.update.formula(dissolution,y0~., from.new="y0"))) &
-          (apply(rbind(sapply(y1s, function(nw) summary(ergm.update.formula(formation,nw~., from.new="nw")))),1,sum)==summary(ergm.update.formula(formation,y1~., from.new="y1"))) &
-          (apply(rbind(sapply(y1s, function(nw) summary(ergm.update.formula(dissolution,nw~., from.new="nw")))),1,sum)==summary(ergm.update.formula(dissolution,y1~., from.new="y1"))))
-      if(any(bad.stat)) stop("Fitting the terms ", paste.and(names(bad.stat)[bad.stat]), " over multiple network transitions is not supported at this time.")
+        !(c(eql(apply(rbind(sapply(y0s, function(nw) summary(ergm.update.formula(formation,nw~., from.new="nw")))),1,sum), summary(ergm.update.formula(formation,y0~., from.new="y0"))),
+            eql(apply(rbind(sapply(y0s, function(nw) summary(ergm.update.formula(dissolution,nw~., from.new="nw")))),1,sum), summary(ergm.update.formula(dissolution,y0~., from.new="y0")))) &
+          c(eql(apply(rbind(sapply(y1s, function(nw) summary(ergm.update.formula(formation,nw~., from.new="nw")))),1,sum), summary(ergm.update.formula(formation,y1~., from.new="y1"))),
+            eql(apply(rbind(sapply(y1s, function(nw) summary(ergm.update.formula(dissolution,nw~., from.new="nw")))),1,sum), summary(ergm.update.formula(dissolution,y1~., from.new="y1")))))
+      if(any(bad.stat)) stop("Fitting the term(s) ", paste.and(unique(names(bad.stat)[bad.stat])), " over multiple network transitions is not supported at this time.")
     }
   }else{
     # We are about to do logical operations on networks, so make sure
