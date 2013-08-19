@@ -13,19 +13,24 @@ control.stergm<-function(init.form=NULL,
                          MCMC.init.maxedges=20000,
                          MCMC.init.maxchanges=20000,
                          MCMC.packagenames=c(),
-                         # Number of proposals within each time step.
-                         MCMC.burnin=10000,
-                         MCMC.burnin.mul=7,
-                         MCMC.interval=100,
-
+                         
+                         CMLE.MCMC.burnin = 10000,
+                         CMLE.MCMC.interval = 100,
                          CMLE.control=NULL,
-                         CMLE.control.form=control.ergm(init=init.form, MCMC.burnin=MCMC.burnin, MCMC.interval=MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
-                         CMLE.control.diss=control.ergm(init=init.diss, MCMC.burnin=MCMC.burnin, MCMC.interval=MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.control.form=control.ergm(init=init.form, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.control.diss=control.ergm(init=init.diss, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
 
                          CMLE.NA.impute=c(),
                          CMLE.term.check.override=FALSE,
                          
                          EGMME.main.method=c("Gradient-Descent"),
+
+                         EGMME.MCMC.burnin.min=1000,
+                         EGMME.MCMC.burnin.max=100000,
+                         EGMME.MCMC.burnin.pval=0.5,
+                         EGMME.MCMC.burnin.add=0.1,
+
+                         MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                          
                          SAN.maxit=10,
                          SAN.control=control.san(coef=init.form,
@@ -33,7 +38,7 @@ control.stergm<-function(init.form=NULL,
                            SAN.prop.args=MCMC.prop.args.form,
                            SAN.init.maxedges=MCMC.init.maxedges,
                            
-                           SAN.burnin=MCMC.burnin,
+                           SAN.burnin=round(sqrt(EGMME.MCMC.burnin.min*EGMME.MCMC.burnin.max)),
                            SAN.packagenames=MCMC.packagenames,
                            
                            parallel=parallel,
@@ -98,7 +103,9 @@ control.stergm<-function(init.form=NULL,
                          parallel=0,
                          parallel.type=NULL,
                          parallel.version.check=TRUE){
-  
+
+  if(!is.null(MCMC.burnin) || !is.null(MCMC.burnin.mul)) stop("Control parameters MCMC.burnin and MCMC.burnin.mul are no longer used. See help for EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max, EGMME.MCMC.burnin.pval, EGMME.MCMC.burnin.pval, and CMLE.MCMC.burnin and CMLE.MCMC.interval for their replacements.")
+
   match.arg.pars=c("EGMME.main.method","SA.refine")
 
   if(!is.null(CMLE.control)) CMLE.control.form <- CMLE.control.diss <- CMLE.control

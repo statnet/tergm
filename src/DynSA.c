@@ -24,7 +24,7 @@ void MCMCDynSArun_wrapper(// Observed network.
 			     int *attribs, int *maxout, int *maxin, int *minout,
 			     int *minin, int *condAllDegExact, int *attriblength,
 			     // MCMC settings.
-			     int *SA_burnin, int *SA_interval, int *max_MH_interval, double *MH_interval_mul,
+			     int *SA_burnin, int *SA_interval, int *min_MH_interval, int *max_MH_interval, double *MH_pval, double *MH_interval_add,
 			     // Space for output.
 			     int *maxedges, int *maxchanges,
 			     int *newnetworktail, int *newnetworkhead, 
@@ -70,7 +70,7 @@ void MCMCDynSArun_wrapper(// Observed network.
 			 difftime, difftail, diffhead,
 			 opt_history,
 			 
-			 *SA_burnin, *SA_interval, *max_MH_interval, *MH_interval_mul,
+			 *SA_burnin, *SA_interval, *min_MH_interval, *max_MH_interval, *MH_pval, *MH_interval_add,
 			 *fVerbose);
   
   /* record the final network to pass back to R */
@@ -109,7 +109,7 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 			      Vertex *difftime, Vertex *difftail, Vertex *diffhead,
 			      double *opt_history,
 			      // MCMC settings.
-			      unsigned int SA_burnin, unsigned int SA_interval, unsigned int max_MH_interval, double MH_interval_mul,
+			      unsigned int SA_burnin, unsigned int SA_interval, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
 			      // Verbosity.
 			      int fVerbose){
   Edge nextdiffedge=1;
@@ -141,7 +141,7 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 					  NULL, NULL, dev,
 					  maxchanges, &nextdiffedge,
 					  difftime, difftail, diffhead, NULL,
-					  max_MH_interval, MH_interval_mul,
+					  min_MH_interval, max_MH_interval, MH_pval, MH_interval_add,
 					  fVerbose);
 
       if(status==MCMCDyn_TOO_MANY_CHANGES)
@@ -161,7 +161,7 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 					  NULL, NULL, dev,
 					  maxchanges, &nextdiffedge,
 					  difftime, difftail, diffhead, NULL,
-					  max_MH_interval, MH_interval_mul,
+					  min_MH_interval, max_MH_interval, MH_pval, MH_interval_add,
 					  fVerbose);
 
       if(status==MCMCDyn_TOO_MANY_CHANGES)

@@ -83,10 +83,18 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
                           verbose=FALSE, ...){
   check.control.class(c("simulate.stergm","simulate.network"))
   
-  control.transfer <- c("MCMC.burnin", "MCMC.burnin.mul", "MCMC.prop.weights", "MCMC.prop.args", "MCMC.packagenames", "MCMC.init.maxedges", "MCMC.init.maxchanges")
-  for(arg in control.transfer)
+  control.transfer <- list(MCMC.prop.weights="MCMC.prop.weights",
+                           MCMC.prop.args="MCMC.prop.args",
+                           MCMC.packagenames="MCMC.packagenames",
+                           MCMC.init.maxedges="MCMC.init.maxedges",
+                           MCMC.init.maxchanges="MCMC.init.maxchanges",
+                           EGMME.MCMC.burnin.min="MCMC.burnin.min",
+                           EGMME.MCMC.burnin.max="MCMC.burnin.max",
+                           EGMME.MCMC.burnin.pval="MCMC.burnin.pval",
+                           EGMME.MCMC.burnin.add="MCMC.burnin.add")
+  for(arg in names(control.transfer))
     if(is.null(control[[arg]]))
-      control[arg] <- list(object$control[[arg]])
+      control[control.transfer[[arg]]] <- list(object$control[[arg]])
 
   control <- set.control.class("control.simulate.network")
 

@@ -111,8 +111,8 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
             as.integer(MHproposal.form$arguments$constraints$bd$minout), as.integer(MHproposal.form$arguments$constraints$bd$minin),
             as.integer(MHproposal.form$arguments$constraints$bd$condAllDegExact), as.integer(length(MHproposal.form$arguments$constraints$bd$attribs)),
             # MCMC settings.
-            as.double(control$time.samplesize), as.integer(control$MCMC.burnin), as.double(control$MCMC.burnin.mul),
-            as.double(control$time.burnin), as.double(control$time.interval),
+            as.integer(control$time.samplesize), as.integer(control$MCMC.burnin.min), as.integer(control$MCMC.burnin.max), as.double(control$MCMC.burnin.pval), as.double(control$MCMC.burnin.add),
+            as.integer(control$time.burnin), as.integer(control$time.interval),
             # Space for output.
             collect.form = as.integer(collect.form), s.form = if(collect.form) double(Clist.form$nstats*(control$time.samplesize+1)) else double(0),
             collect.diss = as.integer(collect.diss), s.diss = if(collect.diss) double(Clist.diss$nstats*(control$time.samplesize+1)) else double(0),
