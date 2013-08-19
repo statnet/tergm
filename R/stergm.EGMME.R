@@ -100,7 +100,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
                            EGMME.MCMC.burnin.pval="MCMC.burnin.pval",
                            EGMME.MCMC.burnin.add="MCMC.burnin.add")
   for(arg in names(control.transfer))
-      if(is.null(control[[arg]]))
+      if(is.null(control[[control.transfer[[arg]]]]))
           control[control.transfer[[arg]]] <- list(control[[arg]])
 
   
