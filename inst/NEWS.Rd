@@ -4,6 +4,66 @@
 
 % When a release is forked, copy the sections to a new release and
 % delete unused sections.
+\section{Changes in version 3.1.2}{
+
+  \subsection{DEPRECATED & DEFUNCT}{
+    \itemize{
+      \item The previously deprecated start and end attr valeus attached 
+           to networks returned by \code{\link{simulate.network}} and 
+           \code{\link{simulate.networkDynamic}} have been removed and 
+           replaced with observation spells recorded as a 
+           \code{\link{net.obs.period}} network attribute. 
+    }
+  }
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      
+      \item No longer generates deprecation warnings about start and end
+       attrs when various internal functions use as.data.frame. Resolved
+      by replacing start and end with a \code{\link{net.obs.period}}
+      object.  
+
+      \item A bug in the check for whether terms were amenable to being
+      fit using STERGM CMLE for multiple transitions has been fixed.
+
+      \item Some minor documentation typos have been fixed.
+    }
+  }
+
+  % \subsection{C-LEVEL FACILITIES}{
+  %   \itemize{
+  %     \item It is not clear that we need a subsection called "C-LEVEL FACILITIES".
+  %   }
+  % }
+
+  % \subsection{UTILITIES}{
+  %   \itemize{
+  %     \item Likewise, "UTILITIES" is probably unnecessary.
+  %   }
+  % }
+
+  % \subsection{INSTALLATION}{
+  %   \itemize{
+  %     \item ... as is "INSTALLATION".
+  %   }
+  % }
+
+  % \subsection{PACKAGE INSTALLATION}{
+  %   \itemize{
+  %     \item ditto.
+  %   }
+  % }
+
+}
+
+\section{Changes in version 3.1.1}{
+  \itemize{
+    \item Version 3.1.1 has been skipped to ease upgrading for those using a
+    preview release.
+  }
+}
+
 \section{Changes in version 3.1}{
 
   \subsection{THIS IS AN INITIAL RELEASE}{
