@@ -57,6 +57,9 @@ simtest <- function(S, edges, dur, n, dir=FALSE, bip=0){
   # Replay the simulation using a networkDynamic:
   gf1.stats <- as.matrix(tergm.godfather(dynsim3~edgecov("dc")+edgecov.ages("dc"), start=0, end=S*3))
   
+  # Replay the sim using networkDynamic with no explicit time params (should be using net.obs.period)
+  gf1b.stats <- as.matrix(tergm.godfather(dynsim3~edgecov("dc")+edgecov.ages("dc")))
+  
   # Replay the simulation using a network + list of changes:
   gf2.stats <- as.matrix(tergm.godfather(g1~edgecov("dc")+edgecov.ages("dc"), start=0, end=S*3, changes=attr(dynsim3,"changes")))
   
@@ -65,13 +68,14 @@ simtest <- function(S, edges, dur, n, dir=FALSE, bip=0){
   
   # If they aren't all identical, we are in trouble.
   stopifnot(all.equal(sim.stats,gf1.stats),
+            all.equal(sim.stats,gf1b.stats),
             all.equal(sim.stats,gf2.stats),
             all.equal(sim.stats,summ.stats))
 }
 
 cat("Undirected, unipartite:\n")
-simtest(20, 10, 10, 10, FALSE, 0)
+simtest(20, 10, 10, 10, FALSE, FALSE)
 cat("Directed, unipartite:\n")
-simtest(20, 10, 10, 10, TRUE, 0)
+simtest(20, 10, 10, 10, TRUE, FALSE)
 cat("Undirected, biipartite:\n")
 simtest(20, 10, 10, 10, FALSE, 3)

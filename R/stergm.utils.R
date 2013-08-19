@@ -104,12 +104,18 @@ to.networkDynamic.lasttoggle <- function(nw){
   nwd<-delete.network.attribute(nwd, "time")
   nwd<-delete.network.attribute(nwd, "lasttoggle")
   class(nwd) <- c("networkDynamic","network")
-  attr(nwd,"end") <- nw %n% "time"
+  #attr(nwd,"end") <- nw %n% "time"
   
   nwd
 }
 
 networkDynamic.apply.changes <- function(nwd, changes){
+  
+  # if there are no changes, just return the existing network
+  if(nrow(changes)==0){
+    return(nwd)
+  }
+  
   ## Add edges that were never present in the initial network.
   extant.edges <- as.edgelist(nwd)
   changed.edges <- unique(changes[,c("tail","head"),drop=FALSE])
@@ -121,7 +127,7 @@ networkDynamic.apply.changes <- function(nwd, changes){
   # Group changes by tail and head, resulting in a "data frame" with
   # columns tail, head, time, and to, with time and to being columns
   # of lists of changes for that dyad.
-  changes <- aggregate(as.data.frame(changes[,c("time","to")]),by=list(tail=changes[,"tail"],head=changes[,"head"]),FUN=list)
+  changes <- aggregate(as.data.frame(changes[,c("time","to"),drop=FALSE]),by=list(tail=changes[,"tail"],head=changes[,"head"]),FUN=list)
 
   # Now, for each row in this "data frame", construct a list of lists,
   # each containing elements eID, times, and tos.
