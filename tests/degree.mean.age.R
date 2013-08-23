@@ -17,8 +17,8 @@ coef.form.f<-function(coef.diss,density) -log(((1+exp(coef.diss))/(density/(1-de
 
 S<-10000
 
-n<-60
-target.stats<-edges<-60
+n<-100
+target.stats<-edges<-100
 duration<-12
 coef.diss<-logit(1-1/duration)
 
@@ -39,14 +39,16 @@ print(coef.diss)
 
 # Simulate from the fit.
 dynsim<-simulate(g0,formation=~edges,dissolution=~edges,coef.form=coef.form,coef.diss=coef.diss,time.burnin=S, time.slices=S,verbose=TRUE,output="stats",
-                 monitor=~edges+mean.age+
-                 degree.mean.age(1:3)+degrange.mean.age(1:2,3:4)+degrange.mean.age(1:2)+
-                 degree.mean.age(1:3,"a")+degrange.mean.age(1:2,3:4,"a")+degrange.mean.age(1:2,by="a"))
+                 monitor=~edges+mean.age
+                 +degree.mean.age(1:3)+degrange.mean.age(1:2,3:4)+degrange.mean.age(1:2)
+                 +degree.mean.age(1:3,"a")+degrange.mean.age(1:2,3:4,"a")+degrange.mean.age(1:2,by="a")
+                 )
 
-targets <- c(60,12,rep(12,21))
+dynsim.dup <- duplicated(as.data.frame(t(dynsim)))
+dynsim <- dynsim[,!dynsim.dup]
 
+targets <- c(edges,rep(12, ncol(dynsim)-1))
 test <- approx.hotelling.diff.test(dynsim,mu0=targets)
-
 if(test$p.value < 0.001){
   print(test)
   stop("At least one statistic differs from target.")
