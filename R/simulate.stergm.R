@@ -145,7 +145,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   # output is a "main call" parameter, since it affects what to
   # compute rather than just how to compute it, but it's convenient to
   # have it as a part of the control data structure.
-  if((time.burnin!=0 || time.interval!=1) && output!="stats"){
+  if((time.burnin!=0 || time.interval!=1) && output!="stats" && output!="final"){
     stop("Generating a networkDynamic or change list output is incompatible with a time.burnin!=1 or a time.interval!=1. Only network statistics can be returned with these settings.")
   }
   
