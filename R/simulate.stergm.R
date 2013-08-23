@@ -189,8 +189,6 @@ simulate.network <- function(object, nsim=1, seed=NULL,
 
   model.mon <- if(!is.null(monitor)) ergm.getmodel(monitor, nw, role="target") else NULL
   
-  verbose <- match(verbose,
-                c("FALSE","TRUE", "very"), nomatch=1)-1
   if(missing(coef.form)) {
     coef.form <- rep(0,length(model.form$coef.names))
     warning("No parameter values given, using Bernouli formation.\nThis means that every time step, half the non-tie dyads will gain a tie!")
