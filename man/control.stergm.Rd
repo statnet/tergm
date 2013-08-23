@@ -18,8 +18,8 @@
                          CMLE.MCMC.burnin = 10000,
                          CMLE.MCMC.interval = 100,
                          CMLE.control=NULL,
-                         CMLE.control.form=control.ergm(init=init.form, MCMC.burnin=MCMC.burnin, MCMC.interval=MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
-                         CMLE.control.diss=control.ergm(init=init.diss, MCMC.burnin=MCMC.burnin, MCMC.interval=MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.control.form=control.ergm(init=init.form, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.control.diss=control.ergm(init=init.diss, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
                          CMLE.NA.impute=c(),
                          CMLE.term.check.override=FALSE,
                          EGMME.main.method=c("Gradient-Descent"),
@@ -33,7 +33,7 @@
                            SAN.prop.weights=MCMC.prop.weights.form,
                            SAN.prop.args=MCMC.prop.args.form,
                            SAN.init.maxedges=MCMC.init.maxedges,
-                           SAN.burnin=MCMC.burnin,
+                           SAN.burnin=round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max)),
                            SAN.packagenames=MCMC.packagenames,
                            parallel=parallel,
                            parallel.type=parallel.type,
@@ -176,7 +176,8 @@
     estimator.  Currently only "Gradient-Descent" is implemented.
   }
 
-  \item{EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max, EGMME.MCMC.burnin.pval}{Number of
+  \item{EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max,
+    EGMME.MCMC.burnin.pval, EGMME.MCMC.burnin.add}{Number of
     Metropolis-Hastings steps per phase (formation and dissolution) per
     time step used in EGMME fitting. By default, this is
     determined adaptively by keeping track of increments in the Hamming
@@ -377,8 +378,9 @@
 
   \item{MCMC.burnin, MCMC.burnin.mul}{No longer used. See
     \code{EGMME.MCMC.burnin.min}, \code{EGMME.MCMC.burnin.max},
-    \code{EGMME.MCMC.burnin.pval}, \code{EGMME.MCMC.burnin.pval}, and
-    \code{CMLE.MCMC.burnin} and \code{CMLE.MCMC.interval}.
+    \code{EGMME.MCMC.burnin.pval}, \code{EGMME.MCMC.burnin.pval},
+    \code{EGMME.MCMC.burnin.add} and \code{CMLE.MCMC.burnin} and
+    \code{CMLE.MCMC.interval}.
   }
 }
 \details{

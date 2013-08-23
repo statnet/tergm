@@ -15,6 +15,8 @@
 \alias{InitMHP.formationMLEblockdiag}
 \alias{InitMHP.formationMLEblockdiagTNT}
 \alias{InitMHP.formationNonObservedMLEblockdiag}
+\alias{InitMHP.dissolutionMLETNT}
+\alias{InitMHP.dissolutionMLEblockdiagTNT}
 
 \alias{combine.networks}
 

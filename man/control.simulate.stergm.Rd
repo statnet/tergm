@@ -30,7 +30,7 @@ control.simulate.network(MCMC.burnin.min=1000, MCMC.burnin.max=100000,
     See the \code{usage} section in \code{\link{simulate.stergm}} for details.
 }
 \arguments{
-  \item{MCMC.burnin.min, MCMC.burnin.max, MCMC.burnin.pval}{Number of
+  \item{MCMC.burnin.min, MCMC.burnin.max, MCMC.burnin.pval, MCMC.burnin.add}{Number of
     Metropolis-Hastings steps per phase (formation and dissolution) per
     time step used in simulation. By default, this is
     determined adaptively by keeping track of increments in the Hamming
@@ -72,9 +72,9 @@ control.simulate.network(MCMC.burnin.min=1000, MCMC.burnin.max=100000,
   }
 
   \item{MCMC.burnin, MCMC.burnin.mul}{No longer used. See
-    \code{EGMME.MCMC.burnin.min}, \code{EGMME.MCMC.burnin.max},
-    \code{EGMME.MCMC.burnin.pval}, \code{EGMME.MCMC.burnin.pval}, and
-    \code{CMLE.MCMC.burnin} and \code{CMLE.MCMC.interval}.
+    \code{MCMC.burnin.min}, \code{MCMC.burnin.max},
+    \code{MCMC.burnin.pval}, \code{MCMC.burnin.pval}, and
+    \code{MCMC.burnin.add}.
   }
 }
 \value{
