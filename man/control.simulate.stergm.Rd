@@ -7,7 +7,7 @@
 }
 \usage{
 control.simulate.stergm(MCMC.burnin.min=NULL, MCMC.burnin.max=NULL,
-                        MCMC.burnin.pval=NULL, MCMC.burnin.add,
+                        MCMC.burnin.pval=NULL, MCMC.burnin.add=NULL,
                         MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                         MCMC.prop.weights.form=NULL,MCMC.prop.args.form=NULL,
                         MCMC.prop.weights.diss=NULL,MCMC.prop.args.diss=NULL,
