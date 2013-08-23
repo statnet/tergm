@@ -352,7 +352,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
       double zi = mi / sqrt(vi * s2/(s*s)); // denom = sqrt(sum(w^2 * v)/sum(w)^2)
       double pi = pnorm(zi, 0, 1, FALSE, FALSE); // Pr(Z > zi)
 
-      // Rprintf("%u: s=%2.2f s2=%2.2f d=%d i=%d si=%2.2f si2=%2.2f mi=%2.2f vi=%2.2f ni=%2.2f zi=%2.2f pi=%2.2f\n", step, s, s2, nwp[1].nedges, i, si, si2, mi, vi, (s*s)/s2, zi, pi);
+      if(fVerbose>=5) Rprintf("%u: s=%2.2f s2=%2.2f d=%d i=%d si=%2.2f si2=%2.2f mi=%2.2f vi=%2.2f ni=%2.2f zi=%2.2f pi=%2.2f\n", step, s, s2, nwp[1].nedges, i, si, si2, mi, vi, (s*s)/s2, zi, pi);
   
       if(pi > MH_pval){
 	extrasteps = step*MH_interval_add+round(runif(0,1));
@@ -362,7 +362,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 
     if(finished) finished++;
   }
-  if(fVerbose>4){
+  if(fVerbose>=4){
     if(step>=max_MH_interval ) Rprintf("Convergence not achieved after %u M-H steps.\n",step);
     else Rprintf("Convergence achieved after %u M-H steps.\n",step);
   }
