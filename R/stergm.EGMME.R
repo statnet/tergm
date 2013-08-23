@@ -103,6 +103,15 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
   targets <- ergm.update.formula(targets,nw~., from.new="nw")
   formation <- ergm.update.formula(formation,nw~., from.new="nw")
   dissolution <- ergm.update.formula(dissolution,nw~., from.new="nw")
+
+  control.transfer <- list(EGMME.MCMC.burnin.min="MCMC.burnin.min",
+                           EGMME.MCMC.burnin.max="MCMC.burnin.max",
+                           EGMME.MCMC.burnin.pval="MCMC.burnin.pval",
+                           EGMME.MCMC.burnin.add="MCMC.burnin.add")
+  for(arg in names(control.transfer))
+      if(is.null(control[[control.transfer[[arg]]]]))
+          control[control.transfer[[arg]]] <- list(control[[arg]])
+
   
   if(!is.null(target.stats)){
     nw.stats<-summary(targets)

@@ -41,14 +41,18 @@
 #
 #########################################################################
 
-control.simulate.network<-function(MCMC.burnin=1000,
-                                   MCMC.burnin.mul=7,
+control.simulate.network<-function(MCMC.burnin.min=1000,
+                                   MCMC.burnin.max=100000,
+                                   MCMC.burnin.pval=0.5,
+                                   MCMC.burnin.add=1,
+                                   MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                                    MCMC.prop.weights.form="default",MCMC.prop.args.form=NULL,
                                    MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,                                  
                                    MCMC.init.maxedges=20000,
                                    MCMC.packagenames=c(),
                                    
                                    MCMC.init.maxchanges=1000000){
+    if(!is.null(MCMC.burnin) || !is.null(MCMC.burnin.mul)) stop("Control parameters MCMC.burnin and MCMC.burnin.mul are no longer used. See help for EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max, EGMME.MCMC.burnin.pval, EGMME.MCMC.burnin.pval, and CMLE.MCMC.burnin and CMLE.MCMC.interval for their replacements.")
     control<-list()
     for(arg in names(formals(sys.function())))
       control[arg]<-list(get(arg))
@@ -56,14 +60,18 @@ control.simulate.network<-function(MCMC.burnin=1000,
     set.control.class()
   }
 
-control.simulate.stergm<-function(MCMC.burnin=NULL,
-                                  MCMC.burnin.mul=NULL,
+control.simulate.stergm<-function(MCMC.burnin.min=NULL,
+                                  MCMC.burnin.max=NULL,
+                                  MCMC.burnin.pval=NULL,
+                                  MCMC.burnin.add=NULL,
+                                  MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                                   MCMC.prop.weights.form=NULL,MCMC.prop.args.form=NULL,
                                   MCMC.prop.weights.diss=NULL,MCMC.prop.args.diss=NULL,                                  
                                   MCMC.init.maxedges=NULL,
                                   MCMC.packagenames=NULL,
 
                                   MCMC.init.maxchanges=NULL){
+    if(!is.null(MCMC.burnin) || !is.null(MCMC.burnin.mul)) stop("Control parameters MCMC.burnin and MCMC.burnin.mul are no longer used. See help for EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max, EGMME.MCMC.burnin.pval, EGMME.MCMC.burnin.pval, and CMLE.MCMC.burnin and CMLE.MCMC.interval for their replacements.")
     control<-list()
     for(arg in names(formals(sys.function())))
       control[arg]<-list(get(arg))

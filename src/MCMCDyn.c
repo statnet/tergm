@@ -86,8 +86,8 @@ void MCMCDyn_wrapper(// Starting network.
 		     int *attribs, int *maxout, int *maxin, int *minout,
 		     int *minin, int *condAllDegExact, int *attriblength, 
 		     // MCMC settings.
-		     double *nsteps,  int *max_MH_interval, double *MH_interval_mul,
-		     double *burnin, double *interval,  
+		     int *nsteps,  int *min_MH_interval, int *max_MH_interval, double *MH_pval, double *MH_interval_add,
+		     int *burnin, int *interval,  
 		     // Space for output.
 		     int *F_collect, double *F_sample, 
 		     int *D_collect, double *D_sample, 
@@ -142,7 +142,7 @@ void MCMCDyn_wrapper(// Starting network.
 			  D_m, &D_MH, D_eta,
 			  M_m,
 			  *F_collect?F_sample:NULL, *D_collect?D_sample:NULL, M_m?M_sample:NULL, *maxedges, *maxchanges, *log_changes, difftime, difftail, diffhead, diffto,
-			  *nsteps, *max_MH_interval, *MH_interval_mul, *burnin, *interval,
+			  *nsteps, *min_MH_interval, *max_MH_interval, *MH_pval, *MH_interval_add, *burnin, *interval,
 			  *fVerbose);
    
   /* record new generated network to pass back to R */
@@ -190,7 +190,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 			    int log_changes,
 			    Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,		    
 			    // MCMC settings.
-			    unsigned int nsteps, unsigned int max_MH_interval, double MH_interval_mul,
+			    unsigned int nsteps, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
 			    unsigned int burnin, unsigned int interval, 
 			    // Verbosity.
 			    int fVerbose){
@@ -211,7 +211,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 					F_m, F_MH, F_eta, D_m, D_MH, D_eta, M_m,
 					log_changes, F_stats, D_stats, M_stats,
 					maxchanges, &nextdiffedge, difftime, difftail, diffhead, diffto,
-					max_MH_interval, MH_interval_mul, fVerbose);
+					min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, fVerbose);
     // Check that we didn't run out of log space.
     if(status==MCMCDyn_TOO_MANY_CHANGES)
       return MCMCDyn_TOO_MANY_CHANGES;
@@ -258,7 +258,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 					  F_m, F_MH, F_eta, D_m, D_MH, D_eta, M_m,
 					  log_changes, F_stats, D_stats, M_stats,
 					  maxchanges, &nextdiffedge, difftime, difftail, diffhead, diffto,
-					  max_MH_interval, MH_interval_mul, fVerbose);
+					  min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, fVerbose);
       
       // Check that we didn't run out of log space.
       if(status==MCMCDyn_TOO_MANY_CHANGES)
@@ -291,18 +291,25 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 */
  void MCMCDyn1Step_sample(MHproposal *MH,
 			  double *par,
-			  int max_MH_interval, 
+			  unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
 			  Network *nwp,
-			  Model *m){
-  Vertex step;
-  double cutoff, ip;
-  unsigned int i;
-  
+			  Model *m, int fVerbose){
+  double cutoff;
+  double 
+    si = 0, // sum of increments
+    si2 = 0, // sum of squared increments
+    s = 0, // sum of weights 
+    s2 = 0 // sum of squared weights
+    ;
+  double sdecay = 1 - 1.0/min_MH_interval;
+
   MH->ntoggles = 0;
   (*(MH->func))(MH, nwp); /* Call MH proposal function to initialize */
   
-  for(step = 0; step < max_MH_interval; step++) {
-    
+  unsigned int step=0; // So that we could print out the number of steps later.
+  for(unsigned int finished = 0, extrasteps = 0; step < max_MH_interval && finished < extrasteps+1; step++) {
+    unsigned int prev_discord = nwp[1].nedges;
+
     MH->logratio = 0;
     (*(MH->func))(MH, nwp); /* Call MH function to propose toggles */
     //      Rprintf("Back from proposal; step=%d\n",step);
@@ -318,7 +325,8 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
     
     //  Rprintf("change stats:"); 
     /* Calculate inner product */
-    for (i=0, ip=0.0; i<m->n_stats; i++){
+    double ip = 0;
+    for (unsigned int i=0; i<m->n_stats; i++){
       ip += par[i] * m->workspace[i];
       //  Rprintf("%f ", m->workspace[i]); 
     }
@@ -332,13 +340,42 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
     if (cutoff >= 0.0 || log(unif_rand()) < cutoff) { 
       /* Hold off updating timesteamps until the changes are committed,
       which doesn't happen until later. */
-      for (i=0; i < MH->ntoggles; i++){
+      for (unsigned int i=0; i < MH->ntoggles; i++){
         ToggleEdge(MH->toggletail[i], MH->togglehead[i], &nwp[0]);
         ToggleEdge(MH->toggletail[i], MH->togglehead[i], &nwp[1]);  /* Toggle the discord for this edge */
       }
       /* Do NOT record network statistics for posterity yet. */
     }
+
+    int i = nwp[1].nedges - prev_discord;
+    s *= sdecay; si *= sdecay;
+    s++; si += i;
+    s2 *= sdecay*sdecay; si2 *= sdecay;
+    s2++; si2 += i*i;
+         
+    if(step >= min_MH_interval && !finished) { 
+      // Now, perform the test:
+      double mi = (double)si / s, mi2 = (double)si2 / s;
+      
+      double vi = mi2 - mi*mi;
+      double zi = mi / sqrt(vi * s2/(s*s)); // denom = sqrt(sum(w^2 * v)/sum(w)^2)
+      double pi = pnorm(zi, 0, 1, FALSE, FALSE); // Pr(Z > zi)
+
+      if(fVerbose>=5) Rprintf("%u: s=%2.2f s2=%2.2f d=%d i=%d si=%2.2f si2=%2.2f mi=%2.2f vi=%2.2f ni=%2.2f zi=%2.2f pi=%2.2f\n", step, s, s2, nwp[1].nedges, i, si, si2, mi, vi, (s*s)/s2, zi, pi);
+  
+      if(pi > MH_pval){
+	extrasteps = step*MH_interval_add+round(runif(0,1));
+	finished++;
+      }
+    }
+
+    if(finished) finished++;
   }
+  if(fVerbose>=4){
+    if(step>=max_MH_interval ) Rprintf("Convergence not achieved after %u M-H steps.\n",step);
+    else Rprintf("Convergence achieved after %u M-H steps.\n",step);
+  }
+
 }
 
 /*
@@ -434,7 +471,7 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
 		  unsigned int maxchanges, Edge *nextdiffedge,
 		  Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
 		  // MCMC settings.
-		  unsigned int max_MH_interval, double MH_interval_mul,
+		  unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
 		  // Verbosity.
 		  int fVerbose){
   
@@ -445,14 +482,14 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
   if(nextdiffedge) nde=*nextdiffedge;
 
   /* Run the dissolution process. */
-  MCMCDyn1Step_sample(D_MH, D_eta, MIN(max_MH_interval,nwp->nedges*MH_interval_mul), nwp, D_m);
+  MCMCDyn1Step_sample(D_MH, D_eta, min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, nwp, D_m, fVerbose);
   ntoggles_status = MCMCDyn1Step_record_reset(maxchanges, difftime, difftail, diffhead, nwp, &nde);
   if(ntoggles_status<0) return MCMCDyn_TOO_MANY_CHANGES;
   if(diffto) for(unsigned int i = 1; i<=ntoggles_status; i++) diffto[nde-i] = 0;
   ntoggles = ntoggles_status;
   
   /* Run the formation process. */
-  MCMCDyn1Step_sample(F_MH, F_eta, MIN(max_MH_interval,(DYADCOUNT(nwp->nnodes, nwp->bipartite, nwp->directed_flag)-nwp->nedges)*MH_interval_mul), nwp, F_m);
+  MCMCDyn1Step_sample(F_MH, F_eta, min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, nwp, F_m, fVerbose);
   ntoggles_status = MCMCDyn1Step_record_reset(maxchanges, difftime, difftail, diffhead, nwp, &nde);
   if(ntoggles_status<0) return MCMCDyn_TOO_MANY_CHANGES;
   if(diffto) for(unsigned int i = 1; i<=ntoggles_status; i++) diffto[nde-i] = 1;

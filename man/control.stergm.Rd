@@ -24,21 +24,25 @@
                          MCMC.init.maxedges=20000,
                          MCMC.init.maxchanges=20000,
                          MCMC.packagenames=c(),
-                         MCMC.burnin=10000,
-                         MCMC.burnin.mul=7,
-                         MCMC.interval=100,
+                         CMLE.MCMC.burnin = 10000,
+                         CMLE.MCMC.interval = 100,
                          CMLE.control=NULL,
-                         CMLE.control.form=control.ergm(init=init.form, MCMC.burnin=MCMC.burnin, MCMC.interval=MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
-                         CMLE.control.diss=control.ergm(init=init.diss, MCMC.burnin=MCMC.burnin, MCMC.interval=MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.control.form=control.ergm(init=init.form, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.control.diss=control.ergm(init=init.diss, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
                          CMLE.NA.impute=c(),
                          CMLE.term.check.override=FALSE,
                          EGMME.main.method=c("Gradient-Descent"),
+                         EGMME.MCMC.burnin.min=1000,
+                         EGMME.MCMC.burnin.max=100000,
+                         EGMME.MCMC.burnin.pval=0.5,
+                         EGMME.MCMC.burnin.add=1,
+                         MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                          SAN.maxit=10,
                          SAN.control=control.san(coef=init.form,
                            SAN.prop.weights=MCMC.prop.weights.form,
                            SAN.prop.args=MCMC.prop.args.form,
                            SAN.init.maxedges=MCMC.init.maxedges,
-                           SAN.burnin=MCMC.burnin,
+                           SAN.burnin=round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max)),
                            SAN.packagenames=MCMC.packagenames,
                            parallel=parallel,
                            parallel.type=parallel.type,
@@ -137,19 +141,12 @@
     functions in addition to those autodetected. This argument should not be
     needed outside of very strange setups.
   }
-  \item{MCMC.burnin}{Maximum number of Metropolis-Hastings steps per phase
-    (formation and dissolution) per time step.
+  
+  \item{CMLE.MCMC.burnin}{Maximum number of Metropolis-Hastings steps per phase
+    (formation and dissolution) per time step used in CMLE fitting.
   }
-  \item{MCMC.burnin.mul}{Multiplier for the number of "changeables" to
-    determine the Metropolis-Hastings steps per phase (formation and
-    dissolution) per time steps. (I.e., for formation, the number of
-    steps will be set to
-    \code{(network.dyadcount(nw0)-network.edgecount(nw0))*control$MCMC.burnin.mul},
-    while for dissolution, it will be set to
-    \code{network.edgecount(nw0)*control$MCMC.burnin.mul}, or
-    \code{control$MCMC.burnin}, whichever is smaller.)
-  }
-  \item{MCMC.interval}{Number of Metropolis-Hastings steps between
+  
+  \item{CMLE.MCMC.interval}{Number of Metropolis-Hastings steps between
     successive draws when running MCMC MLE.}
   
   \item{CMLE.control}{A convenience argument for specifying both
@@ -186,6 +183,26 @@
     used to find the Equilibrium Generalized Method of Moments
     estimator.  Currently only "Gradient-Descent" is implemented.
   }
+
+  \item{EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max,
+    EGMME.MCMC.burnin.pval, EGMME.MCMC.burnin.add}{Number of
+    Metropolis-Hastings steps per phase (formation and dissolution) per
+    time step used in EGMME fitting. By default, this is
+    determined adaptively by keeping track of increments in the Hamming
+    distance between the transitioned-from network and the network being
+    sampled (formation network or dissolution network). Once
+    \code{EGMME.MCMC.burnin.min} steps have elapsed, the increments are tested
+    against 0, and when their average number becomes statistically
+    indistinguishable from 0 (with the p-value being greater than
+    \code{EGMME.MCMC.burnin.pval}), or \code{EGMME.MCMC.burnin.max} steps are
+    proposed, whichever comes first, the simulation is stopped after an
+    additional \code{EGMME.MCMC.burnin.add} times the number of elapsed
+    steps had been taken. (Stopping immediately would bias the sampling.)
+
+    To use a fixed number of steps, set both \code{EGMME.MCMC.burnin.min} and
+    \code{EGMME.MCMC.burnin.max} to the desired number of steps.
+  }
+  
   \item{SAN.maxit}{ When \code{target.stats} argument is passed to
   \code{\link{ergm}}, the maximum number of attempts to use
   \code{\link{san}} to obtain a network with statistics close to those
@@ -361,6 +378,13 @@
   \item{parallel.version.check}{Logical:  If TRUE, check that the version of
     \code{\link[=ergm-package]{ergm}} running on the slave nodes is the
     same as that running on the master node.
+  }
+
+  \item{MCMC.burnin, MCMC.burnin.mul}{No longer used. See
+    \code{EGMME.MCMC.burnin.min}, \code{EGMME.MCMC.burnin.max},
+    \code{EGMME.MCMC.burnin.pval}, \code{EGMME.MCMC.burnin.pval},
+    \code{EGMME.MCMC.burnin.add} and \code{CMLE.MCMC.burnin} and
+    \code{CMLE.MCMC.interval}.
   }
 }
 \details{

@@ -61,6 +61,11 @@ InitMHP.dissolutionMLE <- function(arguments, nw) {
 #ergm.MHP.table("c", "Bernoulli", "atmost",  0, "random", "dissolutionMLE")
 #ergm.MHP.table("c", "Bernoulli", "atmost+bd",  0, "random", "dissolutionMLE")
 
+InitMHP.dissolutionMLETNT <- function(arguments, nw) {
+  MHproposal <- list(name = "DissolutionMLETNT", inputs=ergm.Cprepare.el(arguments$constraints$atmost$nw))
+  MHproposal
+}
+
 InitMHP.formationNonObservedMLE <- function(arguments, nw) {
   ## Precalculate toggleable dyads: dyads which
   ## * are unobserved in y[t]

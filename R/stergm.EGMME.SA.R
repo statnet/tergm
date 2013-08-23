@@ -577,8 +577,7 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
             # MCMC settings.              
             as.integer(control$SA.burnin),
             as.integer(control$SA.interval),
-            as.integer(control$MCMC.burnin),
-            as.double(control$MCMC.burnin.mul),
+            as.integer(control$MCMC.burnin.min), as.integer(control$MCMC.burnin.max), as.double(control$MCMC.burnin.pval), as.double(control$MCMC.burnin.add),
             # Space for output.
             as.integer(maxedges),
             as.integer(maxchanges),

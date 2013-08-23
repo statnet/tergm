@@ -92,10 +92,18 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
                           verbose=FALSE, ...){
   check.control.class(c("simulate.stergm","simulate.network"))
   
-  control.transfer <- c("MCMC.burnin", "MCMC.burnin.mul", "MCMC.prop.weights", "MCMC.prop.args", "MCMC.packagenames", "MCMC.init.maxedges", "MCMC.init.maxchanges")
-  for(arg in control.transfer)
-    if(is.null(control[[arg]]))
-      control[arg] <- list(object$control[[arg]])
+  control.transfer <- list(MCMC.prop.weights="MCMC.prop.weights",
+                           MCMC.prop.args="MCMC.prop.args",
+                           MCMC.packagenames="MCMC.packagenames",
+                           MCMC.init.maxedges="MCMC.init.maxedges",
+                           MCMC.init.maxchanges="MCMC.init.maxchanges",
+                           EGMME.MCMC.burnin.min="MCMC.burnin.min",
+                           EGMME.MCMC.burnin.max="MCMC.burnin.max",
+                           EGMME.MCMC.burnin.pval="MCMC.burnin.pval",
+                           EGMME.MCMC.burnin.add="MCMC.burnin.add")
+  for(arg in names(control.transfer))
+    if(is.null(control[[control.transfer[[arg]]]]))
+      control[control.transfer[[arg]]] <- list(object$control[[arg]])
 
   control <- set.control.class("control.simulate.network")
 
@@ -146,7 +154,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   # output is a "main call" parameter, since it affects what to
   # compute rather than just how to compute it, but it's convenient to
   # have it as a part of the control data structure.
-  if((time.burnin!=0 || time.interval!=1) && output!="stats"){
+  if((time.burnin!=0 || time.interval!=1) && output!="stats" && output!="final"){
     stop("Generating a networkDynamic or change list output is incompatible with a time.burnin!=1 or a time.interval!=1. Only network statistics can be returned with these settings.")
   }
   
@@ -190,8 +198,6 @@ simulate.network <- function(object, nsim=1, seed=NULL,
 
   model.mon <- if(!is.null(monitor)) ergm.getmodel(monitor, nw, role="target") else NULL
   
-  verbose <- match(verbose,
-                c("FALSE","TRUE", "very"), nomatch=1)-1
   if(missing(coef.form)) {
     coef.form <- rep(0,length(model.form$coef.names))
     warning("No parameter values given, using Bernouli formation.\nThis means that every time step, half the non-tie dyads will gain a tie!")

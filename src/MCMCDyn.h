@@ -63,8 +63,8 @@ void MCMCDyn_wrapper(// Starting network.
 		     int *attribs, int *maxout, int *maxin, int *minout,
 		     int *minin, int *condAllDegExact, int *attriblength, 
 		     // MCMC settings.
-		     double *nsteps,  int *max_MH_interval, double *MH_interval_mul,
-		     double *burnin, double *interval,  
+		     int *nsteps,  int *min_MH_interval, int *max_MH_interval, double *MH_pval, double *MH_interval_add,
+		     int *burnin, int *interval,  
 		     // Space for output.
 		     int *F_collect, double *F_sample, 
 		     int *D_collect, double *D_sample, 
@@ -95,7 +95,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 			    int log_changes,
 			    Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,		    
 			    // MCMC settings.
-			    unsigned int nsteps, unsigned int max_MH_interval, double MH_interval_mul,
+			    unsigned int nsteps, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
 			    unsigned int burnin, unsigned int interval, 
 			    // Verbosity.
 			    int fVerbose);
@@ -114,7 +114,7 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
 			   unsigned int maxchanges, Edge *nextdiffedge,
 			   Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
 			   // MCMC settings.
-			   unsigned int max_MH_interval, double MH_interval_mul,
+			   unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
 			   // Verbosity.
 			   int fVerbose);
 
