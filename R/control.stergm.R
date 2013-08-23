@@ -28,7 +28,7 @@ control.stergm<-function(init.form=NULL,
                          EGMME.MCMC.burnin.min=1000,
                          EGMME.MCMC.burnin.max=100000,
                          EGMME.MCMC.burnin.pval=0.5,
-                         EGMME.MCMC.burnin.add=0.1,
+                         EGMME.MCMC.burnin.add=1,
 
                          MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                          
