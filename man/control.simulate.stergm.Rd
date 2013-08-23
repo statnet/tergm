@@ -16,7 +16,7 @@ control.simulate.stergm(MCMC.burnin.min=NULL, MCMC.burnin.max=NULL,
                         MCMC.init.maxchanges=NULL)
 
 control.simulate.network(MCMC.burnin.min=1000, MCMC.burnin.max=100000,
-                         MCMC.burnin.pval=0.5, MCMC.burnin.add=0.1,
+                         MCMC.burnin.pval=0.5, MCMC.burnin.add=1,
                          MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                          MCMC.prop.weights.form="default",MCMC.prop.args.form=NULL,
                          MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,
