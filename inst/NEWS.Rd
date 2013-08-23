@@ -15,13 +15,32 @@
 % delete unused sections.
 \section{Changes in version 3.1.2}{
 
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item The Tie-NonTie (TNT) proposal has been implemented for
+      dissolution phase models. This should improve mixing and inference
+      for these models.
+
+      \item \code{stergm} and \code{simulate.stergm} now determine the
+      number of Metropolis-Hastings steps per time step adaptively,
+      stopping when the formation/dissolution process appears to have
+      converged.
+    }
+  }
+  
   \subsection{DEPRECATED & DEFUNCT}{
     \itemize{
       \item The previously deprecated start and end attr valeus attached 
-           to networks returned by \code{\link{simulate.network}} and 
-           \code{\link{simulate.networkDynamic}} have been removed and 
-           replaced with observation spells recorded as a 
-           \code{\link{net.obs.period}} network attribute. 
+      to networks returned by \code{\link{simulate.network}} and 
+      \code{\link{simulate.networkDynamic}} have been removed and 
+      replaced with observation spells recorded as a 
+      \code{\link{net.obs.period}} network attribute.
+
+      \item \code{MCMC.burnin} and \code{MCMC.interval} arguments to
+      \code{control.stergm}, \code{control.simulate.network}, and
+      \code{control.simulate.stergm} have been replaced by a different
+      mechanism. See the help for the respective control functions for
+      more information.
     }
   }
 
