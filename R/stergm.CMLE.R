@@ -19,7 +19,6 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
 
   # Construct a list of "from" networks and a list of "to" networks.
    if(inherits(nw,"networkDynamic")){
-    require(networkDynamic) # This is needed for the "%t%.network" function
     y0s <- lapply(times[-length(times)], function(t) nw %t% t)
     y1s <- lapply(times[-1], function(t) nw %t% t)
   }else if(inherits(nw, "network.list") || is.list(nw)){

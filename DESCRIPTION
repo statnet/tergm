@@ -13,8 +13,8 @@ Authors@R:c(
 	person("Ayn", "Leslie-Cook", role=c("ctb"), email="aynlc3@uw.edu"),
 	person("Skye", "Bender-deMoll", role=c("ctb"), email="skyebend@skyeome.net"))
 LinkingTo: ergm
-Depends: statnet.common (>= 3.2), ergm (>= 3.2), robustbase (>= 0.9-10), nlme, network (>= 1.8), networkDynamic (>= 0.5), coda
-Enhances: ergm
+Depends: statnet.common (>= 3.2), ergm (>= 3.2), network (>= 1.7), networkDynamic (>= 0.4),
+Imports: robustbase (>= 0.9-10), coda
 Suggests: lattice, snow
 Description: An integrated set of extensions to the `ergm` package to analyze and simulate network evolution based on exponential-family random graph models (ERGM). "tergm" is a part of the "statnet" suite of packages for network analysis.
 License: GPL-3 + file LICENSE

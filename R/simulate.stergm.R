@@ -236,7 +236,6 @@ simulate.network <- function(object, nsim=1, seed=NULL,
     out <-
       switch(output,
              networkDynamic = {
-               library(networkDynamic)
                nwd <- to.networkDynamic.lasttoggle(nw)
                nwd <- networkDynamic.apply.changes(nwd,z$changed)
                attributes(nwd) <- c(attributes(nwd), # Don't clobber existing attributes!
