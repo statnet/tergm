@@ -21,7 +21,7 @@
   
   \subsection{DEPRECATED & DEFUNCT}{
     \itemize{
-      \item The previously deprecated start and end attr valeus attached 
+      \item The previously deprecated start and end attr values attached 
       to networks returned by \code{\link{simulate.network}} and 
       \code{\link{simulate.networkDynamic}} have been removed and 
       replaced with observation spells recorded as a 
