@@ -18,7 +18,9 @@
   statistics of the network, and, optionally, the final network.
 }
 \usage{
-tergm.godfather(formula, changes = NULL, toggles = changes[, -4, drop = FALSE], start = NULL, end = NULL, end.network = FALSE, stats.start = FALSE, verbose = FALSE, control = control.tergm.godfather())
+tergm.godfather(formula, changes = NULL, toggles = changes[, -4, drop = FALSE],
+  start = NULL, end = NULL, end.network = FALSE, stats.start = FALSE, verbose = FALSE,
+  control = control.tergm.godfather())
 }
 \arguments{
   \item{formula}{
@@ -98,9 +100,10 @@ g1 \%n\% "lasttoggle" <- -1-rgeom(network.dyadcount(g1),1/4)
 dc <- matrix(rnorm(100),10,10); dc <- dc+t(dc)
 
 # Simulate a network, tracking its statistics.
-simnet <- simulate(g1, formation=~edges, dissolution=~edges, coef.form=-1,
-coef.diss=1, time.slices=50, monitor=~degree(1)+mean.age+degree.mean.age(1)+edge.ages+edgecov(dc)+edgecov.ages(dc),
-output="networkDynamic")
+simnet <- simulate(g1, formation=~edges, dissolution=~edges, coef.form=-1, coef.diss=1,
+                   time.slices=50, monitor=~degree(1)+mean.age+degree.mean.age(1)+
+                                            edge.ages+edgecov(dc)+edgecov.ages(dc),
+                   output="networkDynamic")
 
 sim.stats <- attr(simnet, "stats")
 
@@ -109,20 +112,25 @@ sim.stats <- as.matrix(sim.stats)
 
 # Replay the simulation using a networkDynamic, monitoring a potentially different set of
 # statistics (but same in this case).
-gf1.stats <- tergm.godfather(simnet~degree(1)+mean.age+degree.mean.age(1)+edge.ages+edgecov(dc)+edgecov.ages(dc), start=0, end=50)
+gf1.stats <- tergm.godfather(simnet~degree(1)+mean.age+degree.mean.age(1)+
+                                    edge.ages+edgecov(dc)+edgecov.ages(dc),
+                             start=0, end=50)
 
 print(head(gf1.stats))
 gf1.stats <- as.matrix(gf1.stats)
 
 # Replay the simulation using the initial network + list of changes.
-gf2.stats <- tergm.godfather(g1~degree(1)+mean.age+degree.mean.age(1)+edge.ages+edgecov(dc)+edgecov.ages(dc),
-start=0, end=50, changes=attr(simnet,"changes"))
+
+gf2.stats <- tergm.godfather(g1~degree(1)+mean.age+degree.mean.age(1)+
+                                edge.ages+edgecov(dc)+edgecov.ages(dc),
+                             start=0, end=50, changes=attr(simnet,"changes"))
 
 print(head(gf2.stats))
 gf2.stats <- as.matrix(gf2.stats)
 
 # We can also compare them to the network statistics summarized.
-summ.stats <- summary(simnet~degree(1)+mean.age+degree.mean.age(1)+edge.ages+edgecov(dc)+edgecov.ages(dc), at=1:50)
+summ.stats <- summary(simnet~degree(1)+mean.age+degree.mean.age(1)+
+                             edge.ages+edgecov(dc)+edgecov.ages(dc), at=1:50)
 
 print(head(summ.stats))
 

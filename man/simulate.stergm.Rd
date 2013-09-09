@@ -21,47 +21,47 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
 }
 \usage{
 \method{simulate}{stergm}(object, nsim=1, seed=NULL,
-                          coef.form = object$formation.fit$coef,
-                          coef.diss = object$dissolution.fit$coef,
-                          constraints = object$constraints,
-                          monitor = object$targets,
-                          time.slices=1, time.start=NULL, time.burnin=0, time.interval=1,
-                          control=control.simulate.stergm(),
-                          statsonly=NULL,
-                          output=c("networkDynamic", "stats", "changes", "final"),
-                          nw.start = NULL,
-                          stats.form = FALSE,
-                          stats.diss = FALSE,
-                          verbose=FALSE, 
-                          \dots)
+  coef.form = object$formation.fit$coef,
+  coef.diss = object$dissolution.fit$coef,
+  constraints = object$constraints,
+  monitor = object$targets,
+  time.slices=1, time.start=NULL, time.burnin=0, time.interval=1,
+  control=control.simulate.stergm(),
+  statsonly=NULL,
+  output=c("networkDynamic", "stats", "changes", "final"),
+  nw.start = NULL,
+  stats.form = FALSE,
+  stats.diss = FALSE,
+  verbose=FALSE, 
+  \dots)
 \method{simulate}{network}(object, nsim=1, seed=NULL,
-                           formation, dissolution,
-                           coef.form, coef.diss,
-                           constraints = ~.,
-                           monitor = NULL,
-                           time.slices=1, time.start=NULL, time.burnin=0, time.interval=1,
-                           control=control.simulate.network(),
-                           statsonly=NULL,
-                           output=c("networkDynamic", "stats", "changes", "final"),
-                           stats.form = FALSE,
-                           stats.diss = FALSE,
-                           verbose=FALSE,
-                           \dots)
+  formation, dissolution,
+  coef.form, coef.diss,
+  constraints = ~.,
+  monitor = NULL,
+  time.slices=1, time.start=NULL, time.burnin=0, time.interval=1,
+  control=control.simulate.network(),
+  statsonly=NULL,
+  output=c("networkDynamic", "stats", "changes", "final"),
+  stats.form = FALSE,
+  stats.diss = FALSE,
+  verbose=FALSE,
+  \dots)
 \method{simulate}{networkDynamic}(object, nsim=1, seed=NULL,
-                                  formation = attr(object, "formation"),
-                                  dissolution = attr(object, "dissolution"),
-                                  coef.form = attr(object, "coef.form"),
-                                  coef.diss = attr(object, "coef.diss"),
-                                  constraints = NVL(attr(object, "constraints"), ~.),
-                                  monitor = attr(object, "monitor"),
-                                  time.slices=1, time.start=NULL, time.burnin=0, time.interval=1,
-                                  control=control.simulate.network(),
-                                  statsonly=NULL,
-                                  output=c("networkDynamic", "stats", "changes"),
-                                  stats.form = FALSE,
-                                  stats.diss = FALSE,
-                                  verbose=FALSE,
-                                  \dots)
+   formation = attr(object, "formation"),
+   dissolution = attr(object, "dissolution"),
+   coef.form = attr(object, "coef.form"),
+   coef.diss = attr(object, "coef.diss"),
+   constraints = NVL(attr(object, "constraints"), ~.),
+   monitor = attr(object, "monitor"),
+   time.slices=1, time.start=NULL, time.burnin=0, time.interval=1,
+   control=control.simulate.network(),
+   statsonly=NULL,
+   output=c("networkDynamic", "stats", "changes"),
+   stats.form = FALSE,
+   stats.diss = FALSE,
+   verbose=FALSE,
+   \dots)
 }
 \arguments{
   \item{object}{an \R object of type \code{\link{stergm}} giving a model
@@ -318,7 +318,9 @@ print(coef.form)
 print(coef.diss)
 
 # Simulate a networkDynamic
-dynsim<-simulate(g1,formation=~edges,dissolution=~edges,coef.form=coef.form,coef.diss=coef.diss,time.slices=S,verbose=TRUE)
+dynsim<-simulate(g1,formation=~edges,dissolution=~edges,
+                 coef.form=coef.form,coef.diss=coef.diss,
+                 time.slices=S,verbose=TRUE)
 
 # "Resume" the simulation.
 dynsim2<-simulate(dynsim,time.slices=S,verbose=TRUE)

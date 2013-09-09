@@ -2,7 +2,9 @@
 useDynLib(tergm)
 
 importFrom(utils, packageDescription)
-importFrom(ergm)
+importFrom(robustbase, lmrob, covMcd)
+importFrom(coda, mcmc, mcmc.list, effectiveSize)
+import(statnet.common, ergm, network, networkDynamic)
 
 # Export all names that do not begin with a dot.
 exportPattern("^[^\\.]")
