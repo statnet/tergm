@@ -30,14 +30,14 @@ dynsim<-simulate(g1,formation=~edges,dissolution=~edges,coef.form=coef.form,coef
 # ----- check net.obs.period encoding ----
 
 # should have a net.obs.period object from 0 to 5
-if (!all(unlist((dynsim%n%'net.obs.period')$observations)==c(0,10))){
+if (!all(unlist((dynsim%n%'net.obs.period')$observations)==c(0,1,1,11))){
   stop("simulate.network did not encode net.obs.period$observation correctly")
 }
 
 # "Resume" the simulation for five steps
 dynsim2<-simulate(dynsim,time.slices=S)
 
-if (!all(unlist((dynsim2%n%'net.obs.period')$observations)==c(0,10,10,20))){
+if (!all(unlist((dynsim2%n%'net.obs.period')$observations)==c(0,1,1,11,11,21))){
   stop("simulate.networkDynamic did not encode net.obs.period$observation correctly")
 }
 
