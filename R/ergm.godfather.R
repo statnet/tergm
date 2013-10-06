@@ -83,7 +83,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
     nwend<-NULL
     nwstart<-NULL
     if (!is.null(net.obs.period)){
-      nwend<-max(unlist(net.obs.period$observations))
+      nwend<-max(unlist(net.obs.period$observations))-1
     }
     if (!is.null(net.obs.period)){
       start<-min(unlist(net.obs.period$observations))

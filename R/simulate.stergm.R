@@ -224,15 +224,8 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   
   out <- replicate(nsim, {
     if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(round(-.Machine$integer.max/2), network.dyadcount(nw))
-    nwtime <- nw %n% "time"
-
-    nw %n% "time" <- if(is.null(nwtime)) NVL(time.start,0) else{
-      if(!is.null(time.start)){
-        if(time.start!=nwtime) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.")
-        time.start
-      }else nwtime
-    }
-    
+    nw <- .set.default.net.obs.period(nw, time.start)
+    nw %n% "time" <- start <- .get.start.time(nw, time.start)
     
     z <- stergm.getMCMCsample(nw, model.form, model.diss, model.mon,
                               MHproposal.form, MHproposal.diss,
@@ -258,10 +251,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                                          coef.diss=coef.diss,
                                          constraints=constraints,
                                          changes = z$changed))
-               # created a net.obs.period object to describe simulation period for other uses
-               net.obs.period<-list(observations=list(c(nw%n%"time" + 0,nw%n%"time"+time.slices)),mode="discrete",time.increment=1,time.unit="step")
-               nwd<-set.network.attribute(nwd,'net.obs.period',net.obs.period)
-               
+               nwd <- .add.net.obs.period.spell(nwd, start, time.slices)
                nwd
              },
              changes = {
@@ -362,21 +352,12 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
     warning("Argument `statsonly' for STERGM simulate() is deprecated and may be removed in a future version. Use `output' instead.")
     output <- if(statsonly) "stats" else "networkDynamic"
   }
+
+  # Resolve the starting time by setting the initial (implicit) net.obs.period.
+  object <- .set.default.net.obs.period(object, time.start)
+  start <- .get.start.time(object, time.start)
+
   
-  # get net.obs.period from object, if it exists
-  net.obs.period<-object%n%'net.obs.period'
-  nwend<-NULL
-  if (!is.null(net.obs.period)){
-    nwend<-max(unlist(net.obs.period$observations))
-  }
-
-  start <- if(is.null(nwend)) NVL(time.start,0) else{
-    if(!is.null(time.start)){
-      if(time.start!=nwend) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.")
-      time.start
-    }else nwend
-  }
-
   nw <- network.extract.with.lasttoggle(object, start)
   vActiveIDs <- nw %v% ".networkDynamicID"
   delete.vertex.attribute(nw, ".networkDynamicID")
@@ -407,14 +388,8 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   object  <- networkDynamic.apply.changes(object, sim)
   
   # set up net.obs.period list to describe time period simulated
-  # TODO: don't we need to account for interval?
-  if (is.null(net.obs.period)){
-    net.obs.period<-list(observations=list(c(start,start+time.slices)),mode="discrete",time.increment=1 ,time.unit="step")
-  } else {
-    # add another observation to the end
-    net.obs.period$observations<-c(net.obs.period$observations,list(c(start,start+time.slices)))
-  }
-  object<-set.network.attribute(object,'net.obs.period',net.obs.period)
+  object <- .add.net.obs.period.spell(object, start, time.slices)
+  
   attributes(object) <- c(attributes(object), # Don't clobber existing attributes!
                           list(formation = ergm.update.formula(formation,nw~., from.new="nw"),
                                dissolution = ergm.update.formula(dissolution,nw~., from.new="nw"),
@@ -428,4 +403,41 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                changes = rbind(attr(object,"changes"),matrix(c(sim), nrow=nrow(sim),ncol=ncol(sim),dimnames=list(rownames(sim),colnames(sim))))
                                ))
   object
+}
+
+.set.default.net.obs.period <- function(nw, time.start=NULL){
+  # get net.obs.period from nw, if it exists
+  if (!is.null(nw%n%'net.obs.period')) return(nw)
+  
+  nwtime <- nw %n% "time"
+  delete.network.attribute(nw,"time")
+  
+  nwtime <- if(is.null(nwtime)) NVL(time.start,0) else{
+    if(!is.null(time.start)){
+      if(time.start!=nwtime) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.")
+      time.start
+    }else nwtime
+  }
+
+  set.network.attribute(nw, 'net.obs.period', list(observations=list(c(nwtime,nwtime+1)),mode="discrete",time.increment=1,time.unit="step"))
+}
+
+.get.start.time <- function(nw, time.start=NULL){
+  # get net.obs.period from nw
+  net.obs.period<-nw%n%'net.obs.period'
+  # the max(...) is the index of the first unobserved time step, so the previous simulation must have ended at max(...)-1
+  nwend<-max(unlist(net.obs.period$observations))-1
+   
+  if(!is.null(time.start)){
+    if(time.start<nwend) stop("Attempting to resume from a time point prior to the end of the previous simulation is not supported at this time.", call.=FALSE)
+    if(time.start>nwend) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.", call.=FALSE)
+    time.start
+  }else nwend
+}
+
+# add another observation spell to the end; note that the first *simulated* network is at start+1
+.add.net.obs.period.spell <- function(nw, time.start, time.steps){
+  nop <- nw%n%'net.obs.period'
+  nop$observations<-c(nop$observations,list(c(time.start+1,time.start+time.steps+1)))
+  set.network.attribute(nw, 'net.obs.period', nop)
 }
