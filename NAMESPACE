@@ -4,6 +4,7 @@ useDynLib(tergm)
 importFrom(utils, packageDescription)
 importFrom(robustbase, lmrob, covMcd)
 importFrom(coda, mcmc, mcmc.list, effectiveSize)
+importFrom(nlme, gls, corAR1)
 import(statnet.common, ergm, network, networkDynamic)
 
 # Export all names that do not begin with a dot.
