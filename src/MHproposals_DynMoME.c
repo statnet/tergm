@@ -68,17 +68,29 @@ void MH_FormationTNT (MHproposal *MHp, Network *nwp)
   }
   
   BD_LOOP({
-      if(ndedges != 0 && unif_rand() < comp) { /* Select a discordant dyad at random */
+      if(ndedges != 0 && (nempty == 0 || unif_rand() < comp)) { /* Select a discordant dyad at random */
 	GetRandEdge(Mtail, Mhead, nwp+1);
 	
-	MHp->logratio += log(ndedges / ((double)nempty + 1)/comp * ((ndedges==1)? 1 : (1-comp)));
+	if(nempty==0){
+	  MHp->logratio += log(ndedges*(1-comp));
+	}else{
+	  if(ndedges==1){
+	    MHp->logratio += log(1.0 / (nempty + 1) /comp);
+	  }else{
+	    MHp->logratio += log((double) ndedges / (nempty + 1) / odds);
+	  }
+	}
       }else{ /* select an empty dyad in nwp[0] at random */
 	GetRandNonedge(Mtail, Mhead, nwp);
 	
 	if(ndedges==0){
 	  MHp->logratio += log(nempty*comp);
 	}else{
-	  MHp->logratio += log(((double)nempty)/(ndedges+1) *odds);
+	  if(nempty==1){
+	    MHp->logratio += log(1.0 / ndyads / (1-comp));
+	  }else{
+	    MHp->logratio += log((double) nempty / (ndedges+1) * odds);
+	  }
 	}
       }
     });
@@ -132,6 +144,7 @@ void MH_Dissolution (MHproposal *MHp, Network *nwp)
 void MH_DissolutionTNT (MHproposal *MHp, Network *nwp) 
 {  
   Edge nedges=nwp[0].nedges, ndedges=nwp[1].nedges;
+  Edge nedges0 = nedges + ndedges;
   static double comp=0.5, odds;
   
   if(MHp->ntoggles == 0) { /* Initialize */
@@ -140,9 +153,6 @@ void MH_DissolutionTNT (MHproposal *MHp, Network *nwp)
     return;
   }
 
-  nedges  = nwp[0].nedges;
-  ndedges = nwp[1].nedges;
-
   if(nedges==0 && ndedges==0){  /* Attempting dissolution on an empty graph. */
     Mtail[0]=MH_FAILED;
     Mhead[0]=MH_IMPOSSIBLE;
@@ -150,17 +160,29 @@ void MH_DissolutionTNT (MHproposal *MHp, Network *nwp)
   }
   
   BD_LOOP({
-      if(ndedges != 0 && unif_rand() < comp) { /* Select a discordant dyad at random */
+      if(ndedges != 0 && (nedges==0 || unif_rand() < comp)) { /* Select a discordant dyad at random */
 	GetRandEdge(Mtail, Mhead, nwp+1);
 	
-	MHp->logratio += log(ndedges / ((double)nedges + 1)/comp * ((ndedges==1)? 1 : (1-comp)));
+	if(nedges==0){
+	  MHp->logratio += log(ndedges*(1-comp));
+	}else{
+	  if(ndedges==1){
+	    MHp->logratio += log((double) ndedges / nedges0 / comp);
+	  }else{
+	    MHp->logratio += log((double) ndedges / (nedges + 1) / odds);
+	  }
+	}
       }else{ /* select an edge in nwp[0] at random */
 	GetRandEdge(Mtail, Mhead, nwp);
 	
 	if(ndedges==0){
 	  MHp->logratio += log(nedges*comp);
 	}else{
-	  MHp->logratio += log(((double)nedges)/(ndedges+1) *odds);
+	  if(nedges==1){
+	    MHp->logratio += log(1.0 / nedges0 / (1-comp));
+	  }else{
+	    MHp->logratio += log((double) nedges / (ndedges+1) * odds);
+	  }
 	}
       }
     });
