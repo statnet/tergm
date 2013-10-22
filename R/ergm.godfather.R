@@ -71,14 +71,8 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
     toggles[,1] <- ceiling(toggles[,1]) # Fractional times take effect at the end of the time step.
     
     net.obs.period<-nw%n%'net.obs.period'
-    nwend<-NULL
-    nwstart<-NULL
-    if (!is.null(net.obs.period)){
-      nwend<-max(unlist(net.obs.period$observations))-1
-    }
-    if (!is.null(net.obs.period)){
-      start<-min(unlist(net.obs.period$observations))
-    }
+    nwend <- if(!is.null(net.obs.period)) .get.last.obs.time(nw) else NULL
+    nwstart<- if(!is.null(net.obs.period)) .get.first.obs.time(nw) else NULL
    
     start <- NVL(start,
                  nwstart,
