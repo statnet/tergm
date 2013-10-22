@@ -73,7 +73,7 @@ void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp)
 {  
   static Vertex nnodes, blks;
   Vertex tail,head;
-  static Edge ndyads;
+  static Edge ndyads, nedges0;
   static double comp=0.5, odds;
   static Network discord;
   static double *blkinfo, *blkpos, *blkcwt; 
@@ -83,7 +83,7 @@ void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp)
     nnodes = nwp->nnodes;
     odds = comp/(1.0-comp);
 
-    Edge nedges0 = MHp->inputs[0];
+    nedges0 = MHp->inputs[0];
     MHp->discord = (Network**) calloc(2,sizeof(Network*)); // A space for the sentinel NULL pointer.
     MHp->discord[0] = &discord;
     discord = NetworkInitializeD(MHp->inputs+1, MHp->inputs+1+nedges0, nedges0, nnodes, nwp->directed_flag, nwp->bipartite, 0, 0, NULL);
@@ -110,10 +110,18 @@ void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp)
   }
 
   BD_LOOP({
-    if(ndedges != 0 && unif_rand() < comp) { /* Select a discordant dyad at random */
+      if(ndedges != 0 && (nempty == 0 || unif_rand() < comp)) { /* Select a discordant dyad at random */
       GetRandEdge(&tail, &head, &discord);
       
-      MHp->logratio += log(ndedges / ((double)nempty + 1)/comp * ((ndedges==1)? 1 : (1-comp)));
+      if(nempty==0){
+	MHp->logratio += log(ndedges*(1-comp));
+      }else{
+	if(ndedges==1){
+	  MHp->logratio += log(1.0 / (nempty + 1) /comp);
+	}else{
+	  MHp->logratio += log((double) ndedges / (nempty + 1) / odds);
+	}
+      }
     }else{ /* select an empty dyad in nwp[0] at random */
       do{ /* Keep trying block-diagonal dyads as long as it's an edge in nwp */
 	double r = unif_rand();
@@ -135,7 +143,11 @@ void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp)
       if(ndedges==0){
         MHp->logratio += log(nempty*comp);
       }else{
-        MHp->logratio += log(((double)nempty)/(ndedges+1) *odds);
+	if(nempty==1){
+	  MHp->logratio += log(1.0 / ndyads / (1-comp));
+	}else{
+	  MHp->logratio += log((double) nempty / (ndedges+1) * odds);
+	}
       }
     }
     
