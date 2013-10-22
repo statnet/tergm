@@ -225,7 +225,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   out <- replicate(nsim, {
     if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(round(-.Machine$integer.max/2), network.dyadcount(nw))
     nw <- .set.default.net.obs.period(nw, time.start)
-    nw %n% "time" <- start <- .get.start.time(nw, time.start)
+    nw %n% "time" <- start <- .get.last.obs.time(nw, time.start)
     
     z <- stergm.getMCMCsample(nw, model.form, model.diss, model.mon,
                               MHproposal.form, MHproposal.diss,
@@ -355,7 +355,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
 
   # Resolve the starting time by setting the initial (implicit) net.obs.period.
   object <- .set.default.net.obs.period(object, time.start)
-  start <- .get.start.time(object, time.start)
+  start <- .get.last.obs.time(object, time.start)
 
   
   nw <- network.extract.with.lasttoggle(object, start)
@@ -422,17 +422,28 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   set.network.attribute(nw, 'net.obs.period', list(observations=list(c(nwtime,nwtime+1)),mode="discrete",time.increment=1,time.unit="step"))
 }
 
-.get.start.time <- function(nw, time.start=NULL){
+.get.last.obs.time <- function(nw, time.user=NULL){
   # get net.obs.period from nw
   net.obs.period<-nw%n%'net.obs.period'
-  # the max(...) is the index of the first unobserved time step, so the previous simulation must have ended at max(...)-1
-  nwend<-max(unlist(net.obs.period$observations))-1
-   
-  if(!is.null(time.start)){
-    if(time.start<nwend) stop("Attempting to resume from a time point prior to the end of the previous simulation is not supported at this time.", call.=FALSE)
-    if(time.start>nwend) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.", call.=FALSE)
-    time.start
+  spells <- do.call(rbind,net.obs.period$observations)
+  last.spell <- spells[which.max(apply(spells,1,mean)),]
+  nwend <-
+    if(last.spell[1]==last.spell[2] || net.obs.period$mode=="continuous") last.spell[2]
+    else last.spell[1]+ceiling((last.spell[2]-last.spell[1])/net.obs.period$time.increment-1)*net.obs.period$time.increment # Discrete mode: with time.increment=1, c(0,1) -> 0, c(0,0.5) -> 0, etc.
+  
+  if(!is.null(time.user)){
+    if(time.user<nwend) stop("Attempting to resume from a time point prior to the end of the previous simulation is not supported at this time.", call.=FALSE)
+    if(time.user>nwend) warning("Argument time.user specified for a network that already has a time stamp. Overriding the time stamp.", call.=FALSE)
+    time.user
   }else nwend
+}
+
+.get.first.obs.time <- function(nw){
+  # get net.obs.period from nw
+  net.obs.period<-nw%n%'net.obs.period'
+  spells <- do.call(rbind,net.obs.period$observations)
+  first.spell <- spells[which.min(apply(spells,1,mean)),]
+  nwstart <- first.spell[1]
 }
 
 # add another observation spell to the end; note that the first *simulated* network is at start+1
