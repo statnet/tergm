@@ -41,3 +41,46 @@ if (!all(unlist((dynsim2%n%'net.obs.period')$observations)==c(0,1,1,11,11,21))){
   stop("simulate.networkDynamic did not encode net.obs.period$observation correctly")
 }
 
+# check a realistic example of starting a sim from scratch
+mean.rel.dur <- 10
+msm.sim <- network.initialize(1000,directed=F)
+activate.vertices(msm.sim,-Inf,Inf)
+set.network.attribute(msm.sim,'net.obs.period',list(observations=list(c(-1,0)),
+                                                    mode="discrete", time.increment=1,time.unit="step"))
+formation <- ~edges
+dissolution <- ~offset(edges)
+target.stats <- 400
+coef.diss <- log(mean.rel.dur-1)
+formation.with.stnet <- update.formula(formation,msm.startnet~.)
+msm.startnet <- network.collapse(msm.sim,at=0)
+msm.est <- ergm(formation.with.stnet,target.stats=target.stats)
+coef.form <- msm.est$coef
+coef.form[1] <- coef.form[1] - coef.diss
+msm.edgelist <- as.edgelist(simulate(msm.est))
+add.edges(msm.sim,msm.edgelist[,1],msm.edgelist[,2])
+activate.edges(msm.sim, -Inf, Inf)
+
+#first timestep 
+msm.sim <- simulate(msm.sim,
+                    formation=formation,
+                    dissolution=~edges,
+                    coef.form=coef.form,
+                    coef.diss=coef.diss,
+                    time.slices = 1,
+                    monitor="all",
+                    verbose=T
+)
+#second timestep
+msm.sim <- simulate(msm.sim,
+                    formation=formation,
+                    dissolution=~edges,
+                    coef.form=coef.form,
+                    coef.diss=coef.diss,
+                    time.slices = 1,
+                    monitor="all",
+                    verbose=T
+)
+
+if(!all(unlist((msm.sim%n%'net.obs.period')$observations)==c(-1,  0,  0,  1,  1,  2))){
+  stop('net.obs.period (and simulation) was not constructed as expected when stopping and restarting simulate.networkdynamic')
+}
