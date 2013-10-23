@@ -429,7 +429,12 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   last.spell <- spells[which.max(apply(spells,1,mean)),]
   nwend <-
     if(last.spell[1]==last.spell[2] || net.obs.period$mode=="continuous") last.spell[2]
-    else last.spell[1]+ceiling((last.spell[2]-last.spell[1])/net.obs.period$time.increment-1)*net.obs.period$time.increment # Discrete mode: with time.increment=1, c(0,1) -> 0, c(0,0.5) -> 0, etc.
+  # If in discrete mode and the last spell is not a point spell, then
+  # find the latest time point that is an integer number of
+  # time.icrements away from the onset, while still being strictly
+  # less than terminus. For example, with time.interval=1, c(0,2) -> 1, c(0, 1.5) -> 1.
+    else last.spell[1]+ceiling((last.spell[2]-last.spell[1])/net.obs.period$time.increment-1)*net.obs.period$time.increment
+
   
   if(!is.null(time.user)){
     if(time.user<nwend) stop("Attempting to resume from a time point prior to the end of the previous simulation is not supported at this time.", call.=FALSE)
