@@ -357,13 +357,12 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   object <- .set.default.net.obs.period(object, time.start)
   start <- .get.last.obs.time(object, time.start)
 
-  
+  if(verbose) cat("extracting state of networkDynamic at time ",start,"\n")
   nw <- network.extract.with.lasttoggle(object, start)
   vActiveIDs <- nw %v% ".networkDynamicID"
   delete.vertex.attribute(nw, ".networkDynamicID")
  
   output <- match.arg(output)
-  
   sim <- simulate.network(nw, nsim=1, seed=NULL,
                           formation=formation, dissolution=dissolution,
                           coef.form=coef.form,coef.diss=coef.diss,
@@ -379,7 +378,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   ## If all the user wants is statistics or a list of toggles, we are done.
   if(output!="networkDynamic") return(sim)
 
-  if(verbose) cat("Updating networkDynamic.\n")
+  if(verbose) cat("Updating networkDynamic ")
   
   ## Map the vertex IDs:
   sim[,"tail"] <- vActiveIDs[sim[,"tail"]]
@@ -389,6 +388,11 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   
   # set up net.obs.period list to describe time period simulated
   object <- .add.net.obs.period.spell(object, start, time.slices)
+  
+  if(verbose){
+    obs<-(object%n%'net.obs.period')$observations
+    cat("with simulated time: (",obs[[length(obs)]],").\n")
+  }
   
   attributes(object) <- c(attributes(object), # Don't clobber existing attributes!
                           list(formation = ergm.update.formula(formation,nw~., from.new="nw"),
