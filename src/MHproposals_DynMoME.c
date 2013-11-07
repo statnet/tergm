@@ -10,7 +10,7 @@
 ***********************/
 void MH_Formation (MHproposal *MHp, Network *nwp) 
 {  
-  static Edge ndyads;
+  static Dyad ndyads;
 
   if(MHp->ntoggles == 0) { /* Initialize */
     MHp->ntoggles=1;
@@ -46,9 +46,10 @@ void MH_Formation (MHproposal *MHp, Network *nwp)
 ***********************/
 void MH_FormationTNT (MHproposal *MHp, Network *nwp) 
 {  
-  Edge nedges, ndedges, nempty;
+  Edge nedges, ndedges;
+  Dyad nempty;
   static double comp=0.5, odds;
-  static Edge ndyads;
+  static Dyad ndyads;
   
   if(MHp->ntoggles == 0) { /* Initialize */
     MHp->ntoggles=1;
