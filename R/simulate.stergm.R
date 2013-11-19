@@ -226,7 +226,6 @@ simulate.network <- function(object, nsim=1, seed=NULL,
     if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(round(-.Machine$integer.max/2), network.dyadcount(nw))
     nw <- .set.default.net.obs.period(nw, time.start)
     nw %n% "time" <- start <- .get.last.obs.time(nw, time.start)
-    
     z <- stergm.getMCMCsample(nw, model.form, model.diss, model.mon,
                               MHproposal.form, MHproposal.diss,
                               eta.form, eta.diss, control, verbose)
@@ -359,6 +358,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
 
   if(verbose) cat("extracting state of networkDynamic at time ",start,"\n")
   nw <- network.extract.with.lasttoggle(object, start)
+ 
   vActiveIDs <- nw %v% ".networkDynamicID"
   delete.vertex.attribute(nw, ".networkDynamicID")
  
@@ -368,7 +368,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                           coef.form=coef.form,coef.diss=coef.diss,
                           constraints = constraints,
                           monitor = monitor,
-                          time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,
+                          time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval,
                           control=control,          
                           output=switch(output, networkDynamic = "changes", output),
                           stats.form = stats.form,
@@ -385,7 +385,6 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   sim[,"head"] <- vActiveIDs[sim[,"head"]]
 
   object  <- networkDynamic.apply.changes(object, sim)
-  
   # set up net.obs.period list to describe time period simulated
   object <- .add.net.obs.period.spell(object, start, time.slices)
   
@@ -441,8 +440,8 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
 
   
   if(!is.null(time.user)){
-    if(time.user<nwend) stop("Attempting to resume from a time point prior to the end of the previous simulation is not supported at this time.", call.=FALSE)
-    if(time.user>nwend) warning("Argument time.user specified for a network that already has a time stamp. Overriding the time stamp.", call.=FALSE)
+    if(time.user<nwend & nwend!=Inf) stop("Attempting to resume from a time point prior to the end of the previous simulation is not supported at this time.", call.=FALSE)
+    if(time.user>nwend) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.", call.=FALSE)
     time.user
   }else nwend
 }
