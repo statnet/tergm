@@ -348,7 +348,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   object <- .set.default.net.obs.period(object, time.start)
   start <- .get.last.obs.time(object, time.start)
 
-  
+  if(verbose) cat("extracting state of networkDynamic at time ",start,"\n")
   nw <- network.extract.with.lasttoggle(object, start)
   vActiveIDs <- nw %v% ".networkDynamicID"
   delete.vertex.attribute(nw, ".networkDynamicID")
@@ -360,7 +360,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                           coef.form=coef.form,coef.diss=coef.diss,
                           constraints = constraints,
                           monitor = monitor,
-                          time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,
+                          time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval,
                           control=control,          
                           output=switch(output, networkDynamic = "changes", output),
                           stats.form = stats.form,
@@ -370,7 +370,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   ## If all the user wants is statistics or a list of toggles, we are done.
   if(output!="networkDynamic") return(sim)
 
-  if(verbose) cat("Updating networkDynamic.\n")
+  if(verbose) cat("Updating networkDynamic ")
   
   ## Map the vertex IDs:
   sim[,"tail"] <- vActiveIDs[sim[,"tail"]]
@@ -380,6 +380,11 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   
   # set up net.obs.period list to describe time period simulated
   object <- .add.net.obs.period.spell(object, start, time.slices)
+  
+  if(verbose){
+    obs<-(object%n%'net.obs.period')$observations
+    cat("with simulated time: (",obs[[length(obs)]],").\n")
+  }
   
   attributes(object) <- c(attributes(object), # Don't clobber existing attributes!
                           list(formation = ergm.update.formula(formation,nw~., from.new="nw"),
@@ -428,8 +433,8 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
 
   
   if(!is.null(time.user)){
-    if(time.user<nwend) stop("Attempting to resume from a time point prior to the end of the previous simulation is not supported at this time.", call.=FALSE)
-    if(time.user>nwend) warning("Argument time.user specified for a network that already has a time stamp. Overriding the time stamp.", call.=FALSE)
+    if(time.user<nwend & nwend!=Inf) stop("Attempting to resume from a time point prior to the end of the previous simulation is not supported at this time.", call.=FALSE)
+    if(time.user>nwend) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.", call.=FALSE)
     time.user
   }else nwend
 }
