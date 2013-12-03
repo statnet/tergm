@@ -146,6 +146,15 @@ if(!all(network.dynamic.check(msm.sim,complete=FALSE)$dyad.checks)){
 }
 
 
+# check that vertex ids in changes are correctly translated
+dyn<-as.networkDynamic(network.initialize(4))
+deactivate.vertices(dyn,v=1)
+# define stergm that should toggle on all ties
+changes<-simulate.networkDynamic(dyn,formation=~edges,dissolution=~edges,coef.form=1,coef.diss=0,output='changes')
+# check if any changes involve vertex 1 (shouldn't because it is inactive)
+if(any(changes[,2:3]==1)){
+  stop("simulate.networkDynamic returned changes involving an inactive vertex" )
+}
 
 
 

@@ -375,15 +375,15 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                           stats.diss = stats.diss,
                           verbose=verbose, ...)
   
+  ## Map the vertex IDs back to the original network:
+  sim[,"tail"] <- vActiveIDs[sim[,"tail"]]
+  sim[,"head"] <- vActiveIDs[sim[,"head"]]
+  
   ## If all the user wants is statistics or a list of toggles, we are done.
   if(output!="networkDynamic") return(sim)
 
   if(verbose) cat("Updating networkDynamic ")
   
-  ## Map the vertex IDs:
-  sim[,"tail"] <- vActiveIDs[sim[,"tail"]]
-  sim[,"head"] <- vActiveIDs[sim[,"head"]]
-
   object  <- networkDynamic.apply.changes(object, sim)
   # set up net.obs.period list to describe time period simulated
   object <- .add.net.obs.period.spell(object, start, time.slices)
