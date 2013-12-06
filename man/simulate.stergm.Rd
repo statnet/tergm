@@ -39,7 +39,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   coef.form, coef.diss,
   constraints = ~.,
   monitor = NULL,
-  time.slices=1, time.start=NULL, time.burnin=0, time.interval=1,
+  time.slices=1, time.start=NULL, time.burnin=0, time.offset=1, time.interval=1,
   control=control.simulate.network(),
   statsonly=NULL,
   output=c("networkDynamic", "stats", "changes", "final"),
@@ -54,7 +54,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
    coef.diss = attr(object, "coef.diss"),
    constraints = NVL(attr(object, "constraints"), ~.),
    monitor = attr(object, "monitor"),
-   time.slices=1, time.start=NULL, time.burnin=0, time.interval=1,
+   time.slices=1, time.start=NULL, time.burnin=0, time.offset=1, time.interval=1,
    control=control.simulate.network(),
    statsonly=NULL,
    output=c("networkDynamic", "stats", "changes"),
@@ -133,6 +133,10 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   \item{time.start}{
     An optional argument specifying the time point at which the
     simulation is to start. See Details for further information.
+  }
+  
+  \item{time.offset}{
+    Argument specifying the offset between the point when the state of the network is sampled (\code{time.start}) and the the beginning of the spell that should be recorded for the newly simulated network state.
   }
   
   \item{time.burnin}{

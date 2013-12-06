@@ -145,6 +145,41 @@ if(!all(network.dynamic.check(msm.sim,complete=FALSE)$dyad.checks)){
   stop('vertex dynamics in stergm sim created inconsistent dyads')
 }
 
+# at this point msm.sim has observations as far as 2.  Try sampling at 2 and upating from (2,3)
+msm.sim <- simulate(msm.sim,
+                    formation=formation,
+                    dissolution=~edges,
+                    coef.form=coef.form,
+                    coef.diss=coef.diss,
+                    time.slices = 1, time.start=2,time.offset=0,
+                    monitor="all",
+                    verbose=T
+)
+
+if (max(unlist((msm.sim%n%'net.obs.period')$observations)) > 3){
+  stop("simulate.networkDynamic updated net.obs.period inappropriately when time.start and time.offset was explicitly set" )
+}
+if (!all(get.change.times(msm.sim)==0:2)){
+  stop("simulate.networkDynamic updated edge spells inappropriately when time.start and time.offset was explicitly set")
+}
+
+# try it again to make sure nothing got mangled
+msm.sim <- simulate(msm.sim,
+                    formation=formation,
+                    dissolution=~edges,
+                    coef.form=coef.form,
+                    coef.diss=coef.diss,
+                    time.slices = 1, time.start=3,time.offset=0,
+                    monitor="all",
+                    verbose=T
+)
+if (max(unlist((msm.sim%n%'net.obs.period')$observations)) > 4){
+  stop("simulate.networkDynamic updated net.obs.period inappropriately when time.start and time.offset was explicitly set" )
+}
+if (!all(get.change.times(msm.sim)==0:3)){
+  stop("simulate.networkDynamic updated edge spells inappropriately when time.start and time.offset was explicitly set")
+}
+
 
 # check that vertex ids in changes are correctly translated
 dyn<-as.networkDynamic(network.initialize(4))

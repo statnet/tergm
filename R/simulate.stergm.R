@@ -133,7 +133,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                              coef.form,coef.diss,
                              constraints = ~.,
                              monitor = NULL,
-                             time.slices = 1, time.start=NULL, time.burnin=0, time.interval=1,
+                             time.slices = 1, time.start=NULL, time.burnin=0, time.offset=1, time.interval=1,
                              control=control.simulate.network(),
                              statsonly=NULL,
                              output=c("networkDynamic", "stats", "changes", "final"),
@@ -237,8 +237,13 @@ simulate.network <- function(object, nsim=1, seed=NULL,
     out <-
       switch(output,
              networkDynamic = {
+               changes <- z$changed
+               # update the times on the list of changes returned to match the update time requested by time.offset
+               # TODO: this is a horrible hack, should really make the change inside simulate.stergm
+               # assume that simulate.stergm has added +1 to all the time values, so subtract 1 for an offset of 0
+               changes[,1]<-changes[,1]-1+time.offset
                nwd <- to.networkDynamic.lasttoggle(nw)
-               nwd <- networkDynamic.apply.changes(nwd,z$changed)
+               nwd <- networkDynamic.apply.changes(nwd,changes)
                attributes(nwd) <- c(attributes(nwd), # Don't clobber existing attributes!
                                     list(formation = formation,
                                          dissolution = dissolution,
@@ -249,12 +254,16 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                                          coef.form=coef.form,
                                          coef.diss=coef.diss,
                                          constraints=constraints,
-                                         changes = z$changed))
-               nwd <- .add.net.obs.period.spell(nwd, start, time.slices)
+                                         changes = changes))
+               nwd <- .add.net.obs.period.spell(nwd, start-1+time.offset, time.slices)
                nwd
              },
              changes = {
                changes <- z$changed
+               # todo: update the times on the list of changes returned to match the update time requested by time.offset
+               # this is a horrible hack, should really make the change inside simulate.stergm
+               # assume that simulate.stergm has added +1 to all the time values, so subtract 1 for an offset of 0
+               changes[,1]<-changes[,1]-1+time.offset
                attributes(changes) <- c(attributes(changes), # Don't clobber existing attributes!
                                         list(formation = formation,
                                              dissolution = dissolution,
@@ -273,6 +282,11 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                list(stats.form = stats.form,stats.diss = stats.diss, stats = stats)
              },
              final = {
+               changes <- z$changed
+               # update the times on the list of changes returned to match the update time requested by time.offset
+               # TODO: this is a horrible hack, should really make the change inside simulate.stergm
+               # assume that simulate.stergm has added +1 to all the time values, so subtract 1 for an offset of 0
+               changes[,1]<-changes[,1]-1+time.offset
                newnw <- z$newnetwork
                attributes(newnw) <- c(attributes(newnw), # Don't clobber existing attributes!
                                       list(formation = formation,
@@ -286,7 +300,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                                            constraints=constraints,
                                            start = nw%n%"time" + 0,
                                            end = nw%n%"time" + time.slices,
-                                           changes = z$changed))
+                                           changes = changes))
                newnw
              })
   },
@@ -338,7 +352,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     coef.form = attr(object, "coef.form"), coef.diss = attr(object, "coef.diss"),
                                     constraints = NVL(attr(object, "constraints"),~.),
                                     monitor = attr(object, "monitor"),
-                                    time.slices = 1, time.start=NULL, time.burnin=0, time.interval=1,
+                                    time.slices = 1, time.start=NULL, time.burnin=0, time.offset=1,time.interval=1,
                                     control=control.simulate.network(),
                                     statsonly=NULL,
                                     output=c("networkDynamic", "stats", "changes"),
@@ -368,7 +382,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                           coef.form=coef.form,coef.diss=coef.diss,
                           constraints = constraints,
                           monitor = monitor,
-                          time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval,
+                          time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval, time.offset=time.offset,
                           control=control,          
                           output=switch(output, networkDynamic = "changes", output),
                           stats.form = stats.form,
@@ -386,7 +400,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   
   object  <- networkDynamic.apply.changes(object, sim)
   # set up net.obs.period list to describe time period simulated
-  object <- .add.net.obs.period.spell(object, start, time.slices)
+  object <- .add.net.obs.period.spell(object, start+time.offset-1, time.slices)
   
   if(verbose){
     obs<-(object%n%'net.obs.period')$observations
@@ -417,7 +431,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   
   nwtime <- if(is.null(nwtime)) NVL(time.start,0) else{
     if(!is.null(time.start)){
-      if(time.start!=nwtime) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.")
+      if(time.start!=nwtime) warning("Argument time.start of ",time.start," specified for a network that already has a time stamp of ",nwtime, ". Overriding the time stamp.")
       time.start
     }else nwtime
   }
@@ -441,7 +455,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   
   if(!is.null(time.user)){
     if(time.user<nwend & nwend!=Inf) stop("Attempting to resume from a time point prior to the end of the previous simulation is not supported at this time.", call.=FALSE)
-    if(time.user>nwend) warning("Argument time.start specified for a network that already has a time stamp. Overriding the time stamp.", call.=FALSE)
+    if(time.user>nwend) warning("Argument time.start of ", time.user," specified for a network that already has a time stamp of ",nwend,". Overriding the time stamp.", call.=FALSE)
     time.user
   }else nwend
 }
