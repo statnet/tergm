@@ -192,4 +192,36 @@ if(any(changes[,2:3]==1)){
 }
 
 
+mean.rel.dur <- 10
+msm.sim <- as.networkDynamic(network.initialize(1000,directed=F))
+#set.network.attribute(msm.sim,'net.obs.period',list(observations=list(c(-1,0)),
+#                                                    mode="discrete", time.increment=1,time.unit="step"))
+formation <- ~edges
+dissolution <- ~offset(edges)
+target.stats <- 400
+coef.diss <- log(mean.rel.dur-1)
+formation.with.stnet <- update.formula(formation,msm.startnet~.)
+# simulate a set of edges to use as the starting point for the network
+msm.startnet <- network.collapse(msm.sim,at=0)
+msm.est <- ergm(formation.with.stnet,target.stats=target.stats)
+coef.form <- msm.est$coef
+coef.form[1] <- coef.form[1] - coef.diss
+msm.edgelist <- as.edgelist(simulate(msm.est))
+add.edges(msm.sim,msm.edgelist[,1],msm.edgelist[,2])
+
+msm.sim <- simulate(msm.sim,
+                    formation=formation,
+                    dissolution=~edges,
+                    coef.form=coef.form,
+                    coef.diss=coef.diss,
+                    time.slices = 1, time.start=0,time.offset=0,
+                    monitor="all",
+                    verbose=T
+)
+
+
+if(length((msm.sim%n%'net.obs.period')$observations)>1){
+  stop('simulate.networkDynamic mangled net.obs.period with time.offset=0 argument')
+}
+
 

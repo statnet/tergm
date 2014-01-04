@@ -471,6 +471,14 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
 # add another observation spell to the end; note that the first *simulated* network is at start+1
 .add.net.obs.period.spell <- function(nw, time.start, time.steps){
   nop <- nw%n%'net.obs.period'
-  nop$observations<-c(nop$observations,list(c(time.start+1,time.start+time.steps+1)))
+  # make sure we don't add a duplicate of existing last spell
+  # why didn't I (skye) define $observations as a spell list so we could use existing tools?  ... sigh
+  newSpl<-c(time.start+1,time.start+time.steps+1)
+  if (length(nop$observations)>0 && all(nop$observations[[length(nop$observations)]]==newSpl)){
+    # don't do anything
+  } else {
+    # tack the new spell on the end of the observations list
+    nop$observations<-c(nop$observations,list(newSpl))
+  }
   set.network.attribute(nw, 'net.obs.period', nop)
 }

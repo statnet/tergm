@@ -5,10 +5,7 @@ importFrom(utils, packageDescription)
 importFrom(robustbase, lmrob, covMcd)
 importFrom(coda, mcmc, mcmc.list, effectiveSize)
 importFrom(nlme, gls, corAR1)
-# temporary work around to avoid importing the add.edge and add.vertices methods from network which will be overriden by network dynamic
-importFrom(network,as.color, as.matrix.network, as.matrix.network.adjacency, as.matrix.network.edgelist, as.matrix.network.incidence, as.network, as.network.default, as.network.matrix, as.network.network, as.sociomatrix, '%c%', '%c%.network', delete.edge.attribute, delete.edges, delete.network.attribute, delete.vertex.attribute, delete.vertices, '%e%', '%e%<-', '%eattr%', '%eattr%<-', get.edge.attribute, get.edgeIDs, get.edges, get.edge.value, get.inducedSubgraph, get.neighborhood, get.network.attribute, get.vertex.attribute, has.loops, is.adjacent, is.bipartite, is.color, is.directed, is.discrete, is.discrete.character, is.discrete.numeric, is.hyper, is.multiplex, is.na.network, is.network, list.edge.attributes, list.network.attributes, list.vertex.attributes, mixingmatrix, '%n%', '%n%<-', '%nattr%', '%nattr%<-', network, '<-.network', '|.network', '-.network', '!.network', '[<-.network', '[.network', '$<-.network', '*.network', '&.network', '+.network', network.adjacency, network.arrow, network.bipartite, network.copy, network.density, network.dyadcount, network.edgecount, network.edgelabel, network.edgelist, network.incidence, network.initialize, network.layout.circle, network.layout.fruchtermanreingold, network.layout.kamadakawai, network.loop, network.naedgecount, networkOperatorSetup, network.size, network.vertex, network.vertex.names, 'network.vertex.names<-', permute.vertexIDs, plot.network, plot.network.default, print.mixingmatrix, print.network, print.summary.character, print.summary.network, prod.network, readAndVectorizeLine, read.paj, read.paj.simplify, '%s%', set.edge.attribute, set.edge.value, set.network.attribute, set.vertex.attribute, summary.character, summary.network, sum.network, switchArcDirection, '%v%', '%v%<-', valid.eids, '%vattr%', '%vattr%<-', which.matrix.type)
-import(statnet.common, ergm, networkDynamic)
-
+import(statnet.common, ergm, network,networkDynamic)
 
 # Export all names that do not begin with a dot.
 exportPattern("^[^\\.]")
