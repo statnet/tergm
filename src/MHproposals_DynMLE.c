@@ -78,33 +78,36 @@ void MH_FormationMLETNT(MHproposal *MHp, Network *nwp)
     return;
   }
 
+  double logratio=0;
   BD_LOOP({
       if(ndedges != 0 && (nempty == 0 || unif_rand() < comp)) { /* Select a discordant dyad at random */
 	GetRandEdge(Mtail, Mhead, &discord);
 	
 	if(nempty==0){
-	  MHp->logratio += log(ndedges*(1-comp));
+	  logratio = log(ndedges*(1-comp));
 	}else{
 	  if(ndedges==1){
-	    MHp->logratio += log(1.0 / (nempty + 1) /comp);
+	    logratio = log(1.0 / (nempty + 1) /comp);
 	  }else{
-	    MHp->logratio += log((double) ndedges / (nempty + 1) / odds);
+	    logratio = log((double) ndedges / (nempty + 1) / odds);
 	  }
 	}
       }else{ /* select an empty dyad in nwp[0] at random */
 	GetRandNonedge(Mtail, Mhead, nwp);
 	
 	if(ndedges==0){
-	  MHp->logratio += log(nempty*comp);
+	  logratio = log(nempty*comp);
 	}else{
 	  if(nempty==1){
-	    MHp->logratio += log(1.0 / ndyads / (1-comp));
+	    logratio = log(1.0 / ndyads / (1-comp));
 	  }else{
-	    MHp->logratio += log((double) nempty / (ndedges+1) * odds);
+	    logratio = log((double) nempty / (ndedges+1) * odds);
 	  }
 	}
       }
     });
+
+  MHp->logratio += logratio;
 }
 
 /********************
@@ -146,31 +149,33 @@ void MH_DissolutionMLETNT(MHproposal *MHp, Network *nwp)
     return;
   }
   
+  double logratio=0;
   BD_LOOP({
       if(ndedges != 0 && (nedges == 0 || unif_rand() < comp)) { /* Select a discordant dyad at random */
 	GetRandEdge(Mtail, Mhead, &discord);
 	
 	if(nedges==0){
-	  MHp->logratio += log(ndedges*(1-comp));
+	  logratio = log(ndedges*(1-comp));
 	}else{
 	  if(ndedges==1){
-	    MHp->logratio += log((double) ndedges / nedges0 / comp);
+	    logratio = log((double) ndedges / nedges0 / comp);
 	  }else{
-	    MHp->logratio += log((double) ndedges / (nedges + 1) / odds);
+	    logratio = log((double) ndedges / (nedges + 1) / odds);
 	  }
 	}
       }else{ /* select an edge in nwp[0] at random */
 	GetRandEdge(Mtail, Mhead, nwp);
 	
 	if(ndedges==0){
-	  MHp->logratio += log(nedges*comp);
+	  logratio = log(nedges*comp);
 	}else{
 	  if(nedges==1){
-	    MHp->logratio += log(1.0 / nedges0 / (1-comp));
+	    logratio = log(1.0 / nedges0 / (1-comp));
 	  }else{
-	    MHp->logratio += log((double) nedges / (ndedges+1) * odds);
+	    logratio = log((double) nedges / (ndedges+1) * odds);
 	  }
 	}
       }
     });
+  MHp->logratio += logratio;
 }
