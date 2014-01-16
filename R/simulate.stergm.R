@@ -217,7 +217,6 @@ simulate.network <- function(object, nsim=1, seed=NULL,
     if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(round(-.Machine$integer.max/2), network.dyadcount(nw))
     nw <- .set.default.net.obs.period(nw, time.start)
     nw %n% "time" <- start <- .get.last.obs.time(nw, time.start)
-    
     z <- stergm.getMCMCsample(nw, model.form, model.diss, model.mon,
                               MHproposal.form, MHproposal.diss,
                               eta.form, eta.diss, control, verbose)
@@ -364,11 +363,11 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
 
   if(verbose) cat("extracting state of networkDynamic at time ",start,"\n")
   nw <- network.extract.with.lasttoggle(object, start)
+ 
   vActiveIDs <- nw %v% ".networkDynamicID"
   delete.vertex.attribute(nw, ".networkDynamicID")
  
   output <- match.arg(output)
-  
   sim <- simulate.network(nw, nsim=1, seed=NULL,
                           formation=formation, dissolution=dissolution,
                           coef.form=coef.form,coef.diss=coef.diss,
@@ -381,17 +380,16 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                           stats.diss = stats.diss,
                           verbose=verbose, ...)
   
+  ## Map the vertex IDs back to the original network:
+  sim[,"tail"] <- vActiveIDs[sim[,"tail"]]
+  sim[,"head"] <- vActiveIDs[sim[,"head"]]
+  
   ## If all the user wants is statistics or a list of toggles, we are done.
   if(output!="networkDynamic") return(sim)
 
   if(verbose) cat("Updating networkDynamic ")
   
-  ## Map the vertex IDs:
-  sim[,"tail"] <- vActiveIDs[sim[,"tail"]]
-  sim[,"head"] <- vActiveIDs[sim[,"head"]]
-
   object  <- networkDynamic.apply.changes(object, sim)
-  
   # set up net.obs.period list to describe time period simulated
   object <- .add.net.obs.period.spell(object, start+time.offset-1, time.slices)
   
