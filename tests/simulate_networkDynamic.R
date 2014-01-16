@@ -1,6 +1,4 @@
-# test simulate.networkDynamic using example code
-require(networkDynamic)
-require(tergm)
+library(tergm)
 
 logit<-function(p)log(p/(1-p))
 coef.form.f<-function(coef.diss,density) -log(((1+exp(coef.diss))/(density/(1-density)))-1)
