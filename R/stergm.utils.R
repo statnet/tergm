@@ -39,6 +39,10 @@ get.dev <- local({
 
 
 # A wrapper around network.extract
+# extracts the network at the specified time point and and attaches
+# a network attribute representing that time point
+# as well as numeric vector named "lasttoggle" representing the age of every (off-diagonal, 
+# non-bipartite crossing) possible dyad in the network.
 network.extract.with.lasttoggle <- function(nwd, at){
   nw <- network.extract(nwd, at=at)
   nw %v% ".networkDynamicID" <- which(is.active(nwd, at=at, v=seq_len(network.size(nwd))))
