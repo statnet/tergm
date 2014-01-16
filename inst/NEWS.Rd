@@ -21,7 +21,11 @@
       return incorrect acceptance probabilities when combined with the
       \code{\link[=ergm-constraints]{bd}} constraint. This has been
       fixed.
-    }      
+
+      \item In \code{\link{simulate.networkDynamic}}, an error in which
+      vertices were queried and updated in the simulation has been
+      fixed.
+    }
   }
 
   \subsection{OTHER USER-VISIBLE CHANGES}{
