@@ -13,6 +13,63 @@
 
 % When a release is forked, copy the sections to a new release and
 % delete unused sections.
+\section{Changes in version 3.1.3}{
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item Some Metropolis-Hastings proposal functions would sometimes
+      return incorrect acceptance probabilities when combined with the
+      \code{\link[=ergm-constraints]{bd}} constraint. This has been
+      fixed.
+    }      
+  }
+
+  \subsection{OTHER USER-VISIBLE CHANGES}{
+    \itemize{
+      \item \code{\link{simulate.networkDynamic}} and
+      \code{\link{simulate.network}} functions now take an additional
+      argument, \code{time.offset}. See help for those functions for
+      details.
+    }
+  }
+
+  % \subsection{NEW FEATURES}{
+  %   \itemize{
+  %   }
+  % }
+  
+  % \subsection{DEPRECATED & DEFUNCT}{
+  %   \itemize{
+  %   }
+  % }
+  
+  % \subsection{C-LEVEL FACILITIES}{
+  %   \itemize{
+  %     \item It is not clear that we need a subsection called "C-LEVEL FACILITIES".
+  %   }
+  % }
+
+  % \subsection{UTILITIES}{
+  %   \itemize{
+  %     \item Likewise, "UTILITIES" is probably unnecessary.
+  %   }
+  % }
+
+  % \subsection{INSTALLATION}{
+  %   \itemize{
+  %     \item ... as is "INSTALLATION".
+  %   }
+  % }
+
+  % \subsection{PACKAGE INSTALLATION}{
+  %   \itemize{
+  %     \item ditto.
+  %   }
+  % }
+
+}
+
+
 \section{Changes in version 3.1.2}{
 
   \subsection{NEW FEATURES}{
@@ -58,31 +115,6 @@
       \item Some minor documentation typos have been fixed.
     }
   }
-
-  % \subsection{C-LEVEL FACILITIES}{
-  %   \itemize{
-  %     \item It is not clear that we need a subsection called "C-LEVEL FACILITIES".
-  %   }
-  % }
-
-  % \subsection{UTILITIES}{
-  %   \itemize{
-  %     \item Likewise, "UTILITIES" is probably unnecessary.
-  %   }
-  % }
-
-  % \subsection{INSTALLATION}{
-  %   \itemize{
-  %     \item ... as is "INSTALLATION".
-  %   }
-  % }
-
-  % \subsection{PACKAGE INSTALLATION}{
-  %   \itemize{
-  %     \item ditto.
-  %   }
-  % }
-
 }
 
 \section{Changes in version 3.1.1}{
