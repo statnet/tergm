@@ -329,6 +329,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
         # This test is fast, so no need to thin.
         p.val.1 <- try(approx.hotelling.diff.test(ys)$p.value)
+        if(is.na(p.val.1)) p.val.1 <- 0
 
         # Thin the data to keep from bogging down.
         x <- unique(round(seq(from=1,to=NROW(history$oh),length.out=control$SA.stepdown.maxn)))
