@@ -747,9 +747,7 @@ msm.fit <- stergm(msm.net,
 	targets="formation",
 	target.stats= msm.target.stats,
 	offset.coef.diss = msm.theta.diss,
-	estimate = "EGMME",
-	control=control.stergm(
-	    SA.init.gain=0.005)
+	estimate = "EGMME"
 )
 @
 
