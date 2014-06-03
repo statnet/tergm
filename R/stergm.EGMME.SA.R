@@ -239,6 +239,10 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     ## Adjust the number of time steps between jumps using burn-in.
     edge.ages <- unlist(sapply(states, function(state) state$nw%n%"time"-ergm.el.lasttoggle(state$nw)[,3]+1))
     control$SA.burnin<-control$SA.interval<- round(min(control$SA.max.interval, max(control$SA.min.interval, if(length(edge.ages)>0) control$SA.interval.mul*mean(edge.ages)))/2)
+  
+  if(is.nan(control$SA.burnin)|is.null(control$SA.burnin)|is.na(control$SA.burnin))
+    control$SA.burnin <- control$SA.interval <- 10 # TODO: Kirk : check this
+  
     if(verbose>1){
       cat("New interval:",control$SA.interval ,"\n")
     }  
@@ -557,8 +561,8 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
     z <- .C("MCMCDynSArun_wrapper",
             # Observed/starting network. 
             as.integer(Clist.form$tails), as.integer(Clist.form$heads),
-            time = if(is.null(Clist.form$time)) as.integer(0) else as.integer(Clist.form$time),
-            lasttoggle = if(is.null(Clist.form$time)) integer(network.dyadcount(state$nw)) else as.integer(Clist.form$lasttoggle),
+            time = as.integer(min(Clist.form$time,Clist.diss$time,Clist.diss$time)),
+            lasttoggle = as.integer(NVL(Clist.form$lasttoggle,Clist.diss$lasttoggle,Clist.mon$lasttoggle,0)),  
             as.integer(Clist.form$nedges),
             as.integer(Clist.form$n),
             as.integer(Clist.form$dir), as.integer(Clist.form$bipartite),

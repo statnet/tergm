@@ -26,6 +26,8 @@ void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *
   Network nw;
   Model *m;
 
+  if(*lasttoggle == 0) lasttoggle = NULL;
+
   MCMCDyn_init_common(tails, heads, *time, lasttoggle, *n_edges,
 		      *n_nodes, *directed_flag, *bipartite, &nw,
 		      0, NULL, NULL, NULL, NULL,
@@ -80,6 +82,7 @@ void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *
   if(*status == MCMCDyn_OK && *maxedges>0){
     newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList(newnetworktails+1,newnetworkheads+1,&nw,*maxedges-1);
     *time = nw.duration_info.time;
+    if(nw.duration_info.lasttoggle)
     memcpy(lasttoggle, nw.duration_info.lasttoggle, sizeof(int)*DYADCOUNT(*n_nodes, *bipartite, *directed_flag));
   }
 

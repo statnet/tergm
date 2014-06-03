@@ -37,6 +37,7 @@
 \alias{stergm.EGMME.initialfit}
 \alias{stergm.getMCMCsample}
 
+\alias{is.lasttoggle}
 
 \description{
 Internal stergm functions.}

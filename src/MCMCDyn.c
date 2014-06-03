@@ -95,6 +95,8 @@ void MCMCDyn_wrapper(// Starting network.
   Model *F_m, *D_m, *M_m;
   MHproposal F_MH, D_MH;
 
+  if(*lasttoggle == 0) lasttoggle = NULL;
+
   Vertex *difftime, *difftail, *diffhead;
   int *diffto;
 
@@ -141,6 +143,8 @@ void MCMCDyn_wrapper(// Starting network.
   if(*status == MCMCDyn_OK && *maxedges>0){
     newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList(newnetworktails+1,newnetworkheads+1,nw,*maxedges-1);
     *time = nw->duration_info.time;
+
+    if(nw->duration_info.lasttoggle)
     memcpy(lasttoggle, nw->duration_info.lasttoggle, sizeof(int)*DYADCOUNT(*n_nodes, *bipartite, *dflag));
   }
 
@@ -151,7 +155,6 @@ void MCMCDyn_wrapper(// Starting network.
   }
 
   MCMCDyn_finish_common(nw, F_m, D_m, M_m, &F_MH, &D_MH);
-
 }
 
 /*********************
@@ -494,4 +497,3 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
     *nextdiffedge=nde;
   return MCMCDyn_OK;
 }
-

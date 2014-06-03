@@ -23,6 +23,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   nw.start = NULL,
   stats.form = FALSE,
   stats.diss = FALSE,
+  duration.dependent = NULL,
   verbose=FALSE, 
   \dots)
 \method{simulate}{network}(object, nsim=1, seed=NULL,
@@ -36,6 +37,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   output=c("networkDynamic", "stats", "changes", "final"),
   stats.form = FALSE,
   stats.diss = FALSE,
+  duration.dependent = NULL,
   verbose=FALSE,
   \dots)
 \method{simulate}{networkDynamic}(object, nsim=1, seed=NULL,
@@ -51,6 +53,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
    output=c("networkDynamic", "stats", "changes"),
    stats.form = FALSE,
    stats.diss = FALSE,
+   duration.dependent = NULL,
    verbose=FALSE,
    \dots)
 }
@@ -170,7 +173,12 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   \item{stats.form, stats.diss}{Logical: Whether to return
     formation/dissolution model statistics. This is not the recommended
     method: use \code{monitor} argument instead.}
-
+    
+  \item{duration.dependent}{Logical: Whether the model terms in formula 
+    or model are durational dependent. E.g., if a duration-dependent term 
+    is used in estimation/simulation model, the probability of forming or 
+    dissolving a tie may dependent on the age the dyad status. 
+        
   \item{verbose}{Logical:  If TRUE, extra information is printed
     as the Markov chain progresses. 
   }

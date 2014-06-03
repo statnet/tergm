@@ -5,8 +5,8 @@
 stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times=NULL, offset.coef.form=NULL, offset.coef.diss=NULL,
                    targets=NULL, target.stats=NULL,
                    eval.loglik=TRUE,
-                 control=control.stergm(),
-                 verbose=FALSE, ...) {
+                   control=control.stergm(),
+                   verbose=FALSE, ...) {
   check.control.class()
   
   if(!is.null(control$seed))  set.seed(as.integer(control$seed))
@@ -25,7 +25,15 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
     warning("Dissolution formula has an LHS, which will be ignored in favor of nw.")
     dissolution <- dissolution[c(1,3)] # in a formula f<-y~x, f[1]=~, f[2]=y, and f[3]=x
   }
-
+  
+  # lasttoggle
+  if(estimate=="EGMME"){
+  duration.dependent <- is.lasttoggle(nw,formation,dissolution,targets)
+  
+  if(duration.dependent)
+    nw %n% "lasttoggle" <- NVL(nw %n% "lasttoggle",rep(round(-.Machine$integer.max/2), network.dyadcount(nw)))  else nw %n% "lasttoggle" <- NULL
+  }
+  
   out <- switch(estimate,
                 CMLE=,
                 CMPLE=stergm.CMLE(nw, formation, dissolution, constraints,
@@ -35,12 +43,12 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
                   offset.coef.form, offset.coef.diss,
                   targets, target.stats, estimate, control, verbose)
                   )
-
+  
   
   out$formation <- formation
   out$dissolution <- dissolution
   out$control <- control
-
+  
   class(out)<-"stergm"
   out
 }

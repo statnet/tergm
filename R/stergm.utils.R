@@ -43,46 +43,45 @@ get.dev <- local({
 # a network attribute representing that time point
 # as well as numeric vector named "lasttoggle" representing the age of every (off-diagonal, 
 # non-bipartite crossing) possible dyad in the network.
-network.extract.with.lasttoggle <- function(nwd, at){
-  nw <- network.extract(nwd, at=at)
-  nw %v% ".networkDynamicID" <- which(is.active(nwd, at=at, v=seq_len(network.size(nwd))))
-  
-  # There is probably a more efficient way to do this:
-
-  # Note that nw is still a networkDynamic, and still has vertex and
-  # edge activity.
-  lttails <- lapply(nw$mel, "[[", "outl")
-  ltheads <- lapply(nw$mel, "[[", "inl")
-  # I.e., from the edge attribute list, grab the "active" matrix, and from it, extract the highest (most recent) timestamp that's prior to or at at.
-  # Note that if x[x<=at] is empty, max(x[x<=at]) returns -Inf, which is what we want.
-  ltlts <- lapply(lapply(lapply(nw$mel, "[[", "atl"), "[[", "active"), function(x) suppressWarnings(max(x[x<=at])))
-
-  # Now, strip the networkDynamic information from it.
-  delete.vertex.attribute(nw, "active")
-  delete.edge.attribute(nw, "active")
-  class(nw) <- "network"
-  
-  ltm <-
-    if(is.bipartite(nw)) m <- matrix(-Inf, nw%n%"bipartite", network.size(nw) - nw%n%"bipartite")
-    else m <- matrix(-Inf, network.size(nw), network.size(nw))
-
-  for(i in seq_along(ltlts))
-    if(ltlts[[i]]!=-Inf){
-      e<-c(lttails[[i]],ltheads[[i]])
-      if(!all(e)) next
-      if(!is.directed(nw)) e <- c(min(e),max(e))
-      if(is.bipartite(nw)) e[2] <- e[2] - nw %n% "bipartite"
-      # The -1 is important: lasttoggle is shifted by -1 relative to
-      # networkDynamic (at least for now).
-      m[e[1],e[2]] <- ltlts[[i]] - 1 
-    }
-  m[m==-Inf] <- round(-.Machine$integer.max/2)
-  
-  nw %n% "time" <- at
-  nw %n% "lasttoggle" <- to.lasttoggle.matrix(m, is.directed(nw), is.bipartite(nw))
-
-  nw
+# updates: lasttoggle is NULL when duration.dependent is FALSE
+network.extract.with.lasttoggle <- function(nwd, at, duration.dependent){
+	nw <- network.extract(nwd, at=at)
+	nw %v% ".networkDynamicID" <- which(is.active(nwd, at=at, v=seq_len(network.size(nwd))))
+	if(duration.dependent==1){
+		lttails <- lapply(nw$mel, "[[", "outl")
+		ltheads <- lapply(nw$mel, "[[", "inl")
+		ltlts <- lapply(lapply(lapply(nw$mel, "[[", "atl"), "[[", 
+						"active"), function(x) suppressWarnings(max(x[x <= at])))
+		
+		delete.vertex.attribute(nw, "active")
+		delete.edge.attribute(nw, "active")
+		class(nw) <- "network"
+		
+		ltm <- if (is.bipartite(nw)) 
+					m <- matrix(-Inf, nw %n% "bipartite", network.size(nw) - 
+									nw %n% "bipartite")
+				else m <- matrix(-Inf, network.size(nw), network.size(nw))
+		for (i in seq_along(ltlts)) if (ltlts[[i]] != -Inf) {
+				e <- c(lttails[[i]], ltheads[[i]])
+				if (!all(e)) 
+					next
+				if (!is.directed(nw)) 
+					e <- c(min(e), max(e))
+				if (is.bipartite(nw)) 
+					e[2] <- e[2] - nw %n% "bipartite"
+				m[e[1], e[2]] <- ltlts[[i]] - 1
+			}
+		m[m == -Inf] <- round(-.Machine$integer.max/2)
+		lasttoggle <-to.lasttoggle.matrix(m, is.directed(nw), is.bipartite(nw))} 
+	else{
+		lasttoggle <- NULL
+	}
+	
+	nw %n% "time" <- at
+	nw %n% "lasttoggle" <- lasttoggle
+	nw
 }
+
 
 to.networkDynamic.lasttoggle <- function(nw){
   nwd <- nw

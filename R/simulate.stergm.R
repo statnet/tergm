@@ -40,6 +40,8 @@
 #                  'changes' will be switched to FALSE if either of
 #                  'time.burnin' or 'time.interval' do not have their default
 #                  values; default=TRUE
+#   duration.dependent : whether the model/formula are durational dependent
+#                  default=NULL
 #   verbose      : whether to print out information on the status of
 #                  the simulations; default=FALSE
 #
@@ -80,6 +82,7 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
                           nw.start = NULL,
                           stats.form = FALSE,
                           stats.diss = FALSE,
+                          duration.dependent = NULL,
                           verbose=FALSE, ...){
   check.control.class(c("simulate.stergm","simulate.network"))
   
@@ -112,8 +115,14 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
   }else if(is.networkDynamic(nw.start)){
     stop("Using a networkDynamic to start a simulation from a STERGM is not supported at this time.")
   }
+    if(is.null(duration.dependent)){
+    duration.dependent <-   is.lasttoggle(nw.start,object$formation,object$dissolution,object$monitor)
+  }
   
-  simulate.network(nw.start,formation=object$formation,dissolution=object$dissolution,nsim=nsim,coef.form=coef.form, coef.diss=coef.diss, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, statsonly=statsonly, output=output, stats.form = stats.form, stats.diss = stats.diss, verbose=verbose,...)
+  if(!duration.dependent)
+    nw.start %n% "lasttoggle" <- NULL
+  
+  simulate.network(nw.start,formation=object$formation,dissolution=object$dissolution,nsim=nsim,coef.form=coef.form, coef.diss=coef.diss, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, statsonly=statsonly, output=output, stats.form = stats.form, stats.diss = stats.diss, duration.dependent=duration.dependent, verbose=verbose,...)
 }
 
 
@@ -130,7 +139,8 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                              output=c("networkDynamic", "stats", "changes", "final"),
                              stats.form = FALSE,
                              stats.diss = FALSE,
-                             verbose=FALSE, ...) {
+                             duration.dependent=NULL,
+                             verbose=FALSE,...) {
   if(length(list(...))) stop("Unknown arguments: ",names(list(...)))
   check.control.class(myname="STERGM simulate.network")
 
@@ -181,6 +191,15 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   
   if(!is.null(monitor)) monitor<-ergm.update.formula(monitor,nw~., from.new="nw")
   
+  if(is.null(duration.dependent)){ # in the case of simulating from nw directly 
+    duration.dependent <- is.lasttoggle(nw,formation,dissolution,monitor)
+    if(duration.dependent)
+      nw %n% "lasttoggle" <- NVL(nw %n% "lasttoggle",rep(round(-.Machine$integer.max/2), network.dyadcount(nw)))  else nw %n% "lasttoggle" <- NULL
+      
+  }
+
+
+
   model.form <- ergm.getmodel(formation, nw, role="formation")
   if(!missing(coef.form) && coef.length.model(model.form)!=length(coef.form)) stop("coef.form has ", length(coef.form), " elements, while the model requires ",coef.length.model(model.form)," parameters.")
 
@@ -214,7 +233,6 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   control$collect.diss <- stats.diss
   
   out <- replicate(nsim, {
-    if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(round(-.Machine$integer.max/2), network.dyadcount(nw))
     nw <- .set.default.net.obs.period(nw, time.start)
     nw %n% "time" <- start <- .get.last.obs.time(nw, time.start)
     z <- stergm.getMCMCsample(nw, model.form, model.diss, model.mon,
@@ -349,7 +367,9 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     output=c("networkDynamic", "stats", "changes"),
                                     stats.form = FALSE,
                                     stats.diss = FALSE,
+                                    duration.dependent = NULL,
                                     verbose=FALSE, ...){
+  
   if(nsim>1) stop("Simulating more than one chain of networks is not supported at this time. If you want to simulate over multiple time steps, use the time.slices argument.")
 
   if(!is.null(statsonly)){
@@ -360,10 +380,21 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   # Resolve the starting time by setting the initial (implicit) net.obs.period.
   object <- .set.default.net.obs.period(object, time.start)
   start <- .get.last.obs.time(object, time.start)
-
+  
+  # if the network does not have a vertex pid, create one
+  if(is.null(object%n%'vertex.pid')){
+    set.vertex.attribute(object,'.networkDynamicID',1:network.size(object))
+    object%n%'vertex.pid'<-'.networkDynamicID'
+  }
+  
   if(verbose) cat("extracting state of networkDynamic at time ",start,"\n")
-  nw <- network.extract.with.lasttoggle(object, start)
- 
+  
+  # extract nwd to nw
+  
+  if(is.null(duration.dependent))
+    duration.dependent <- is.lasttoggle(object,formation,dissolution,monitor)
+  
+  nw <- network.extract.with.lasttoggle(object, start, duration.dependent)
   vActiveIDs <- nw %v% ".networkDynamicID"
   delete.vertex.attribute(nw, ".networkDynamicID")
  
@@ -378,9 +409,11 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                           output=switch(output, networkDynamic = "changes", output),
                           stats.form = stats.form,
                           stats.diss = stats.diss,
+                          duration.dependent=duration.dependent,
                           verbose=verbose, ...)
   
   ## Map the vertex IDs back to the original network:
+  
   sim[,"tail"] <- vActiveIDs[sim[,"tail"]]
   sim[,"head"] <- vActiveIDs[sim[,"head"]]
   

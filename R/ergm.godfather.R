@@ -64,6 +64,8 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
 
   nw <- ergm.getnetwork(formula)
   
+  formula <- ergm.update.formula(formula, nw~., from.new="nw")
+  
   if(is.networkDynamic(nw)){
     if(!is.null(toggles)) stop("Network passed already contains change or toggle information.")
 
@@ -98,8 +100,9 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
       stop("Network size and/or composition appears to change in the interval between start and end. This is not supported by ergm.godfather() at this time.")
 
     # Finally, we are ready to extract the network.
-    nw <- network.extract.with.lasttoggle(nw, start)
-    
+  duration.dependent <- if(is.durational(formula)){1} else {0}
+  nw <- network.extract.with.lasttoggle(nw, at=start, duration.dependent)
+
   }else{
     if(is.null(toggles)) stop("Either pass a networkDynamic, or provide change or toggle information.")
       
@@ -139,7 +142,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
     z <- .C("godfather_wrapper",
             as.integer(Clist$tails), as.integer(Clist$heads),
             time = if(is.null(Clist$time)) as.integer(0) else as.integer(Clist$time),
-            lasttoggle = if(is.null(Clist$lasttoggle)) as.integer(NULL) else as.integer(Clist$lasttoggle),
+            lasttoggle = as.integer(NVL(Clist$lasttoggle,0)),             
             as.integer(Clist$nedges),
             as.integer(Clist$n),
             as.integer(Clist$dir), as.integer(Clist$bipartite),

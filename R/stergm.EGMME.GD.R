@@ -101,6 +101,12 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     ## Adjust the number of time steps between jumps.
     edge.ages <- unlist(sapply(states, function(state) state$nw%n%"time"-ergm.el.lasttoggle(state$nw)[,3]+1))
     control$SA.burnin<-control$SA.interval<- round(min(control$SA.max.interval, max(control$SA.min.interval, if(length(edge.ages)>0) control$SA.interval.mul*mean(edge.ages)))/2)
+    
+    
+    if(is.nan(control$SA.burnin)|is.null(control$SA.burnin)|is.na(control$SA.burnin))
+        control$SA.burnin <- control$SA.interval <- 10 # TODO: Kirk : check this
+    
+    
     if(verbose>1){
       cat("New interval:",control$SA.interval ,"\n")
     }
