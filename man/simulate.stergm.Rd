@@ -177,7 +177,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   \item{duration.dependent}{Logical: Whether the model terms in formula 
     or model are durational dependent. E.g., if a duration-dependent term 
     is used in estimation/simulation model, the probability of forming or 
-    dissolving a tie may dependent on the age the dyad status. 
+    dissolving a tie may dependent on the age the dyad status. }
         
   \item{verbose}{Logical:  If TRUE, extra information is printed
     as the Markov chain progresses. 
@@ -185,6 +185,8 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   \item{\dots}{Further arguments passed to or used by methods.
   }
 }
+
+
 \details{
   The dynamic process is run forward and the results are returned. For
   the method for \code{\link{networkDynamic}}, the simulation is resumed
