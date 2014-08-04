@@ -10,7 +10,7 @@
 }
 \description{
   A method for \code{\link[ergm]{summary.statistics}} to calculate the specified 
-  statistics for an observed \code{\link{networkDynamic}}.
+  statistics for an observed \code{\link{networkDynamic}} at the specified time point(s).
   See \code{\link{ergm-terms}} for more information on the statistics that may
   be specified.
 }
@@ -35,10 +35,20 @@
 }
 }
 \value{
-  A matrix with \code{length(at)} rows, one for each time point,
-  containing the statistics measured on the network.
+  A matrix with \code{length(at)} rows, one for each time point in \code{at},
+  and columns for each term of the formula, containing the corresponding statistics measured on the network.
 }
 \seealso{
   ergm, networkDynamic, ergm-terms, summary.statistics.network
+}
+\examples{
+# create a toy dynamic network
+my.nD <- network.initialize(100,directed=FALSE)
+activate.vertices(my.nD, onset=0, terminus = 10)
+add.edges.active(my.nD,tail=1:2,head=2:3,onset=5,terminus=8)
+
+# use a summary formula to display number of isolates and edges
+# at discrete time points
+summary(my.nD~isolates+edges, at=1:10)
 }
 \keyword{ models }

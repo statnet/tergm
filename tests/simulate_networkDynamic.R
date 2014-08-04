@@ -222,3 +222,9 @@ if(length((msm.sim%n%'net.obs.period')$observations)>1){
   stop('simulate.networkDynamic mangled net.obs.period with time.offset=0 argument')
 }
 
+# ---- check summary.statistics.networkDynamic ---
+# this was giving error in #958
+my.nD <- network.initialize(100,directed=F)
+activate.vertices(my.nD, onset=0, terminus = 10)
+class(my.nD)
+summary(my.nD~isolates, at=1)
