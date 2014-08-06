@@ -222,6 +222,67 @@ if(length((msm.sim%n%'net.obs.period')$observations)>1){
   stop('simulate.networkDynamic mangled net.obs.period with time.offset=0 argument')
 }
 
+
+# --- check that adding and deleting vertices behaves properly ---
+g0<-network.initialize(20,dir=TRUE)
+g1<-san(g0~edges,target.stats=20,verbose=TRUE)
+# Simulate a networkDynamic from static 
+dynsim<-simulate(g1,formation=~edges,dissolution=~edges,
+                 coef.form=-9.326322,coef.diss=2.197225,
+                 time.slices=1,verbose=TRUE)
+# add more vertices
+add.vertices(dynsim,3)
+# simulate another step
+dynsim<-simulate(dynsim,formation=~edges,dissolution=~edges,
+                 coef.form=-9.326322,coef.diss=2.197225,
+                 time.slices=1,verbose=TRUE)
+# expect to see a pid defined, but will just be numeric values
+if (dynsim%n%'vertex.pid'!=".networkDynamicID"){
+  stop("simulate.networkDynamic net not add a vertex.pid to the network as expected")
+}
+if(!all(is.numeric(dynsim%v%".networkDynamicID"))){
+  stop("simulate.networkDynamic did not create new numeric vertex pid as expected")
+}
+
+
+# add more (at this point there should be some non-numeric pids created)
+add.vertices(dynsim,3)
+if(all(is.numeric(dynsim%v%".networkDynamicID"))){
+  stop("add.vertices did not create new non-numeric vertex pids as expected")
+}
+
+# simulate
+dynsim<-simulate(dynsim,formation=~edges,dissolution=~edges,
+                 coef.form=-9.326322,coef.diss=2.197225,
+                 time.slices=1,verbose=TRUE)
+# delete some vertices
+delete.vertices(dynsim,vid = 5:10)
+dynsim<-simulate(dynsim,formation=~edges,dissolution=~edges,
+                 coef.form=-9.326322,coef.diss=2.197225,
+                 time.slices=1,verbose=TRUE)
+
+# test with an externally defined PID  --------------
+
+# Simulate a networkDynamic from static 
+dynsim<-simulate(g1,formation=~edges,dissolution=~edges,
+                 coef.form=-9.326322,coef.diss=2.197225,
+                 time.slices=1,verbose=TRUE)
+dynsim%n%'vertex.pid'<-'letters'
+dynsim%v%'letters'<-LETTERS[1:20]
+# simulate another step
+dynsim<-simulate(dynsim,formation=~edges,dissolution=~edges,
+                 coef.form=-9.326322,coef.diss=2.197225,
+                 time.slices=1,verbose=TRUE)
+# expect to see a pid defined, but will just be numeric values
+if (dynsim%n%'vertex.pid'!="letters"){
+  stop("simulate.networkDynamic vertex pid missing")
+}
+if(!all(is.na(dynsim%v%".networkDynamicID"))){
+  stop("simulate.networkDynamic created a .networkDynamicID when a vertex.pid already existed")
+}
+
+
+
 # ---- check summary.statistics.networkDynamic ---
 # this was giving error in #958
 my.nD <- network.initialize(100,directed=F)

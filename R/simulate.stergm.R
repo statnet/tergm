@@ -395,10 +395,11 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
     duration.dependent <- is.lasttoggle(object,formation,dissolution,monitor)
   
   nw <- network.extract.with.lasttoggle(object, start, duration.dependent)
-  vActiveIDs <- nw %v% ".networkDynamicID"
-  delete.vertex.attribute(nw, ".networkDynamicID")
+  #vActiveIDs <- as.numeric(nw %v% ".networkDynamicID")
+  #delete.vertex.attribute(nw, ".networkDynamicID")
  
   output <- match.arg(output)
+  # get back a 'changes' matrix for the next sim step with columns 'time','tail','head','to'
   sim <- simulate.network(nw, nsim=1, seed=NULL,
                           formation=formation, dissolution=dissolution,
                           coef.form=coef.form,coef.diss=coef.diss,
@@ -412,10 +413,13 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                           duration.dependent=duration.dependent,
                           verbose=verbose, ...)
   
-  ## Map the vertex IDs back to the original network:
-  
-  sim[,"tail"] <- vActiveIDs[sim[,"tail"]]
-  sim[,"head"] <- vActiveIDs[sim[,"head"]]
+  ## Map the vertex IDs back to the original dynamic network from the static sim:
+  #  using the pid methods to be safe for when pids are non-numeric
+  # pids are either pre-existing, or set by network.extract.with.lasttoggle
+  #sim[,"tail"] <- vActiveIDs[sim[,"tail"]]
+  #sim[,"head"] <- vActiveIDs[sim[,"head"]]
+  sim[,"tail"] <- get.vertex.id(object,get.vertex.pid(nw,sim[,"tail"]))
+  sim[,"head"] <- get.vertex.id(object,get.vertex.pid(nw,sim[,"head"]))
   
   ## If all the user wants is statistics or a list of toggles, we are done.
   if(output!="networkDynamic") return(sim)

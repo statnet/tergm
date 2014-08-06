@@ -46,13 +46,17 @@ get.dev <- local({
 # updates: lasttoggle is NULL when duration.dependent is FALSE
 network.extract.with.lasttoggle <- function(nwd, at, duration.dependent){
 	nw <- network.extract(nwd, at=at)
-	nw %v% ".networkDynamicID" <- which(is.active(nwd, at=at, v=seq_len(network.size(nwd))))
+  # check if the appropriate pid is defined, and if not, add it
+  if (is.null(nwd%n%'vertex.pid')){
+	  nw %v% ".networkDynamicID" <- which(is.active(nwd, at=at, v=seq_len(network.size(nwd))))
+  }
 	if(duration.dependent==1){
 		lttails <- lapply(nw$mel, "[[", "outl")
 		ltheads <- lapply(nw$mel, "[[", "inl")
 		ltlts <- lapply(lapply(lapply(nw$mel, "[[", "atl"), "[[", 
 						"active"), function(x) suppressWarnings(max(x[x <= at])))
 		
+    #TODO: why is the activity info deleted?  will slow things down
 		delete.vertex.attribute(nw, "active")
 		delete.edge.attribute(nw, "active")
 		class(nw) <- "network"
@@ -72,8 +76,9 @@ network.extract.with.lasttoggle <- function(nwd, at, duration.dependent){
 				m[e[1], e[2]] <- ltlts[[i]] - 1
 			}
 		m[m == -Inf] <- round(-.Machine$integer.max/2)
-		lasttoggle <-to.lasttoggle.matrix(m, is.directed(nw), is.bipartite(nw))} 
-	else{
+		lasttoggle <-to.lasttoggle.matrix(m, is.directed(nw), is.bipartite(nw))
+	} 
+	else {  # non-duration dependent model
 		lasttoggle <- NULL
 	}
 	
