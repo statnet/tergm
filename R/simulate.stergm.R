@@ -383,8 +383,8 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   
   # if the network does not have a vertex pid, create one
   if(is.null(object%n%'vertex.pid')){
-    set.vertex.attribute(object,'.networkDynamicID',1:network.size(object))
-    object%n%'vertex.pid'<-'.networkDynamicID'
+    set.vertex.attribute(object,'tergm_pid',1:network.size(object))
+    object%n%'vertex.pid'<-'tergm_pid'
   }
   
   if(verbose) cat("extracting state of networkDynamic at time ",start,"\n")
@@ -395,9 +395,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
     duration.dependent <- is.lasttoggle(object,formation,dissolution,monitor)
   
   nw <- network.extract.with.lasttoggle(object, start, duration.dependent)
-  #vActiveIDs <- as.numeric(nw %v% ".networkDynamicID")
-  #delete.vertex.attribute(nw, ".networkDynamicID")
- 
+
   output <- match.arg(output)
   # get back a 'changes' matrix for the next sim step with columns 'time','tail','head','to'
   sim <- simulate.network(nw, nsim=1, seed=NULL,

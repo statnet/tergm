@@ -48,7 +48,7 @@ network.extract.with.lasttoggle <- function(nwd, at, duration.dependent){
 	nw <- network.extract(nwd, at=at)
   # check if the appropriate pid is defined, and if not, add it
   if (is.null(nwd%n%'vertex.pid')){
-	  nw %v% ".networkDynamicID" <- which(is.active(nwd, at=at, v=seq_len(network.size(nwd))))
+	  nw %v% "tergm_pid" <- which(is.active(nwd, at=at, v=seq_len(network.size(nwd))))
   }
 	if(duration.dependent==1){
 		lttails <- lapply(nw$mel, "[[", "outl")

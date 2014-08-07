@@ -237,17 +237,17 @@ dynsim<-simulate(dynsim,formation=~edges,dissolution=~edges,
                  coef.form=-9.326322,coef.diss=2.197225,
                  time.slices=1,verbose=TRUE)
 # expect to see a pid defined, but will just be numeric values
-if (dynsim%n%'vertex.pid'!=".networkDynamicID"){
+if (dynsim%n%'vertex.pid'!="tergm_pid"){
   stop("simulate.networkDynamic net not add a vertex.pid to the network as expected")
 }
-if(!all(is.numeric(dynsim%v%".networkDynamicID"))){
+if(!all(is.numeric(dynsim%v%"tergm_pid"))){
   stop("simulate.networkDynamic did not create new numeric vertex pid as expected")
 }
 
 
 # add more (at this point there should be some non-numeric pids created)
 add.vertices(dynsim,3)
-if(all(is.numeric(dynsim%v%".networkDynamicID"))){
+if(all(is.numeric(dynsim%v%"tergm_pid"))){
   stop("add.vertices did not create new non-numeric vertex pids as expected")
 }
 
@@ -277,8 +277,8 @@ dynsim<-simulate(dynsim,formation=~edges,dissolution=~edges,
 if (dynsim%n%'vertex.pid'!="letters"){
   stop("simulate.networkDynamic vertex pid missing")
 }
-if(!all(is.na(dynsim%v%".networkDynamicID"))){
-  stop("simulate.networkDynamic created a .networkDynamicID when a vertex.pid already existed")
+if(!all(is.na(dynsim%v%"tergm_pid"))){
+  stop("simulate.networkDynamic created a tergm_pid when a vertex.pid already existed")
 }
 
 
