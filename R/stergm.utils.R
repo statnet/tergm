@@ -56,11 +56,6 @@ network.extract.with.lasttoggle <- function(nwd, at, duration.dependent){
 		ltlts <- lapply(lapply(lapply(nw$mel, "[[", "atl"), "[[", 
 						"active"), function(x) suppressWarnings(max(x[x <= at])))
 		
-    #TODO: why is the activity info deleted?  will slow things down
-		delete.vertex.attribute(nw, "active")
-		delete.edge.attribute(nw, "active")
-		class(nw) <- "network"
-		
 		ltm <- if (is.bipartite(nw)) 
 					m <- matrix(-Inf, nw %n% "bipartite", network.size(nw) - 
 									nw %n% "bipartite")
