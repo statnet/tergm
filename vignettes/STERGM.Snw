@@ -20,6 +20,8 @@
 \newcommand{\paramVec}{\theta}
 \newcommand{\covmat}{\mathbf{X}}
 
+%\VignetteIndexEntry{STERGM Vignette}
+
 <<echo=false>>=
 options(width=60)
 @
