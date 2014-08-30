@@ -289,3 +289,26 @@ my.nD <- network.initialize(100,directed=F)
 activate.vertices(my.nD, onset=0, terminus = 10)
 class(my.nD)
 summary(my.nD~isolates, at=1)
+
+
+# --- checking simulate with Inf coefficients ---
+# was giving error to #995
+n <- 50
+nw <- network.initialize(n, directed = FALSE)
+nw <- set.vertex.attribute(nw, "loc", rep(0:1, each = n/2))
+
+fit <- ergm(nw ~ edges + offset(nodemix("loc", base=c(1, 3))),
+            target.stats = 15,
+            offset.coef = -Inf)
+coef.form <- fit$coef
+coef.form[1] <- coef.form[1] - log(40-1)
+
+fit.sim <- simulate(fit)
+diag.sim <- simulate(fit.sim,
+                     formation = ~ edges + offset(nodemix("loc", base=c(1, 3))),
+                     dissolution = ~offset(edges),
+                     coef.form = coef.form,
+                     coef.diss = log(40-1),
+                     time.slices = 100,
+                     monitor = "formation",
+                     nsim = 1)

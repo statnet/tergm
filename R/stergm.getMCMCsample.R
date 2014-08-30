@@ -79,6 +79,7 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
   maxchanges <- control$MCMC.init.maxchanges
   repeat{
     #FIXME: Separate MCMC control parameters and properly attach them.
+    
     z <- .C("MCMCDyn_wrapper",
             # Observed network.
             as.integer(Clist.form$tails), as.integer(Clist.form$heads),
@@ -92,13 +93,13 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
             as.character(Clist.form$fnamestring),
             as.character(Clist.form$snamestring),
             as.character(MHproposal.form$name), as.character(MHproposal.form$pkgname),
-            as.double(Clist.form$inputs), as.double(eta.form),
+            as.double(Clist.form$inputs), as.double(ergm:::.deinf(eta.form)),
             # Dissolution terms and proposals.
             as.integer(Clist.diss$nterms), 
             as.character(Clist.diss$fnamestring),
             as.character(Clist.diss$snamestring),
             as.character(MHproposal.diss$name), as.character(MHproposal.diss$pkgname),
-            as.double(Clist.diss$inputs), as.double(eta.diss),
+            as.double(Clist.diss$inputs), as.double(ergm:::.deinf(eta.diss)),
             # Monitored terms.
             if(!is.null(model.mon)) as.integer(Clist.mon$nterms) else as.integer(0), 
             if(!is.null(model.mon)) as.character(Clist.mon$fnamestring) else character(0),
