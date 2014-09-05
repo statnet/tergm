@@ -557,6 +557,9 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
   maxedges <- max(control$MCMC.init.maxedges, Clist.mon$nedges)
   maxchanges <- max(control$MCMC.init.maxchanges, Clist.mon$nedges)
 
+  eta.form <- ergm:::.deinf(state$eta.form)
+  eta.diss <- ergm:::.deinf(state$eta.diss)
+  
   repeat{
     z <- .C("MCMCDynSArun_wrapper",
             # Observed/starting network. 
@@ -575,7 +578,7 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
             as.character(MHproposal.diss$name), as.character(MHproposal.diss$pkgname),
             as.double(Clist.diss$inputs),
             # Parameter fitting.
-            eta=as.double(c(state$eta.form,state$eta.diss)),
+            eta=as.double(c(eta.form, eta.diss)),
             as.integer(Clist.mon$nterms), as.character(Clist.mon$fnamestring), as.character(Clist.mon$snamestring),
             as.double(Clist.mon$inputs), 
             nw.diff=as.double(state$nw.diff),
