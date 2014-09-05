@@ -64,6 +64,7 @@ simtest <- function(S, edges, dur, n, dir=FALSE, bip=0){
             all.equal(sim.stats,summ.stats))
 }
 
+set.seed(1)
 cat("Undirected, unipartite:\n")
 simtest(20, 10, 10, 10, FALSE, FALSE)
 cat("Directed, unipartite:\n")

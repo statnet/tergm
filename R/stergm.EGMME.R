@@ -79,7 +79,10 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
 #  if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(round(-.Machine$integer.max/2), network.dyadcount(nw))
 	
   if(is.null(nw %n% "time")) nw %n% "time" <- 0
-   
+
+  # EGMME requires targets, or there will be an error
+  if (is.null(targets)) stop('stergm.EGMME requires targets parameter be specified')
+ 
   # Allow the user to specify targets as copied from formation or dissolution formula.
   if(is.character(targets)){
     targets <- switch(targets,

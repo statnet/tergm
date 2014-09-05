@@ -18,6 +18,9 @@
 \alias{InitErgmTerm.edgecov.mean.age}
 \alias{InitErgmTerm.degrange.mean.age}
 \alias{InitErgmTerm.degree.mean.age}
+\alias{InitErgmTerm.competitor.log.age}
+\alias{InitErgmTerm.log.ages}
+\alias{InitErgmTerm.mean.log.age}
 \docType{methods}
 \title{Temporally-Sensitive Terms used in Exponential Family Random Graph Models}
 \description{
