@@ -24,6 +24,7 @@ stergm.EGMME.initialfit<-function(init.form, init.diss, nw, model.form, model.di
     
     # Fit an ERGM to the formation terms:
     form.targets <- model.mon$target.stats[match(model.form$coef.names,model.mon$coef.names)]
+    form.targets <- form.targets[!model.form$etamap$offsettheta]
     init.form<-coef(ergm(model.form$formula,control=control.ergm(init=init.form), target.stats=form.targets, eval.loglik=FALSE))
     # Now, match up non-offset formation terms with dissolution terms.
     # In case it's not obvious (it's not to me) what the following

@@ -113,12 +113,15 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
     if(length(nw.stats)!=length(target.stats))
       stop("Incorrect length of the target.stats vector: should be ", length(nw.stats), " but is ",length(target.stats),".")
     
-    if (length(target.stats) != length(control$init.form)) {
+    if (!is.null(control$init.form) && length(target.stats) != length(control$init.form)) {
       if (length(target.stats) != length(control$SAN.control$coef)) {
         cat('SAN initial coefficients should have same length as targets. Setting them to SAN defaults.\n')
         control$SAN.control$coef <- NULL
       }
     }
+    
+    # target formula should not have offsets
+    #targets <- unset.offset.formula(targets)
     
     if(verbose) cat("Constructing an approximate response network.\n")
     ## If target.stats are given, overwrite the given network and targets
