@@ -99,6 +99,13 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
   formation <- ergm.update.formula(formation,nw~., from.new="nw")
   dissolution <- ergm.update.formula(dissolution,nw~., from.new="nw")
 
+  # target formula should not have offsets. removing them
+  if (any(offset.info.formula(targets)$term)) {
+    warning("Targets formula should not contain offset terms;
+                they have been been removed.")
+    targets <- remove.offset.formula(targets)
+  }
+
   control.transfer <- list(EGMME.MCMC.burnin.min="MCMC.burnin.min",
                            EGMME.MCMC.burnin.max="MCMC.burnin.max",
                            EGMME.MCMC.burnin.pval="MCMC.burnin.pval",
@@ -109,6 +116,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
 
   
   if(!is.null(target.stats)){
+
     nw.stats<-summary(targets)
     if(length(nw.stats)!=length(target.stats))
       stop("Incorrect length of the target.stats vector: should be ", length(nw.stats), " but is ",length(target.stats),".")
@@ -119,10 +127,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
         control$SAN.control$coef <- NULL
       }
     }
-    
-    # target formula should not have offsets
-    #targets <- unset.offset.formula(targets)
-    
+        
     if(verbose) cat("Constructing an approximate response network.\n")
     ## If target.stats are given, overwrite the given network and targets
     ## with SAN-ed network and targets.

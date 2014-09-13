@@ -91,7 +91,7 @@
     parameters.
   }
   \item{targets}{One-sided \code{\link{ergm}}-style formula specifying statistics whose
-    moments are used for the EGMME. Unused for CMLE and CMPLE.
+    moments are used for the EGMME. Unused for CMLE and CMPLE. Targets is required for EGMME estimation. It may contain any valid ergm terms. If specified as "formation" or "dissolution", it copies the formula from the respective model. Any offset terms are removed automatically.
   }
 
   \item{target.stats}{
