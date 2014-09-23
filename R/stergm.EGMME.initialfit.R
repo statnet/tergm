@@ -4,7 +4,7 @@ stergm.EGMME.initialfit<-function(init.form, init.diss, nw, model.form, model.di
     init.diss[is.na(init.diss)]<-0
   }else if(!any(is.na(init.form)) && !any(is.na(init.diss))){
     # Don't need to do anything.
-  }else if(all(model.form$coef.names %in% model.mon$coef.names)
+  }else if(all(model.form$coef.names[!model.form$etamap$offsettheta] %in% model.mon$coef.names)
            && (
                 all(model.diss$etamap$offsettheta)
                 || (

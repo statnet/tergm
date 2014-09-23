@@ -120,6 +120,8 @@
 \strong{Model Terms}
   See \code{\link{ergm}} and  \code{\link{ergm-terms}} for details. At
   this time, only linear ERGM terms are allowed.
+  
+  For more usage examples, see the wiki page at \code{https://statnet.csde.washington.edu/trac/wiki/tergmUsage}
 }
 
 

@@ -1,34 +1,49 @@
 library(tergm)
 
 opttest({
-  net <- network.initialize(10,directed=F)
-  net[1,2] <- net[2,3] <- net[3,4] <- net[4,5] <- net[5,6] <- 1 
+  data(florentine)
+  net <- flobusiness
+  summary(net ~ edges+degree(3))
   
-  # this works, specifying initial coefs; note the difference between init.form and san
-  mod1 <- stergm(net, formation= ~edges + offset(degree(3)), 
-                 offset.coef.form=-4, 
-                 target.stats = 10, edapprox=T,
+  # default initialization
+  mod1 <- stergm(flobusiness, formation= ~edges + offset(degree(3)), 
+                 offset.coef.form=0.8, 
                  dissolution= ~offset(edges),
-                 offset.coef.diss=3, 
-                 targets=~edges, estimate="EGMME",   
-                 control=control.stergm(init.form=c(-2,-4), SAN.control=control.san(coef=-2))
+                 offset.coef.diss=log(9), 
+                 targets="formation",
+                 estimate="EGMME"
   )
   
   # init.method set to zeros works
-  mod1 <- stergm(net, formation= ~edges + offset(degree(3)), 
-                 offset.coef.form=-4, 
-                 target.stats = 10, edapprox=T,
+  mod2 <- stergm(flobusiness, formation= ~edges + offset(degree(3)), 
+                 offset.coef.form=0.8, 
                  dissolution= ~offset(edges),
-                 offset.coef.diss=3, 
-                 targets=~edges, estimate="EGMME", control=control.stergm(init.method='zeros'))
+                 offset.coef.diss=log(9), 
+                 targets="formation",
+                 estimate="EGMME",control=control.stergm(init.method='zeros'))
   
   # this works, auto defaulting SAN coefs if they are different from stergm init.form
-  mod1 <- stergm(net, formation= ~edges + offset(degree(3)), 
-                 offset.coef.form=-4, 
-                 target.stats = 10, edapprox=T,
+  mod3 <- stergm(flobusiness, formation= ~edges + offset(degree(3)), 
+                 offset.coef.form=0.8, 
                  dissolution= ~offset(edges),
-                 offset.coef.diss=3, 
-                 targets=~edges, estimate="EGMME",   
-                 control=control.stergm(init.form=c(-2,-4))
+                 offset.coef.diss=log(9), 
+                 targets='formation', estimate="EGMME",   
+                 control=control.stergm(init.form=c(-3,0.8))
   )
+  
+  # we can explicitly specify the target and target stats
+  mod4 <- stergm(flobusiness, formation= ~edges + offset(degree(3)), 
+                 offset.coef.form=0.8, 
+                 dissolution= ~offset(edges),
+                 offset.coef.diss=log(9), 
+                 targets=~edges, target.stats = 15,
+                 estimate="EGMME",   
+                 control=control.stergm(init.form=c(-3,0.8))
+  )
+  
+  sapply(list(mod1, mod2, mod3, mod4), function(x) coef(x)$formation)
+  
+  for (mod in list(mod1, mod2, mod3, mod4)) {
+    print(apply(simulate(mod, monitor=~edges+degree(3), output="stats", time.slices=200), 2, mean))
+  }
 }, testname='target_offset')
