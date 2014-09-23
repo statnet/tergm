@@ -111,7 +111,7 @@ control.stergm(init.form=NULL,
     \itemize{
       \item{Elements corresponding to
         terms enclosed in \code{offset()} are used as the fixed offset
-        coefficients.
+        coefficients. These should match the offset values given in \code{offset.coef.form}.
       }
       \item{Elements that do not correspond to offset terms and are not
         \code{NA} are used as starting values in the estimation. 
@@ -121,12 +121,14 @@ control.stergm(init.form=NULL,
         \code{\link[=control.ergm]{control$init.method}}.
       }
     }
-    Passing \code{control.ergm(init=coef(prev.fit))} can be used to ``resume''
+    Passing \code{control.ergm(init=coef(prev.fit))} can be used to "resume"
     an uncoverged \code{\link{ergm}} run, but see
     \code{\link{enformulate.curved}}.
   }
   \item{init.method}{Estimation method
-    used to acquire initial values for estimation. Unused at this time.
+    used to acquire initial values for estimation. If \code{NULL} (the default), the initial values
+    are computed using the Carnegie-Krivitsky-Hunter-Goodreau approximation, when appropriate. 
+    If set to "zeros", the initial values are set to zeros.
   }
   \item{force.main}{Logical:  If TRUE, then force MCMC-based estimation
     method, even if the exact MLE can be computed via maximum pseudolikelihood
