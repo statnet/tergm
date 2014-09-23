@@ -134,9 +134,10 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
     
     newnw <- try({
       for(srun in seq_len(control$SAN.maxit)){
-        nw<-san(targets, target.stats=target.stats,
+        nw<-suppressWarnings(
+          san(targets, target.stats=target.stats,
                 control=control$SAN.control,
-                verbose=verbose)
+                verbose=verbose))
         targets<-ergm.update.formula(targets,nw~., from.new="nw")
         nw.stats <- summary(targets)
         srun <- srun + 1
