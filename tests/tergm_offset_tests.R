@@ -4,6 +4,7 @@ opttest({
   data(florentine)
   net <- flobusiness
   summary(net ~ edges+degree(3))
+  set.seed(1)
   
   # default initialization
   mod1 <- stergm(flobusiness, formation= ~edges + offset(degree(3)), 
