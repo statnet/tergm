@@ -14,7 +14,7 @@ stergm.EGMME.initialfit<-function(init.form, init.diss, nw, model.form, model.di
                 )
            && all(model.diss$coef.names %in% model.form$coef.names)
            && is.dyad.independent(model.diss$formula)){
-    if(verbose) cat("Formation statistics are analogous to targeted statistics, dissolution is fixed or is edges with a mean.age target, dissolution terms appear to have formation analogs, and dissolution process is dyad-independent, so using Carnegie-Krivitsky-Hunter-Goodreau approximation.\n")
+    if(verbose) cat("Formation statistics are analogous to targeted statistics, dissolution is fixed or is edges with a mean.age target, dissolution terms appear to have formation analogs, and dissolution process is dyad-independent, so using edges dissolution approximation  (Carnegie et al.).\n")
 
     if(!all(model.diss$etamap$offsettheta)){ # This must mean that the two provisos above are satisfied.
       mean.age <- model.mon$target.stats[model.mon$coef.names=="mean.age"]

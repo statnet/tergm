@@ -127,7 +127,7 @@ control.stergm(init.form=NULL,
   }
   \item{init.method}{Estimation method
     used to acquire initial values for estimation. If \code{NULL} (the default), the initial values
-    are computed using the Carnegie-Krivitsky-Hunter-Goodreau approximation, when appropriate. 
+    are computed using the edges dissolution approximation (Carnegie et al.) when appropriate. 
     If set to "zeros", the initial values are set to zeros.
   }
   \item{force.main}{Logical:  If TRUE, then force MCMC-based estimation
