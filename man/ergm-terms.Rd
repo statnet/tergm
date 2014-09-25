@@ -18,9 +18,7 @@
 \alias{InitErgmTerm.edgecov.mean.age}
 \alias{InitErgmTerm.degrange.mean.age}
 \alias{InitErgmTerm.degree.mean.age}
-\alias{InitErgmTerm.competitor.log.age}
-\alias{InitErgmTerm.log.ages}
-\alias{InitErgmTerm.mean.log.age}
+
 \docType{methods}
 \title{Temporally-Sensitive Terms used in Exponential Family Random Graph Models}
 \description{
@@ -166,7 +164,7 @@
       if it is. This is, technically, an arbitrary value, but it should
       not have a substantial effect unless a non-negligible fraction of
       networks at the parameter configuration of interest is empty.  }
-    
+
     
   }
 }
