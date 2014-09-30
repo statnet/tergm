@@ -30,7 +30,8 @@ get.dev <- local({
 .my.levelplot <- function(m,levels=80,...){
   bound <- max(na.omit(c(abs(m))))
 
-  levelplot(m, at=unique(c(seq(-bound,-.Machine$double.eps,length.out=levels/2+1),
+  require(lattice, quietly=TRUE, warn.conflicts=FALSE)
+  lattice::levelplot(m, at=unique(c(seq(-bound,-.Machine$double.eps,length.out=levels/2+1),
                  seq(.Machine$double.eps,+bound,length.out=levels/2+1))),
             col.regions=c(hsv(h=0,s=seq(1,2/levels,length.out=levels/2),v=1),rgb(0,0,0),
               hsv(h=.5,s=seq(2/levels,1,length.out=levels/2),v=1)),
