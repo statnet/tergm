@@ -101,7 +101,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
 
   # target formula should not have offsets. removing them
   if (any(offset.info.formula(targets)$term)) {
-    warning("Targets formula should not contain offset terms;
+    message("Targets formula should not contain offset terms;
                 they have been been removed.")
     targets <- remove.offset.formula(targets)
   }
