@@ -44,10 +44,13 @@ library('tergm')
 
 \tableofcontents
 
+\section{Intro}
+This document is a brief vignette intended to quickly demonstrate the core functionality of \texttt{tergm}.  For a more in-depth tutorial, please see the workshop materials on the \texttt{statnet} wiki: \url{http://statnet.csde.washington.edu/workshops/SUNBELT/current/tergm/tergm_tutorial.pdf}
+
 \section{Getting the software}
 
-If you have not already done so, please download and install \texttt{ergm} version 3.1 and \texttt{networkDynamic} version 3.1. 
-You will also want to make sure you have a reasonably new version of R, preferably the latest (2.15.3).
+If you have not already done so, please download and install \texttt{ergm} version 3.2 and \texttt{networkDynamic} version 0.7. 
+You will also want to make sure you have a reasonably new version of R, preferably the latest (3.1).
 
 <<eval=FALSE>>=
 install.packages("ergm")
