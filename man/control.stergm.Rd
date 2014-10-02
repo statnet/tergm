@@ -390,7 +390,7 @@ control.stergm(init.form=NULL,
   }
   \item{parallel.type}{API to use for parallel
     processing. Supported values are \code{"MPI"} and
-    \code{"SOCK"}. Defaults to using the \code{snow} package
+    \code{"PSOCK"}. Defaults to using the \code{parallel} package
     default.
   }
   \item{parallel.version.check}{Logical:  If TRUE, check that the version of

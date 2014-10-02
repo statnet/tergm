@@ -33,8 +33,8 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     h.fits <-
       if(!is.null(cl)){
-        library(snow)
-        snow::clusterApplyLB(cl, 1:q,
+        library(parallel)
+        parallel::clusterApplyLB(cl, 1:q,
                        function(i){
                          y<-ys[,i]
                          suppressWarnings(try(

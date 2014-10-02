@@ -31,11 +31,11 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     if(verbose) cat("Running stochastic optimization... ")
     zs <- if(!is.null(cl)){
-      library(snow)
+      library(parallel)
       # Conveniently, the first argument of stergm.EGMME.SA.Phase2.C
       # is the state of the optimization, so giving clusterApply a
       # list of states will call it for each thread's state.
-      snow::clusterApply(cl, states, stergm.EGMME.SA.Phase2.C, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, control, verbose=verbose)
+      parallel::clusterApply(cl, states, stergm.EGMME.SA.Phase2.C, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, control, verbose=verbose)
     }else{
       list(stergm.EGMME.SA.Phase2.C(states[[1]], model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, control, verbose=verbose))
     }
@@ -206,8 +206,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     cat("Burning in... ")
     
     zs <- if(!is.null(cl)){
-      library(snow)
-      snow::clusterApply(cl, seq_along(states), function(i) stergm.getMCMCsample(states[[i]]$nw, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, states[[i]]$eta.form, states[[i]]$eta.diss, control.phase1, verbose))
+      library(parallel)
+      parallel::clusterApply(cl, seq_along(states), function(i) stergm.getMCMCsample(states[[i]]$nw, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, states[[i]]$eta.form, states[[i]]$eta.diss, control.phase1, verbose))
     }else{
       list(stergm.getMCMCsample(states[[1]]$nw, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, states[[1]]$eta.form, states[[1]]$eta.diss, control.phase1, verbose))
     }

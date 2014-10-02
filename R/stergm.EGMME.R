@@ -215,6 +215,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
 
   if(control$parallel){
     cl <- ergm.getCluster(control, verbose=verbose)
+    if(verbose && !is.null(cl)) cat("Using parallel cluster.\n")
     on.exit(suppressWarnings(try(ergm.stopCluster(cl),silent=TRUE)))
   }else cl <- NULL
   
