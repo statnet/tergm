@@ -10,7 +10,7 @@ opttest({
                  offset.coef.diss=log(9), 
                  targets="formation",
                  estimate="EGMME",
-                 control=control.stergm(parallel=3, parallel.type="PSOCK")
+                 control=control.stergm(parallel=2, parallel.type="PSOCK")
   )
 
 }, testname='tergm_parallel')
@@ -25,7 +25,7 @@ opttest({
                  offset.coef.diss=log(9), 
                  targets="formation",
                  estimate="EGMME",
-                 control=control.stergm(parallel=3, parallel.type="MPI")
+                 control=control.stergm(parallel=2, parallel.type="MPI")
   )
   
 }, testname='tergm_parallel_MPI', testvar="ENABLE_MPI_TESTS")
