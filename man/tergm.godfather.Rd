@@ -2,7 +2,7 @@
 \alias{tergm.godfather}
 \alias{control.tergm.godfather}
 \title{
-  A function to apply a given series of changes a the network.
+  A function to apply a given series of changes to a network.
 }
 \description{
   Gives the network a series of timed proposals it can't refuse. Returns the

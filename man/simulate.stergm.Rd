@@ -260,7 +260,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   }
   
   \item{"changes"}{An integer matrix with four columns (\code{time},
-      \code{tail}, \code{head}, and \code{to}), giving the timetabled
+      \code{tail}, \code{head}, and \code{to}), giving the time-stamped
       changes relative to the current network. \code{to} is \code{1} if
       a tie was formed and \code{0} if a tie was dissolved. The
       convention for \code{time} is that it gives the time point during
