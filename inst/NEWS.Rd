@@ -9,15 +9,14 @@
     \subsection{NEW FEATURES}{
      \itemize{
        \item Speed improvements. Internal data handling has been modified to avoid allocating (and passing around) a large matrix of tie ages unless the formula/model explicitly requires tie duration information. This increases speed of model initialization, which is especially helpful when simulating a network where the model must be re-initialized at each timestep (i.e. models with vital dynamics).
-       \item Allows simpler specification of offset values in formation model, when using \code{stergm.EGMME} with target statistics. Usage examples: https://statnet.csde.washington.edu/trac/wiki/tergmUsage 
-
-      \item Offset terms in the target formula are automatically removed. This includes the case where the target is set equal to formation (targets = "formation"). Use Carnegie approximation for initializing formation models with offset term.
+      \item{Simplified specification of offset values in formation model, when using stergm.EGMME with target statistics. Edges dissolution approximation is used to initialize the coefficients for estimation when there is an offset. See \link{http://statnet.csde.washington.edu/trac/wiki/tergmUsage} for examples.}
+      \item{Offset terms in the target formula are automatically removed. This includes the case where the target is set equal to formation: \code{targets = "formation"}}
        \item The simulate.networkDynamic and related function now make use of networkDynamics persistant id (PID) functionality. If the network does not have any \code{\link[networkDynamic]{persistent.ids}}  defined for vertices, a vertex.pid will be attached in a vertex attribute  named \code{'tergm_pid'} to facilitate 'bookkeeping' between the networkDynamic argument and the simulated network time step. 
        \item{Parallel functionality: tergm can take user-created clusters as the control.stergm(parallel) control parameter. This is the recommended method for using tergm on a high-performance computing cluster. See \link{ergm-parallel}. Functionality is now implemented via the \code{parallel} package, direct dependence on \code{snow} package is removed}
        \item{Addition of bipartite formation and dissolution Metropolis-Hastings proposals}
        \item{Addition of a TNT dissolution proposal constraint}
        \item{Inclusion of a Stergm vignette}
-       \item Fixme: better handling of INF values that would be passed to C?
+       \item{-Inf offsets are recoded to a large negative number to be compatible with C code. The fitted coefficients will show the large negative number instead of the -Inf offset.}
      }
      
    }
