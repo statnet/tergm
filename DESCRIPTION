@@ -11,7 +11,9 @@ Authors@R:c(
 	person("Nicole Bohme", "Carnegie", role=c("ctb"), email="nicole.carnegie@nyu.edu"),
         person("Carter T.", "Butts", role=c("ctb"), email="buttsc@uci.edu"),
 	person("Ayn", "Leslie-Cook", role=c("ctb"), email="aynlc3@uw.edu"),
-	person("Skye", "Bender-deMoll", role=c("ctb"), email="skyebend@skyeome.net"))
+	person("Skye", "Bender-deMoll", role=c("ctb"), email="skyebend@skyeome.net"),
+  person("Li","Wang",role=c("ctb"),email="lxwang@gmail.com"),
+  person("Kirk","Li",role=c("ctb"),email="kirkli@uw.edu"))
 LinkingTo: ergm
 Depends: statnet.common (>= 3.2), ergm (>= 3.2), network (>= 1.11), networkDynamic (>= 0.7)
 Imports: robustbase (>= 0.9-10), coda, nlme
