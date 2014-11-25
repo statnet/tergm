@@ -146,6 +146,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
         nw<-suppressWarnings(
           san(targets, target.stats=target.stats,
                 control=control$SAN.control,
+                constraints=constraints,
                 verbose=verbose))
         targets<-ergm.update.formula(targets,nw~., from.new="nw")
         nw.stats <- summary(targets)
