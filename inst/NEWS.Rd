@@ -14,7 +14,7 @@
 % When a release is forked, copy the sections to a new release and
 % delete unused sections.
 
-\section{Changes in version 3.2.0}{
+\section{Changes in version 3.2}{
     \subsection{NEW FEATURES}{
      \itemize{
        \item Speed improvements. Internal data handling has been modified to avoid allocating (and passing around) a large matrix of tie ages unless the formula/model explicitly requires tie duration information. This increases speed of model initialization, which is especially helpful when simulating a network where the model must be re-initialized at each timestep (i.e. models with vital dynamics).
@@ -32,7 +32,8 @@
 
   \subsection{BUG FIXES}{
     \itemize{
-      \item Namespace prefixing has been added to some functions called from external packages to deal with CRAN check warnings
+      \item{Namespace prefixing has been added to some functions called from external packages to deal with CRAN check warnings}
+      \item{Bug fix where stergm constraints were not being passed from all the way down into san}
     }
   }
 
