@@ -1,3 +1,12 @@
+#  File R/impute.network.list.R in package tergm, part of the Statnet suite
+#  of packages for network analysis, http://statnet.org .
+#
+#  This software is distributed under the GPL-3 license.  It is free,
+#  open source, and has the attribution requirements (GPL Section 7) at
+#  http://statnet.org/attribution
+#
+#  Copyright 2003-2014 Statnet Commons
+#######################################################################
 impute.network.list <- function(nwl, imputers=c(), nwl.prepend=list(), nwl.append=list()){
   # TODO: Make it possible to write one's own imputers. E.g., break the following out into impute.network.stop(), impute.network.next(), etc..
   IMPUTERS <- c("next", "previous", "majority", "0", "1")

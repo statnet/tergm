@@ -1,9 +1,90 @@
+%  File inst/NEWS.Rd in package tergm, part of the Statnet suite
+%  of packages for network analysis, http://statnet.org .
+%
+%  This software is distributed under the GPL-3 license.  It is free,
+%  open source, and has the attribution requirements (GPL Section 7) at
+%  http://statnet.org/attribution
+%
+%  Copyright 2003-2014 Statnet Commons
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \name{NEWS}
 \title{NEWS file for the \code{\link[=tergm-package]{tergm}} package}
 \encoding{UTF-8}
 
 % When a release is forked, copy the sections to a new release and
 % delete unused sections.
+
+\section{Changes in version 3.2}{
+    \subsection{NEW FEATURES}{
+     \itemize{
+       \item Speed improvements. Internal data handling has been modified to avoid allocating (and passing around) a large matrix of tie ages unless the formula/model explicitly requires tie duration information. This increases speed of model initialization, which is especially helpful when simulating a network where the model must be re-initialized at each timestep (i.e. models with vital dynamics).
+      \item{Simplified specification of offset values in formation model, when using stergm.EGMME with target statistics. Edges dissolution approximation is used to initialize the coefficients for estimation when there is an offset. See \link{http://statnet.csde.washington.edu/trac/wiki/tergmUsage} for examples.}
+      \item{Offset terms in the target formula are automatically removed. This includes the case where the target is set equal to formation: \code{targets = "formation"}}
+       \item The simulate.networkDynamic and related function now make use of networkDynamics persistant id (PID) functionality. If the network does not have any \code{\link[networkDynamic]{persistent.ids}}  defined for vertices, a vertex.pid will be attached in a vertex attribute  named \code{'tergm_pid'} to facilitate 'bookkeeping' between the networkDynamic argument and the simulated network time step. 
+       \item{Parallel functionality: tergm can take user-created clusters as the control.stergm(parallel) control parameter. This is the recommended method for using tergm on a high-performance computing cluster. See \link{ergm-parallel}. Functionality is now implemented via the \code{parallel} package, direct dependence on \code{snow} package is removed}
+       \item{Addition of bipartite formation and dissolution Metropolis-Hastings proposals}
+       \item{Addition of a TNT dissolution proposal constraint}
+       \item{Inclusion of a Stergm vignette}
+       \item{-Inf offsets are recoded to a large negative number to be compatible with C code. The fitted coefficients will show the large negative number instead of the -Inf offset.}
+     }
+     
+   }
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item{Namespace prefixing has been added to some functions called from external packages to deal with CRAN check warnings}
+      \item{Bug fix where stergm constraints were not being passed from all the way down into san}
+    }
+  }
+
+  \subsection{OTHER USER-VISIBLE CHANGES}{
+    \itemize{
+      \item Changes to \code{control.stergm} parameters:
+      \itemize{
+        \item \code{init.method} If \code{NULL} (the default), the initial values
+    are computed using the edges dissolution approximation (Carnegie et al.) when appropriate. 
+    If set to "zeros", the initial values are set to zeros.
+        \item \code{SA.oh.memory = 100000} Absolute maximum number of data points per thread to store in the full optimization history.
+      }
+      \item  Changes to \code{simulate.stergm} parameters: addition of \code{duration.dependent} parameter: {Logical: Whether the model terms in formula or model are duration dependent. E.g., if a duration-dependent term  is used in estimation/simulation model, the probability of forming or  dissolving a tie may dependent on the age the dyad status. If TRUE, the matrix of tie ages will be allocated.}
+    }
+  }
+
+  % \subsection{NEW FEATURES}{
+  %   \itemize{
+  %   }
+  % }
+  
+  % \subsection{DEPRECATED & DEFUNCT}{
+  %   \itemize{
+  %   }
+  % }
+  
+  % \subsection{C-LEVEL FACILITIES}{
+  %   \itemize{
+  %     \item It is not clear that we need a subsection called "C-LEVEL FACILITIES".
+  %   }
+  % }
+
+  % \subsection{UTILITIES}{
+  %   \itemize{
+  %     \item Likewise, "UTILITIES" is probably unnecessary.
+  %   }
+  % }
+
+  % \subsection{INSTALLATION}{
+  %   \itemize{
+  %     \item ... as is "INSTALLATION".
+  %   }
+  % }
+
+  % \subsection{PACKAGE INSTALLATION}{
+  %   \itemize{
+  %     \item ditto.
+  %   }
+  % }
+
+}
 \section{Changes in version 3.1.3}{
 
   \subsection{BUG FIXES}{
@@ -231,7 +312,7 @@
   \subsection{DEPRECATED & DEFUNCT}{
     \itemize{
       \item A number of \code{\link{control.stergm}} parameters had been
-      renamed and otherwise chaged.
+      renamed and otherwise changed.
 
       \item Argument \code{statsonly} to the
       \code{\link{simulate.stergm}} and related functions has been

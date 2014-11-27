@@ -1,8 +1,17 @@
+%  File man/tergm.godfather.Rd in package tergm, part of the Statnet suite
+%  of packages for network analysis, http://statnet.org .
+%
+%  This software is distributed under the GPL-3 license.  It is free,
+%  open source, and has the attribution requirements (GPL Section 7) at
+%  http://statnet.org/attribution
+%
+%  Copyright 2003-2014 Statnet Commons
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \name{tergm.godfather}
 \alias{tergm.godfather}
 \alias{control.tergm.godfather}
 \title{
-  A function to apply a given series of changes a the network.
+  A function to apply a given series of changes to a network.
 }
 \description{
   Gives the network a series of timed proposals it can't refuse. Returns the

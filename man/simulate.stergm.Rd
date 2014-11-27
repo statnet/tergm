@@ -1,3 +1,12 @@
+%  File man/simulate.stergm.Rd in package tergm, part of the Statnet suite
+%  of packages for network analysis, http://statnet.org .
+%
+%  This software is distributed under the GPL-3 license.  It is free,
+%  open source, and has the attribution requirements (GPL Section 7) at
+%  http://statnet.org/attribution
+%
+%  Copyright 2003-2014 Statnet Commons
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \name{simulate.stergm}
 \alias{simulate.stergm}
 \alias{simulate.network}
@@ -260,7 +269,7 @@ Draw from the distribution of an Separable Temporal Exponential Family Random Gr
   }
   
   \item{"changes"}{An integer matrix with four columns (\code{time},
-      \code{tail}, \code{head}, and \code{to}), giving the timetabled
+      \code{tail}, \code{head}, and \code{to}), giving the time-stamped
       changes relative to the current network. \code{to} is \code{1} if
       a tie was formed and \code{0} if a tie was dissolved. The
       convention for \code{time} is that it gives the time point during
