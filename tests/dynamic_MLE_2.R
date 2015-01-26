@@ -70,7 +70,10 @@ cat("Missing data:\n")
 
 y2m<-network.copy(y2)
 set.seed(765)
-y2m[as.edgelist(simulate(y1~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))]<-NA
+#y2m[as.edgelist(simulate(y1~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))]<-NA
+e <- as.edgelist(y2)[1,]
+y2m[e[1], e[2]] <- NA
+y2m[1,2] <- NA
 
 # Force CMPLE
 set.seed(765)
