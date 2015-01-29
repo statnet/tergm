@@ -12,8 +12,8 @@ opttest({
 library(tergm)
 
 tolerance<-0.05
-n<-10
-ns <- c(4,6)
+n<-16
+ns <- c(7,9)
 theta<--1.5
 
 logit<-function(p) log(p/(1-p))
@@ -44,7 +44,7 @@ y1<-standardize.network(simulate(y0~edges, constraints=~blockdiag("a"), coef=the
 
 # Force CMPLE
 set.seed(543)
-fit<-stergm(list(y0,y1), formation=~edges, dissolution=~edges, constraints=~blockdiag("a"), estimate="CMPLE")
+fit<-stergm(list(y0,y1), formation=~edges, dissolution=~edges, constraints=~blockdiag("a"), estimate="CMPLE", times=c(1,2))
 
 stopifnot(fit$estimate=="CMPLE", fit$formation.fit$estimate=="MPLE", fit$dissolution.fit$estimate=="MPLE")
 stopifnot(all.equal(form.mle(y0,y1), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
@@ -52,7 +52,7 @@ stopifnot(all.equal(diss.mle(y0,y1), coef(fit$dissolution.fit), tolerance=tolera
 
 # Autodetected CMPLE
 set.seed(543)
-fit<-stergm(list(y0,y1), formation=~edges, dissolution=~edges, constraints=~blockdiag("a"), estimate="CMLE")
+fit<-stergm(list(y0,y1), formation=~edges, dissolution=~edges, constraints=~blockdiag("a"), estimate="CMLE", times=c(1,2))
 
 stopifnot(fit$estimate=="CMLE", is.null(fit$formation.fit$sample), is.null(fit$dissolution.fit$sample))
 stopifnot(all.equal(form.mle(y0,y1), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
@@ -60,7 +60,7 @@ stopifnot(all.equal(diss.mle(y0,y1), coef(fit$dissolution.fit), tolerance=tolera
 
 # Force CMLE
 set.seed(543)
-fit<-stergm(list(y0,y1), formation=~edges, dissolution=~edges, constraints=~blockdiag("a"), estimate="CMLE", control=control.stergm(force.main=TRUE))
+fit<-stergm(list(y0,y1), formation=~edges, dissolution=~edges, constraints=~blockdiag("a"), estimate="CMLE", control=control.stergm(force.main=TRUE), times=c(1,2))
 
 stopifnot(fit$estimate=="CMLE", fit$formation.fit$estimate=="MLE", fit$dissolution.fit$estimate=="MLE")
 stopifnot(all.equal(form.mle(y0,y1), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
@@ -77,7 +77,7 @@ y1m[1,2] <- NA
 
 # Force CMPLE
 set.seed(765)
-fit<-stergm(list(y0,y1m), formation=~edges, dissolution=~edges, constraints=~blockdiag("a"), estimate="CMPLE")
+fit<-stergm(list(y0,y1m), formation=~edges, dissolution=~edges, constraints=~blockdiag("a"), estimate="CMPLE", times=c(1,2))
 
 stopifnot(fit$estimate=="CMPLE", fit$formation.fit$estimate=="MPLE", fit$dissolution.fit$estimate=="MPLE")
 stopifnot(all.equal(form.mle(y0,y1m), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
@@ -85,7 +85,7 @@ stopifnot(all.equal(diss.mle(y0,y1m), coef(fit$dissolution.fit), tolerance=toler
 
 # Autodetected CMPLE
 set.seed(765)
-fit<-stergm(list(y0,y1m), formation=~edges, dissolution=~edges, constraints=~blockdiag("a"), estimate="CMLE")
+fit<-stergm(list(y0,y1m), formation=~edges, dissolution=~edges, constraints=~blockdiag("a"), estimate="CMLE", times=c(1,2))
 
 stopifnot(fit$estimate=="CMLE", is.null(fit$formation.fit$sample), is.null(fit$dissolution.fit$sample))
 stopifnot(all.equal(form.mle(y0,y1m), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
@@ -93,7 +93,7 @@ stopifnot(all.equal(diss.mle(y0,y1m), coef(fit$dissolution.fit), tolerance=toler
 
 # Force CMLE
 set.seed(765)
-fit<-stergm(list(y0,y1m), formation=~edges, dissolution=~edges, constraints=~blockdiag("a"), estimate="CMLE", control=control.stergm(force.main=TRUE))
+fit<-stergm(list(y0,y1m), formation=~edges, dissolution=~edges, constraints=~blockdiag("a"), estimate="CMLE", control=control.stergm(force.main=TRUE), times=c(1,2))
 
 stopifnot(fit$estimate=="CMLE", fit$formation.fit$estimate=="MLE", fit$dissolution.fit$estimate=="MLE")
 stopifnot(all.equal(form.mle(y0,y1m), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))

@@ -38,13 +38,13 @@ y0<-standardize.network(simulate(y0~edges, coef=theta, control=control.simulate(
 
 cat("Complete data:\n")
 
-set.seed(432)
+set.seed(123)
 y1<-standardize.network(simulate(y0~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))
 y2<-standardize.network(simulate(y1~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))
 
 # Force CMPLE
 set.seed(543)
-fit<-stergm(list(y0,y1,y2), formation=~edges, dissolution=~edges, estimate="CMPLE")
+fit<-stergm(list(y0,y1,y2), formation=~edges, dissolution=~edges, estimate="CMPLE", times=c(1,2,3))
 
 stopifnot(fit$estimate=="CMPLE", fit$formation.fit$estimate=="MPLE", fit$dissolution.fit$estimate=="MPLE")
 stopifnot(all.equal(form.mle(y0,y1,y2), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
@@ -52,7 +52,7 @@ stopifnot(all.equal(diss.mle(y0,y1,y2), coef(fit$dissolution.fit), tolerance=tol
 
 # Autodetected CMPLE
 set.seed(543)
-fit<-stergm(list(y0,y1,y2), formation=~edges, dissolution=~edges, estimate="CMLE")
+fit<-stergm(list(y0,y1,y2), formation=~edges, dissolution=~edges, estimate="CMLE", times=c(1,2,3))
 
 stopifnot(fit$estimate=="CMLE", is.null(fit$formation.fit$sample), is.null(fit$dissolution.fit$sample))
 stopifnot(all.equal(form.mle(y0,y1,y2), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
@@ -60,7 +60,7 @@ stopifnot(all.equal(diss.mle(y0,y1,y2), coef(fit$dissolution.fit), tolerance=tol
 
 # Force CMLE
 set.seed(543)
-fit<-stergm(list(y0,y1,y2), formation=~edges, dissolution=~edges, estimate="CMLE", control=control.stergm(force.main=TRUE))
+fit<-stergm(list(y0,y1,y2), formation=~edges, dissolution=~edges, estimate="CMLE", control=control.stergm(force.main=TRUE), times=c(1,2,3))
 
 stopifnot(fit$estimate=="CMLE", fit$formation.fit$estimate=="MLE", fit$dissolution.fit$estimate=="MLE")
 stopifnot(all.equal(form.mle(y0,y1,y2), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
@@ -77,7 +77,7 @@ y2m[1,2] <- NA
 
 # Force CMPLE
 set.seed(765)
-fit<-stergm(list(y0,y1,y2m), formation=~edges, dissolution=~edges, estimate="CMPLE")
+fit<-stergm(list(y0,y1,y2m), formation=~edges, dissolution=~edges, estimate="CMPLE", times=c(1,2,3))
 
 stopifnot(fit$estimate=="CMPLE", fit$formation.fit$estimate=="MPLE", fit$dissolution.fit$estimate=="MPLE")
 stopifnot(all.equal(form.mle(y0,y1,y2m), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
@@ -85,15 +85,15 @@ stopifnot(all.equal(diss.mle(y0,y1,y2m), coef(fit$dissolution.fit), tolerance=to
 
 # Autodetected CMPLE
 set.seed(765)
-fit<-stergm(list(y0,y1,y2m), formation=~edges, dissolution=~edges, estimate="CMLE")
+fit<-stergm(list(y0,y1,y2m), formation=~edges, dissolution=~edges, estimate="CMLE", times=c(1,2,3))
 
 stopifnot(fit$estimate=="CMLE", is.null(fit$formation.fit$sample), is.null(fit$dissolution.fit$sample))
 stopifnot(all.equal(form.mle(y0,y1,y2m), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
 stopifnot(all.equal(diss.mle(y0,y1,y2m), coef(fit$dissolution.fit), tolerance=tolerance, check.attributes=FALSE))
 
 # Force CMLE
-set.seed(765)
-fit<-stergm(list(y0,y1,y2m), formation=~edges, dissolution=~edges, estimate="CMLE", control=control.stergm(force.main=TRUE))
+set.seed(234)
+fit<-stergm(list(y0,y1,y2m), formation=~edges, dissolution=~edges, estimate="CMLE", control=control.stergm(force.main=TRUE), times=c(1,2,3))
 
 stopifnot(fit$estimate=="CMLE", fit$formation.fit$estimate=="MLE", fit$dissolution.fit$estimate=="MLE")
 stopifnot(all.equal(form.mle(y0,y1,y2m), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
