@@ -1,5 +1,5 @@
 Package: tergm
-Version: 3.2.3-13213-13510-2014.12.06-23.02.25
+Version: 3.2.5-13213-13510-2014.12.06-23.02.25
 Date: 2014-12-06
 Title:  Fit, Simulate and Diagnose Models for Network Evolution based on Exponential-Family Random Graph Models
 Authors@R:c(
