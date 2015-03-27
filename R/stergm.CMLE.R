@@ -16,7 +16,7 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   if(is.null(times)){
     if(inherits(nw, "network.list") || is.list(nw)){
       times  <- seq_along(nw)
-      warning("Time points not specified for a list. Modeling transition from the between successive networks jointly. This behavior may change in the future.")
+      warning("Time points not specified for a list. Modeling transition between successive networks jointly. This behavior may change in the future.")
     }else if(inherits(nw,"networkDynamic")){
       times  <- c(0,1)
       warning("Time points not specified for a networkDynamic. Modeling transition from time 0 to 1.")
