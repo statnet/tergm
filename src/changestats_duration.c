@@ -9,6 +9,14 @@
  */
 #include "changestats_duration.h"
 
+#define CSD_TRANSFORM_ET(et)					\
+  double ett=0, ett1=1;						\
+  switch(transform){						\
+  case 0: ett = et; ett1 = et+1; break;				\
+  case 1: ett = log(et); ett1 = log(et+1); break;		\
+  default: error("Unrecognized dyad age transformation code."); \
+  }								\
+  (void) ett; (void) ett1; // Get rid of unused variable warnings, since either ett or ett1 may be unused.
 
 /*****************
  void d_competitor_log_age
@@ -90,65 +98,6 @@ D_CHANGESTAT_FN(d_log_ages){
   }
   UNDO_PREVIOUS_TOGGLES(i);
 }
-
-/*****************
- void d_mean_log_age
-
- Mean of log-ages of all extant ties.
-
- The mean_log_ages of an empty network is defined to be emptyval.
-
- *****************/
-
-D_CHANGESTAT_FN(d_mean_log_age_mon){
-  int i;
-  
-  double s0 = 0, s1 = 0; // Sum of age values of initial and final network.
-  double zeroval = INPUT_PARAM[0]; // Empty network value.
-  Edge e0, e1; // Number of edges in initial and final network.
-  
-  e0 = e1 = N_EDGES;
-  
-  for(Edge k=1; k <= e0; k++){
-    Vertex tail, head;
-    FindithEdge(&tail, &head, k, nwp);
-    int et = ElapsedTime(tail,head,nwp);
-    s0 += log(et);
-    s1 += log(et + 1);
-  }
-  
-  FOR_EACH_TOGGLE(i){
-    Vertex tail = tails[i], head = heads[i];
-    if(IS_OUTEDGE(tail, head)){
-      s1 -= log(ElapsedTime(tail,head,nwp) + 1);
-      e1--;
-    }else{
-      s1 += log(1);
-      e1++;
-    }
-  }
-  
-  CHANGE_STAT[0]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
-}
-
-S_CHANGESTAT_FN(s_mean_log_age_mon){
-  CHANGE_STAT[0] = 0;
-  double zeroval = INPUT_PARAM[0];
-
-  if(N_EDGES>0){
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex tail, head;
-      FindithEdge(&tail, &head, k, nwp);
-      int age = ElapsedTime(tail,head,nwp);
-      CHANGE_STAT[0] += log(age);
-    }
-    
-    CHANGE_STAT[0] /= N_EDGES;
-  }else{
-    CHANGE_STAT[0] = zeroval;
-  }
-}
-
 
 /*****************
  void d_edges_ageinterval
@@ -321,7 +270,7 @@ S_CHANGESTAT_FN(s_edgecov_ages_mon){
 /*****************
  void d_mean_age
 
- Mean of ages of all extant ties.
+ Mean of (optionally log-) ages of all extant ties.
 
  The mean_ages of an empty network is defined to be emptyval.
 
@@ -332,6 +281,7 @@ D_CHANGESTAT_FN(d_mean_age_mon){
   
   double s0 = 0, s1 = 0; // Sum of age values of initial and final network.
   double zeroval = INPUT_PARAM[0]; // Empty network value.
+  int transform = INPUT_PARAM[1]; // Transformation code.
   Edge e0, e1; // Number of edges in initial and final network.
   
   e0 = e1 = N_EDGES;
@@ -340,17 +290,22 @@ D_CHANGESTAT_FN(d_mean_age_mon){
     Vertex tail, head;
     FindithEdge(&tail, &head, k, nwp);
     int et = ElapsedTime(tail,head,nwp);
-    s0 += et;
-    s1 += et + 1;
+    CSD_TRANSFORM_ET(et);
+    s0 += ett;
+    s1 += ett1;
   }
   
   FOR_EACH_TOGGLE(i){
     Vertex tail = tails[i], head = heads[i];
     if(IS_OUTEDGE(tail, head)){
-      s1 -= ElapsedTime(tail,head,nwp) + 1;
+      int et = ElapsedTime(tail,head,nwp);
+      CSD_TRANSFORM_ET(et);
+      s1 -= ett1;
       e1--;
     }else{
-      s1 += 1;
+      int et = 0;
+      CSD_TRANSFORM_ET(et);
+      s1 += ett1;
       e1++;
     }
   }
@@ -361,13 +316,15 @@ D_CHANGESTAT_FN(d_mean_age_mon){
 S_CHANGESTAT_FN(s_mean_age_mon){
   CHANGE_STAT[0] = 0;
   double zeroval = INPUT_PARAM[0];
+  int transform = INPUT_PARAM[1]; // Transformation code.
 
   if(N_EDGES>0){
     for (Edge k=1; k <= N_EDGES; k++){
       Vertex tail, head;
       FindithEdge(&tail, &head, k, nwp);
-      int age = ElapsedTime(tail,head,nwp);
-      CHANGE_STAT[0] += age;
+      int et = ElapsedTime(tail,head,nwp);
+      CSD_TRANSFORM_ET(et);
+      CHANGE_STAT[0] += ett;
     }
     
     CHANGE_STAT[0] /= N_EDGES;
@@ -385,18 +342,19 @@ S_CHANGESTAT_FN(s_mean_age_mon){
 
  *****************/
 
-D_CHANGESTAT_FN(d_edgecov_age_mon){
+D_CHANGESTAT_FN(d_edgecov_mean_age_mon){
   int noffset = BIPARTITE, nrow;
   if(noffset > 0){
     nrow = noffset;
   }else{
-    nrow = INPUT_PARAM[1];
+    nrow = INPUT_PARAM[2];
   }
 
   int i;
 
   double s0 = 0, s1 = 0; // Sum of age values of initial and final network.
   double zeroval = INPUT_PARAM[0]; // Empty network value.
+  int transform = INPUT_PARAM[1]; // Transformation code.
   double e0 = 0, e1 = 0; // Sum of edge weights in initial and final network.
 
   for(Edge k=1; k <= N_EDGES; k++){
@@ -405,8 +363,9 @@ D_CHANGESTAT_FN(d_edgecov_age_mon){
     double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];   
     if(val!=0){
       int et = ElapsedTime(tail,head,nwp);
-      s0 += et*val;
-      s1 += (et + 1)*val;
+      CSD_TRANSFORM_ET(et);
+      s0 += ett*val;
+      s1 += ett1*val;
       e0 += val;
     }
   }
@@ -418,10 +377,14 @@ D_CHANGESTAT_FN(d_edgecov_age_mon){
     double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];   
     if(val!=0){
       if(IS_OUTEDGE(tail, head)){
-	s1 -= (ElapsedTime(tail,head,nwp)+1)*val;
+	int et = ElapsedTime(tail,head,nwp);	
+	CSD_TRANSFORM_ET(et);
+	s1 -= ett1*val;
 	e1 -= val;
       }else{
-	s1 += 1;
+	int et = 0;	
+	CSD_TRANSFORM_ET(et);
+	s1 += ett1;
 	e1 += val;
       }
     }
@@ -433,6 +396,7 @@ D_CHANGESTAT_FN(d_edgecov_age_mon){
 S_CHANGESTAT_FN(s_edgecov_mean_age_mon){
   CHANGE_STAT[0] = 0;
   double zeroval = INPUT_PARAM[0], s=0, e=0;
+  int transform = INPUT_PARAM[1]; // Transformation code.
   int noffset = BIPARTITE, nrow;
   if(noffset > 0){
     nrow = noffset;
@@ -445,8 +409,9 @@ S_CHANGESTAT_FN(s_edgecov_mean_age_mon){
     FindithEdge(&tail, &head, k, nwp);
     double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];
     if(val!=0){
-      int age = ElapsedTime(tail,head,nwp);
-      s += age * val;
+      int et = ElapsedTime(tail,head,nwp);	
+      CSD_TRANSFORM_ET(et);
+      s += ett * val;
       e += val;
     }
   }
@@ -471,12 +436,13 @@ D_CHANGESTAT_FN(d_degree_mean_age_mon){
   int i;
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
+  int transform = INPUT_PARAM[1]; // Transformation code.
   
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
     double s0 = 0, s1 = 0;
     Edge e0 = 0, e1 = 0;
 
-    Vertex deg = INPUT_PARAM[j+1];
+    Vertex deg = INPUT_PARAM[j+2];
     
     for (Edge k=1; k <= N_EDGES; k++){
       Vertex tail, head;
@@ -486,8 +452,9 @@ D_CHANGESTAT_FN(d_degree_mean_age_mon){
       
       if(w){
 	int et = ElapsedTime(tail,head,nwp);
-	s0 += et*w;
-	s1 += (et+1)*w;
+	CSD_TRANSFORM_ET(et);
+	s0 += ett*w;
+	s1 += ett1*w;
 	e0+=w;
 	e1+=w;
       }
@@ -517,12 +484,14 @@ D_CHANGESTAT_FN(d_degree_mean_age_mon){
       case -1: // tail was previously counted, but is no longer
 	STEP_THROUGH_OUTEDGES(tail, e, head1){
 	  TMP_SET_ET(tail,head1);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	STEP_THROUGH_INEDGES(tail, e, head1){
 	  TMP_SET_ET(head1,tail);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	break;
@@ -533,21 +502,26 @@ D_CHANGESTAT_FN(d_degree_mean_age_mon){
       case +1: // tail was previously not counted, but is now
 	STEP_THROUGH_OUTEDGES(tail, e, head1){
 	  TMP_SET_ET(tail,head1);
-	  s1 += et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}
 	STEP_THROUGH_INEDGES(tail, e, head1){
 	  TMP_SET_ET(head1,tail);
-	  s1 += et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}
 	// Here, we need to handle the focus dyad:
 	if(change==+1){// if it's formed, add 1 to s1
-	  s1 += 1;
+	  int et = 0;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
 	  int et = ElapsedTime(tail,head,nwp);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	break;
@@ -557,12 +531,14 @@ D_CHANGESTAT_FN(d_degree_mean_age_mon){
       case -1: // head was previously counted, but is no longer
 	STEP_THROUGH_OUTEDGES(head, e, tail1){
 	  TMP_SET_ET(head,tail1);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	STEP_THROUGH_INEDGES(head, e, tail1){
 	  TMP_SET_ET(tail1,head);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	break;
@@ -573,21 +549,26 @@ D_CHANGESTAT_FN(d_degree_mean_age_mon){
       case +1: // head was previously not counted, but is now
 	STEP_THROUGH_OUTEDGES(head, e, tail1){
 	  TMP_SET_ET(head,tail1);
-	  s1 += et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}
 	STEP_THROUGH_INEDGES(head, e, tail1){
 	  TMP_SET_ET(tail1,head);
-	  s1 += et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}
 	// Here, we need to handle the focus dyad:
 	if(change==+1){// if it's formed, add 1 to s1
-	  s1 += 1;
+	  int et = 0;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
 	  int et = ElapsedTime(tail,head,nwp);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	break;
@@ -607,11 +588,12 @@ S_CHANGESTAT_FN(s_degree_mean_age_mon){
   int i;
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
+  int transform = INPUT_PARAM[1]; // Transformation code.
 
   ZERO_ALL_CHANGESTATS(i);
 
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
-    Vertex deg = INPUT_PARAM[j+1];
+    Vertex deg = INPUT_PARAM[j+2];
     Edge e=0;
 
     for (Edge k=1; k <= N_EDGES; k++){
@@ -621,7 +603,9 @@ S_CHANGESTAT_FN(s_degree_mean_age_mon){
       unsigned int w = (od[tail]+id[tail]==deg ? 1:0) + (od[head]+id[head]==deg ? 1:0);
       
       if(w){
-	CHANGE_STAT[j] += ElapsedTime(tail,head,nwp)*w;
+	int et = ElapsedTime(tail,head,nwp);
+	CSD_TRANSFORM_ET(et);
+	CHANGE_STAT[j] += ett*w;
 	e+=w;
       }
     }
@@ -644,29 +628,31 @@ D_CHANGESTAT_FN(d_degree_by_attr_mean_age_mon){
   int i;
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
+  int transform = INPUT_PARAM[1]; // Transformation code.
   
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
     double s0 = 0, s1 = 0;
     Edge e0 = 0, e1 = 0;
 
-    Vertex deg = INPUT_PARAM[2*j+1];
-    int testattr = INPUT_PARAM[2*j+2];
+    Vertex deg = INPUT_PARAM[2*j+2];
+    int testattr = INPUT_PARAM[2*j+3];
     
     for (Edge k=1; k <= N_EDGES; k++){
       Vertex tail, head;
       FindithEdge(&tail, &head, k, nwp);
       
       Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
-      int tailattr = INPUT_PARAM[2*N_CHANGE_STATS + tail]; 
-      int headattr = INPUT_PARAM[2*N_CHANGE_STATS + head]; 
+      int tailattr = INPUT_PARAM[2*N_CHANGE_STATS + tail + 1]; 
+      int headattr = INPUT_PARAM[2*N_CHANGE_STATS + head + 1]; 
 
       unsigned int w = ((taildeg==deg && tailattr==testattr) ? 1 : 0) +
 	((headdeg==deg && headattr==testattr) ? 1 : 0);
       
       if(w){
 	int et = ElapsedTime(tail,head,nwp);
-	s0 += et*w;
-	s1 += (et+1)*w;
+	CSD_TRANSFORM_ET(et);
+	s0 += ett*w;
+	s1 += ett1*w;
 	e0+=w;
 	e1+=w;
       }
@@ -674,8 +660,8 @@ D_CHANGESTAT_FN(d_degree_by_attr_mean_age_mon){
 
     FOR_EACH_TOGGLE(i){
       Vertex tail=TAIL(i), head=HEAD(i);
-      int tailattr = INPUT_PARAM[2*N_CHANGE_STATS + tail]; 
-      int headattr = INPUT_PARAM[2*N_CHANGE_STATS + head]; 
+      int tailattr = INPUT_PARAM[2*N_CHANGE_STATS + tail + 1]; 
+      int headattr = INPUT_PARAM[2*N_CHANGE_STATS + head + 1]; 
 
       // If neither attribute matches, this toggle has no effect on the statistic.
       if(tailattr!=testattr && headattr!=testattr){
@@ -705,12 +691,14 @@ D_CHANGESTAT_FN(d_degree_by_attr_mean_age_mon){
       case -1: // tail was previously counted, but is no longer
 	STEP_THROUGH_OUTEDGES(tail, e, head1){
 	  TMP_SET_ET(tail,head1);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	STEP_THROUGH_INEDGES(tail, e, head1){
 	  TMP_SET_ET(head1,tail);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	break;
@@ -721,21 +709,26 @@ D_CHANGESTAT_FN(d_degree_by_attr_mean_age_mon){
       case +1: // tail was previously not counted, but is now
 	STEP_THROUGH_OUTEDGES(tail, e, head1){
 	  TMP_SET_ET(tail,head1);
-	  s1 += et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}
 	STEP_THROUGH_INEDGES(tail, e, head1){
 	  TMP_SET_ET(head1,tail);
-	  s1 += et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}
 	// Here, we need to handle the focus dyad:
 	if(change==+1){// if it's formed, add 1 to s1
-	  s1 += 1;
+	  int et = 0;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
 	  int et = ElapsedTime(tail,head,nwp);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	break;
@@ -745,12 +738,14 @@ D_CHANGESTAT_FN(d_degree_by_attr_mean_age_mon){
       case -1: // head was previously counted, but is no longer
 	STEP_THROUGH_OUTEDGES(head, e, tail1){
 	  TMP_SET_ET(head,tail1);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	STEP_THROUGH_INEDGES(head, e, tail1){
 	  TMP_SET_ET(tail1,head);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	break;
@@ -761,21 +756,26 @@ D_CHANGESTAT_FN(d_degree_by_attr_mean_age_mon){
       case +1: // head was previously not counted, but is now
 	STEP_THROUGH_OUTEDGES(head, e, tail1){
 	  TMP_SET_ET(head,tail1);
-	  s1 += et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}
 	STEP_THROUGH_INEDGES(head, e, tail1){
 	  TMP_SET_ET(tail1,head);
-	  s1 += et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}
 	// Here, we need to handle the focus dyad:
 	if(change==+1){// if it's formed, add 1 to s1
-	  s1 += 1;
+	  int et = 0;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
 	  int et = ElapsedTime(tail,head,nwp);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	break;
@@ -794,7 +794,8 @@ S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon){
   int i;
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
-
+  int transform = INPUT_PARAM[1]; // Transformation code.
+  
   ZERO_ALL_CHANGESTATS(i);
 
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
@@ -804,17 +805,19 @@ S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon){
       Vertex tail, head;
       FindithEdge(&tail, &head, k, nwp);
       Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
-      int tailattr = INPUT_PARAM[2*N_CHANGE_STATS + tail]; 
-      int headattr = INPUT_PARAM[2*N_CHANGE_STATS + head]; 
+      int tailattr = INPUT_PARAM[2*N_CHANGE_STATS + tail + 1]; 
+      int headattr = INPUT_PARAM[2*N_CHANGE_STATS + head + 1]; 
     
-      Vertex deg = INPUT_PARAM[2*j+1];
-      int testattr = INPUT_PARAM[2*j+2];
+      Vertex deg = INPUT_PARAM[2*j+2];
+      int testattr = INPUT_PARAM[2*j+3];
 
       unsigned int w = ((taildeg==deg && tailattr==testattr) ? 1 : 0) +
 	((headdeg==deg && headattr==testattr) ? 1 : 0);
       
       if(w){
-	CHANGE_STAT[j] += ElapsedTime(tail,head,nwp)*w;
+	int et = ElapsedTime(tail,head,nwp);
+	CSD_TRANSFORM_ET(et);
+	CHANGE_STAT[j] += ett*w;
 	e+=w;
       }
     }
@@ -841,12 +844,13 @@ D_CHANGESTAT_FN(d_degrange_mean_age_mon){
   int i;
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
+  int transform = INPUT_PARAM[1]; // Transformation code.
   
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
     double s0 = 0, s1 = 0;
     Edge e0 = 0, e1 = 0;
 
-    Vertex from = INPUT_PARAM[j*2+1], to = INPUT_PARAM[j*2+2];
+    Vertex from = INPUT_PARAM[j*2+2], to = INPUT_PARAM[j*2+3];
     
     for (Edge k=1; k <= N_EDGES; k++){
       Vertex tail, head;
@@ -856,8 +860,9 @@ D_CHANGESTAT_FN(d_degrange_mean_age_mon){
       
       if(w){
 	int et = ElapsedTime(tail,head,nwp);
-	s0 += et*w;
-	s1 += (et+1)*w;
+	CSD_TRANSFORM_ET(et);
+	s0 += ett*w;
+	s1 += ett1*w;
 	e0+=w;
 	e1+=w;
       }
@@ -890,12 +895,14 @@ D_CHANGESTAT_FN(d_degrange_mean_age_mon){
       if(tailin0 && !tailin1){ // tail was previously counted, but is no longer
 	STEP_THROUGH_OUTEDGES(tail, e, head1){
 	  TMP_SET_ET(tail,head1);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	STEP_THROUGH_INEDGES(tail, e, head1){
 	  TMP_SET_ET(head1,tail);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	// We don't need to do anything special for the focus dyad here:
@@ -904,30 +911,38 @@ D_CHANGESTAT_FN(d_degrange_mean_age_mon){
       }else if(!tailin0 && tailin1){ // tail was previously not counted, but is now
 	STEP_THROUGH_OUTEDGES(tail, e, head1){
 	  TMP_SET_ET(tail,head1);
-	  s1 += et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}
 	STEP_THROUGH_INEDGES(tail, e, head1){
 	  TMP_SET_ET(head1,tail);
-	  s1 += et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}
 	// Here, we need to handle the focus dyad:
 	if(change==+1){// if it's formed, add 1 to s1
-	  s1 += 1;
+	  int et = 0;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
 	  int et = ElapsedTime(tail,head,nwp);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
       }else if(tailin0 && tailin1){ // tail was counted both times, but we need to handle the focus dyad
 	if(change==+1){// if it's formed, add 1 to s1
-	  s1 += 1;
+	  int et = 0;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}else{// if it's dissolved, it must be subtracted from s1
 	  int et = ElapsedTime(tail,head,nwp);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
       }
@@ -936,12 +951,14 @@ D_CHANGESTAT_FN(d_degrange_mean_age_mon){
       if(headin0 && !headin1){ // head was previously counted, but is no longer
 	STEP_THROUGH_OUTEDGES(head, e, tail1){
 	  TMP_SET_ET(head,tail1);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	STEP_THROUGH_INEDGES(head, e, tail1){
 	  TMP_SET_ET(tail1,head);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
 	// We don't need to do anything special for the focus dyad here:
@@ -950,30 +967,38 @@ D_CHANGESTAT_FN(d_degrange_mean_age_mon){
       }else if(!headin0 && headin1){ // head was previously not counted, but is now
 	STEP_THROUGH_OUTEDGES(head, e, tail1){
 	  TMP_SET_ET(head,tail1);
-	  s1 += et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}
 	STEP_THROUGH_INEDGES(head, e, tail1){
 	  TMP_SET_ET(tail1,head);
-	  s1 += et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}
 	// Here, we need to handle the focus dyad:
 	if(change==+1){// if it's formed, add 1 to s1
-	  s1 += 1;
+	  int et = 0;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
 	  int et = ElapsedTime(tail,head,nwp);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
       }else if(headin0 && headin1){ // tail was counted both times, but we need to handle the focus dyad
 	if(change==+1){// if it's formed, add 1 to s1
-	  s1 += 1;
+	  int et = 0;
+	  CSD_TRANSFORM_ET(et);
+	  s1 += ett1;
 	  e1++;
 	}else{// if it's dissolved, it must be subtracted from s1
 	  int et = ElapsedTime(tail,head,nwp);
-	  s1 -= et+1;
+	  CSD_TRANSFORM_ET(et);
+	  s1 -= ett1;
 	  e1--;
 	}
       }
@@ -993,11 +1018,12 @@ S_CHANGESTAT_FN(s_degrange_mean_age_mon){
   int i;
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
-
+  int transform = INPUT_PARAM[1]; // Transformation code.
+  
   ZERO_ALL_CHANGESTATS(i);
 
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
-    Vertex from = INPUT_PARAM[j*2+1], to = INPUT_PARAM[j*2+2];
+    Vertex from = INPUT_PARAM[j*2+2], to = INPUT_PARAM[j*2+3];
     Edge e=0;
 
     for (Edge k=1; k <= N_EDGES; k++){
@@ -1007,7 +1033,9 @@ S_CHANGESTAT_FN(s_degrange_mean_age_mon){
       unsigned int w = FROM_TO(od[tail]+id[tail],from,to) + FROM_TO(od[head]+id[head],from,to);
       
       if(w){
-	CHANGE_STAT[j] += ElapsedTime(tail,head,nwp)*w;
+	int et = ElapsedTime(tail,head,nwp);	
+	CSD_TRANSFORM_ET(et);
+	CHANGE_STAT[j] += ett*w;
 	e+=w;
       }
     }
@@ -1030,29 +1058,31 @@ D_CHANGESTAT_FN(d_degrange_by_attr_mean_age_mon){
   int i;
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
+  int transform = INPUT_PARAM[1]; // Transformation code.
   
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
     double s0 = 0, s1 = 0;
     Edge e0 = 0, e1 = 0;
 
-    Vertex from = INPUT_PARAM[3*j+1], to = INPUT_PARAM[3*j+2];
-    int testattr = INPUT_PARAM[3*j+3];
+    Vertex from = INPUT_PARAM[3*j+2], to = INPUT_PARAM[3*j+3];
+    int testattr = INPUT_PARAM[3*j+4];
     
     for (Edge k=1; k <= N_EDGES; k++){
       Vertex tail, head;
       FindithEdge(&tail, &head, k, nwp);
       
       Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
-      int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail]; 
-      int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head]; 
+      int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail + 1]; 
+      int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head + 1]; 
 
       unsigned int w = (FROM_TO(taildeg, from, to) && tailattr==testattr) +
 	(FROM_TO(headdeg, from, to) && headattr==testattr);
       
       if(w){
 	int et = ElapsedTime(tail,head,nwp);
-	s0 += et*w;
-	s1 += (et+1)*w;
+	CSD_TRANSFORM_ET(et);
+	s0 += ett*w;
+	s1 += ett1*w;
 	e0+=w;
 	e1+=w;
       }
@@ -1060,8 +1090,8 @@ D_CHANGESTAT_FN(d_degrange_by_attr_mean_age_mon){
 
     FOR_EACH_TOGGLE(i){
       Vertex tail=TAIL(i), head=HEAD(i);
-      int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail]; 
-      int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head]; 
+      int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail + 1]; 
+      int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head + 1]; 
 
       // If neither attribute matches, this toggle has no effect on the statistic.
       if(tailattr!=testattr && headattr!=testattr){
@@ -1094,12 +1124,14 @@ D_CHANGESTAT_FN(d_degrange_by_attr_mean_age_mon){
 	if(tailin0 && !tailin1){ // tail was previously counted, but is no longer
 	  STEP_THROUGH_OUTEDGES(tail, e, head1){
 	    TMP_SET_ET(tail,head1);
-	    s1 -= et+1;
+	    CSD_TRANSFORM_ET(et);
+	    s1 -= ett1;
 	    e1--;
 	  }
 	  STEP_THROUGH_INEDGES(tail, e, head1){
 	    TMP_SET_ET(head1,tail);
-	    s1 -= et+1;
+	    CSD_TRANSFORM_ET(et);
+	    s1 -= ett1;
 	    e1--;
 	  }
 	  // We don't need to do anything special for the focus dyad here:
@@ -1108,30 +1140,38 @@ D_CHANGESTAT_FN(d_degrange_by_attr_mean_age_mon){
 	}else if(!tailin0 && tailin1){ // tail was previously not counted, but is now
 	  STEP_THROUGH_OUTEDGES(tail, e, head1){
 	    TMP_SET_ET(tail,head1);
-	    s1 += et+1;
+	    CSD_TRANSFORM_ET(et);
+	    s1 += ett1;
 	    e1++;
 	  }
 	  STEP_THROUGH_INEDGES(tail, e, head1){
 	    TMP_SET_ET(head1,tail);
-	    s1 += et+1;
+	    CSD_TRANSFORM_ET(et);
+	    s1 += ett1;
 	    e1++;
 	  }
 	  // Here, we need to handle the focus dyad:
 	  if(change==+1){// if it's formed, add 1 to s1
-	    s1 += 1;
+	    int et = 0;
+	    CSD_TRANSFORM_ET(et);
+	    s1 += ett1;
 	    e1++;
 	  }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
 	    int et = ElapsedTime(tail,head,nwp);
-	    s1 -= et+1;
+	    CSD_TRANSFORM_ET(et);
+	    s1 -= ett1;
 	    e1--;
 	  }
 	}else if(tailin0 && tailin1){ // tail was counted both times, but we need to handle the focus dyad
 	  if(change==+1){// if it's formed, add 1 to s1
-	    s1 += 1;
+	    int et = 0;
+	    CSD_TRANSFORM_ET(et);
+	    s1 += ett1;
 	    e1++;
 	  }else{// if it's dissolved, it must be subtracted from s1
 	    int et = ElapsedTime(tail,head,nwp);
-	    s1 -= et+1;
+	    CSD_TRANSFORM_ET(et);
+	    s1 -= ett1;
 	    e1--;
 	  }
 	}
@@ -1142,12 +1182,14 @@ D_CHANGESTAT_FN(d_degrange_by_attr_mean_age_mon){
 	if(headin0 && !headin1){ // head was previously counted, but is no longer
 	  STEP_THROUGH_OUTEDGES(head, e, tail1){
 	    TMP_SET_ET(head,tail1);
-	    s1 -= et+1;
+	    CSD_TRANSFORM_ET(et);
+	    s1 -= ett1;
 	    e1--;
 	  }
 	  STEP_THROUGH_INEDGES(head, e, tail1){
 	    TMP_SET_ET(tail1,head);
-	    s1 -= et+1;
+	    CSD_TRANSFORM_ET(et);
+	    s1 -= ett1;
 	    e1--;
 	  }
 	  // We don't need to do anything special for the focus dyad here:
@@ -1156,30 +1198,38 @@ D_CHANGESTAT_FN(d_degrange_by_attr_mean_age_mon){
 	}else if(!headin0 && headin1){ // head was previously not counted, but is now
 	  STEP_THROUGH_OUTEDGES(head, e, tail1){
 	    TMP_SET_ET(head,tail1);
-	    s1 += et+1;
+	    CSD_TRANSFORM_ET(et);
+	    s1 += ett1;
 	    e1++;
 	  }
 	  STEP_THROUGH_INEDGES(head, e, tail1){
 	    TMP_SET_ET(tail1,head);
-	    s1 += et+1;
+	    CSD_TRANSFORM_ET(et);
+	    s1 += ett1;
 	    e1++;
 	  }
 	  // Here, we need to handle the focus dyad:
 	  if(change==+1){// if it's formed, add 1 to s1
-	    s1 += 1;
+	    int et = 0;
+	    CSD_TRANSFORM_ET(et);
+	    s1 += ett1;
 	    e1++;
 	  }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
 	    int et = ElapsedTime(tail,head,nwp);
-	    s1 -= et+1;
+	    CSD_TRANSFORM_ET(et);
+	    s1 -= ett1;
 	    e1--;
 	  }
 	}else if(headin0 && headin1){ // tail was counted both times, but we need to handle the focus dyad
 	  if(change==+1){// if it's formed, add 1 to s1
-	    s1 += 1;
+	    int et = 0;
+	    CSD_TRANSFORM_ET(et);
+	    s1 += ett1;
 	    e1++;
 	  }else{// if it's dissolved, it must be subtracted from s1
 	    int et = ElapsedTime(tail,head,nwp);
-	    s1 -= et+1;
+	    CSD_TRANSFORM_ET(et);
+	    s1 -= ett1;
 	    e1--;
 	  }
 	}
@@ -1199,7 +1249,7 @@ S_CHANGESTAT_FN(s_degrange_by_attr_mean_age_mon){
   int i;
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
-
+  int transform = INPUT_PARAM[1]; // Transformation code.
   ZERO_ALL_CHANGESTATS(i);
 
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
@@ -1209,17 +1259,19 @@ S_CHANGESTAT_FN(s_degrange_by_attr_mean_age_mon){
       Vertex tail, head;
       FindithEdge(&tail, &head, k, nwp);
       Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
-      int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail]; 
-      int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head]; 
+      int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail + 1]; 
+      int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head + 1]; 
     
-      Vertex from = INPUT_PARAM[3*j+1], to = INPUT_PARAM[3*j+2];
-      int testattr = INPUT_PARAM[3*j+3];
+      Vertex from = INPUT_PARAM[3*j+2], to = INPUT_PARAM[3*j+3];
+      int testattr = INPUT_PARAM[3*j+4];
 
       unsigned int w = (FROM_TO(taildeg, from, to) && tailattr==testattr) +
 	(FROM_TO(headdeg, from, to) && headattr==testattr);
       
       if(w){
-	CHANGE_STAT[j] += ElapsedTime(tail,head,nwp)*w;
+	int et = ElapsedTime(tail,head,nwp);
+	CSD_TRANSFORM_ET(et);
+	CHANGE_STAT[j] += ett*w;
 	e+=w;
       }
     }
@@ -1230,3 +1282,4 @@ S_CHANGESTAT_FN(s_degrange_by_attr_mean_age_mon){
 }
 
 #undef FROM_TO
+#undef CSD_TRANSFORM_ET
