@@ -8,6 +8,53 @@
 #  Copyright 2003-2014 Statnet Commons
 #######################################################################
 
+InitErgmTerm.competitor.log.age<-function(nw, arglist, role, ...) {
+  if(!any(role %in% c("formation"))) stop("Term competitor.log.age can only be used in a formation model.")
+  a <- check.ErgmTerm(nw, arglist, directed=FALSE,
+                      varnames = c(),
+                      vartypes = c(),
+                      defaultvalues = list(),
+                      required = c())
+  
+  list(name="competitor_log_age",
+       coef.names = "competitor.log.age",
+       inputs=c(),
+       duration=TRUE,
+       dependence=TRUE)
+}
+
+InitErgmTerm.log.ages<-function(nw, arglist, role, ...) {
+  if(!any(role %in% c("dissolution"))) stop("Term log.ages can only be used in a dissolution model.")
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c(),
+                      vartypes = c(),
+                      defaultvalues = list(),
+                      required = c())
+  
+  list(name="log_ages",
+       coef.names = "log.ages",
+       inputs=c(),
+       duration=TRUE,
+       dependence=FALSE)
+}
+
+InitErgmTerm.mean.log.age<-function(nw, arglist, role, ...) {
+  if(role!="target") stop("Term mean.age can only be used as a target statistic.")
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = "emptyval",
+                      vartypes = "numeric",
+                      defaultvalues = list(0),
+                      required = FALSE)
+  
+  
+  list(name="mean_log_age_mon",
+       coef.names = "mean.log.age",
+       inputs = a$emptyval,
+       emptynwstats = a$emptyval,
+       duration=TRUE,
+       dependence=FALSE)
+}
+
 
 InitErgmTerm.edges.ageinterval<-function(nw, arglist, role, ...) {
   if(!any(role %in% c("dissolution","target"))) stop("Term edges.ageinterval can only be used in a dissolution model or as a target statistic.")
@@ -29,7 +76,7 @@ else if(any(from>=to)) stop("Term edges.ageinterval must have from<to.")
   list(name=if(role=="target") "edges_ageinterval_mon" else "edges_ageinterval",
        coef.names = paste("edges.age",from,"to",to,sep=""),
        inputs=c(rbind(from, ifelse(to==Inf, 0, to))),
-	   duration=TRUE,
+       duration=TRUE,
        dependence=FALSE)
 }
 
@@ -39,7 +86,7 @@ InitErgmTerm.edge.ages<-function(nw, arglist, role, ...) {
   
   list(name="edge_ages_mon",
        coef.names = "edge.ages",
-	   duration=TRUE,
+       duration=TRUE,
        dependence=FALSE)
 }
 
@@ -56,7 +103,7 @@ InitErgmTerm.mean.age<-function(nw, arglist, role, ...) {
        coef.names = "mean.age",
        inputs = a$emptyval,
        emptynwstats = a$emptyval,
-		duration=TRUE,
+       duration=TRUE,
        dependence=FALSE)
 }
 
@@ -121,7 +168,7 @@ InitErgmTerm.edgecov.ages<-function(nw, arglist, role, ...) {
   }
   inputs <- c(NCOL(xm), as.double(xm))
   attr(inputs, "ParamsBeforeCov") <- 1
-  list(name="edgecov_ages_mon", coef.names = cn, inputs = inputs, duration=TRUE,dependence=FALSE)
+  list(name="edgecov_ages_mon", coef.names = cn, inputs = inputs, duration=TRUE, dependence=FALSE)
 }
 
 ################################################################################
@@ -164,7 +211,7 @@ InitErgmTerm.degree.mean.age<-function(nw, arglist, role, ...) {
     inputs <- c(as.vector(du), nodecov)
   }
   list(name=name,coef.names=coef.names, inputs=c(a$emptyval,inputs),
-       emptynwstats=rep(a$emptyval,length(coef.names)),duration=TRUE,  dependence=TRUE)
+       emptynwstats=rep(a$emptyval,length(coef.names)), duration=TRUE, dependence=TRUE)
 }
 
 ################################################################################

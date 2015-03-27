@@ -9,6 +9,147 @@
  */
 #include "changestats_duration.h"
 
+
+/*****************
+ void d_competitor_log_age
+
+This is a formation-only statistic that counts, only for *new ties*
+the sum of logs of ages of extant ties incident on the same actors.
+
+*****************/
+D_CHANGESTAT_FN(d_competitor_log_age){
+  int i;
+  
+  ZERO_ALL_CHANGESTATS(i);
+
+  FOR_EACH_TOGGLE(i){
+    Vertex tail=TAIL(i), head=HEAD(i);
+
+    /* This is the formation phase, so,
+       
+       nwp[0]  nwp[1]
+          0       0   -> no edge
+	  0       1   -> can't happen in formation
+          1       0   -> extant
+	  1       1   -> just formed
+	  
+       The focus edge can either be [0,0] or [1,1]. By construction,
+       we can't propose anything else, so we don't need to check.
+
+       For the "competitors", we need to iterate over edges incident
+       on tail and head, skipping any that are just formed (i.e.,
+       present in nwp[1]).
+     */
+
+
+    Edge e, head1;
+    double competition=0;
+
+    STEP_THROUGH_OUTEDGES(tail, e, head1){
+      if(head1==head) continue; // Focus dyad.
+      if(EdgetreeSearch(MIN(tail,head1),MAX(tail,head1),(nwp+1)->outedges)!=0) continue; // Just formed.
+      competition += ElapsedTime(tail,head1,nwp);
+    }
+    STEP_THROUGH_INEDGES(tail, e, head1){
+      if(head1==head) continue; // Focus dyad.
+      if(EdgetreeSearch(MIN(tail,head1),MAX(tail,head1),(nwp+1)->outedges)!=0) continue; // Just formed.
+      competition += ElapsedTime(tail,head1,nwp);
+    }
+    
+    if(competition>0){
+      unsigned int edgeflag = IS_OUTEDGE(tail, head);
+      CHANGE_STAT[0] += edgeflag ? - log(competition) : log(competition);
+    }
+
+    TOGGLE_IF_MORE_TO_COME(i);
+    TOGGLE_DISCORD_IF_MORE_TO_COME(i);
+  }
+  UNDO_PREVIOUS_DISCORD_TOGGLES(i);
+}
+
+
+
+/*****************
+ void d_log_ages
+
+ This is the sum(log(age[i,j])) dissolution-only statistic.
+
+*****************/
+D_CHANGESTAT_FN(d_log_ages){
+  int i;
+  
+  ZERO_ALL_CHANGESTATS(i);
+
+  FOR_EACH_TOGGLE(i){
+    Vertex tail, head;
+    int age = ElapsedTime(tail=TAIL(i),head=HEAD(i),nwp);
+    unsigned int edgeflag = IS_OUTEDGE(tail, head);
+    CHANGE_STAT[0] += edgeflag ? - log(age) : log(age);
+
+    TOGGLE_IF_MORE_TO_COME(i);
+  }
+  UNDO_PREVIOUS_TOGGLES(i);
+}
+
+/*****************
+ void d_mean_log_age
+
+ Mean of log-ages of all extant ties.
+
+ The mean_log_ages of an empty network is defined to be emptyval.
+
+ *****************/
+
+D_CHANGESTAT_FN(d_mean_log_age_mon){
+  int i;
+  
+  double s0 = 0, s1 = 0; // Sum of age values of initial and final network.
+  double zeroval = INPUT_PARAM[0]; // Empty network value.
+  Edge e0, e1; // Number of edges in initial and final network.
+  
+  e0 = e1 = N_EDGES;
+  
+  for(Edge k=1; k <= e0; k++){
+    Vertex tail, head;
+    FindithEdge(&tail, &head, k, nwp);
+    int et = ElapsedTime(tail,head,nwp);
+    s0 += log(et);
+    s1 += log(et + 1);
+  }
+  
+  FOR_EACH_TOGGLE(i){
+    Vertex tail = tails[i], head = heads[i];
+    if(IS_OUTEDGE(tail, head)){
+      s1 -= log(ElapsedTime(tail,head,nwp) + 1);
+      e1--;
+    }else{
+      s1 += log(1);
+      e1++;
+    }
+  }
+  
+  CHANGE_STAT[0]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+}
+
+S_CHANGESTAT_FN(s_mean_log_age_mon){
+  CHANGE_STAT[0] = 0;
+  double zeroval = INPUT_PARAM[0];
+
+  if(N_EDGES>0){
+    for (Edge k=1; k <= N_EDGES; k++){
+      Vertex tail, head;
+      FindithEdge(&tail, &head, k, nwp);
+      int age = ElapsedTime(tail,head,nwp);
+      CHANGE_STAT[0] += log(age);
+    }
+    
+    CHANGE_STAT[0] /= N_EDGES;
+  }else{
+    CHANGE_STAT[0] = zeroval;
+  }
+}
+
+
 /*****************
  void d_edges_ageinterval
 
