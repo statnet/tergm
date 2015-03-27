@@ -102,6 +102,7 @@ dc <- matrix(rnorm(100),10,10); dc <- dc+t(dc)
 # Simulate a network, tracking its statistics.
 simnet <- simulate(g1, formation=~edges, dissolution=~edges, coef.form=-1, coef.diss=1,
                    time.slices=50, monitor=~degree(1)+mean.age+degree.mean.age(1)+
+                                            degrange(1,3)+mean.age+degrange.mean.age(1,3)+
                                             edge.ages+edgecov(dc)+edgecov.ages(dc),
                    output="networkDynamic")
 
@@ -113,6 +114,7 @@ sim.stats <- as.matrix(sim.stats)
 # Replay the simulation using a networkDynamic, monitoring a potentially different set of
 # statistics (but same in this case).
 gf1.stats <- tergm.godfather(simnet~degree(1)+mean.age+degree.mean.age(1)+
+                                    degrange(1,3)+mean.age+degrange.mean.age(1,3)+
                                     edge.ages+edgecov(dc)+edgecov.ages(dc),
                              start=0, end=50)
 
@@ -122,6 +124,7 @@ gf1.stats <- as.matrix(gf1.stats)
 # Replay the simulation using the initial network + list of changes.
 
 gf2.stats <- tergm.godfather(g1~degree(1)+mean.age+degree.mean.age(1)+
+                                degrange(1,3)+mean.age+degrange.mean.age(1,3)+
                                 edge.ages+edgecov(dc)+edgecov.ages(dc),
                              start=0, end=50, changes=attr(simnet,"changes"))
 
@@ -130,6 +133,7 @@ gf2.stats <- as.matrix(gf2.stats)
 
 # We can also compare them to the network statistics summarized.
 summ.stats <- summary(simnet~degree(1)+mean.age+degree.mean.age(1)+
+                             degrange(1,3)+mean.age+degrange.mean.age(1,3)+
                              edge.ages+edgecov(dc)+edgecov.ages(dc), at=1:50)
 
 print(head(summ.stats))
