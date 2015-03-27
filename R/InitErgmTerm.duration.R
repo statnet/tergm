@@ -8,8 +8,8 @@
 #  Copyright 2003-2014 Statnet Commons
 #######################################################################
 
-InitErgmTerm.competitor.log.age<-function(nw, arglist, role, ...) {
-  if(!any(role %in% c("formation"))) stop("Term competitor.log.age can only be used in a formation model.")
+InitErgmTerm.competitor.log.age<-function(nw, arglist, role=NULL, ...) {
+  if(!is.null(role) && !any(role %in% c("formation"))) stop("Term competitor.log.age can only be used in a formation model.")
   a <- check.ErgmTerm(nw, arglist, directed=FALSE,
                       varnames = c(),
                       vartypes = c(),
@@ -23,8 +23,8 @@ InitErgmTerm.competitor.log.age<-function(nw, arglist, role, ...) {
        dependence=TRUE)
 }
 
-InitErgmTerm.log.ages<-function(nw, arglist, role, ...) {
-  if(!any(role %in% c("dissolution"))) stop("Term log.ages can only be used in a dissolution model.")
+InitErgmTerm.log.ages<-function(nw, arglist, role=NULL, ...) {
+  if(!is.null(role) && !any(role %in% c("dissolution"))) stop("Term log.ages can only be used in a dissolution model.")
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c(),
                       vartypes = c(),
@@ -38,8 +38,8 @@ InitErgmTerm.log.ages<-function(nw, arglist, role, ...) {
        dependence=FALSE)
 }
 
-InitErgmTerm.mean.log.age<-function(nw, arglist, role, ...) {
-  if(role!="target") stop("Term mean.age can only be used as a target statistic.")
+InitErgmTerm.mean.log.age<-function(nw, arglist, role=NULL, ...) {
+  if(role!="target") stop("Term mean.log.age can only be used as a target statistic.")
   a <- check.ErgmTerm(nw, arglist,
                       varnames = "emptyval",
                       vartypes = "numeric",
@@ -56,8 +56,8 @@ InitErgmTerm.mean.log.age<-function(nw, arglist, role, ...) {
 }
 
 
-InitErgmTerm.edges.ageinterval<-function(nw, arglist, role, ...) {
-  if(!any(role %in% c("dissolution","target"))) stop("Term edges.ageinterval can only be used in a dissolution model or as a target statistic.")
+InitErgmTerm.edges.ageinterval<-function(nw, arglist, role=NULL, ...) {
+  if(!is.null(role) && !any(role %in% c("dissolution","target"))) stop("Term edges.ageinterval can only be used in a dissolution model or as a target statistic.")
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("from","to"),
                       vartypes = c("numeric","numeric"),
@@ -80,8 +80,8 @@ else if(any(from>=to)) stop("Term edges.ageinterval must have from<to.")
        dependence=FALSE)
 }
 
-InitErgmTerm.edge.ages<-function(nw, arglist, role, ...) {
-  if(role!="target") stop("Term edge.ages can only be used as a target statistic.")
+InitErgmTerm.edge.ages<-function(nw, arglist, role=NULL, ...) {
+  if(!is.null(role) && !any(role %in% c("target"))) stop("Term edge.ages can only be used as a target statistic.")
   a <- check.ErgmTerm(nw, arglist)
   
   list(name="edge_ages_mon",
@@ -90,8 +90,8 @@ InitErgmTerm.edge.ages<-function(nw, arglist, role, ...) {
        dependence=FALSE)
 }
 
-InitErgmTerm.mean.age<-function(nw, arglist, role, ...) {
-  if(role!="target") stop("Term mean.age can only be used as a target statistic.")
+InitErgmTerm.mean.age<-function(nw, arglist, role=NULL, ...) {
+  if(!is.null(role) && !any(role %in% c("target"))) stop("Term mean.age can only be used as a target statistic.")
   a <- check.ErgmTerm(nw, arglist,
                       varnames = "emptyval",
                       vartypes = "numeric",
@@ -107,8 +107,8 @@ InitErgmTerm.mean.age<-function(nw, arglist, role, ...) {
        dependence=FALSE)
 }
 
-InitErgmTerm.edgecov.mean.age<-function(nw, arglist, role, ...) {
-  if(role!="target") stop("Term mean.age can only be used as a target statistic.")
+InitErgmTerm.edgecov.mean.age<-function(nw, arglist, role=NULL, ...) {
+  if(!is.null(role) && !any(role %in% c("target"))) stop("Term mean.age can only be used as a target statistic.")
 
   a <- check.ErgmTerm(nw, arglist, 
                       varnames = c("x", "attrname", "emptyval"),
@@ -139,8 +139,8 @@ InitErgmTerm.edgecov.mean.age<-function(nw, arglist, role, ...) {
   list(name="edgecov_mean_age_mon", coef.names = cn, inputs = inputs, duration=TRUE, dependence=FALSE, emptynwstats = a$emptyval)
 }
 
-InitErgmTerm.edgecov.ages<-function(nw, arglist, role, ...) {
-  if(role!="target") stop("Term edgecov.ages can only be used as a target statistic.")
+InitErgmTerm.edgecov.ages<-function(nw, arglist, role=NULL, ...) {
+  if(!is.null(role) && !any(role %in% c("target"))) stop("Term edgecov.ages can only be used as a target statistic.")
 
   a <- check.ErgmTerm(nw, arglist, 
                       varnames = c("x", "attrname"),
@@ -172,8 +172,8 @@ InitErgmTerm.edgecov.ages<-function(nw, arglist, role, ...) {
 }
 
 ################################################################################
-InitErgmTerm.degree.mean.age<-function(nw, arglist, role, ...) {
-  if(role!="target") stop("Term degree.mean.age can only be used as a target statistic.")
+InitErgmTerm.degree.mean.age<-function(nw, arglist, role=NULL, ...) {
+  if(!is.null(role) && !any(role %in% c("target"))) stop("Term degree.mean.age can only be used as a target statistic.")
   a <- check.ErgmTerm(nw, arglist, directed=FALSE,
                       varnames = c("d", "byarg", "emptyval"),
                       vartypes = c("numeric", "character", "numeric"),
@@ -215,8 +215,8 @@ InitErgmTerm.degree.mean.age<-function(nw, arglist, role, ...) {
 }
 
 ################################################################################
-InitErgmTerm.degrange.mean.age<-function(nw, arglist, role, ...) {
-  if(role!="target") stop("Term degrange.mean.age can only be used as a target statistic.")
+InitErgmTerm.degrange.mean.age<-function(nw, arglist, role=NULL, ...) {
+  if(!is.null(role) && !any(role %in% c("target"))) stop("Term degrange.mean.age can only be used as a target statistic.")
   a <- check.ErgmTerm(nw, arglist, directed=FALSE,
                       varnames = c("from", "to", "byarg", "emptyval"),
                       vartypes = c("numeric", "numeric", "character", "numeric"),
