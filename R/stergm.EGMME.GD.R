@@ -39,24 +39,33 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     x<-oh[,1:p,drop=FALSE][,!offsets,drop=FALSE] # #$%^$ gls() doesn't respect I()...
     ys <- oh[,-(1:p),drop=FALSE]
     n <- nrow(ys)
-    
     h.fits <-
       if(!is.null(cl)){
         library(parallel)
-        parallel::clusterApplyLB(cl, 1:q,
+        if(verbose) {cat("Calling lm/lmrob:\n"); print(gc())}
+        out <- parallel::clusterApplyLB(cl, 1:q,
                        function(i){
                          y<-ys[,i]
-                         suppressWarnings(try(
-                                            if(control$SA.robust) lmrob(y~x)
-                                            else lm(y~x), silent=TRUE))
+                         suppressWarnings(try({
+                           fit <- if(control$SA.robust) lmrob(y~x,model=FALSE)
+                                  else lm(y~x,model=FALSE)
+                           
+                           list(coef=coef(fit), resid=resid(fit), tvals=summary(fit)$coefficients[,3])},
+                                              silent=TRUE))
+                         
                        })
+        if(verbose) print(gc())
+        out
       }else{
         lapply(1:q,
                function(i){
                  y<-ys[,i]
-                 suppressWarnings(try(
-                                    if(control$SA.robust) lmrob(y~x)
-                                    else lm(y~x), silent=TRUE))
+                 suppressWarnings(try({
+                   fit <- if(control$SA.robust) lmrob(y~x,model=FALSE)
+                          else lm(y~x,model=FALSE)
+                   
+                   list(coef=coef(fit), resid=resid(fit), tvals=summary(fit)$coefficients[,3])},
+                                      silent=TRUE))
                })
       }
 
@@ -76,13 +85,15 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     h.nfs <- h.fit <- h.pvals <- h.tvals <- matrix(NA, nrow=p.free+1,ncol=q)
 
-    h.fit[,!bad.fits] <- sapply(h.fits[!bad.fits], coef)[seq_len(p.free+1),]
+    h.fit[,!bad.fits] <- sapply(h.fits[!bad.fits], "[[", "coef")[seq_len(p.free+1),]
     
     h.resid <- matrix(NA, nrow=n, ncol=q)
-    h.resid[,!bad.fits] <- sapply(h.fits[!bad.fits], resid)
+    h.resid[,!bad.fits] <- sapply(h.fits[!bad.fits], "[[", "resid")
 
-    h.tvals[,!bad.fits] <- sapply(h.fits[!bad.fits],function(fit) summary(fit)$coefficients[seq_len(p.free+1),3])
+    h.tvals[,!bad.fits] <- sapply(h.fits[!bad.fits], "[[", "tvals")[seq_len(p.free+1),]
 
+    rm(h.fits)
+    
     h.nfs[,!bad.fits] <- matrix(apply(h.resid[,!bad.fits,drop=FALSE],2,function(x) sum(tapply(x,list(tid),length))/sum(tapply(x,list(tid),effectiveSize))), nrow=p.free+1, ncol=sum(!bad.fits), byrow=TRUE)
 
     h.tvals[,!bad.fits] <- h.tvals[,!bad.fits,drop=FALSE]/sqrt(h.nfs[,!bad.fits,drop=FALSE])
