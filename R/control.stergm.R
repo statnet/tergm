@@ -99,6 +99,7 @@ control.stergm<-function(init.form=NULL,
                          SA.phase2.jitter.mul=0.2, # The jitter standard deviation of each parameter is this times its standard deviation sans jitter.
                          SA.phase2.maxreljump=4, # Maximum jump per run, relative to the magnitude of other jumps in the history.
                          SA.guard.mul = 4, # The multiplier for the range of parameter values to compute the guard width.
+                         SA.par.eff.pow = 1, # How do we scale rows of the estimating equation as a function of G?
                          SA.robust = FALSE, # Should the (slower) robust linear regression and covariance estimation be used?
                          SA.oh.memory = 100000, # Maximum number of jumps to store.
                          

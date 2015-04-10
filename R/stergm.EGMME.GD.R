@@ -153,7 +153,8 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     ## Adaptively scale the estimating equations so that none of the
     ## parameters are "neglected".
     par.eff <- apply(sweep(G,1,ifelse(bad.fits,1,sqrt(diag(v))),"/"),2,function(z)mean(z^2))
-    par.eff <- sqrt(par.eff)
+    par.eff <- sqrt(par.eff)^control$SA.par.eff.pow
+    par.eff <- par.eff / mean(par.eff)
 
     
     rownames(w)<-colnames(w)<-rownames(v)<-colnames(v)<-q.names

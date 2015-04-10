@@ -98,7 +98,8 @@ control.stergm(init.form=NULL,
                SA.keep.min=0, 
                SA.phase2.jitter.mul=0.2, 
                SA.phase2.maxreljump=4, 
-               SA.guard.mul = 4, 
+               SA.guard.mul = 4,
+               SA.par.eff.pow = 1,
                SA.robust = FALSE,
                SA.oh.memory = 100000,
                SA.refine=c("mean","linear","none"), 
@@ -359,6 +360,18 @@ control.stergm(init.form=NULL,
     width.
   }
 
+  \item{SA.par.eff.pow}{
+    Because some parameters have much, much greater effects than others,
+    it improves numerical conditioning and makes estimation more stable
+    to rescale the \eqn{k}th estimating function by
+    \eqn{s_k = (\sum_{i=1}^{q} G_{i,k}^2/V_{i,i})^{-p/2}}, where
+    \eqn{G_{i,k}} is the estimated gradient of the \eqn{i}th target
+    statistics with respect to \eqn{k}th parameter. This parameter sets
+    the value of \eqn{p}: \code{0} for no rescaling, \code{1} (default)
+    for scaling by root-mean-square normalized gradient, and greater
+    values for greater penalty.
+  }
+  
   \item{SA.robust}{
     Whether to use robust linear regression (for gradients) and
     covariance estimation.
