@@ -40,7 +40,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     if(verbose) cat("Running stochastic optimization... ")
     zs <- if(!is.null(cl)){
-      library(parallel)
+      requireNamespace('parallel')
       # Conveniently, the first argument of stergm.EGMME.SA.Phase2.C
       # is the state of the optimization, so giving clusterApply a
       # list of states will call it for each thread's state.
@@ -116,7 +116,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
     # Plot if requested.
     if(control$SA.plot.progress && dev.interactive(TRUE)){
-      library(lattice)
+      requireNamespace('lattice')
       
       get.dev("progress.plot")
       
@@ -218,7 +218,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     cat("Burning in... ")
     
     zs <- if(!is.null(cl)){
-      library(parallel)
+      requireNamespace('parallel')
       if(verbose) {cat("Calling stergm.getMCMCsample:\n"); print(gc())}
       out <- parallel::clusterApply(cl, seq_along(states), function(i) stergm.getMCMCsample(states[[i]]$nw, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, states[[i]]$eta.form, states[[i]]$eta.diss, control.phase1, verbose))
       if(verbose) print(gc())

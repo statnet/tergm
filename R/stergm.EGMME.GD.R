@@ -41,7 +41,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     n <- nrow(ys)
     h.fits <-
       if(!is.null(cl)){
-        library(parallel)
+        requireNamespace('parallel')
         if(verbose) {cat("Calling lm/lmrob:\n"); print(gc())}
         out <- parallel::clusterApplyLB(cl, 1:q,
                        function(i){
@@ -187,7 +187,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
     # Plot if requested.
     if(control$SA.plot.stats && dev.interactive(TRUE)){
-      library(lattice)
+      requireNamespace('lattice')
       
       try({
         get.dev("gradients")
