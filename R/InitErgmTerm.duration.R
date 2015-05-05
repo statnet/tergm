@@ -8,41 +8,6 @@
 #  Copyright 2003-2014 Statnet Commons
 #######################################################################
 
-InitErgmTerm.competitor.log.age<-function(nw, arglist, role=NULL, ...) {
-  if(!is.null(role) && !any(role %in% c("formation"))) stop("Term competitor.log.age can only be used in a formation model.")
-  a <- check.ErgmTerm(nw, arglist, directed=FALSE,
-                      varnames = c(),
-                      vartypes = c(),
-                      defaultvalues = list(),
-                      required = c())
-  
-  list(name="competitor_log_age",
-       coef.names = "competitor.log.age",
-       inputs=c(),
-       duration=TRUE,
-       dependence=TRUE)
-}
-
-InitErgmTerm.log.ages<-function(nw, arglist, role=NULL, ...) {
-  if(!is.null(role) && !any(role %in% c("dissolution"))) stop("Term log.ages can only be used in a dissolution model.")
-  a <- check.ErgmTerm(nw, arglist,
-                      varnames = c(),
-                      vartypes = c(),
-                      defaultvalues = list(),
-                      required = c())
-  
-  list(name="log_ages",
-       coef.names = "log.ages",
-       inputs=c(),
-       duration=TRUE,
-       dependence=FALSE)
-}
-
-InitErgmTerm.mean.log.age<-function(nw, arglist, role=NULL, ...) {
-  if(role!="target") stop("Term mean.log.age can only be used as a target statistic.")
-  InitErgmTerm.mean.age(nw, modifyList(arglist, list(log=TRUE)))
-}
-
 
 InitErgmTerm.edges.ageinterval<-function(nw, arglist, role=NULL, ...) {
   if(!is.null(role) && !any(role %in% c("dissolution","target"))) stop("Term edges.ageinterval can only be used in a dissolution model or as a target statistic.")
