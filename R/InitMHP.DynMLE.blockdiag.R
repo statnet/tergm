@@ -100,6 +100,27 @@ InitMHP.formationNonObservedMLEblockdiag <- function(arguments, nw) {
   MHproposal
 }
 
+InitMHP.formationNonObservedMLEblockdiagTNT <- function(arguments, nw) {
+  ## Precalculate toggleable dyads: dyads which
+  ## * are unobserved in y[t]
+  ## * are non-ties in y[t-1]
+  
+  y0<-arguments$costraints$atleast$nw
+  y.miss<-is.na(nw)
+
+  if(is.bipartite(nw)) stop("Block-diagonal sampling is not implemented for bipartite networks at this time.")
+  # rle() returns contigous runs of values.
+  a <- nw %v% arguments$constraints$blockdiag$attrname
+  # If we have more runs than unique values, the blocks must not be all contiguous.
+  if(length(rle(a)$lengths)!=length(unique(rle(a)$values))) stop("Current implementation of block-diagonal sampling requires that the blocks be contiguous.")
+  el <- as.edgelist(y.miss-y0)
+  el <- el[a[el[,1]]==a[el[,2]],,drop=FALSE]
+
+  ## Given the list of toggleable dyads, no formation-specific proposal function is needed:
+  MHproposal <- list(name = "listTNT", inputs=ergm.Cprepare.el(el), pkgname="ergm")
+  MHproposal
+}
+
 InitMHP.dissolutionNonObservedMLEblockdiag <- function(arguments, nw) {
   ## Precalculate toggleable dyads: dyads which
   ## * are unobserved in y[t]
@@ -119,6 +140,29 @@ InitMHP.dissolutionNonObservedMLEblockdiag <- function(arguments, nw) {
   
   ## Given the list of toggleable dyads, no formation-specific proposal function is needed:
   MHproposal <- list(name = "randomtoggleList", inputs=ergm.Cprepare.el(el), pkgname="ergm")
+  MHproposal
+}
+
+
+InitMHP.dissolutionNonObservedMLEblockdiagTNT <- function(arguments, nw) {
+  ## Precalculate toggleable dyads: dyads which
+  ## * are unobserved in y[t]
+  ## * are ties in y[t-1]
+
+  y0<-arguments$constraints$atmost$nw
+  y.miss<-is.na(nw)
+
+  if(is.bipartite(nw)) stop("Block-diagonal sampling is not implemented for bipartite networks at this time.")
+  # rle() returns contigous runs of values.
+  a <- nw %v% arguments$constraints$blockdiag$attrname
+  # If we have more runs than unique values, the blocks must not be all contiguous.
+  if(length(rle(a)$lengths)!=length(unique(rle(a)$values))) stop("Current implementation of block-diagonal sampling requires that the blocks be contiguous.")
+  el <- as.edgelist(y.miss & y0)
+  el <- el[a[el[,1]]==a[el[,2]],,drop=FALSE]
+
+  
+  ## Given the list of toggleable dyads, no formation-specific proposal function is needed:
+  MHproposal <- list(name = "listTNT", inputs=ergm.Cprepare.el(el), pkgname="ergm")
   MHproposal
 }
 
