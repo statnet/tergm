@@ -9,6 +9,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \name{tergm-package}
 \alias{tergm-package}
+\alias{tergm}
 \docType{package}
 \title{
 Fit, Simulate and Diagnose Dynamic Network Models derived from

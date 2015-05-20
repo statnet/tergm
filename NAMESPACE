@@ -9,7 +9,54 @@ importFrom(stats,simulate)
 import(statnet.common, ergm, network, networkDynamic)
 
 # Export all names that do not begin with a dot.
-exportPattern("^[^\\.]")
+#exportPattern("^[^\\.]")
+export(
+ # all.same,  made.internal
+coefficients.stergm,
+coef.stergm, 
+combine.networks,
+control.logLik.stergm, 
+control.simulate.network,
+control.simulate.stergm, 
+control.stergm,
+control.tergm.godfather, 
+get.dev,
+gof.stergm, 
+impute.network.list,
+is.lasttoggle, 
+logLikNull.stergm,
+logLik.stergm, 
+mcmc.diagnostics.stergm,
+networkDynamic.apply.changes, 
+network.extract.with.lasttoggle,
+plot.gof.stergm, 
+print.gof.stergm,
+print.stergm, 
+print.summary.stergm,
+simulate.network, 
+simulate.networkDynamic,
+simulate.stergm, 
+stergm,
+stergm.CMLE, 
+stergm.EGMME,
+stergm.EGMME.GD, 
+stergm.EGMME.initialfit,
+stergm.EGMME.SA, 
+stergm.EGMME.SA.Phase2.C,
+stergm.getMCMCsample, 
+summary.gof.stergm,
+summary.statistics.networkDynamic, 
+summary.stergm,
+tergm.godfather, 
+to.networkDynamic.lasttoggle
+)
+
+# export all the ergm terms
+exportPattern("^InitErgmTerm.*")
+# export all the MH proposals
+exportPattern("^InitMHP.*")
+# export all the constaints
+exportPattern("^InitConstraint.*")
 
 S3method('coef','stergm')
 S3method('gof','stergm')

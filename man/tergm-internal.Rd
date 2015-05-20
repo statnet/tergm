@@ -8,7 +8,7 @@
 %  Copyright 2003-2014 Statnet Commons
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \name{stergm-internal}
-\title{Internal stergm Objects}
+\title{Internal tergm Objects}
 
 \alias{InitMHP.dissolution}
 \alias{InitMHP.dissolutionTNT}
@@ -33,7 +33,7 @@
 
 \alias{network.extract.with.lasttoggle}
 \alias{networkDynamic.apply.changes}
-\alias{all.same}
+%\alias{all.same}
 \alias{to.networkDynamic.lasttoggle}
 
 
@@ -49,7 +49,7 @@
 \alias{is.lasttoggle}
 
 \description{
-Internal stergm functions.}
+Internal tergm functions.}
 
 \details{
 Most of these are not to be called by the user (or in some cases are just
