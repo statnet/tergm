@@ -11,24 +11,24 @@ import(statnet.common, ergm, network, networkDynamic)
 # Export all names that do not begin with a dot.
 #exportPattern("^[^\\.]")
 export(
- # all.same,  made.internal
+ # all.same,  made internal
 coefficients.stergm,
 coef.stergm, 
-combine.networks,
+# combine.networks, made internal
 control.logLik.stergm, 
 control.simulate.network,
 control.simulate.stergm, 
 control.stergm,
 control.tergm.godfather, 
-get.dev,
+# get.dev,   made internal
 gof.stergm, 
 impute.network.list,
-is.lasttoggle, 
+# is.lasttoggle,    made internal
 logLikNull.stergm,
 logLik.stergm, 
 mcmc.diagnostics.stergm,
-networkDynamic.apply.changes, 
-network.extract.with.lasttoggle,
+# networkDynamic.apply.changes,   made internal 
+# network.extract.with.lasttoggle,
 plot.gof.stergm, 
 print.gof.stergm,
 print.stergm, 
@@ -37,18 +37,18 @@ simulate.network,
 simulate.networkDynamic,
 simulate.stergm, 
 stergm,
-stergm.CMLE, 
-stergm.EGMME,
-stergm.EGMME.GD, 
-stergm.EGMME.initialfit,
-stergm.EGMME.SA, 
-stergm.EGMME.SA.Phase2.C,
+# stergm.CMLE,    made internal
+# stergm.EGMME,   made internal
+# stergm.EGMME.GD,    made internal
+# stergm.EGMME.initialfit,   made internal
+# stergm.EGMME.SA,    made internal
+# stergm.EGMME.SA.Phase2.C,   made internal
 stergm.getMCMCsample, 
 summary.gof.stergm,
 summary.statistics.networkDynamic, 
 summary.stergm,
-tergm.godfather, 
-to.networkDynamic.lasttoggle
+tergm.godfather
+# to.networkDynamic.lasttoggle    made internal
 )
 
 # export all the ergm terms

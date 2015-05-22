@@ -27,26 +27,26 @@
 \alias{InitMHP.dissolutionMLETNT}
 \alias{InitMHP.dissolutionMLEblockdiagTNT}
 
-\alias{combine.networks}
+%\alias{combine.networks}
 
-\alias{get.dev}
+%\alias{get.dev}
 
-\alias{network.extract.with.lasttoggle}
-\alias{networkDynamic.apply.changes}
+%\alias{network.extract.with.lasttoggle} 
+%\alias{networkDynamic.apply.changes}
 %\alias{all.same}
-\alias{to.networkDynamic.lasttoggle}
+%\alias{to.networkDynamic.lasttoggle}
 
 
 \alias{control.logLik.stergm}
-\alias{stergm.CMLE}
-\alias{stergm.EGMME}
-\alias{stergm.EGMME.GD}
-\alias{stergm.EGMME.SA}
-\alias{stergm.EGMME.SA.Phase2.C}
-\alias{stergm.EGMME.initialfit}
+%\alias{stergm.CMLE}
+%\alias{stergm.EGMME}
+%\alias{stergm.EGMME.GD}
+%\alias{stergm.EGMME.SA}
+%\alias{stergm.EGMME.SA.Phase2.C}
+%\alias{stergm.EGMME.initialfit}
 \alias{stergm.getMCMCsample}
 
-\alias{is.lasttoggle}
+%\alias{is.lasttoggle}
 
 \description{
 Internal tergm functions.}

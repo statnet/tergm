@@ -14,6 +14,7 @@ all.same <- function(x){
   return(TRUE)
 }
 
+# create a single block-diagonal network by combining multible networks
 combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockname="NetworkID", detect.edgecov=TRUE, standardized=FALSE){
   if(any(sapply(nwl, is.bipartite))) stop("Bipartite networks are not supported at this time.")
   if(any(diff(sapply(nwl, is.directed)))) stop("All networks must have the same directedness.")
