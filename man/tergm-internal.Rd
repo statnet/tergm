@@ -44,7 +44,7 @@
 %\alias{stergm.EGMME.SA}
 %\alias{stergm.EGMME.SA.Phase2.C}
 %\alias{stergm.EGMME.initialfit}
-\alias{stergm.getMCMCsample}
+%\alias{stergm.getMCMCsample}
 
 %\alias{is.lasttoggle}
 
