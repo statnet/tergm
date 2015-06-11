@@ -10,22 +10,7 @@
 \name{stergm-internal}
 \title{Internal tergm Objects}
 
-\alias{InitMHP.dissolution}
-\alias{InitMHP.dissolutionTNT}
-\alias{InitMHP.dissolutionMLE}
-\alias{InitMHP.dissolutionNonObservedMLE}
-\alias{InitMHP.formation}
-\alias{InitMHP.formationMLE}
-\alias{InitMHP.formationMLETNT}
-\alias{InitMHP.formationNonObservedMLE}
-\alias{InitMHP.formationTNT}
-\alias{InitMHP.dissolutionMLEblockdiag}
-\alias{InitMHP.dissolutionNonObservedMLEblockdiag}
-\alias{InitMHP.formationMLEblockdiag}
-\alias{InitMHP.formationMLEblockdiagTNT}
-\alias{InitMHP.formationNonObservedMLEblockdiag}
-\alias{InitMHP.dissolutionMLETNT}
-\alias{InitMHP.dissolutionMLEblockdiagTNT}
+
 
 %\alias{combine.networks}
 
