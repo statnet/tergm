@@ -17,6 +17,9 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
     if(inherits(nw, "network.list") || is.list(nw)){
       times  <- seq_along(nw)
       warning("Time points not specified for a list. Modeling transition between successive networks jointly. This behavior may change in the future.")
+      if(var(sapply(nw,network.size))>0){
+        stop("Networks in the network series passed must all be of the same size.")
+      }
     }else if(inherits(nw,"networkDynamic")){
       times  <- c(0,1)
       warning("Time points not specified for a networkDynamic. Modeling transition from time 0 to 1.")
@@ -27,9 +30,17 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
 
 
   # Construct a list of "from" networks and a list of "to" networks.
-   if(inherits(nw,"networkDynamic")){
-    y0s <- lapply(times[-length(times)], function(t) nw %k% t)
-    y1s <- lapply(times[-1], function(t) nw %k% t)
+  if(inherits(nw,"networkDynamic")){
+
+    # Grab only the needed vertices.
+    subnw <- network.extract(nw, onset=min(times), terminus=max(times)+min(abs(diff(times)))/2)
+    # Grab the vector of vertex activity indicators for each time
+    # point, bind them into an n*T matrix. If any rows have
+    # variability, we have a changing composition.
+    if(any(apply(sapply(times, function(t) networkDynamic::is.active(subnw, at=t, v=1:network.size(subnw))), 1, var)>0)) warning("Active vertex set varies from time point to time point. Estimation may not work.")
+    
+    y0s <- lapply(times[-length(times)], function(t) networkDynamic::network.collapse(subnw, at=t, retain.all.vertices=TRUE))
+    y1s <- lapply(times[-1], function(t) networkDynamic::network.collapse(subnw, at=t, retain.all.vertices=TRUE))
   }else if(inherits(nw, "network.list") || is.list(nw)){
     y0s <- nw[times[-length(times)]]
     y1s <- nw[times[-1]]
