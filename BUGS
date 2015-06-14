@@ -1,1 +1,1 @@
-* Currently, stergm() over a series of bipartite network might not handle dyadic covariates correctly.
+* Currently, fitting CMLE stergm() over a series of more than two bipartite networks is not supported.
