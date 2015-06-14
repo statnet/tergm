@@ -39,8 +39,18 @@ combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper",
        && all(sapply(vl, nrow)==ns)
        && all(sapply(vl, ncol)==ns)
        && all.same(sapply(vl, mode))){
-      
-      m <- matrix(NA, sum(ns), sum(ns))
+
+      # A logical vector that extracts off-diagonal element of the ns*ns matrix.
+
+
+      offdiags <- c(diag(1, nrow(vl[[1]]))==0)
+      # It doesn't matter what the "filler" elements are, as long as
+      # adding them doesn't add another category and it's not NA. So,
+      # what this does is as follows: grab the off-diagonal elements
+      # of each covariate matrix, concatenate them into one vector,
+      # remove the NAs, and take the minimum value.
+      dummyval <- min(na.omit(unlist(lapply(vl, "[", offdiags))))
+      m <- matrix(dummyval, sum(ns), sum(ns))
       mode(m) <- mode(vl[[1]])
       
       for(b in seq_along(vl)){
