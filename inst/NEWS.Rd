@@ -32,7 +32,9 @@
       \item  Running STERGM EGMME with parallel > 0 no longer causes it to eat up all the memory. 
       \item{Namespace prefixing has been added to some functions called from external packages to deal with CRAN check warnings, replaced require() and library() calls with requireNamespace()}
       \item{updated CITATION file to deal with CRAN check warnings (\code{packageDescription} is no longer used)}
-      \item  Added S3 method registration in NAMESPACE for all S3 functions
+      \item  Added S3 method registration in NAMESPACE for all S3
+      functions
+      \item Handling of \code{\link{networkDynamic}} inputs has been improved.
     }
   }
 
