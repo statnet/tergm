@@ -1,0 +1,1 @@
+* Currently, stergm() over a series of bipartite network might not handle dyadic covariates correctly.
