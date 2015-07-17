@@ -141,11 +141,11 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
     if(z$status==0) break;
     if(z$status==1){
       maxedges <- 5*maxedges
-      message("Too many edges encountered in the simulation. Increasing capacity to ", maxedges)
+      if(verbose>0) message("Too many edges encountered in the simulation. Increasing capacity to ", maxedges)
     }
     if(z$status==3){
       maxchanges <- 5*maxchanges
-      message("Too many changes elapsed in the simulation. Increasing capacity to ", maxchanges)
+      if(verbose>0) message("Too many changes elapsed in the simulation. Increasing capacity to ", maxchanges)
     }
   }
   
