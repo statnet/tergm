@@ -189,12 +189,12 @@ CRAN.R-project.org/package=ergm>.
 \item  Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
   Egocentric Data with Durational Information. \emph{Pennsylvania State
   University Department of Statistics Technical Report},
-  2012(2012-01). \url{http://stat.psu.edu/Research/2012-technical-reports}
+  2012(2012-01). \url{http://stat.psu.edu/research/technical-report-files/2012-technical-reports/modeling-of-dynamic-networks-based-on-egocentric-data-with-durational-information}
 
 \item  Krivitsky, P.N. (2012). Modeling Tie Duration in ERGM-Based Dynamic
   Network Models. \emph{Pennsylvania State University Department of
   Statistics Technical Report},
-  2012(2012-02). \url{http://stat.psu.edu/Research/2012-technical-reports}
+  2012(2012-02). \url{http://stat.psu.edu/research/technical-report-files/2012-technical-reports/TR1201A.pdf}
   }
 }
 \seealso{\code{\link[ergm:ergm-terms]{ergm-terms}} (from the \code{\link[=ergm-package]{ergm}} package), \code{\link{ergm}}, \code{\link{network}}, \code{\link{\%v\%}}, \code{\link{\%n\%}}}

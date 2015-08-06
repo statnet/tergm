@@ -5,8 +5,13 @@ importFrom(utils, packageDescription)
 importFrom(robustbase, lmrob, covMcd)
 importFrom(coda, mcmc, mcmc.list, effectiveSize)
 importFrom(nlme, gls, corAR1)
-importFrom(stats,simulate)
 import(statnet.common, ergm, network, networkDynamic)
+importFrom("grDevices", "dev.cur", "dev.interactive", "dev.list",
+             "dev.new", "dev.set", "hsv", "rgb")
+importFrom("graphics", "plot")
+importFrom("stats", "simulate","aggregate", "coef", "cov", "cov2cor", "lm",
+             "logLik", "mahalanobis", "median", "na.omit", "pchisq",
+             "pnorm", "quantile", "resid", "sd", "var", "vcov", "window")
 
 # Export all names that do not begin with a dot.
 #exportPattern("^[^\\.]")

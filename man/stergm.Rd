@@ -221,10 +221,12 @@ summary(samplk123)
     \item Krivitsky PN, Handcock MS (2010). A Separable Model for Dynamic
   Networks. \url{http://arxiv.org/abs/1011.1937}
   
-  \item Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
+  \item  Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
   Egocentric Data with Durational Information. \emph{Pennsylvania State
-    University Department of Statistics Technical Report},
-  2012(2012-01). \url{http://stat.psu.edu/Research/2012-technical-reports}
+  University Department of Statistics Technical Report},
+  2012(2012-01). \url{http://stat.psu.edu/research/technical-report-files/2012-technical-reports/modeling-of-dynamic-networks-based-on-egocentric-data-with-durational-information}
+
+
 }
 }
 
