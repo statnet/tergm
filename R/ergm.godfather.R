@@ -173,7 +173,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
     if(z$status==0) break;
     if(z$status==1){
       maxedges <- 5*maxedges
-      message("Too many edges encountered in the simulation. Increasing capacity to ", maxedges)
+      if(verbose>0) message("Too many edges encountered in the simulation. Increasing capacity to ", maxedges)
     }
   }
 
