@@ -108,7 +108,7 @@ void MH_FormationMLETNT(MHproposal *MHp, Network *nwp)
 	  logratio = log(nempty*comp);
 	}else{
 	  if(nempty==1){
-	    logratio = log(1.0 / ndyads / (1-comp));
+	    logratio = log((double) nempty / (ndedges+1) / (1-comp));
 	  }else{
 	    logratio = log((double) nempty / (ndedges+1) * odds);
 	  }

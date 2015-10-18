@@ -1,4 +1,4 @@
-#  File tests/dynamic_MLE_blockdiag.R in package tergm, part of the Statnet suite
+#  File tests/dynamic_MLE_blockdiag.bipartite.R in package tergm, part of the Statnet suite
 #  of packages for network analysis, http://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
@@ -12,28 +12,39 @@ opttest({
 library(tergm)
 
 tolerance<-0.05
-n<-16
-ns <- c(7,9)
-theta<--1.5
+n<-20
+m<-13
+
+theta<--.4
+
+prop.weights <- c("default", "random")
 
 logit<-function(p) log(p/(1-p))
 
-block.dyadcount<-function(y){
-  a <- rle(y %v% "a")
-  sum(a$lengths*(a$lengths-1)) / (if(is.directed(y)) 1 else 2)
+block.dyadcount<-function(y, na.omit=TRUE){
+  a <- y %v% "a"
+  M <- outer(a,a,"==")
+  M[1:m,1:m]<-0
+  M[(m+1):n,(m+1):n]<-0
+  M[lower.tri(M, TRUE)]<-0
+  if(na.omit) M[as.edgelist(is.na(y))] <- 0
+  sum(M)
 }
 
 form.mle<-function(y0,y1){
-  logit(network.edgecount(y1-y0,na.omit=TRUE)/(block.dyadcount(y0)-network.edgecount(y0-is.na(y1))-network.naedgecount(y1)))
+  logit(network.edgecount(y1-y0,na.omit=TRUE)/(block.dyadcount(y1)-network.edgecount(y0-is.na(y1))))
 }
 
 diss.mle<-function(y0,y1){
   -logit(network.edgecount(y0-y1,na.omit=TRUE)/(network.edgecount(y0-is.na(y1))))
 }
 
-do.run <- function(dir, prop.weights="default"){
-y0<-network.initialize(n,dir=dir)
-y0 %v% "a" <- rep(seq_along(ns), ns)
+y0 <- network.initialize(n, directed=FALSE, bipartite=m)
+a <- rep(1:6,1:6)[1:n]
+a <- unlist(split(a, rep(1:2, n/2)))
+a <- c(sort(a[1:m]), sort(a[-(1:m)]))
+y0 %v% "a" <- a
+
 set.seed(321)
 y0<-standardize.network(simulate(y0~edges, constraints=~blockdiag("a"), coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))
 
@@ -75,7 +86,7 @@ y1m<-network.copy(y1)
 set.seed(765)
 e <- as.edgelist(y1)[1,]
 y1m[e[1], e[2]] <- NA
-y1m[1,2] <- NA
+y1m[1,m+2] <- NA
 
 # Force CMPLE
 set.seed(765)
@@ -103,10 +114,5 @@ stopifnot(fit$estimate=="CMLE", fit$formation.fit$estimate=="MLE", fit$dissoluti
 stopifnot(all.equal(form.mle(y0,y1m), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
 stopifnot(all.equal(diss.mle(y0,y1m), coef(fit$dissolution.fit), tolerance=tolerance, check.attributes=FALSE))
 }
-}
 
-cat("=========== Directed test ===========\n")
-do.run(TRUE, prop.weights=c("default","random"))
-cat("=========== Undirected test ===========\n")
-do.run(FALSE, prop.weights=c("default","random"))
 }, "dynamic MLE with block-diagonal constraints")
