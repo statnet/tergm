@@ -1,3 +1,1 @@
-* Currently, fitting CMLE stergm() over a series of more than two bipartite networks is not supported.
-
 * Fitting CMLE for networkDynamic inputs is unreliable. To be safe, convert the snapshots to a network.list first.

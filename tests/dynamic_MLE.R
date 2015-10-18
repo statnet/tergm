@@ -11,20 +11,25 @@ library(tergm)
 
 tolerance<-0.05
 n<-10
+m<-6
 theta<--1.5
 
 logit<-function(p) log(p/(1-p))
 
 form.mle<-function(y0,y1){
-  logit(network.edgecount(y1-y0,na.omit=TRUE)/(network.dyadcount(y0)-network.edgecount(y0-is.na(y1))-network.naedgecount(y1)))
+  logit(network.edgecount(y1-y0,na.omit=TRUE)/(network.dyadcount(y1)-network.edgecount(y0-is.na(y1))))
 }
 
 diss.mle<-function(y0,y1){
   -logit(network.edgecount(y0-y1,na.omit=TRUE)/(network.edgecount(y0-is.na(y1))))
 }
 
-do.run <- function(dir){
-y0<-network.initialize(n,dir=dir)
+do.run <- function(dir, bip=FALSE, prop.weights="default"){
+if(bip){ # Extreme theta creates networks with too few ties to properly test.
+  theta <- theta/2
+}
+  
+y0<-network.initialize(n,dir=dir,bipartite=bip)
 set.seed(321)
 y0<-standardize.network(simulate(y0~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))
 
@@ -50,21 +55,23 @@ stopifnot(all.equal(form.mle(y0,y1), coef(fit$formation.fit), tolerance=toleranc
 stopifnot(all.equal(diss.mle(y0,y1), coef(fit$dissolution.fit), tolerance=tolerance, check.attributes=FALSE))
 
 # Force CMLE
+for(prop.weight in prop.weights){
+cat("====",prop.weight,"====\n")
 set.seed(543)
-fit<-stergm(list(y0,y1), formation=~edges, dissolution=~edges, estimate="CMLE", control=control.stergm(force.main=TRUE), times=c(1,2))
+fit<-stergm(list(y0,y1), formation=~edges, dissolution=~edges, estimate="CMLE", control=control.stergm(CMLE.control=control.ergm(force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2))
 
 stopifnot(fit$estimate=="CMLE", fit$formation.fit$estimate=="MLE", fit$dissolution.fit$estimate=="MLE")
 stopifnot(all.equal(form.mle(y0,y1), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
 stopifnot(all.equal(diss.mle(y0,y1), coef(fit$dissolution.fit), tolerance=tolerance, check.attributes=FALSE))
+}
 
 cat("Missing data:\n")
 
 y1m<-network.copy(y1)
 set.seed(765)
-#y1m[as.edgelist(simulate(y0~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))]<-NA
 e <- as.edgelist(y1)[1,]
 y1m[e[1], e[2]] <- NA
-y1m[1,2] <- NA
+y1m[1,m+1] <- NA
 
 # Force CMPLE
 set.seed(765)
@@ -83,15 +90,20 @@ stopifnot(all.equal(form.mle(y0,y1m), coef(fit$formation.fit), tolerance=toleran
 stopifnot(all.equal(diss.mle(y0,y1m), coef(fit$dissolution.fit), tolerance=tolerance, check.attributes=FALSE))
 
 # Force CMLE
-set.seed(123)
-fit<-stergm(list(y0,y1m), formation=~edges, dissolution=~edges, estimate="CMLE", control=control.stergm(force.main=TRUE), times=c(1,2))
+for(prop.weight in prop.weights){
+cat("====",prop.weight,"====\n")
+set.seed(234)
+fit<-stergm(list(y0,y1m), formation=~edges, dissolution=~edges, estimate="CMLE", control=control.stergm(CMLE.control=control.ergm(force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2))
 
 stopifnot(fit$estimate=="CMLE", fit$formation.fit$estimate=="MLE", fit$dissolution.fit$estimate=="MLE")
 stopifnot(all.equal(form.mle(y0,y1m), coef(fit$formation.fit), tolerance=tolerance, check.attributes=FALSE))
 stopifnot(all.equal(diss.mle(y0,y1m), coef(fit$dissolution.fit), tolerance=tolerance, check.attributes=FALSE))
 }
+}
 
-# Directed test
-do.run(TRUE)
-# Undirected test
-do.run(FALSE)
+cat("=========== Directed test ===========\n")
+do.run(TRUE, prop.weights=c("default","random"))
+cat("=========== Undirected test ===========\n")
+do.run(FALSE, prop.weights=c("default","random"))
+cat("=========== Undirected bipartite test ===========\n")
+do.run(FALSE, m, prop.weights=c("default","random"))
