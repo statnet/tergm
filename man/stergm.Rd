@@ -89,8 +89,8 @@
   \item{times}{For CMLE and CMPLE estimation, times or indexes at which
     the networks whose transition is to be modeled are
     observed. Default to \code{c(0,1)} if \code{nw} is a
-    \code{\link[networkDynamic]{networkDynamic}} and to \code{c(1:2)}
-    (first two elements) if \code{nw} is a \code{\link{network.list}} or
+    \code{\link[networkDynamic]{networkDynamic}} and to \code{1:length(nw)}
+    (all transitions) if \code{nw} is a \code{\link{network.list}} or
     a \code{\link{list}}. Unused for EGMME.
   }
   \item{offset.coef.form}{Numeric vector to specify offset formation
