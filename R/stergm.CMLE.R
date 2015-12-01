@@ -14,15 +14,17 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
                         verbose) {
 
   if(is.null(times)){
-    if(inherits(nw, "network.list") || is.list(nw)){
+    # check if it is has network list class, or NOT a network and is a list (because all networks are lists)
+    if(inherits(nw, "network.list") || (is.list(nw) & !is.network(nw))){
       times  <- seq_along(nw)
-      warning("Time points not specified for a list. Modeling transition between successive networks jointly. This behavior may change in the future.")
+      warning("'times' argument was not provided to specify sampling time points for a list. Modeling transition between successive networks jointly. This behavior may change in the future.")
       if(var(sapply(nw,network.size))>0){
         stop("Networks in the network series passed must all be of the same size.")
       }
     }else if(inherits(nw,"networkDynamic")){
       times  <- c(0,1)
-      warning("Time points not specified for a networkDynamic. Modeling transition from time 0 to 1.")
+      warning("the 'times' argument was not provided to specify sampling time points for networkDynamic object. Modeling transition from time 0 to 1.")
+      # TODO: should it check vertex activity to ensure that the effective sizes of the networks are the same at all time points
     }
   }
   
