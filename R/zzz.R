@@ -10,7 +10,9 @@
 .onAttach <- function(lib, pkg){
   sm <- statnetStartupMessage("tergm", c("statnet"), FALSE)
   if(!is.null(sm)) packageStartupMessage(sm)
-  
+}
+
+.onLoad <- function(lib, pkg){
   .RegisterMHPs()
   .RegisterConstraintImplications()
 }
