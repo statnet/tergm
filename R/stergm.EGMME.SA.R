@@ -169,7 +169,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     c(solve(t(x)%*%w%*%x)%*%t(x)%*%w%*%y)
   }
 
-  V.sandwich <- function(w, G, V.stat=robust.inverse(w)){
+  V.sandwich <- function(w, G, V.stat=ginv(w)){
     solve(t(G)%*%w%*%G)%*%t(G)%*%w%*%V.stat%*%w%*%G%*%solve(t(G)%*%w%*%G)
   }
 

@@ -116,7 +116,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     v[is.na(v)] <- 0
     v <- v*(nrow(h.resid)-1)/(nrow(h.resid)-p.free-1)
     
-    w <- robust.inverse(v)
+    w <- ginv(v)
     
     ## Adjust the number of time steps between jumps.
     edge.ages <- unlist(sapply(states, function(state) state$nw%n%"time"-ergm.el.lasttoggle(state$nw)[,3]+1))
