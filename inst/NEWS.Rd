@@ -14,7 +14,7 @@
 % When a release is forked, copy the sections to a new release and
 % delete unused sections.
 
-\section{Changes in version 3.3.2}{
+\section{Changes in version 3.4.0}{
    %%  \subsection{NEW FEATURES}{
    %%   \itemize{
    %%   }
