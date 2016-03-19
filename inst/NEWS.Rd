@@ -14,27 +14,21 @@
 % When a release is forked, copy the sections to a new release and
 % delete unused sections.
 
-\section{Changes in version 3.3.1}{
-    \subsection{NEW FEATURES}{
-     \itemize{
-       \item STERGM conditional MLE can now be fit to series of more
-       than two bipartite networks. (Previously, for bipartite networks,
-       only a series of two (i.e., one transition) could be fit.)
-     }
+\section{Changes in version 3.3.2}{
+   %%  \subsection{NEW FEATURES}{
+   %%   \itemize{
+   %%   }
      
-   }
+   %% }
 
   \subsection{BUG FIXES}{
     \itemize{
-      \item Miscellaneous CMLE bug fixes.
+      \item Miscellaneous bugfixes.
 
-      \item Some low-priority warnings are no longer printed by
-	default.
+      \item The list of functions exported is now explicitly defined.
 
-      \item A bug in formation TNT proposals has been fixed. The only
-      analyses that may be affected are those on tiny (about 8 nodes) or
-      extremely dense (i.e., high probability of a complete graph)
-      networks.
+      \item \code{\link{robust.inverse}} has been replaced by
+      \code{\link{ginv}}.
     }
   }
 
@@ -77,6 +71,32 @@
   %   }
   % }
 
+}
+
+
+\section{Changes in version 3.3.1}{
+    \subsection{NEW FEATURES}{
+     \itemize{
+       \item STERGM conditional MLE can now be fit to series of more
+       than two bipartite networks. (Previously, for bipartite networks,
+       only a series of two (i.e., one transition) could be fit.)
+     }
+     
+   }
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item Miscellaneous CMLE bug fixes.
+
+      \item Some low-priority warnings are no longer printed by
+	default.
+
+      \item A bug in formation TNT proposals has been fixed. The only
+      analyses that may be affected are those on tiny (about 8 nodes) or
+      extremely dense (i.e., high probability of a complete graph)
+      networks.
+    }
+  }
 }
 
 \section{Changes in version 3.3}{
