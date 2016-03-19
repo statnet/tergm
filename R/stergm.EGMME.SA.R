@@ -174,7 +174,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
   }
 
   best.states <- function(states, history){
-    w <- robust.inverse(cov(history$oh.all[,-(1:p),drop=FALSE]))
+    w <- ginv(cov(history$oh.all[,-(1:p),drop=FALSE]))
     best.i <- which.min(mahalanobis((history$oh.all[-1,-(1:p),drop=FALSE]+history$oh.all[-nrow(history$oh.all),-(1:p),drop=FALSE])/2,0,w,inverted=TRUE))
     best.par <- history$oh.all[best.i,1:p][!offsets]
 
@@ -352,7 +352,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
         # Thin the data to keep from bogging down.
         x <- unique(round(seq(from=1,to=NROW(history$oh),length.out=control$SA.stepdown.maxn)))
-        y <- sqrt(mahalanobis(ys,0,robust.inverse(cov(ys)),inverted=TRUE)[x])
+        y <- sqrt(mahalanobis(ys,0,ginv(cov(ys)),inverted=TRUE)[x])
         i <- history$ind[x]
         t <- history$tid[x]
 
@@ -448,7 +448,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       nlin.coef <- nlin.coef[nlin.totest & !drop,,drop=FALSE]
       nlin.nfs <- nlin.nfs[nlin.totest & !drop,,drop=FALSE]
       nlin.vcov <- t(nlin.vcov[nlin.totest[!drop],nlin.totest[!drop],drop=FALSE]*sqrt(c(nlin.nfs)))*sqrt(c(nlin.nfs))
-      chi2 <- mahalanobis(c(nlin.coef),0,robust.inverse(nlin.vcov),inverted=TRUE)
+      chi2 <- mahalanobis(c(nlin.coef),0,ginv(nlin.vcov),inverted=TRUE)
 
       p.val.1 <- pchisq(chi2, length(nlin.coef), lower.tail=FALSE)
       if(verbose) cat("Local nonlinearity p-value:",p.val.1,"\n")
@@ -512,7 +512,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
         sm.tid <- history$tid.all[history$ind.all>=min.ind.se]
 
         V.stat<-cov(sm.mon)
-        ee <- sm.mon %*% robust.inverse(V.stat) %*% G
+        ee <- sm.mon %*% ginv(V.stat) %*% G
         p.val.1 <- approx.hotelling.diff.test(ee)$p.value
 
         if(verbose) cat("Estimating equation = 0 p-value:",p.val.1,"\n")
