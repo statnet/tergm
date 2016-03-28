@@ -1,3 +1,5 @@
+library(statnet.common)
+opttest({
 library(network)
 
 requireNamespace('ergm')
@@ -23,3 +25,4 @@ summary(dynfit)
 my.nD <- simulate(dynfit, nsim=1, time.slices=100, output="networkDynamic")
 ergm::summary.formula(my.nD~isolates+edges+mean.age, at=1:10)
 ergm::summary.statistics.formula(my.nD~mean.age)
+}, "requireNamespace")
