@@ -79,7 +79,7 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
   #
   Clist.form <- ergm.Cprepare(nw, model.form)
   Clist.diss <- ergm.Cprepare(nw, model.diss)
-  Clist.mon <- if(!is.null(model.mon)) Clist.mon <- ergm.Cprepare(nw, model.mon)
+  Clist.mon <- if(!is.null(model.mon)) ergm.Cprepare(nw, model.mon) else NULL
   
   collect.form<-if(!is.null(control$collect.form)) control$collect.form else TRUE
   collect.diss<-if(!is.null(control$collect.diss)) control$collect.diss else TRUE
