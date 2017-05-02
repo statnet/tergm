@@ -1,5 +1,6 @@
 \name{stergm.getMCMCsample}
 \alias{stergm.getMCMCsample}
+\alias{stergm.getMCMCsample.slave}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Collects a sample of networks and returns the formation and dissolution statistics of each sample
@@ -8,42 +9,36 @@ Collects a sample of networks and returns the formation and dissolution statisti
 \code{stergm.getMCMCsample} is a low-level internal function not intended to be called directly by end users. It collects a sample of networks and
  returns the formation and dissolution statistics of each sample, along with
  a toggle matrix of the changes needed from the original network to each
- in the sample
+ in the sample. \code{stergm.getMCMCsample.slave} is an even lower-level
+ function that actually calls the C code.
 }
 \usage{
-stergm.getMCMCsample(nw, model.form, model.diss, model.mon, 
-                    MHproposal.form, MHproposal.diss, 
-                    eta.form, eta.diss, control, verbose)
+stergm.getMCMCsample(nw, model.form, model.diss, model.mon,
+                     MHproposal.form, MHproposal.diss, eta.form,
+                     eta.diss, control, verbose)
+
+stergm.getMCMCsample.slave(Clist.form, Clist.diss, Clist.mon,
+                           MHproposal.form, MHproposal.diss, eta.form,
+                           eta.diss, control, verbose)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{nw}{
- a \code{\link{network}} object
-}
-  \item{model.form}{
-a formation model, as returned by \code{\link{ergm.getmodel}}
-}
-  \item{model.diss}{
-a dissolution model, as returned by \code{\link{ergm.getmodel}}
-}
-  \item{model.mon}{
-%%     ~~Describe \code{model.mon} here~~
-}
-  \item{MHproposal.form}{
-a list of parameters needed for MHproposals of the
-  formations
 
-}
-  \item{MHproposal.diss}{
- a list of parameters needed for MHproposals of the
-    dissolutions
-}
-  \item{eta.form}{
-%%     ~~Describe \code{eta.form} here~~
-}
-  \item{eta.diss}{
-%%     ~~Describe \code{eta.diss} here~~
-}
+  \item{nw}{ a \code{\link{network}} object }
+
+  \item{model.form, model.diss, model.mon}{ formation, dissolution, and
+    monitoring model, as returned by \code{\link{ergm.getmodel}} }
+
+  \item{Clist.form, Clist.diss, Clist.mon}{ formation, dissolution, and
+    monitoring "Clist", as returned by \code{\link{ergm.Cprepare}} }
+  
+  \item{MHproposal.form, MHproposal.diss}{ a list of parameters needed
+    for MHproposals of the formations and dissolutions }
+  
+  \item{eta.form, eta.diss}{
+    vectors of natural parameters.
+  }
+  
   \item{control}{
 list of control paramters, probably from \code{\link{control.stergm}}
 }

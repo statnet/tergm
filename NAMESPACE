@@ -50,6 +50,7 @@ stergm,
 # stergm.EGMME.SA,    made internal
 # stergm.EGMME.SA.Phase2.C,   made internal
 stergm.getMCMCsample, 
+stergm.getMCMCsample.slave, 
 summary.gof.stergm,
 summary.statistics.networkDynamic, 
 summary.stergm,
