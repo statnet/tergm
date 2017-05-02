@@ -68,7 +68,9 @@
 #                       input param list
 #
 ############################################################################
-  
+
+
+
 stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
                                   MHproposal.form, MHproposal.diss, eta.form, eta.diss, control, 
                                   verbose){
@@ -81,9 +83,45 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
   Clist.diss <- ergm.Cprepare(nw, model.diss)
   Clist.mon <- if(!is.null(model.mon)) ergm.Cprepare(nw, model.mon) else NULL
   
+  z <- stergm.getMCMCsample.slave(Clist.form, Clist.diss, Clist.mon, MHproposal.form, MHproposal.diss, eta.form, eta.diss, control, verbose)
+
+  newnetwork<-newnw.extract(nw,z)
+  if(is.durational(model.form) || is.durational(model.diss) || is.durational(model.mon)){
+    newnetwork %n% "time" <- z$time
+    newnetwork %n% "lasttoggle" <- z$lasttoggle
+  }
+  diffedgelist<-if(control$changes) {
+    if(z$diffnwtime[1]>0){
+      tmp <- cbind(z$diffnwtime[2:(z$diffnwtime[1]+1)],z$diffnwtails[2:(z$diffnwtails[1]+1)],z$diffnwheads[2:(z$diffnwheads[1]+1)],z$diffnwdirs[2:(z$diffnwdirs[1]+1)])
+      colnames(tmp) <- c("time","tail","head","to")
+      tmp
+    }else{
+      tmp <- matrix(0, ncol=4, nrow=0)
+      colnames(tmp) <- c("time","tail","head","to")
+      tmp
+    }
+  }else{
+    NULL
+  }
+  mode(diffedgelist) <- "integer" # Might save some memory.
+
+  statsmatrix.form <- z$statsmatrix.form
+  statsmatrix.diss <- z$statsmatrix.diss
+  statsmatrix.mon <- z$statsmatrix.mon
+  
+  if(!is.null(statsmatrix.form)) colnames(statsmatrix.form) <- model.form$coef.names
+  if(!is.null(statsmatrix.diss)) colnames(statsmatrix.diss) <- model.diss$coef.names
+  if(!is.null(model.mon)) colnames(statsmatrix.mon) <- model.mon$coef.names
+
+  list(statsmatrix.form=statsmatrix.form, statsmatrix.diss=statsmatrix.diss, statsmatrix.mon=statsmatrix.mon,
+       newnetwork=newnetwork,
+       changed=diffedgelist,
+       maxchanges=control$MCMC.maxchanges)
+}
+
+stergm.getMCMCsample.slave <- function(Clist.form, Clist.diss, Clist.mon, MHproposal.form, MHproposal.diss, eta.form, eta.diss, control, verbose){
   collect.form<-if(!is.null(control$collect.form)) control$collect.form else TRUE
   collect.diss<-if(!is.null(control$collect.diss)) control$collect.diss else TRUE
-
   maxedges <- control$MCMC.init.maxedges
   maxchanges <- control$MCMC.init.maxchanges
   repeat{
@@ -110,10 +148,10 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
             as.character(MHproposal.diss$name), as.character(MHproposal.diss$pkgname),
             as.double(Clist.diss$inputs), as.double(ergm:::.deinf(eta.diss)),
             # Monitored terms.
-            if(!is.null(model.mon)) as.integer(Clist.mon$nterms) else as.integer(0), 
-            if(!is.null(model.mon)) as.character(Clist.mon$fnamestring) else character(0),
-            if(!is.null(model.mon)) as.character(Clist.mon$snamestring) else character(0),
-            if(!is.null(model.mon)) as.double(Clist.mon$inputs) else double(0),
+            if(!is.null(Clist.mon)) as.integer(Clist.mon$nterms) else as.integer(0), 
+            if(!is.null(Clist.mon)) as.character(Clist.mon$fnamestring) else character(0),
+            if(!is.null(Clist.mon)) as.character(Clist.mon$snamestring) else character(0),
+            if(!is.null(Clist.mon)) as.double(Clist.mon$inputs) else double(0),
             # Degree bounds.
             as.integer(MHproposal.form$arguments$constraints$bd$attribs), 
             as.integer(MHproposal.form$arguments$constraints$bd$maxout), as.integer(MHproposal.form$arguments$constraints$bd$maxin),
@@ -125,7 +163,7 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
             # Space for output.
             collect.form = as.integer(collect.form), s.form = if(collect.form) double(Clist.form$nstats*(control$time.samplesize+1)) else double(0),
             collect.diss = as.integer(collect.diss), s.diss = if(collect.diss) double(Clist.diss$nstats*(control$time.samplesize+1)) else double(0),
-            s.mon = if(!is.null(model.mon)) double(Clist.mon$nstats*(control$time.samplesize+1)) else double(0),
+            s.mon = if(!is.null(Clist.mon)) double(Clist.mon$nstats*(control$time.samplesize+1)) else double(0),
             as.integer(maxedges),
             newnwtails = integer(maxchanges), newnwheads = integer(maxchanges), 
             as.integer(maxchanges),
@@ -164,41 +202,21 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
     NULL
 
   statsmatrix.mon <-
-    if(!is.null(model.mon))
+    if(!is.null(Clist.mon))
       matrix(z$s.mon, nrow=control$time.samplesize+1,
              ncol=Clist.mon$nstats,
              byrow = TRUE)[-1,,drop=FALSE]
     else
       NULL
-  
 
-  newnetwork<-newnw.extract(nw,z)
-  if(is.durational(model.form) || is.durational(model.diss) || is.durational(model.mon)){
-    newnetwork %n% "time" <- z$time
-    newnetwork %n% "lasttoggle" <- z$lasttoggle
-  }
-  diffedgelist<-if(control$changes) {
-    if(z$diffnwtime[1]>0){
-      tmp <- cbind(z$diffnwtime[2:(z$diffnwtime[1]+1)],z$diffnwtails[2:(z$diffnwtails[1]+1)],z$diffnwheads[2:(z$diffnwheads[1]+1)],z$diffnwdirs[2:(z$diffnwdirs[1]+1)])
-      colnames(tmp) <- c("time","tail","head","to")
-      tmp
-    }else{
-      tmp <- matrix(0, ncol=4, nrow=0)
-      colnames(tmp) <- c("time","tail","head","to")
-      tmp
-    }
-  }else{
-    NULL
-  }
-  mode(diffedgelist) <- "integer" # Might save some memory.
-  
-
-  if(!is.null(statsmatrix.form)) colnames(statsmatrix.form) <- model.form$coef.names
-  if(!is.null(statsmatrix.diss)) colnames(statsmatrix.diss) <- model.diss$coef.names
-  if(!is.null(model.mon)) colnames(statsmatrix.mon) <- model.mon$coef.names
-
-  list(statsmatrix.form=statsmatrix.form, statsmatrix.diss=statsmatrix.diss, statsmatrix.mon=statsmatrix.mon,
-       newnetwork=newnetwork,
-       changed=diffedgelist,
-       maxchanges=control$MCMC.maxchanges)
+  # Blank all elements of z that we don't want to bother returning.
+  zn <- names(z)
+  for(i in rev(seq_along(zn))){ # Do in reverse, to preserve indexing.
+    if(! zn[i] %in% c("time", "lasttoggle", "newnwtails", "newnwheads", "diffnwtime", "diffnwtails", "diffnwheads", "diffnwdirs", "status"))
+      z[[i]] <- NULL
+  }  
+  c(z,
+    list(statsmatrix.form = statsmatrix.form,
+         statsmatrix.diss = statsmatrix.diss,
+         statsmatrix.mon = statsmatrix.mon))
 }
