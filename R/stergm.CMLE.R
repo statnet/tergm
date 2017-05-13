@@ -64,8 +64,8 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   if(any(y0s.NA)) stop("Transitioned-from network(s) at time(s) ", paste.and(times[-length(times)][y0s.NA]), " has missing dyads that cannot be imputed using the selected imputation options. Fix or add imputation options via CMLE.NA.impute control parameter.")
 
   if(length(times)>2){
-    y0 <- combine.networks(y0s, standardized=TRUE,blockname=".stergm.CMLE.time.index")
-    y1 <- combine.networks(y1s, standardized=TRUE,blockname=".stergm.CMLE.time.index")
+    y0 <- combine.networks(y0s, standardized=TRUE,blockID.vattr=".stergm.CMLE.time.index",detect.edgecov=TRUE)
+    y1 <- combine.networks(y1s, standardized=TRUE,blockID.vattr=".stergm.CMLE.time.index",detect.edgecov=TRUE)
 
     if(!control$CMLE.term.check.override){
       # Check that these networks can be combined for this model.

@@ -54,7 +54,8 @@ stergm.getMCMCsample.slave,
 summary.gof.stergm,
 summary.statistics.networkDynamic, 
 summary.stergm,
-tergm.godfather
+tergm.godfather,
+combine.networks
 # to.networkDynamic.lasttoggle    made internal
 )
 
