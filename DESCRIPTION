@@ -22,3 +22,4 @@ Description: An integrated set of extensions to the 'ergm' package to analyze an
 License: GPL-3 + file LICENSE
 URL: http://www.statnet.org
 RoxygenNote: 6.0.1
+Roxygen: list(markdown = TRUE)
