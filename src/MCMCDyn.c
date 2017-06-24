@@ -325,7 +325,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 	
       case MH_IMPOSSIBLE:
 	// Proceed to the next phase.
-	break;
+	return;
 	
       case MH_UNSUCCESSFUL:
       case MH_CONSTRAINT:
