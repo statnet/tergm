@@ -16,7 +16,7 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
                    eval.loglik=TRUE,
                    control=control.stergm(),
                    verbose=FALSE, ...) {
-  check.control.class()
+  check.control.class("stergm", "stergm")
   
   if(!is.null(control$seed))  set.seed(as.integer(control$seed))
 
