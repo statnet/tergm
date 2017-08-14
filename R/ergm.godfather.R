@@ -69,7 +69,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
                            stats.start=FALSE,
                            verbose=FALSE,
                            control=control.tergm.godfather()){
-  check.control.class("tergm.godfather")
+  check.control.class("tergm.godfather", "tergm.godfather")
 
   nw <- ergm.getnetwork(formula)
   
@@ -219,6 +219,6 @@ control.tergm.godfather<-function(GF.init.maxedges.mul=5
     for(arg in names(formals(sys.function())))
       control[arg]<-list(get(arg))
 
-    control <- set.control.class()
+    control <- set.control.class("control.tergm.godfather")
     control
   }

@@ -21,5 +21,5 @@ control.logLik.stergm<-function(control.form = control.logLik.ergm(),
   for(arg in names(formal.args))
     control[arg]<-list(get(arg))
 
-  set.control.class()
+  set.control.class("control.logLik.stergm")
 }

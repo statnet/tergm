@@ -9,7 +9,7 @@
 #######################################################################
 
 logLik.stergm<-function(object, add=FALSE, force.reeval=FALSE, eval.loglik=add || force.reeval, control=control.logLik.stergm(), ...){
-  check.control.class()
+  check.control.class("logLik.stergm","logLik.stergm")
   if(object$estimate=="EGMME") stop("Log-likelihood for ",object$estimate," is not meaningful.")
   
   if(!is.null(control$seed))  set.seed(as.integer(control$seed))

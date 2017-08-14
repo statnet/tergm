@@ -57,7 +57,7 @@ control.simulate.network<-function(MCMC.burnin.min=1000,
     for(arg in names(formals(sys.function())))
       control[arg]<-list(get(arg))
 
-    set.control.class()
+    set.control.class("control.simulate.network")
   }
 
 control.simulate.stergm<-function(MCMC.burnin.min=NULL,
@@ -76,7 +76,7 @@ control.simulate.stergm<-function(MCMC.burnin.min=NULL,
     for(arg in names(formals(sys.function())))
       control[arg]<-list(get(arg))
 
-    set.control.class()
+    set.control.class("control.simulate.stergm")
   }
 
 
