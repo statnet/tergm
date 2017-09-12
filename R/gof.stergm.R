@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  http://statnet.org/attribution
 #
-#  Copyright 2003-2014 Statnet Commons
+#  Copyright 2008-2017 Statnet Commons
 #######################################################################
 gof.stergm <- function (object, ...){
   if(object$estimate=="EGMME") stop("Goodness of fit for STERGM EGMME is not implemented at this time.")
