@@ -18,6 +18,7 @@ LinkingTo: ergm
 Depends: statnet.common (>= 4.0), ergm (>= 3.8), network (>= 1.13), networkDynamic (>= 0.8.1)
 Imports: robustbase (>= 0.9-10), coda, nlme, MASS
 Suggests: lattice, parallel
+BugReports: https://github.com/statnet/tergm/issues
 Description: An integrated set of extensions to the 'ergm' package to analyze and simulate network evolution based on exponential-family random graph models (ERGM). 'tergm' is a part of the 'statnet' suite of packages for network analysis.
 License: GPL-3 + file LICENSE
 URL: http://www.statnet.org
