@@ -34,25 +34,27 @@
 InitConstraint.atleast<-function(conlist, lhs.nw, nw=NULL, ...){
   if(is.null(nw)) stop("Formation constraint ``atleast'' requires a baseline network.",call.=FALSE)
   if(network.naedgecount(nw)) stop("Baseline network passed to formation constraint ``atleast'' may not have missing dyads.")
-  conlist$atleast<-list(nw=nw)
+  con <- list(
+    nw = nw,
+    free_dyads = !as.rlebdm(as.edgelist(nw)),
+    dependence = FALSE,
+    constrain = "atleast"
+  )
 
-  conlist$atleast$free.dyads <- function(){
-    standardize.network(!nw) # invert and standardize the network
-  }
-
-  conlist
+  c(conlist, atleast = list(con))
 }
 #ergm.ConstraintImplications("atleast", c())
 
 InitConstraint.atmost<-function(conlist, lhs.nw, nw=NULL, ...){
   if(is.null(nw)) stop("Dissolution constraint ``atmost'' requires a baseline network.",call.=FALSE)
   if(network.naedgecount(nw)) stop("Baseline network passed to dissolution constraint ``atmost'' may not have missing dyads.")
-  conlist$atmost<-list(nw=nw)
+  con <- list(
+    nw = nw,
+    free_dyads = as.rlebdm(as.edgelist(nw)),
+    dependence = FALSE,
+    constrain = "atmost"
+  )
 
-  conlist$atmost$free.dyads <- function(){
-    standardize.network(nw)
-  }
-
-  conlist
+  c(conlist, atmost = list(con))
 }
 #ergm.ConstraintImplications("atmost", c())
