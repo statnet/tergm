@@ -4,3 +4,4 @@
 ^.*/\.RData$
 .travis.yml
 appveyor.yml
+.gdb_history
