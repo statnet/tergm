@@ -41,6 +41,8 @@
 #
 #########################################################################
 
+#' @rdname control.simulate.stergm
+#' @export control.simulate.network
 control.simulate.network<-function(MCMC.burnin.min=1000,
                                    MCMC.burnin.max=100000,
                                    MCMC.burnin.pval=0.5,
@@ -60,6 +62,67 @@ control.simulate.network<-function(MCMC.burnin.min=1000,
     set.control.class("control.simulate.network")
   }
 
+
+
+#' Auxiliary for Controlling Separable Temporal ERGM Simulation
+#' 
+#' Auxiliary function as user interface for fine-tuning STERGM simulation.
+#' 
+#' This function is only used within a call to the \code{\link{simulate}}
+#' function.  See the \code{usage} section in \code{\link{simulate.stergm}} for
+#' details.
+#' 
+#' @param
+#'   MCMC.burnin.min,MCMC.burnin.max,MCMC.burnin.pval,MCMC.burnin.add
+#'   Number of Metropolis-Hastings steps per phase (formation and
+#'   dissolution) per time step used in simulation. By default, this
+#'   is determined adaptively by keeping track of increments in the
+#'   Hamming distance between the transitioned-from network and the
+#'   network being sampled (formation network or dissolution
+#'   network). Once \code{MCMC.burnin.min} steps have elapsed, the
+#'   increments are tested against 0, and when their average number
+#'   becomes statistically indistinguishable from 0 (with the p-value
+#'   being greater than \code{MCMC.burnin.pval}), or
+#'   \code{MCMC.burnin.max} steps are proposed, whichever comes first,
+#'   the simulation is stopped after an additional
+#'   \code{MCMC.burnin.add} times the number of elapsed steps had been
+#'   taken.  (Stopping immediately would bias the sampling.)
+#' 
+#'   To use a fixed number of steps, set both \code{MCMC.burnin.min}
+#'   and \code{MCMC.burnin.max} to the desired number of steps.
+#' @param MCMC.prop.weights.form,MCMC.prop.weights.diss Specifies the
+#'   proposal distribution used in the MCMC Metropolis-Hastings
+#'   algorithm for formation and dissolution, respectively. Possible
+#'   choices are \code{"TNT"} or \code{"random"}; the
+#'   \code{"default"}.  The \code{TNT} (tie / no tie) option puts
+#'   roughly equal weight on selecting a dyad with or without a tie as
+#'   a candidate for toggling, whereas the \code{random} option puts
+#'   equal weight on all possible dyads, though the interpretation of
+#'   \code{random} may change according to the constraints in place.
+#'   When no constraints are in place, the default is TNT, which
+#'   appears to improve Markov chain mixing particularly for networks
+#'   with a low edge density, as is typical of many realistic social
+#'   networks.
+#' @param MCMC.prop.args.form,MCMC.prop.args.diss An alternative,
+#'   direct way of specifying additional arguments to proposals.
+#' @param MCMC.init.maxchanges Maximum number of toggles changes for
+#'   which to allocate space.
+#' @param MCMC.packagenames Names of packages in which to look for
+#'   change statistic functions in addition to those
+#'   autodetected. This argument should not be needed outside of very
+#'   strange setups.
+#' @param MCMC.init.maxedges Maximum number of edges expected in
+#'   network.
+#' @param MCMC.burnin,MCMC.burnin.mul No longer used. See
+#'   \code{MCMC.burnin.min}, \code{MCMC.burnin.max},
+#'   \code{MCMC.burnin.pval}, \code{MCMC.burnin.pval}, and
+#'   \code{MCMC.burnin.add}.
+#' @return A list with arguments as components.
+#' @seealso \code{\link{simulate.stergm}},
+#'   \code{\link{simulate.formula}}.  \code{\link{control.stergm}}
+#'   performs a similar function for \code{\link{stergm}}.
+#' @keywords models
+#' @export control.simulate.stergm
 control.simulate.stergm<-function(MCMC.burnin.min=NULL,
                                   MCMC.burnin.max=NULL,
                                   MCMC.burnin.pval=NULL,

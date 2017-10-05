@@ -7,9 +7,9 @@
 #
 #  Copyright 2008-2017 Statnet Commons
 #######################################################################
-library(tergm)
-
+library(statnet.common)
 opttest({
+  library(tergm)
   data(florentine)
   net <- flobusiness
   set.seed(1)

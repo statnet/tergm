@@ -9,6 +9,10 @@
 #######################################################################
 # Summary function for STERGM fits.
 
+#' @describeIn stergm Print the summary of the formation and the
+#'   dissolution model fits.
+#' @aliases print.summary.stergm
+#' @export
 summary.stergm <- function (object, ...){
   out<-list(formation=summary(object$formation.fit,...),
             dissolution=summary(object$dissolution.fit,...))
@@ -16,6 +20,8 @@ summary.stergm <- function (object, ...){
   out
 }
 
+#' @noRd
+#' @export
 print.summary.stergm <- function(x, ...){
   cat("\n==============================\n")
     cat("Summary of formation model fit \n")
@@ -27,6 +33,7 @@ print.summary.stergm <- function(x, ...){
   print(f, showEnv=FALSE)
   cat("\n")
 
+  #' @importFrom utils getS3method
   getS3method("print","summary.ergm")(x$formation, ..., print.header=FALSE, print.formula=FALSE, print.degeneracy=FALSE, print.drop=FALSE, print.deviances=x$formation$estimate!="EGMME")
 
   cat("\n================================\n")

@@ -7,6 +7,7 @@
 #
 #  Copyright 2008-2017 Statnet Commons
 #######################################################################
+#' @import stats
 stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss, model.mon,
                             control, MHproposal.form, MHproposal.diss, cl=NULL,
                             verbose=FALSE){
@@ -39,6 +40,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     x<-oh[,1:p,drop=FALSE][,!offsets,drop=FALSE] # #$%^$ gls() doesn't respect I()...
     ys <- oh[,-(1:p),drop=FALSE]
     n <- nrow(ys)
+    #' @importFrom robustbase lmrob
     h.fits <-
       if(!is.null(cl)){
         requireNamespace('parallel')
@@ -93,7 +95,8 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     h.tvals[,!bad.fits] <- sapply(h.fits[!bad.fits], "[[", "tvals")[seq_len(p.free+1),]
 
     rm(h.fits)
-    
+
+    #' @importFrom coda effectiveSize
     h.nfs[,!bad.fits] <- matrix(apply(h.resid[,!bad.fits,drop=FALSE],2,function(x) sum(tapply(x,list(tid),length))/sum(tapply(x,list(tid),effectiveSize))), nrow=p.free+1, ncol=sum(!bad.fits), byrow=TRUE)
 
     h.tvals[,!bad.fits] <- h.tvals[,!bad.fits,drop=FALSE]/sqrt(h.nfs[,!bad.fits,drop=FALSE])
@@ -112,6 +115,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
     ## Compute the variances (robustly) and the statistic weights.
     v <- matrix(NA, q,q)
+    #' @importFrom robustbase covMcd
     v[!bad.fits,!bad.fits] <- if(control$SA.robust) covMcd(h.resid[,!bad.fits,drop=FALSE])$cov else cov(h.resid[,!bad.fits,drop=FALSE])
     v[is.na(v)] <- 0
     v <- v*(nrow(h.resid)-1)/(nrow(h.resid)-p.free-1)

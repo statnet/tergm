@@ -123,7 +123,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       thin <- (nrow(oh)-1)%/%(control$SA.max.plot.points/length(states)) + 1
       cols <- floor(sqrt(ncol(oh)))
       layout <- c(cols,ceiling(ncol(oh)/cols))
-      
+
+      #' @importFrom coda mcmc.list
       suppressWarnings(print(lattice::xyplot(window(do.call(mcmc.list,by(as.data.frame(oh),INDICES=list(tid=tid),mcmc,start=min.ind.keep)), thin=thin), panel = function(...) {lattice::panel.xyplot(...);lattice::panel.abline(0, 0)}, as.table = TRUE, layout = layout, xlab=NULL)))
     }
     
@@ -168,6 +169,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
     c(solve(t(x)%*%w%*%x)%*%t(x)%*%w%*%y)
   }
+
+  #' @importFrom MASS ginv
 
   V.sandwich <- function(w, G, V.stat=ginv(w)){
     solve(t(G)%*%w%*%G)%*%t(G)%*%w%*%V.stat%*%w%*%G%*%solve(t(G)%*%w%*%G)
@@ -358,6 +361,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
         for(thread in unique(t)) i[t==thread] <- rank(i[t==thread])
 
+        #' @importFrom nlme gls corAR1
         fit.2 <- try(summary(gls(y~x,correlation=corAR1(form=~i|t)))$tTable[2,c(1,4)])
 
          if(!inherits(p.val.1, "try-error") && !inherits(fit.2, "try-error")){

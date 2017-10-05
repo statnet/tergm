@@ -71,6 +71,44 @@
 
 
 
+
+
+#' Collects a sample of networks and returns the formation and dissolution
+#' statistics of each sample
+#' 
+#' \code{stergm.getMCMCsample} is a low-level internal function not intended to
+#' be called directly by end users. It collects a sample of networks and
+#' returns the formation and dissolution statistics of each sample, along with
+#' a toggle matrix of the changes needed from the original network to each in
+#' the sample.
+#' 
+#' This function is normally called inside \code{\link{simulate.stergm}} to
+#' prepare inputs for the C sampling code and return its results
+#' 
+#' @aliases stergm.getMCMCsample stergm.getMCMCsample.slave
+#' @param nw a \code{\link{network}} object
+#' @param model.form,model.diss,model.mon formation, dissolution, and
+#' monitoring model, as returned by \code{\link{ergm.getmodel}}
+#' @param MHproposal.form,MHproposal.diss a list of parameters needed for
+#' MHproposals of the formations and dissolutions
+#' @param eta.form,eta.diss vectors of natural parameters.
+#' @param control list of control paramters, probably from
+#' \code{\link{control.stergm}}
+#' @param verbose logical; whether this and other functions should be verbose
+#' @return returns the MCMC sample as a list containing: \itemize{
+#' \item statsmatrix.form: the matrix of sampled statistics for 'model.form'
+#' RELATIVE TO INITIAL NETWORK \item statsmatrix.diss: the matrix of sampled
+#' statistics for 'model.form' RELATIVE TO INITIAL NETWORK
+#' \item statsmatrix.mon: the matrix of sampled statistics for 'model.mon'
+#' RELATIVE TO INITIAL NETWORK \item newnetwork : the final network from the
+#' sampling process \item changed : a toggle matrix, where the first column is
+#' the timestamp of the toggle and the 2nd and 3rd columns are the head & tail
+#' of the toggle; this is only returned if `control$changes` is not NULL
+#' \item maxchanges : the "MCMC Dyn workspace"; see 'maxchanges' in the input
+#' param list }
+#' @seealso \code{\link{simulate.stergm}}
+#' @keywords internal
+#' @export stergm.getMCMCsample
 stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
                                   MHproposal.form, MHproposal.diss, eta.form, eta.diss, control, 
                                   verbose){
@@ -119,6 +157,13 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
        maxchanges=control$MCMC.maxchanges)
 }
 
+#' @rdname stergm.getMCMCsample
+#' @description \code{stergm.getMCMCsample.slave} is an even
+#'   lower-level function that actually calls the C code.
+#' @param Clist.form,Clist.diss,Clist.mon formation, dissolution, and
+#'   monitoring "Clist", as returned by \code{\link{ergm.Cprepare}}
+#' @useDynLib tergm
+#' @export stergm.getMCMCsample.slave
 stergm.getMCMCsample.slave <- function(Clist.form, Clist.diss, Clist.mon, MHproposal.form, MHproposal.diss, eta.form, eta.diss, control, verbose){
   collect.form<-if(!is.null(control$collect.form)) control$collect.form else TRUE
   collect.diss<-if(!is.null(control$collect.diss)) control$collect.diss else TRUE

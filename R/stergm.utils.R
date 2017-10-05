@@ -16,6 +16,7 @@
 # available, creates a new device, switches to it, and "remembers" the
 # name.
 
+#' @import grDevices
 get.dev <- local({
   devs <- list()
   function(name){    

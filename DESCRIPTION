@@ -1,5 +1,5 @@
 Package: tergm
-Version: 3.5.0-1593
+Version: 3.5.0-1594
 Date: 2017-10-05
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
@@ -15,11 +15,13 @@ Authors@R: c(
   person("Li","Wang",role=c("ctb"),email="lxwang@gmail.com"),
   person("Kirk","Li",role=c("ctb"),email="kirkli@uw.edu"))
 LinkingTo: ergm
-Depends: statnet.common (>= 4.0), ergm (>= 3.9), network (>= 1.13), networkDynamic (>= 0.8.1)
-Imports: robustbase (>= 0.9-10), coda, nlme, MASS
+Depends: ergm (>= 3.9), network (>= 1.13), networkDynamic (>= 0.8.1)
+Imports: robustbase (>= 0.9-10), coda, nlme, MASS, statnet.common (>= 4.1.0)
 Suggests: lattice, parallel
 BugReports: https://github.com/statnet/tergm/issues
 Description: An integrated set of extensions to the 'ergm' package to analyze and simulate network evolution based on exponential-family random graph models (ERGM). 'tergm' is a part of the 'statnet' suite of packages for network analysis.
 License: GPL-3 + file LICENSE
 URL: http://www.statnet.org
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000
+Roxygen: list(markdown = TRUE)
+Encoding: UTF-8

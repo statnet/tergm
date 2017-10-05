@@ -7,11 +7,13 @@
 #
 #  Copyright 2008-2017 Statnet Commons
 #######################################################################
+#' @import statnet.common
 .onAttach <- function(lib, pkg){
   sm <- statnetStartupMessage("tergm", c("statnet"), FALSE)
   if(!is.null(sm)) packageStartupMessage(sm)
 }
 
+#' @import ergm
 .onLoad <- function(lib, pkg){
   .RegisterMHPs()
   .RegisterConstraintImplications()
