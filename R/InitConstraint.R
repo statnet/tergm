@@ -31,30 +31,26 @@
 #
 ##########################################################################################
 
-InitConstraint.atleast<-function(conlist, lhs.nw, nw=NULL, ...){
+InitConstraint.atleast<-function(lhs.nw, nw=NULL, ...){
   if(is.null(nw)) stop("Formation constraint ``atleast'' requires a baseline network.",call.=FALSE)
   if(network.naedgecount(nw)) stop("Baseline network passed to formation constraint ``atleast'' may not have missing dyads.")
-  con <- list(
+  list(
     nw = nw,
     free_dyads = !as.rlebdm(as.edgelist(nw)),
     dependence = FALSE,
     constrain = "atleast"
   )
-
-  c(conlist, atleast = list(con))
 }
 #ergm.ConstraintImplications("atleast", c())
 
-InitConstraint.atmost<-function(conlist, lhs.nw, nw=NULL, ...){
+InitConstraint.atmost<-function(lhs.nw, nw=NULL, ...){
   if(is.null(nw)) stop("Dissolution constraint ``atmost'' requires a baseline network.",call.=FALSE)
   if(network.naedgecount(nw)) stop("Baseline network passed to dissolution constraint ``atmost'' may not have missing dyads.")
-  con <- list(
+  list(
     nw = nw,
     free_dyads = as.rlebdm(as.edgelist(nw)),
     dependence = FALSE,
     constrain = "atmost"
   )
-
-  c(conlist, atmost = list(con))
 }
 #ergm.ConstraintImplications("atmost", c())

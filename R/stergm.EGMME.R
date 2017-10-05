@@ -104,9 +104,9 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
     targets <- targets[c(1,3)] # in a formula f<-y~x, f[1]=~, f[2]=y, and f[3]=x
   }
 
-  targets <- ergm.update.formula(targets,nw~., from.new="nw")
-  formation <- ergm.update.formula(formation,nw~., from.new="nw")
-  dissolution <- ergm.update.formula(dissolution,nw~., from.new="nw")
+  targets <- nonsimp.update.formula(targets,nw~., from.new="nw")
+  formation <- nonsimp.update.formula(formation,nw~., from.new="nw")
+  dissolution <- nonsimp.update.formula(dissolution,nw~., from.new="nw")
 
   # target formula should not have offsets. removing them
   if (any(offset.info.formula(targets)$term)) {
@@ -148,7 +148,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
                 control=control$SAN.control,
                 constraints=constraints,
                 verbose=verbose))
-        targets<-ergm.update.formula(targets,nw~., from.new="nw")
+        targets<-nonsimp.update.formula(targets,nw~., from.new="nw")
         nw.stats <- summary(targets)
         srun <- srun + 1
         if(verbose){
@@ -169,8 +169,8 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
     if(inherits(newnw,"try-error")){
       cat("SAN failed or is not applicable. Increase burn-in if there are problems.\n")
     }else nw <- newnw
-    formation <- ergm.update.formula(formation,nw~., from.new="nw")
-    dissolution <- ergm.update.formula(dissolution,nw~., from.new="nw")
+    formation <- nonsimp.update.formula(formation,nw~., from.new="nw")
+    dissolution <- nonsimp.update.formula(dissolution,nw~., from.new="nw")
   }
 
   if (verbose) cat("Initializing Metropolis-Hastings proposals.\n")

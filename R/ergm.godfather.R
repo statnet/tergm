@@ -73,7 +73,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
 
   nw <- ergm.getnetwork(formula)
   
-  formula <- ergm.update.formula(formula, nw~., from.new="nw")
+  formula <- nonsimp.update.formula(formula, nw~., from.new="nw")
   
   if(is.networkDynamic(nw)){
     if(!is.null(toggles)) stop("Network passed already contains change or toggle information.")
@@ -137,10 +137,10 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
   if(!is.directed(nw)) toggles[,2:3] <- t(apply(toggles[,2:3,drop=FALSE], 1, sort))
   toggles <- toggles[order(toggles[,1],toggles[,2],toggles[,3]),,drop=FALSE]
 
-  formula <- ergm.update.formula(formula, nw~., from.new="nw")
+  formula <- nonsimp.update.formula(formula, nw~., from.new="nw")
   m <- ergm.getmodel(formula, nw, expanded=TRUE, role="target")
   Clist <- ergm.Cprepare(nw, m)
-  m$obs <- summary.statistics.network(m$formula)
+  m$obs <- summary(m$formula)
   if(end.network){
     maxedges.sd <- sqrt(nrow(toggles)*0.25)*2 # I.e., if each toggle has probability 1/2 of being in a particular direction, this is the s.d. of the number of edges added.
     maxedges <- Clist$nedges + maxedges.sd*control$GF.init.maxedges.mul

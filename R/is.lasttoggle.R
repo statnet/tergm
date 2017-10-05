@@ -14,10 +14,10 @@
 is.lasttoggle <- function(nw,formation=NULL,dissolution=NULL,monitor=NULL,target=NULL){
   
   if(!is.null(formation))
-    formation<-ergm.update.formula(formation,nw~., from.new="nw")
+    formation<-nonsimp.update.formula(formation,nw~., from.new="nw")
   
   if(!is.null(dissolution))  
-    dissolution<-ergm.update.formula(dissolution,nw~., from.new="nw")
+    dissolution<-nonsimp.update.formula(dissolution,nw~., from.new="nw")
   
   if(!is.null(monitor)){
     
@@ -37,7 +37,7 @@ is.lasttoggle <- function(nw,formation=NULL,dissolution=NULL,monitor=NULL,target
     }
     
     if(!is.null(monitor)) 
-      monitor <- ergm.update.formula(monitor,nw~., from.new="nw")
+      monitor <- nonsimp.update.formula(monitor,nw~., from.new="nw")
   }
   
   
@@ -47,7 +47,7 @@ is.lasttoggle <- function(nw,formation=NULL,dissolution=NULL,monitor=NULL,target
           formation = formation,
           dissolution = dissolution)}
       
-      targets <- ergm.update.formula(targets,nw~., from.new="nw")
+      targets <- nonsimp.update.formula(targets,nw~., from.new="nw")
     }
   
   

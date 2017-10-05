@@ -1,8 +1,8 @@
 Package: tergm
-Version: 3.5.0-1591
-Date: 2017-09-25
-Title:  Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
-Authors@R:c(
+Version: 3.5.0-1593
+Date: 2017-10-05
+Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
+Authors@R: c(
 	person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="pavel@uow.edu.au"),
         person("Mark S.", "Handcock", role=c("aut","ths"), email="handcock@stat.ucla.edu"),
         person("David R.", "Hunter", role=c("ctb"), email="dhunter@stat.psu.edu"),
@@ -22,3 +22,4 @@ BugReports: https://github.com/statnet/tergm/issues
 Description: An integrated set of extensions to the 'ergm' package to analyze and simulate network evolution based on exponential-family random graph models (ERGM). 'tergm' is a part of the 'statnet' suite of packages for network analysis.
 License: GPL-3 + file LICENSE
 URL: http://www.statnet.org
+RoxygenNote: 6.0.1

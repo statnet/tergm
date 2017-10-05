@@ -180,8 +180,8 @@ simulate.network <- function(object, nsim=1, seed=NULL,
     stop("A network object must be given")
   }
 
-  formation<-ergm.update.formula(formation,nw~., from.new="nw")
-  dissolution<-ergm.update.formula(dissolution,nw~., from.new="nw")
+  formation<-nonsimp.update.formula(formation,nw~., from.new="nw")
+  dissolution<-nonsimp.update.formula(dissolution,nw~., from.new="nw")
 
   unset.offset.call <- function(object){
     if(inherits(object,"call") && object[[1]]=="offset")
@@ -198,7 +198,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                       )
   }
   
-  if(!is.null(monitor)) monitor<-ergm.update.formula(monitor,nw~., from.new="nw")
+  if(!is.null(monitor)) monitor<-nonsimp.update.formula(monitor,nw~., from.new="nw")
   
   if(is.null(duration.dependent)){ # in the case of simulating from nw directly 
     duration.dependent <- is.lasttoggle(nw,formation,dissolution,monitor)
@@ -443,8 +443,8 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   }
   
   attributes(object) <- c(attributes(object), # Don't clobber existing attributes!
-                          list(formation = ergm.update.formula(formation,nw~., from.new="nw"),
-                               dissolution = ergm.update.formula(dissolution,nw~., from.new="nw"),
+                          list(formation = nonsimp.update.formula(formation,nw~., from.new="nw"),
+                               dissolution = nonsimp.update.formula(dissolution,nw~., from.new="nw"),
                                stats.form = rbind(if(isTRUE(attr(sim,"formation")==attr(object,"formation"))) attr(object,"stats.form"),attr(sim,"stats.form")),
                                stats.diss = rbind(if(isTRUE(attr(sim,"dissolution")==attr(object,"dissolution"))) attr(object,"stats.diss"),attr(sim,"stats.diss")),
                                monitor = attr(sim,"monitor"),

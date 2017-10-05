@@ -52,7 +52,6 @@ stergm,
 stergm.getMCMCsample, 
 stergm.getMCMCsample.slave, 
 summary.gof.stergm,
-summary.statistics.networkDynamic, 
 summary.stergm,
 tergm.godfather
 # to.networkDynamic.lasttoggle    made internal
@@ -78,5 +77,5 @@ S3method('simulate','network')
 S3method('simulate','networkDynamic')
 S3method('simulate','stergm')
 S3method('summary','gof.stergm')
-S3method('summary.statistics','networkDynamic')
+S3method('summary_formula','networkDynamic')
 S3method('summary','stergm')

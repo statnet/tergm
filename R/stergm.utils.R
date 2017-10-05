@@ -60,7 +60,7 @@ network.extract.with.lasttoggle <- function(nwd, at, duration.dependent){
   if (is.null(nwd%n%'vertex.pid')){
 	  nw %v% "tergm_pid" <- which(is.active(nwd, at=at, v=seq_len(network.size(nwd))))
   }
-	if(duration.dependent==1){
+	if(duration.dependent){
 		lttails <- lapply(nw$mel, "[[", "outl")
 		ltheads <- lapply(nw$mel, "[[", "inl")
 		ltlts <- lapply(lapply(lapply(nw$mel, "[[", "atl"), "[[", 
@@ -86,7 +86,8 @@ network.extract.with.lasttoggle <- function(nwd, at, duration.dependent){
 	else {  # non-duration dependent model
 		lasttoggle <- NULL
 	}
-	
+
+        nw <- network.collapse(nwd, at=at) #  Convert to a network network.
 	nw %n% "time" <- at
 	nw %n% "lasttoggle" <- lasttoggle
 	nw
