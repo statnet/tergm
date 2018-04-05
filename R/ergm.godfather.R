@@ -193,7 +193,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
 
   nw <- ergm.getnetwork(formula)
   
-  formula <- nonsimp.update.formula(formula, nw~., from.new="nw")
+  formula <- nonsimp_update.formula(formula, nw~., from.new="nw")
   
   if(is.networkDynamic(nw)){
     if(!is.null(toggles)) stop("Network passed already contains change or toggle information.")
@@ -257,7 +257,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
   if(!is.directed(nw)) toggles[,2:3] <- t(apply(toggles[,2:3,drop=FALSE], 1, sort))
   toggles <- toggles[order(toggles[,1],toggles[,2],toggles[,3]),,drop=FALSE]
 
-  formula <- nonsimp.update.formula(formula, nw~., from.new="nw")
+  formula <- nonsimp_update.formula(formula, nw~., from.new="nw")
   m <- ergm.getmodel(formula, nw, expanded=TRUE, role="target")
   Clist <- ergm.Cprepare(nw, m)
   m$obs <- summary(m$formula)

@@ -14,10 +14,10 @@
 is.lasttoggle <- function(nw,formation=NULL,dissolution=NULL,monitor=NULL,target=NULL){
   
   if(!is.null(formation))
-    formation<-nonsimp.update.formula(formation,nw~., from.new="nw")
+    formation<-nonsimp_update.formula(formation,nw~., from.new="nw")
   
   if(!is.null(dissolution))  
-    dissolution<-nonsimp.update.formula(dissolution,nw~., from.new="nw")
+    dissolution<-nonsimp_update.formula(dissolution,nw~., from.new="nw")
   
   if(!is.null(monitor)){
     
@@ -32,12 +32,12 @@ is.lasttoggle <- function(nw,formation=NULL,dissolution=NULL,monitor=NULL,target
       monitor <- switch(monitor,
           formation = formation,
           dissolution = dissolution,
-          all = append.rhs.formula(~nw, unique(lapply(c(term.list.formula(formation[[3]]),term.list.formula(dissolution[[3]])), unset.offset.call)))
+          all = append_rhs.formula(~nw, unique(lapply(c(term.list.formula(formation[[3]]),term.list.formula(dissolution[[3]])), unset.offset.call)))
       )
     }
     
     if(!is.null(monitor)) 
-      monitor <- nonsimp.update.formula(monitor,nw~., from.new="nw")
+      monitor <- nonsimp_update.formula(monitor,nw~., from.new="nw")
   }
   
   
@@ -47,7 +47,7 @@ is.lasttoggle <- function(nw,formation=NULL,dissolution=NULL,monitor=NULL,target
           formation = formation,
           dissolution = dissolution)}
       
-      targets <- nonsimp.update.formula(targets,nw~., from.new="nw")
+      targets <- nonsimp_update.formula(targets,nw~., from.new="nw")
     }
   
   

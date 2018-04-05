@@ -74,10 +74,10 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
           2*abs(target-current)/(abs(target)+abs(current))<tolerance # Some statistics don't give exact equality.
         
       bad.stat <-
-        !(c(eql(apply(rbind(sapply(y0s, function(nw) summary(nonsimp.update.formula(formation,nw~., from.new="nw")))),1,sum), summary(nonsimp.update.formula(formation,y0~., from.new="y0"))),
-            eql(apply(rbind(sapply(y0s, function(nw) summary(nonsimp.update.formula(dissolution,nw~., from.new="nw")))),1,sum), summary(nonsimp.update.formula(dissolution,y0~., from.new="y0")))) &
-          c(eql(apply(rbind(sapply(y1s, function(nw) summary(nonsimp.update.formula(formation,nw~., from.new="nw")))),1,sum), summary(nonsimp.update.formula(formation,y1~., from.new="y1"))),
-            eql(apply(rbind(sapply(y1s, function(nw) summary(nonsimp.update.formula(dissolution,nw~., from.new="nw")))),1,sum), summary(nonsimp.update.formula(dissolution,y1~., from.new="y1")))))
+        !(c(eql(apply(rbind(sapply(y0s, function(nw) summary(nonsimp_update.formula(formation,nw~., from.new="nw")))),1,sum), summary(nonsimp_update.formula(formation,y0~., from.new="y0"))),
+            eql(apply(rbind(sapply(y0s, function(nw) summary(nonsimp_update.formula(dissolution,nw~., from.new="nw")))),1,sum), summary(nonsimp_update.formula(dissolution,y0~., from.new="y0")))) &
+          c(eql(apply(rbind(sapply(y1s, function(nw) summary(nonsimp_update.formula(formation,nw~., from.new="nw")))),1,sum), summary(nonsimp_update.formula(formation,y1~., from.new="y1"))),
+            eql(apply(rbind(sapply(y1s, function(nw) summary(nonsimp_update.formula(dissolution,nw~., from.new="nw")))),1,sum), summary(nonsimp_update.formula(dissolution,y1~., from.new="y1")))))
       if(any(bad.stat)) stop("Fitting the term(s) ", paste.and(unique(names(bad.stat)[bad.stat])), " over multiple network transitions is not supported at this time.")
     }
   }else{
@@ -93,21 +93,21 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   
   y.form <- y0 | y1
   y.form <- nvattr.copy.network(y.form, y0)
-  formation <- nonsimp.update.formula(formation, y.form~., from.new="y.form")
+  formation <- nonsimp_update.formula(formation, y.form~., from.new="y.form")
 
   y.diss <- y0 & y1
   y.diss <- nvattr.copy.network(y.diss, y0)
-  dissolution <- nonsimp.update.formula(dissolution, y.diss~., from.new="y.diss")
+  dissolution <- nonsimp_update.formula(dissolution, y.diss~., from.new="y.diss")
 
   # Construct new constraints
 
-  constraints.form <- if(constraints==~.) ~atleast(y0) else nonsimp.update.formula(constraints, ~.+atleast(y0), from.new="y0")
-  if(length(times)>2) constraints.form <- nonsimp.update.formula(constraints.form, ~.+blockdiag(".stergm.CMLE.time.index"))
+  constraints.form <- if(constraints==~.) ~atleast(y0) else nonsimp_update.formula(constraints, ~.+atleast(y0), from.new="y0")
+  if(length(times)>2) constraints.form <- nonsimp_update.formula(constraints.form, ~.+blockdiag(".stergm.CMLE.time.index"))
   # TODO: Some unlucky variable names can break this. We need to figure out a way around this.
   environment(constraints.form) <- environment()
   
-  constraints.diss <- if(constraints==~.) ~atmost(y0) else nonsimp.update.formula(constraints, ~.+atmost(y0), from.new="y0")
-  if(length(times)>2) constraints.diss <- nonsimp.update.formula(constraints.diss, ~.+blockdiag(".stergm.CMLE.time.index"))
+  constraints.diss <- if(constraints==~.) ~atmost(y0) else nonsimp_update.formula(constraints, ~.+atmost(y0), from.new="y0")
+  if(length(times)>2) constraints.diss <- nonsimp_update.formula(constraints.diss, ~.+blockdiag(".stergm.CMLE.time.index"))
   # TODO: Some unlucky variable names can break this. We need to figure out a way around this.
   environment(constraints.diss) <- environment()
   
