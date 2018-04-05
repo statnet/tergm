@@ -451,7 +451,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       drop <- apply(is.na(nlin.coef),1,any)
       nlin.coef <- nlin.coef[nlin.totest & !drop,,drop=FALSE]
       nlin.nfs <- nlin.nfs[nlin.totest & !drop,,drop=FALSE]
-      nlin.vcov <- t(nlin.vcov[nlin.totest[!drop],nlin.totest[!drop],drop=FALSE]*sqrt(c(nlin.nfs)))*sqrt(c(nlin.nfs))
+      nlin.vcov <- t(nlin.vcov[nlin.totest & !drop, nlin.totest & !drop, drop=FALSE]*sqrt(c(nlin.nfs)))*sqrt(c(nlin.nfs))
       chi2 <- mahalanobis(c(nlin.coef),0,ginv(nlin.vcov),inverted=TRUE)
 
       p.val.1 <- pchisq(chi2, length(nlin.coef), lower.tail=FALSE)
