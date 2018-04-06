@@ -7,12 +7,6 @@
 #
 #  Copyright 2008-2017 Statnet Commons
 #######################################################################
-all.same <- function(x){
-  if(length(x)==0) return(TRUE)
-  v0 <- x[1]
-  for(v in x[-1]) if(!identical(v0,v)) return(FALSE)
-  return(TRUE)
-}
 
 # create a single block-diagonal network by combining multible networks
 
@@ -43,7 +37,7 @@ combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper",
        && all(sapply(vl, is.matrix))
        && all(sapply(vl, nrow)==ns)
        && all(sapply(vl, ncol)==ns)
-       && all.same(sapply(vl, mode))){
+       && all_identical(sapply(vl, mode))){
 
       # A logical vector that extracts off-diagonal element of the ns*ns matrix.
 
@@ -125,7 +119,7 @@ combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper",
        && all(sapply(vl, is.matrix))
        && all(sapply(vl, nrow)==es)
        && all(sapply(vl, ncol)==ns-es)
-       && all.same(sapply(vl, mode))){
+       && all_identical(sapply(vl, mode))){
 
       # It doesn't matter what the "filler" elements are, as long as
       # adding them doesn't add another category and it's not NA. So,
