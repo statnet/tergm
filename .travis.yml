@@ -15,7 +15,7 @@ r_github_packages:
 - statnet/statnet.common
 - statnet/network
 - statnet/networkDynamic
-- statnet/ergm
+- statnet/ergm-private@dev
 addons:
   apt:
     packages:
