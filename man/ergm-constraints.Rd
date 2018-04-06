@@ -13,8 +13,8 @@
 \alias{ergm.constraints}
 \alias{constraints.ergm}
 
-\alias{InitConstraint.atleast}
-\alias{InitConstraint.atmost}
+\alias{InitErgmConstraint.atleast}
+\alias{InitErgmConstraint.atmost}
 
 \docType{methods}
 

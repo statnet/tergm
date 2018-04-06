@@ -6,20 +6,20 @@
 \title{Collects a sample of networks and returns the formation and dissolution
 statistics of each sample}
 \usage{
-stergm.getMCMCsample(nw, model.form, model.diss, model.mon, MHproposal.form,
-  MHproposal.diss, eta.form, eta.diss, control, verbose)
+stergm.getMCMCsample(nw, model.form, model.diss, model.mon, proposal.form,
+  proposal.diss, eta.form, eta.diss, control, verbose)
 
-stergm.getMCMCsample.slave(Clist.form, Clist.diss, Clist.mon, MHproposal.form,
-  MHproposal.diss, eta.form, eta.diss, control, verbose)
+stergm.getMCMCsample.slave(Clist.form, Clist.diss, Clist.mon, proposal.form,
+  proposal.diss, eta.form, eta.diss, control, verbose)
 }
 \arguments{
 \item{nw}{a \code{\link{network}} object}
 
 \item{model.form, model.diss, model.mon}{formation, dissolution, and
-monitoring model, as returned by \code{\link{ergm.getmodel}}}
+monitoring model, as returned by \code{\link{ergm_model}}}
 
-\item{MHproposal.form, MHproposal.diss}{a list of parameters needed for
-MHproposals of the formations and dissolutions}
+\item{proposal.form, proposal.diss}{a list of parameters needed for
+proposals of the formations and dissolutions}
 
 \item{eta.form, eta.diss}{vectors of natural parameters.}
 

@@ -47,7 +47,7 @@ summary_formula.networkDynamic <- function(object, at,..., basis=NULL){
   if (missing(at) || !is.numeric(at)){
     stop( "summary_formula.networkDynamic requires an 'at' parameter specifying the time points at which to summarize the formula")
   }
-  if(!is.null(basis)) object <- nonsimp_update.formula(object, basis~.)
+  if(!is.null(basis)) object <- nonsimp_update.formula(object, basis~., from.new="basis")
   duration.dependent <- is.durational(object)
   t(rbind(sapply(at,
               function(t){
@@ -55,7 +55,7 @@ summary_formula.networkDynamic <- function(object, at,..., basis=NULL){
                 f <- nonsimp_update.formula(object, nw~., from.new="nw")
                 # make sure this is dispatched to the .network  and not .networkDynamic version
                 # of summary statistics to avoid recurisve calls
-                summary(f,...)
+                getS3method("summary_formula","network")(f,...)
               }
           )
       )

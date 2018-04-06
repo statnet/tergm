@@ -9,7 +9,7 @@
 #######################################################################
 #' @import stats
 stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss, model.mon,
-                            control, MHproposal.form, MHproposal.diss, cl=NULL,
+                            control, proposal.form, proposal.diss, cl=NULL,
                             verbose=FALSE){
 
   
@@ -252,6 +252,6 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
   }
   
   stergm.EGMME.SA(theta.form0, theta.diss0, nw, model.form, model.diss, model.mon,
-                  control, MHproposal.form, MHproposal.diss, eval.optpars, cl=cl,
+                  control, proposal.form, proposal.diss, eval.optpars, cl=cl,
                   verbose)
 }

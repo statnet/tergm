@@ -115,8 +115,8 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   if(is.null(control$CMLE.control.form$init)) control$CMLE.control.form$init <- control$init.form
   if(is.null(control$CMLE.control.diss$init)) control$CMLE.control.diss$init <- control$init.diss
  
-  model.form<-ergm.getmodel(formation, y.form, initialfit=TRUE)
-  model.diss<-ergm.getmodel(dissolution, y.diss, initialfit=TRUE)
+  model.form<-ergm_model(formation, y.form, initialfit=TRUE)
+  model.diss<-ergm_model(dissolution, y.diss, initialfit=TRUE)
 
   if(!is.null(control$CMLE.control.form$init)){
     # Check length of control$CMLE.control.form$init.

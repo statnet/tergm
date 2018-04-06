@@ -83,7 +83,6 @@ mcmc.diagnostics.stergm <- function(object,
     cat("\n==========================\n")
     cat("EGMME diagnostics\n")
     cat("==========================\n\n")
-    class(object) <- "ergm" # Dispatch to mcmc.diagnostics.ergm.
-    mcmc.diagnostics(object, center=center, curved=curved, vars.per.page=vars.per.page, ...)
+    getS3method("mcmc.diagnostics","ergm")(object, center=center, curved=curved, vars.per.page=vars.per.page, ...)
   }
 }

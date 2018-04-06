@@ -1,4 +1,4 @@
-#  File R/InitMHP.DynMLE.blockdiag.R in package tergm, part of the Statnet suite
+#  File R/InitErgmProposal.DynMLE.blockdiag.R in package tergm, part of the Statnet suite
 #  of packages for network analysis, http://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
@@ -8,8 +8,8 @@
 #  Copyright 2008-2017 Statnet Commons
 #######################################################################
 #===========================================================================
-# The <InitMHP> file contains the following 24 functions for
-# initializing the MHproposal object; each is prepended with 'InitMHP.'
+# The <InitErgmProposal> file contains the following 24 functions for
+# initializing the proposal object; each is prepended with 'InitErgmProposal.'
 #        <dissolutionMLE>
 #        <formationNonObservedMLE>
 #        <dissolutionNonObservedMLE>
@@ -18,21 +18,21 @@
 
 
 ##########################################2##############################
-# Each of the <InitMHP.X> functions initializes and returns a
-# MHproposal list; when appropriate, proposal types are checked against
+# Each of the <InitErgmProposal.X> functions initializes and returns a
+# proposal list; when appropriate, proposal types are checked against
 # covariates and network types for 1 of 2 side effects: to print warning
-# messages or to halt execution (only <InitMHP.nobetweengroupties> can
+# messages or to halt execution (only <InitErgmProposal.nobetweengroupties> can
 # halt execution)
 #
 # --PARAMETERS--
-#   arguments: is ignored by all but <InitMHP.nobetweengroupties>,
+#   arguments: is ignored by all but <InitErgmProposal.nobetweengroupties>,
 #              where 'arguments' is used to get the nodal attributes
 #              via <get.node.attr>
 #   nw       : the network given by the model
-#   model    : the model for 'nw', as returned by <ergm.getmodel>
+#   model    : the model for 'nw', as returned by <ergm_model>
 #
 # --RETURNED--
-#   MHproposal: a list containing:
+#   proposal: a list containing:
 #        name   : the name of the proposal
 #        inputs : a vector to be passed to the proposal
 #        package: is "tergm"
@@ -76,7 +76,7 @@
 }
 
 
-.InitMHP.blockdiag.bipartite.setup <- function(arguments, nw){
+.InitErgmProposal.blockdiag.bipartite.setup <- function(arguments, nw){
   bip <- nw %n% "bipartite"
 
   ea <- (nw %v% arguments$constraints$blockdiag$attrname)[seq_len(bip)]
@@ -102,7 +102,7 @@
 #### Formation MLE on block diagonals, random and TNT versions ####
 
 ## Helper function, since the following have the same body except for the MH_ function.
-.InitMHP.formationMLEblockdiag <- function(arguments, nw, ...) {
+.InitErgmProposal.formationMLEblockdiag <- function(arguments, nw, ...) {
   # rle() returns contigous runs of values.
   a <- rle(nw %v% arguments$constraints$blockdiag$attrname)
   # If we have more runs than unique values, the blocks must not be all contiguous.
@@ -114,32 +114,32 @@
   w <- w/max(w)
   # Note that this automagically takes care of singleton blocks by giving them weight 0.
   
-  MHproposal <- c(list(inputs=c(ergm.Cprepare.el(arguments$constraints$atleast$nw),nd,length(b)-1,b,w)), list(...))
-  MHproposal
+  proposal <- c(list(inputs=c(to_ergm_Cdouble(arguments$constraints$atleast$nw),nd,length(b)-1,b,w)), list(...))
+  proposal
 }
 
-.InitMHP.formationMLEblockdiag.bipartite <- function(arguments, nw, ...){
-  tmp <- .InitMHP.blockdiag.bipartite.setup(arguments, nw)  
-  MHproposal <- c(list(inputs=c(ergm.Cprepare.el(arguments$constraints$atleast$nw),tmp$nd,length(tmp$eb)-1,tmp$eb,tmp$ab,tmp$w)), list(...))
-  MHproposal
+.InitErgmProposal.formationMLEblockdiag.bipartite <- function(arguments, nw, ...){
+  tmp <- .InitErgmProposal.blockdiag.bipartite.setup(arguments, nw)  
+  proposal <- c(list(inputs=c(to_ergm_Cdouble(arguments$constraints$atleast$nw),tmp$nd,length(tmp$eb)-1,tmp$eb,tmp$ab,tmp$w)), list(...))
+  proposal
 }
 
-InitMHP.formationMLEblockdiag <- function(arguments, nw) {
-  if(is.bipartite(nw)) return(.InitMHP.formationMLEblockdiag.bipartite(arguments, nw, name = "FormationMLEblockdiagB"))
-  MHproposal <- .InitMHP.formationMLEblockdiag(arguments, nw, name = "FormationMLEblockdiag")
-  MHproposal
+InitErgmProposal.formationMLEblockdiag <- function(arguments, nw) {
+  if(is.bipartite(nw)) return(.InitErgmProposal.formationMLEblockdiag.bipartite(arguments, nw, name = "FormationMLEblockdiagB"))
+  proposal <- .InitErgmProposal.formationMLEblockdiag(arguments, nw, name = "FormationMLEblockdiag")
+  proposal
 }
 
-InitMHP.formationMLEblockdiagTNT <- function(arguments, nw) {
-  if(is.bipartite(nw)) return(.InitMHP.formationMLEblockdiag.bipartite(arguments, nw, name = "FormationMLEblockdiagTNTB"))
-  MHproposal <- .InitMHP.formationMLEblockdiag(arguments, nw, name = "FormationMLEblockdiagTNT")
-  MHproposal
+InitErgmProposal.formationMLEblockdiagTNT <- function(arguments, nw) {
+  if(is.bipartite(nw)) return(.InitErgmProposal.formationMLEblockdiag.bipartite(arguments, nw, name = "FormationMLEblockdiagTNTB"))
+  proposal <- .InitErgmProposal.formationMLEblockdiag(arguments, nw, name = "FormationMLEblockdiagTNT")
+  proposal
 }
 
 #### Formation MLE on non-observed dyads in block diagonals, random and TNT versions ####
 
 ## Helper function, since the following two have the same body except for the MH_ function.
-.InitMHP.formationNonObservedMLEblockdiag <- function(arguments, nw, ...){
+.InitErgmProposal.formationNonObservedMLEblockdiag <- function(arguments, nw, ...){
   ## Bipartite is handled seamlessly.
   ## Precalculate toggleable dyads: dyads which
   ## * are unobserved in y[t]
@@ -154,23 +154,23 @@ InitMHP.formationMLEblockdiagTNT <- function(arguments, nw) {
   el <- el[a[el[,1]]==a[el[,2]],,drop=FALSE]
 
   ## Given the list of toggleable dyads, no formation-specific proposal function is needed:
-  MHproposal <- c(list(inputs=ergm.Cprepare.el(el)),list(...))
-  MHproposal
+  proposal <- c(list(inputs=to_ergm_Cdouble(el)),list(...))
+  proposal
 }
 
-InitMHP.formationNonObservedMLEblockdiag <- function(arguments, nw) {
-  .InitMHP.formationNonObservedMLEblockdiag(arguments, nw, name = "randomtoggleList", pkgname="ergm")
+InitErgmProposal.formationNonObservedMLEblockdiag <- function(arguments, nw) {
+  .InitErgmProposal.formationNonObservedMLEblockdiag(arguments, nw, name = "randomtoggleList", pkgname="ergm")
 }
 
-InitMHP.formationNonObservedMLEblockdiagTNT <- function(arguments, nw) {
-  .InitMHP.formationNonObservedMLEblockdiag(arguments, nw, name = "listTNT", pkgname="ergm")
+InitErgmProposal.formationNonObservedMLEblockdiagTNT <- function(arguments, nw) {
+  .InitErgmProposal.formationNonObservedMLEblockdiag(arguments, nw, name = "listTNT", pkgname="ergm")
 }
 
 
 #### Dissolution MLE on non-observed dyads in block diagonals, random and TNT versions ####
 
 ## Helper function, since the following two have the same body except for the MH_ function.
-.InitMHP.dissolutionNonObservedMLEblockdiag  <- function(arguments, nw, ...) {
+.InitErgmProposal.dissolutionNonObservedMLEblockdiag  <- function(arguments, nw, ...) {
   ## Bipartite is handled seamlessly.
   ## Precalculate toggleable dyads: dyads which
   ## * are unobserved in y[t]
@@ -185,20 +185,20 @@ InitMHP.formationNonObservedMLEblockdiagTNT <- function(arguments, nw) {
   el <- el[a[el[,1]]==a[el[,2]],,drop=FALSE]
 
   ## Given the list of toggleable dyads, no formation-specific proposal function is needed:
-  MHproposal <- c(list(inputs=ergm.Cprepare.el(el)), list(...))
-  MHproposal
+  proposal <- c(list(inputs=to_ergm_Cdouble(el)), list(...))
+  proposal
 }
 
-InitMHP.dissolutionNonObservedMLEblockdiag <- function(arguments, nw) {
-  .InitMHP.dissolutionNonObservedMLEblockdiag(arguments, nw, name = "randomtoggleList", pkgname="ergm")
+InitErgmProposal.dissolutionNonObservedMLEblockdiag <- function(arguments, nw) {
+  .InitErgmProposal.dissolutionNonObservedMLEblockdiag(arguments, nw, name = "randomtoggleList", pkgname="ergm")
 }
 
-InitMHP.dissolutionNonObservedMLEblockdiagTNT <- function(arguments, nw) {
-  .InitMHP.dissolutionNonObservedMLEblockdiag(arguments, nw, name = "listTNT", pkgname="ergm")
+InitErgmProposal.dissolutionNonObservedMLEblockdiagTNT <- function(arguments, nw) {
+  .InitErgmProposal.dissolutionNonObservedMLEblockdiag(arguments, nw, name = "listTNT", pkgname="ergm")
 }
 
 ## Helper function, since the following two have the same body except for the MH_ function.
-.InitMHP.dissolutionMLEblockdiag <- function(arguments, nw, ...) {
+.InitErgmProposal.dissolutionMLEblockdiag <- function(arguments, nw, ...) {
   ## Bipartite is handled seamlessly.
 
   y0<-arguments$constraints$atmost$nw
@@ -209,16 +209,16 @@ InitMHP.dissolutionNonObservedMLEblockdiagTNT <- function(arguments, nw) {
   el <- el[a[el[,1]]==a[el[,2]],,drop=FALSE]
 
   # el enforces the block constraint.
-  MHproposal <- c(list(inputs=ergm.Cprepare.el(el)), list(...))
-  MHproposal
+  proposal <- c(list(inputs=to_ergm_Cdouble(el)), list(...))
+  proposal
 }
 
 #### Dissolution MLE on block diagonals, random and TNT versions ####
 
-InitMHP.dissolutionMLEblockdiag <- function(arguments, nw) {
-  .InitMHP.dissolutionMLEblockdiag(arguments, nw, name = "randomtoggleList", pkgname="ergm")
+InitErgmProposal.dissolutionMLEblockdiag <- function(arguments, nw) {
+  .InitErgmProposal.dissolutionMLEblockdiag(arguments, nw, name = "randomtoggleList", pkgname="ergm")
 }
 
-InitMHP.dissolutionMLEblockdiagTNT <- function(arguments, nw) {
-  .InitMHP.dissolutionMLEblockdiag(arguments, nw, name = "DissolutionMLETNT")
+InitErgmProposal.dissolutionMLEblockdiagTNT <- function(arguments, nw) {
+  .InitErgmProposal.dissolutionMLEblockdiag(arguments, nw, name = "DissolutionMLETNT")
 }

@@ -442,27 +442,27 @@ simulate.network <- function(object, nsim=1, seed=NULL,
 
 
 
-  model.form <- ergm.getmodel(formation, nw, role="formation")
-  if(!missing(coef.form) && coef.length.model(model.form)!=length(coef.form)) stop("coef.form has ", length(coef.form), " elements, while the model requires ",coef.length.model(model.form)," parameters.")
+  model.form <- ergm_model(formation, nw, role="formation")
+  if(!missing(coef.form) && nparam(model.form)!=length(coef.form)) stop("coef.form has ", length(coef.form), " elements, while the model requires ",nparam(model.form)," parameters.")
 
-  model.diss <- ergm.getmodel(dissolution, nw, role="dissolution")
-  if(!missing(coef.diss) && coef.length.model(model.diss)!=length(coef.diss)) stop("coef.diss has ", length(coef.diss), " elements, while the model requires ",coef.length.model(model.diss)," parameters.")
+  model.diss <- ergm_model(dissolution, nw, role="dissolution")
+  if(!missing(coef.diss) && nparam(model.diss)!=length(coef.diss)) stop("coef.diss has ", length(coef.diss), " elements, while the model requires ",nparam(model.diss)," parameters.")
 
-  model.mon <- if(!is.null(monitor)) ergm.getmodel(monitor, nw, role="target") else NULL
+  model.mon <- if(!is.null(monitor)) ergm_model(monitor, nw, role="target") else NULL
   
   if(missing(coef.form)) {
-    coef.form <- rep(0,length(model.form$coef.names))
+    coef.form <- rep(0,nparam(model.form, canonical=TRUE))
     warning("No parameter values given, using Bernouli formation.\nThis means that every time step, half the non-tie dyads will gain a tie!")
   }
 
   if(missing(coef.diss)) {
-    coef.diss <- rep(0,length(model.diss$coef.names))
+    coef.diss <- rep(0,nparam(model.diss, canonical=TRUE))
     warning("No parameter values given, using Bernoulli dissolution.\nThis means that every time step, half the ties get dissolved!\n")
   }
     
-  MHproposal.form <- MHproposal(constraints,control$MCMC.prop.args.form,nw,
+  proposal.form <- ergm_proposal(constraints,control$MCMC.prop.args.form,nw,
                                 weights=control$MCMC.prop.weights.form,class="f")
-  MHproposal.diss <- MHproposal(constraints,control$MCMC.prop.args.diss,nw,
+  proposal.diss <- ergm_proposal(constraints,control$MCMC.prop.args.diss,nw,
                                 weights=control$MCMC.prop.weights.diss,class="d")
 
   eta.form <- ergm.eta(coef.form, model.form$etamap)
@@ -478,7 +478,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
     nw <- .set.default.net.obs.period(nw, time.start)
     nw %n% "time" <- start <- .get.last.obs.time(nw, time.start)
     z <- stergm.getMCMCsample(nw, model.form, model.diss, model.mon,
-                              MHproposal.form, MHproposal.diss,
+                              proposal.form, proposal.diss,
                               eta.form, eta.diss, control, verbose)
     
     stats.form <- if(control$collect.form) mcmc(sweep(z$statsmatrix.form,2,summary(formation),"+"),start=time.burnin+1,thin=time.interval)
