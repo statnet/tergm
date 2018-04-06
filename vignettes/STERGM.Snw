@@ -1,7 +1,18 @@
 \documentclass[11pt]{article}
 
-\SweaveOpts{echo=true}
-\SweaveOpts{keep.source=TRUE}
+
+<<include=FALSE>>=
+library(knitr)
+opts_chunk$set(
+             cache=TRUE,
+             autodep=TRUE,
+             echo=TRUE,
+             tidy=FALSE,
+             concordance=TRUE
+)
+options(width=60)
+@
+
 
 \usepackage{color}
 \usepackage{verbatim}
@@ -20,25 +31,18 @@
 \newcommand{\paramVec}{\theta}
 \newcommand{\covmat}{\mathbf{X}}
 
-%\VignetteIndexEntry{STERGM Vignette}
+% \VignetteIndexEntry{STERGM Vignette}
+% \VignetteEngine{knitr::knitr}
 
-<<echo=false>>=
-options(width=60)
-@
-
-<<echo=false>>=
-options(continue=" ")
-@
-
-<<echo=false>>=
+<<echo=FALSE>>=
 library('tergm')
 @
 
 
 \begin{document}
-\SweaveOpts{concordance=TRUE}
 
-\title{STERGM - Separable Temporal ERGMs for modeling discrete relational dynamics with \emph{statnet}}
+
+\title{STERGM -- Separable Temporal ERGMs for modeling discrete relational dynamics with \emph{statnet}}
 \author{Pavel N.~Krivitsky, Steven M.~Goodreau,\\ The \texttt{Statnet} Development Team}
 \maketitle
 
@@ -92,15 +96,9 @@ data("florentine")
 ls()
 @
 
-<<flobusplot, include=FALSE, fig=TRUE>>=
+<<flobusplot, fig.height=3>>=
 plot(flobusiness)
 @
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[height=3in]{STERGM-flobusplot}
-\end{center}
-\end{figure}
 
 To refresh our memories on ERGM syntax, let us fit a cross-sectional example. Just by looking at the plot of \texttt{flobusiness}, 
 we might guess that there are more triangles than expected by chance for a network of this size and density, and thus that there is some
@@ -114,18 +112,11 @@ summary(fit1)
 
 With the estimation in place, we can simulate a new network from the given model:
 
-<<sim1plot, include=FALSE, fig=TRUE>>=
+<<sim1plot, fig.height=3>>=
 sim1 <- simulate(fit1,nsim=1,
           control=control.simulate.ergm(MCMC.burnin=1000))
 plot(sim1)
 @
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[height=3in]{STERGM-sim1plot}
-\end{center}
-\end{figure}
-
 
 \section{An Introduction to STERGMs (non-technical)}
 
@@ -331,7 +322,7 @@ In short, because our dissolution model is dyadic independent, we can calculate 
 We put it all together for our first call to \texttt{stergm}, adding in one additional control argument that helps immensely with monitoring model convergence (and is just plain cool): 
 plotting the progress of the coefficient estimates and the simulated sufficient statistics in real time.
 
-<<results=hide>>=
+<<results='hide'>>=
 
 stergm.fit.1 <- stergm(flobusiness,
 	formation= ~edges+gwesp(0,fixed=T),
@@ -346,7 +337,7 @@ $\Rightarrow$ Lots of output snipped. $\Leftarrow$ \\
 \texttt{== Phase 3: Simulate from the fit and estimate standard errors.==}
 
 First, we should double-check to make sure the fitting went well:
-<<fit1diag, include=FALSE, fig=TRUE, results=hide>>=
+<<fit1diag, include=FALSE, results='hide'>>=
 mcmc.diagnostics(stergm.fit.1)
 @
 
@@ -360,7 +351,7 @@ $\Rightarrow$ Lots of output snipped. $\Leftarrow$\\
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[height=3in]{STERGM-fit1diag}
+\includegraphics[height=3in]{\Sexpr{fig_chunk("fit1diag")}}
 \end{center}
 \end{figure}
 
@@ -398,7 +389,7 @@ functions tailored specifically to the case of dynamic networks in the package \
 
 To illustrate, let us begin with the network that we just created:
 
-<<results=hide>>=
+<<results='hide'>>=
 stergm.sim.1
 @
 
@@ -430,16 +421,9 @@ network.extract(stergm.sim.1,at=429)
 
 For any one of these time points, we can look at the network structure:
 
-<<simex, include=FALSE, fig=TRUE>>=
+<<simex, fig.height=3>>=
 plot(network.extract(stergm.sim.1,at=882))
 @
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[height=3in]{STERGM-simex}
-\end{center}
-\end{figure}
-
 
 How well do the cross-sectional networks within our simulated dynamic network fit the probability distribution implied by our model?  
 We can check by considering the summary statistics for our observed network, and those for our cross-sectional networks.
@@ -451,15 +435,9 @@ colMeans(attributes(stergm.sim.1)$stats)
 
 And we can also easily look at a time series and histogram for each statistic:
 
-<<statsform1, include=FALSE, fig=TRUE>>=
+<<statsform1, fig.height=3>>=
 plot(attributes(stergm.sim.1)$stats)
 @
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[height=3in]{STERGM-statsform1}
-\end{center}
-\end{figure}
 
 We should also check to make sure that our mean duration is what we expect (10 time steps). This requires knowing an additional function: \texttt{as.data.frame}, 
 which, when applied to an object of class \texttt{networkDynamic}, generates a timed edgelist. 
@@ -574,22 +552,13 @@ stergm.sim.2 <- simulate(flobusiness,
 
 Then check the results in terms of cross-sectional network structure and mean relational duration?
 
-<<simform, include=FALSE, fig=TRUE>>=
+<<simform, fig.height=3>>=
 summary(flobusiness~edges+gwesp(0,fixed=T))
 colMeans(attributes(stergm.sim.2)$stats)
 stergm.sim.dm.2 <- as.data.frame(stergm.sim.2)
 mean(stergm.sim.dm.2$duration)
 plot(attributes(stergm.sim.2)$stats)
 @
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[height=3in]{STERGM-simform}
-\end{center}
-\end{figure}
-
-
-
 
 \section{Example 3: Two network cross-sections}
 
@@ -613,7 +582,7 @@ samp[[2]] <- samplk2
 Now we must decide on a model to fit to them.  Plotting one network:
 
 \begin{center}
-<<fig=TRUE>>=
+<<>>=
 plot(samplk1)
 @
 \end{center}
@@ -629,7 +598,7 @@ Because of the different structure of our model, we need to change our arguments
 Moreover, we no longer need the target argument (and it is in fact not allowed for CMLE, since the algorithm automatically targets the sufficient statistics present in each of the two networks).
 In this case, we have no offsets, since there are no coefficients set in either the formation or dissolution model.
 
-<<results=hide>>=
+<<results='hide'>>=
 stergm.fit.3 <- stergm(samp,
 	formation= ~edges+mutual+ctriad+ttriad,
 	dissolution = ~edges+mutual+ctriad+ttriad,
@@ -744,7 +713,7 @@ From trial and error, we know that this model, fit to this relatively large netw
 
 Putting it all together gives us:
 
-<<results=hide>>=
+<<results='hide'>>=
 set.seed(0)
 msm.fit <- stergm(msm.net,
 	formation= msm.form.formula,
@@ -762,13 +731,13 @@ $\Rightarrow$ Lots of output snipped. $\Leftarrow$ \\
 
 Let's first check to make sure it fit well:
 
-<<msmdiag, include=FALSE, fig=TRUE, results=hide>>=
+<<msmdiag, include=FALSE, results='hide'>>=
 mcmc.diagnostics(msm.fit)
 @
 $\Rightarrow$ Lots of output snipped. $\Leftarrow$\\
 \begin{figure}[h]
 \begin{center}
-\includegraphics[height=3in]{STERGM-msmdiag}
+\includegraphics[height=3in]{\Sexpr{fig_chunk("msmdiag")}}
 \end{center}
 \end{figure}
 
@@ -793,17 +762,11 @@ msm.target.stats
 
 Here's another interesting way to look at one aspect of the network structure:
 
-<<msmht, include=FALSE, fig=TRUE>>=
+<<msmht, fig.height=3>>=
 msm.sim.dm <- as.data.frame(msm.sim)
 plot(msm.sim.dm$head,msm.sim.dm$tail)
 @
 
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[height=3in]{STERGM-msmht}
-\end{center}
-\end{figure}
- 
 And relationship length:
 
 <<>>=
