@@ -5,9 +5,16 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  http://statnet.org/attribution
 #
-#  Copyright 2003-2014 Statnet Commons
+#  Copyright 2008-2017 Statnet Commons
 #######################################################################
 
+
+
+#' @describeIn stergm Print the parameter estimates.
+#' 
+#' @param x A \code{\link{stergm}} object.
+#' @param digits Significant digits for coefficients
+#' @export
 print.stergm <- function (x, digits = max(3, getOption("digits") - 3), ...) {
   cat("Formation Coefficients:\n")
   print.default(format(x$formation.fit$coef, digits = digits), print.gap = 2, quote = FALSE)

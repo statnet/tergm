@@ -5,43 +5,32 @@
 %  open source, and has the attribution requirements (GPL Section 7) at
 %  http://statnet.org/attribution
 %
-%  Copyright 2003-2014 Statnet Commons
+%  Copyright 2008-2017 Statnet Commons
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \name{NEWS}
 \title{NEWS file for the \code{\link[=tergm-package]{tergm}} package}
 \encoding{UTF-8}
 
-% When a release is forked, copy the sections to a new release and
-% delete unused sections.
+% When a release is forked, copy the following template to a new release
+% and delete unused sections.
 
-\section{Changes in version 3.4.0}{
+%% \section{Changes in version X.Y.Z}{
    %%  \subsection{NEW FEATURES}{
    %%   \itemize{
    %%   }
      
    %% }
 
-  \subsection{BUG FIXES}{
-    \itemize{
-      \item Miscellaneous bugfixes.
-
-      \item The list of functions exported is now explicitly defined.
-
-      \item \code{\link{robust.inverse}} has been replaced by
-      \code{\link{ginv}}.
-    }
-  }
+  %% \subsection{BUG FIXES}{
+  %%   \itemize{
+  %%   }
+  %% }
 
   % \subsection{OTHER USER-VISIBLE CHANGES}{
   %   \itemize{
   %   }
   % }
 
-  % \subsection{NEW FEATURES}{
-  %   \itemize{
-  %   }
-  % }
-  
   % \subsection{DEPRECATED & DEFUNCT}{
   %   \itemize{
   %   }
@@ -70,7 +59,44 @@
   %     \item ditto.
   %   }
   % }
+%% }
 
+\section{Changes in version 3.4.1}{
+    \subsection{NEW FEATURES}{
+      \itemize{
+	\item Development has been migrated to GitHub.
+      }
+   }
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item Constraint violations in dynamic MCMC are now handled
+      correctly.
+      \item Native C routine registration has been added.
+    }
+  }
+
+  \subsection{OTHER USER-VISIBLE CHANGES}{
+    \itemize{
+      By request from Sam Jennes,
+      \code{\link{stergm.getMCMCsample.slave}} has been split out of
+      \code{\link{stergm.getMCMCsample}} and exported.
+    }
+  }
+}
+
+
+\section{Changes in version 3.4.0}{
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item Miscellaneous bugfixes.
+
+      \item The list of functions exported is now explicitly defined.
+
+      \item \code{\link{robust.inverse}} has been replaced by
+      \code{\link{ginv}}.
+    }
+  }
 }
 
 

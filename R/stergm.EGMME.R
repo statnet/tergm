@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  http://statnet.org/attribution
 #
-#  Copyright 2003-2014 Statnet Commons
+#  Copyright 2008-2017 Statnet Commons
 #######################################################################
 ################################################################################
 # The <stergm> function fits stergms from a specified formation and dissolution
@@ -63,9 +63,9 @@
 #     @&  newnetwork  :  the final network sampled
 #     @&  network    :  the 'nw' inputted to <ergm> via the 'formula'
 #   $     prop.args.form     :  the MHP formation arguments passed to the
-#                               InitMHP rountines
+#                               InitErgmProposal rountines
 #   $     prop.args.diss     :  the MHP dissolution arguments passed to the
-#                               InitMHP rountines
+#                               InitErgmProposal rountines
 #   $     prop.weights.form  :  the method used to allocate probabilities of
 #                               being proposed to dyads in the formation stage,
 #                               as "TNT", "random", "nonobserved", or "default"
@@ -104,9 +104,9 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
     targets <- targets[c(1,3)] # in a formula f<-y~x, f[1]=~, f[2]=y, and f[3]=x
   }
 
-  targets <- ergm.update.formula(targets,nw~., from.new="nw")
-  formation <- ergm.update.formula(formation,nw~., from.new="nw")
-  dissolution <- ergm.update.formula(dissolution,nw~., from.new="nw")
+  targets <- nonsimp_update.formula(targets,nw~., from.new="nw")
+  formation <- nonsimp_update.formula(formation,nw~., from.new="nw")
+  dissolution <- nonsimp_update.formula(dissolution,nw~., from.new="nw")
 
   # target formula should not have offsets. removing them
   if (any(offset.info.formula(targets)$term)) {
@@ -148,7 +148,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
                 control=control$SAN.control,
                 constraints=constraints,
                 verbose=verbose))
-        targets<-ergm.update.formula(targets,nw~., from.new="nw")
+        targets<-nonsimp_update.formula(targets,nw~., from.new="nw")
         nw.stats <- summary(targets)
         srun <- srun + 1
         if(verbose){
@@ -169,21 +169,21 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
     if(inherits(newnw,"try-error")){
       cat("SAN failed or is not applicable. Increase burn-in if there are problems.\n")
     }else nw <- newnw
-    formation <- ergm.update.formula(formation,nw~., from.new="nw")
-    dissolution <- ergm.update.formula(dissolution,nw~., from.new="nw")
+    formation <- nonsimp_update.formula(formation,nw~., from.new="nw")
+    dissolution <- nonsimp_update.formula(dissolution,nw~., from.new="nw")
   }
 
   if (verbose) cat("Initializing Metropolis-Hastings proposals.\n")
-  MHproposal.form <- MHproposal(constraints, weights=control$MCMC.prop.weights.form, control$MCMC.prop.args.form, nw, class="f")
-  MHproposal.diss <- MHproposal(constraints, weights=control$MCMC.prop.weights.diss, control$MCMC.prop.args.diss, nw, class="d")
+  proposal.form <- ergm_proposal(constraints, weights=control$MCMC.prop.weights.form, control$MCMC.prop.args.form, nw, class="f")
+  proposal.diss <- ergm_proposal(constraints, weights=control$MCMC.prop.weights.diss, control$MCMC.prop.args.diss, nw, class="d")
 
-  if(!is.dyad.independent(MHproposal.form$arguments$constraints) || !is.dyad.independent(MHproposal.diss$arguments$constraints)){
+  if(!is.dyad.independent(proposal.form$arguments$constraints) || !is.dyad.independent(proposal.diss$arguments$constraints)){
     warning("Dyad-dependent constraint imposed. Note that the constraint is applied to the post-formation and post-dissolution networks y+ and y-, not the next time-step's network. This behavior may change in the future.")
   }
   
-  model.form <- ergm.getmodel(formation, nw, expanded=TRUE, role="formation")
-  model.diss <- ergm.getmodel(dissolution, nw, expanded=TRUE, role="dissolution")
-  model.mon <- ergm.getmodel(targets, nw, expanded=TRUE, role="target")
+  model.form <- ergm_model(formation, nw, expanded=TRUE, role="formation")
+  model.diss <- ergm_model(dissolution, nw, expanded=TRUE, role="dissolution")
+  model.mon <- ergm_model(targets, nw, expanded=TRUE, role="target")
 
   if(any(model.form$etamap$canonical==0) || any(model.diss$etamap$canonical==0) || any(model.mon$etamap$canonical==0)) stop("Equilibrium GMME for models based on curved ERGMs is not supported at this time.")
 
@@ -232,8 +232,8 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
   Cout <- switch(control$EGMME.main.method,
                  "Gradient-Descent" = stergm.EGMME.GD(initialfit$formation.fit$coef,
                    initialfit$dissolution.fit$coef, nw, model.form, model.diss, model.mon,
-                   control=control, MHproposal.form=MHproposal.form,
-                   MHproposal.diss=MHproposal.diss, cl=cl,
+                   control=control, proposal.form=proposal.form,
+                   proposal.diss=proposal.diss, cl=cl,
                   verbose),
                  stop("Method ", control$EGMME.main.method, " is not implemented.")
                 )

@@ -5,10 +5,14 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  http://statnet.org/attribution
 #
-#  Copyright 2003-2014 Statnet Commons
+#  Copyright 2008-2017 Statnet Commons
 #######################################################################
 # Summary function for STERGM fits.
 
+#' @describeIn stergm Print the summary of the formation and the
+#'   dissolution model fits.
+#' @aliases print.summary.stergm
+#' @export
 summary.stergm <- function (object, ...){
   out<-list(formation=summary(object$formation.fit,...),
             dissolution=summary(object$dissolution.fit,...))
@@ -16,6 +20,8 @@ summary.stergm <- function (object, ...){
   out
 }
 
+#' @noRd
+#' @export
 print.summary.stergm <- function(x, ...){
   cat("\n==============================\n")
     cat("Summary of formation model fit \n")
@@ -27,7 +33,8 @@ print.summary.stergm <- function(x, ...){
   print(f, showEnv=FALSE)
   cat("\n")
 
-  print.summary.ergm(x$formation, ..., print.header=FALSE, print.formula=FALSE, print.degeneracy=FALSE, print.drop=FALSE, print.deviances=x$formation$estimate!="EGMME")
+  #' @importFrom utils getS3method
+  getS3method("print","summary.ergm")(x$formation, ..., print.header=FALSE, print.formula=FALSE, print.degeneracy=FALSE, print.drop=FALSE, print.deviances=x$formation$estimate!="EGMME")
 
   cat("\n================================\n")
     cat("Summary of dissolution model fit\n")
@@ -39,6 +46,6 @@ print.summary.stergm <- function(x, ...){
   print(f, showEnv=FALSE)
   cat("\n")
 
-  print.summary.ergm(x$dissolution, ..., print.header=FALSE, print.formula=FALSE, print.degeneracy=FALSE, print.drop=FALSE, print.deviances=x$formation$estimate!="EGMME")
+  getS3method("print","summary.ergm")(x$dissolution, ..., print.header=FALSE, print.formula=FALSE, print.degeneracy=FALSE, print.drop=FALSE, print.deviances=x$formation$estimate!="EGMME")
 
 }

@@ -5,7 +5,7 @@
 %  open source, and has the attribution requirements (GPL Section 7) at
 %  http://statnet.org/attribution
 %
-%  Copyright 2003-2014 Statnet Commons
+%  Copyright 2008-2017 Statnet Commons
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \name{ergm-terms}
 \alias{ergm-terms}
@@ -41,7 +41,7 @@
   infer the terms that do. More concretely, they may appear in
   \code{targets=} or \code{monitor=} formulas of
   \code{\link{stergm}}, \code{\link{simulate.stergm}}, or
-  \code{\link[ergm]{summary}} (with an ERGM formula), but they may
+  \code{\link[ergm]{summary.formula}} (with an ERGM formula), but they may
   not appear in their \code{\link[=stergm]{formation=}} and
   \code{\link[=stergm]{dissolution=}} formulas. These terms are marked with
   "(target-only)".

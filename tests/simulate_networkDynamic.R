@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  http://statnet.org/attribution
 #
-#  Copyright 2003-2014 Statnet Commons
+#  Copyright 2008-2017 Statnet Commons
 #######################################################################
 library(tergm)
 
@@ -192,7 +192,7 @@ if (!all(get.change.times(msm.sim)==0:3)){
 dyn<-as.networkDynamic(network.initialize(4))
 deactivate.vertices(dyn,v=1)
 # define stergm that should toggle on all ties
-changes<-simulate.networkDynamic(dyn,formation=~edges,dissolution=~edges,coef.form=1,coef.diss=0,output='changes')
+changes<-simulate(dyn,formation=~edges,dissolution=~edges,coef.form=1,coef.diss=0,output='changes')
 # check if any changes involve vertex 1 (shouldn't because it is inactive)
 if(any(changes[,2:3]==1)){
   stop("simulate.networkDynamic returned changes involving an inactive vertex" )

@@ -1,15 +1,15 @@
-#  File R/InitConstraint.R in package tergm, part of the Statnet suite
+#  File R/InitErgmConstraint.R in package tergm, part of the Statnet suite
 #  of packages for network analysis, http://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  http://statnet.org/attribution
 #
-#  Copyright 2003-2014 Statnet Commons
+#  Copyright 2008-2017 Statnet Commons
 #######################################################################
 #============================================================================
 # This file contains the following 12 functions for initializing empty
-# constraint lists (each prependend with "InitConstraint")
+# constraint lists (each prependend with "InitErgmConstraint")
 #         <edges>                   <outdegreedist>
 #         <degrees>=<nodedegrees>   <bd>
 #         <degreesTetrad>           <indegrees>
@@ -19,7 +19,7 @@
 #============================================================================
 
 ##########################################################################################
-# Each of the <InitConstraint.X> functions accepts an existing constraint list, 'conlist',
+# Each of the <InitErgmConstraint.X> functions accepts an existing constraint list, 'conlist',
 # and to this adds an empty constraint list for term X; if any arguments are passed besides
 # 'conlist", execution will halt.
 #
@@ -31,28 +31,22 @@
 #
 ##########################################################################################
 
-InitConstraint.atleast<-function(conlist, lhs.nw, nw=NULL, ...){
+InitErgmConstraint.atleast<-function(lhs.nw, nw=NULL, ...){
   if(is.null(nw)) stop("Formation constraint ``atleast'' requires a baseline network.",call.=FALSE)
   if(network.naedgecount(nw)) stop("Baseline network passed to formation constraint ``atleast'' may not have missing dyads.")
-  conlist$atleast<-list(nw=nw)
-
-  conlist$atleast$free.dyads <- function(){
-    standardize.network(!nw) # invert and standardize the network
-  }
-
-  conlist
+  list(
+    nw=nw,
+    free_dyads = !as.rlebdm(nw),
+    dependence = FALSE
+  )
 }
-#ergm.ConstraintImplications("atleast", c())
 
-InitConstraint.atmost<-function(conlist, lhs.nw, nw=NULL, ...){
+InitErgmConstraint.atmost<-function(lhs.nw, nw=NULL, ...){
   if(is.null(nw)) stop("Dissolution constraint ``atmost'' requires a baseline network.",call.=FALSE)
   if(network.naedgecount(nw)) stop("Baseline network passed to dissolution constraint ``atmost'' may not have missing dyads.")
-  conlist$atmost<-list(nw=nw)
-
-  conlist$atmost$free.dyads <- function(){
-    standardize.network(nw)
-  }
-
-  conlist
+  list(
+    nw = nw,
+    free_dyads = as.rlebdm(nw),
+    dependence = FALSE
+  )
 }
-#ergm.ConstraintImplications("atmost", c())

@@ -5,7 +5,7 @@
 %  open source, and has the attribution requirements (GPL Section 7) at
 %  http://statnet.org/attribution
 %
-%  Copyright 2003-2014 Statnet Commons
+%  Copyright 2008-2017 Statnet Commons
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \name{ergm-constraints}
 \alias{ergm-constraints}
@@ -13,8 +13,8 @@
 \alias{ergm.constraints}
 \alias{constraints.ergm}
 
-\alias{InitConstraint.atleast}
-\alias{InitConstraint.atmost}
+\alias{InitErgmConstraint.atleast}
+\alias{InitErgmConstraint.atmost}
 
 \docType{methods}
 

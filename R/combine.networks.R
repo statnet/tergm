@@ -5,29 +5,8 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  http://statnet.org/attribution
 #
-#  Copyright 2003-2014 Statnet Commons
+#  Copyright 2008-2017 Statnet Commons
 #######################################################################
-
-#' Test if all items in a vector or a list are identical.
-#'
-#' @param x a vector or a list
-#'
-#' @return `TRUE` if all elements of `x` are identical to each other.
-#'
-#' @seealso [base::identical()]
-#'
-#' @examples
-#'
-#' stopifnot(!all.same(1:3))
-#'
-#' stopifnot(all.same(list("a", "a", "a")))
-
-all.same <- function(x){
-  if(length(x)==0) return(TRUE)
-  v0 <- x[1]
-  for(v in x[-1]) if(!identical(v0,v)) return(FALSE)
-  return(TRUE)
-}
 
 #' A single block-diagonal network created by combining multiple networks
 #'
@@ -117,7 +96,6 @@ all.same <- function(x){
 #' image(as.matrix(f1))
 #' head(get.vertex.attribute(f1, ".NetworkID"))
 #' head(get.vertex.attribute(f1, ".NetworkName"))
-#' @export
 combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockID.vattr=".NetworkID", blockName.vattr=NULL, detect.edgecov=FALSE, standardized=FALSE, keep.unshared.attr=FALSE){
   if(any(sapply(nwl, is.bipartite))) .combine.networks.bipartite(nwl=nwl, ignore.nattr=ignore.nattr, ignore.vattr=ignore.vattr, ignore.eattr=ignore.eattr, blockID.vattr=blockID.vattr, blockName.vattr=blockName.vattr, detect.edgecov=detect.edgecov, standardized=standardized, keep.unshared.attr=keep.unshared.attr)
   else .combine.networks.unipartite(nwl=nwl, ignore.nattr=ignore.nattr, ignore.vattr=ignore.vattr, ignore.eattr=ignore.eattr, blockID.vattr=blockID.vattr, blockName.vattr=blockName.vattr, detect.edgecov=detect.edgecov, standardized=standardized, keep.unshared.attr=keep.unshared.attr)
@@ -147,7 +125,7 @@ combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper",
        && all(sapply(vl, is.matrix))
        && all(sapply(vl, nrow)==ns)
        && all(sapply(vl, ncol)==ns)
-       && all.same(sapply(vl, mode))){
+       && all_identical(sapply(vl, mode))){
 
       # A logical vector that extracts off-diagonal element of the ns*ns matrix.
 
@@ -253,7 +231,7 @@ combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper",
        && all(sapply(vl, is.matrix))
        && all(sapply(vl, nrow)==es)
        && all(sapply(vl, ncol)==ns-es)
-       && all.same(sapply(vl, mode))){
+       && all_identical(sapply(vl, mode))){
 
       # It doesn't matter what the "filler" elements are, as long as
       # adding them doesn't add another category and it's not NA. So,

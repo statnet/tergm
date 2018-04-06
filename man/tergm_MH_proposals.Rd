@@ -1,26 +1,26 @@
-\name{tergm_MH_proposals}
-\alias{tergm_MH_proposals}
-\alias{InitMHP}
-\alias{InitMHP.dissolution}
-\alias{InitMHP.dissolutionTNT}
-\alias{InitMHP.dissolutionMLE}
-\alias{InitMHP.dissolutionNonObservedMLE}
-\alias{InitMHP.formation}
-\alias{InitMHP.formationMLE}
-\alias{InitMHP.formationMLETNT}
-\alias{InitMHP.formationNonObservedMLE}
-\alias{InitMHP.formationTNT}
-\alias{InitMHP.dissolutionMLEblockdiag}
-\alias{InitMHP.dissolutionNonObservedMLEblockdiag}
-\alias{InitMHP.formationMLEblockdiag}
-\alias{InitMHP.formationMLEblockdiagTNT}
-\alias{InitMHP.formationNonObservedMLEblockdiag}
-\alias{InitMHP.dissolutionMLETNT}
-\alias{InitMHP.dissolutionMLEblockdiagTNT}
-\alias{InitMHP.dissolutionNonObservedMLETNT}
-\alias{InitMHP.dissolutionNonObservedMLEblockdiagTNT}
-\alias{InitMHP.formationNonObservedMLETNT}
-\alias{InitMHP.formationNonObservedMLEblockdiagTNT}
+\name{tergm_proposals}
+\alias{tergm_proposals}
+\alias{InitErgmProposal}
+\alias{InitErgmProposal.dissolution}
+\alias{InitErgmProposal.dissolutionTNT}
+\alias{InitErgmProposal.dissolutionMLE}
+\alias{InitErgmProposal.dissolutionNonObservedMLE}
+\alias{InitErgmProposal.formation}
+\alias{InitErgmProposal.formationMLE}
+\alias{InitErgmProposal.formationMLETNT}
+\alias{InitErgmProposal.formationNonObservedMLE}
+\alias{InitErgmProposal.formationTNT}
+\alias{InitErgmProposal.dissolutionMLEblockdiag}
+\alias{InitErgmProposal.dissolutionNonObservedMLEblockdiag}
+\alias{InitErgmProposal.formationMLEblockdiag}
+\alias{InitErgmProposal.formationMLEblockdiagTNT}
+\alias{InitErgmProposal.formationNonObservedMLEblockdiag}
+\alias{InitErgmProposal.dissolutionMLETNT}
+\alias{InitErgmProposal.dissolutionMLEblockdiagTNT}
+\alias{InitErgmProposal.dissolutionNonObservedMLETNT}
+\alias{InitErgmProposal.dissolutionNonObservedMLEblockdiagTNT}
+\alias{InitErgmProposal.formationNonObservedMLETNT}
+\alias{InitErgmProposal.formationNonObservedMLEblockdiagTNT}
 
 
 
@@ -37,33 +37,33 @@
 
   TODO: EXPLAIN TERGM PROPOSAL TYPES HERE
   \itemize{
-    \item{InitMHP.dissolution}{}
-    \item{InitMHP.dissolutionTNT}{}
-    \item{InitMHP.dissolutionMLE}{}
-    \item{InitMHP.dissolutionNonObservedMLE}{}
-    \item{InitMHP.formation}{}
-    \item{InitMHP.formationMLE}{}
-    \item{InitMHP.formationMLETNT}{}
-    \item{InitMHP.formationNonObservedMLE}{}
-    \item{InitMHP.formationTNT}{}
-    \item{InitMHP.dissolutionMLEblockdiag}{}
-    \item{InitMHP.dissolutionNonObservedMLEblockdiag}{}
-    \item{InitMHP.formationMLEblockdiag}{}
-    \item{InitMHP.formationMLEblockdiagTNT}{}
-    \item{InitMHP.formationNonObservedMLEblockdiag}{}
-    \item{InitMHP.dissolutionMLETNT}{}
-    \item{InitMHP.dissolutionMLEblockdiagTNT}{}
-    \item{InitMHP.dissolutionNonObservedMLETNT}{}
-    \item{InitMHP.dissolutionNonObservedMLEblockdiagTNT}{}
-    \item{InitMHP.formationNonObservedMLETNT}{}
-    \item{InitMHP.formationNonObservedMLEblockdiagTNT}{}
+    \item{InitErgmProposal.dissolution}{}
+    \item{InitErgmProposal.dissolutionTNT}{}
+    \item{InitErgmProposal.dissolutionMLE}{}
+    \item{InitErgmProposal.dissolutionNonObservedMLE}{}
+    \item{InitErgmProposal.formation}{}
+    \item{InitErgmProposal.formationMLE}{}
+    \item{InitErgmProposal.formationMLETNT}{}
+    \item{InitErgmProposal.formationNonObservedMLE}{}
+    \item{InitErgmProposal.formationTNT}{}
+    \item{InitErgmProposal.dissolutionMLEblockdiag}{}
+    \item{InitErgmProposal.dissolutionNonObservedMLEblockdiag}{}
+    \item{InitErgmProposal.formationMLEblockdiag}{}
+    \item{InitErgmProposal.formationMLEblockdiagTNT}{}
+    \item{InitErgmProposal.formationNonObservedMLEblockdiag}{}
+    \item{InitErgmProposal.dissolutionMLETNT}{}
+    \item{InitErgmProposal.dissolutionMLEblockdiagTNT}{}
+    \item{InitErgmProposal.dissolutionNonObservedMLETNT}{}
+    \item{InitErgmProposal.dissolutionNonObservedMLEblockdiagTNT}{}
+    \item{InitErgmProposal.formationNonObservedMLETNT}{}
+    \item{InitErgmProposal.formationNonObservedMLEblockdiagTNT}{}
    }
     
 }
 
 }
 
-\seealso{\code{\link[=tergm-package]{tergm}} package, \code{\link{ergm}}, \code{\link{ergm-constraints}}, and ergm's  \code{\link[ergm]{MHproposal}} help page}
+\seealso{\code{\link[=tergm-package]{tergm}} package, \code{\link{ergm}}, \code{\link{ergm-constraints}}, and ergm's  \code{\link[ergm]{ergm_proposal}} help page}
 
 
 \references{

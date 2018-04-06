@@ -5,10 +5,10 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  http://statnet.org/attribution
 #
-#  Copyright 2003-2014 Statnet Commons
+#  Copyright 2008-2017 Statnet Commons
 #######################################################################
 stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss, model.mon,
-                            control, MHproposal.form, MHproposal.diss, eval.optpars, cl=cl,
+                            control, proposal.form, proposal.diss, eval.optpars, cl=cl,
                             verbose=FALSE){
 
   ###### Set the constants and convenience variables. ######
@@ -45,11 +45,11 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       # is the state of the optimization, so giving clusterApply a
       # list of states will call it for each thread's state.
       if(verbose) {cat("Calling stergm.EGMME.SA.Phase2.C:\n"); print(gc())}
-      out <- parallel::clusterApply(cl, states, stergm.EGMME.SA.Phase2.C, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, control, verbose=verbose)
+      out <- parallel::clusterApply(cl, states, stergm.EGMME.SA.Phase2.C, model.form, model.diss, model.mon, proposal.form, proposal.diss, control, verbose=verbose)
       if(verbose) print(gc())
       out
     }else{
-      list(stergm.EGMME.SA.Phase2.C(states[[1]], model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, control, verbose=verbose))
+      list(stergm.EGMME.SA.Phase2.C(states[[1]], model.form, model.diss, model.mon, proposal.form, proposal.diss, control, verbose=verbose))
     }
     if(verbose) cat("Finished. Extracting.\n")
     for(i in seq_along(states)){
@@ -123,7 +123,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       thin <- (nrow(oh)-1)%/%(control$SA.max.plot.points/length(states)) + 1
       cols <- floor(sqrt(ncol(oh)))
       layout <- c(cols,ceiling(ncol(oh)/cols))
-      
+
+      #' @importFrom coda mcmc.list
       suppressWarnings(print(lattice::xyplot(window(do.call(mcmc.list,by(as.data.frame(oh),INDICES=list(tid=tid),mcmc,start=min.ind.keep)), thin=thin), panel = function(...) {lattice::panel.xyplot(...);lattice::panel.abline(0, 0)}, as.table = TRUE, layout = layout, xlab=NULL)))
     }
     
@@ -168,6 +169,8 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
     c(solve(t(x)%*%w%*%x)%*%t(x)%*%w%*%y)
   }
+
+  #' @importFrom MASS ginv
 
   V.sandwich <- function(w, G, V.stat=ginv(w)){
     solve(t(G)%*%w%*%G)%*%t(G)%*%w%*%V.stat%*%w%*%G%*%solve(t(G)%*%w%*%G)
@@ -220,11 +223,11 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     zs <- if(!is.null(cl)){
       requireNamespace('parallel')
       if(verbose) {cat("Calling stergm.getMCMCsample:\n"); print(gc())}
-      out <- parallel::clusterApply(cl, seq_along(states), function(i) stergm.getMCMCsample(states[[i]]$nw, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, states[[i]]$eta.form, states[[i]]$eta.diss, control.phase1, verbose))
+      out <- parallel::clusterApply(cl, seq_along(states), function(i) stergm.getMCMCsample(states[[i]]$nw, model.form, model.diss, model.mon, proposal.form, proposal.diss, states[[i]]$eta.form, states[[i]]$eta.diss, control.phase1, verbose))
       if(verbose) print(gc())
       out
     }else{
-      list(stergm.getMCMCsample(states[[1]]$nw, model.form, model.diss, model.mon, MHproposal.form, MHproposal.diss, states[[1]]$eta.form, states[[1]]$eta.diss, control.phase1, verbose))
+      list(stergm.getMCMCsample(states[[1]]$nw, model.form, model.diss, model.mon, proposal.form, proposal.diss, states[[1]]$eta.form, states[[1]]$eta.diss, control.phase1, verbose))
     }
     
     cat("Done.\n")
@@ -358,6 +361,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 
         for(thread in unique(t)) i[t==thread] <- rank(i[t==thread])
 
+        #' @importFrom nlme gls corAR1
         fit.2 <- try(summary(gls(y~x,correlation=corAR1(form=~i|t)))$tTable[2,c(1,4)])
 
          if(!inherits(p.val.1, "try-error") && !inherits(fit.2, "try-error")){
@@ -447,7 +451,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       drop <- apply(is.na(nlin.coef),1,any)
       nlin.coef <- nlin.coef[nlin.totest & !drop,,drop=FALSE]
       nlin.nfs <- nlin.nfs[nlin.totest & !drop,,drop=FALSE]
-      nlin.vcov <- t(nlin.vcov[nlin.totest[!drop],nlin.totest[!drop],drop=FALSE]*sqrt(c(nlin.nfs)))*sqrt(c(nlin.nfs))
+      nlin.vcov <- t(nlin.vcov[nlin.totest & !drop, nlin.totest & !drop, drop=FALSE]*sqrt(c(nlin.nfs)))*sqrt(c(nlin.nfs))
       chi2 <- mahalanobis(c(nlin.coef),0,ginv(nlin.vcov),inverted=TRUE)
 
       p.val.1 <- pchisq(chi2, length(nlin.coef), lower.tail=FALSE)
@@ -565,7 +569,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
 }
 
 stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
-                             MHproposal.form, MHproposal.diss, control, verbose) {
+                             proposal.form, proposal.diss, control, verbose) {
   Clist.form <- ergm.Cprepare(state$nw, model.form)
   Clist.diss <- ergm.Cprepare(state$nw, model.diss)
   Clist.mon <- ergm.Cprepare(state$nw, model.mon)
@@ -586,11 +590,11 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
             as.integer(Clist.form$dir), as.integer(Clist.form$bipartite),
             # Formation terms and proposals. 
             as.integer(Clist.form$nterms), as.character(Clist.form$fnamestring), as.character(Clist.form$snamestring),
-            as.character(MHproposal.form$name), as.character(MHproposal.form$pkgname),
+            as.character(proposal.form$name), as.character(proposal.form$pkgname),
             as.double(Clist.form$inputs),
             # Dissolution terms and proposals. 
             as.integer(Clist.diss$nterms), as.character(Clist.diss$fnamestring), as.character(Clist.diss$snamestring),
-            as.character(MHproposal.diss$name), as.character(MHproposal.diss$pkgname),
+            as.character(proposal.diss$name), as.character(proposal.diss$pkgname),
             as.double(Clist.diss$inputs),
             # Parameter fitting.
             eta=as.double(c(eta.form, eta.diss)),
@@ -603,10 +607,10 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
             as.double(control$dev.guard),
             as.double(control$par.guard),
             # Degree bounds.
-            as.integer(MHproposal.form$arguments$constraints$bd$attribs), 
-            as.integer(MHproposal.form$arguments$constraints$bd$maxout), as.integer(MHproposal.form$arguments$constraints$bd$maxin),
-            as.integer(MHproposal.form$arguments$constraints$bd$minout), as.integer(MHproposal.form$arguments$constraints$bd$minin),
-            as.integer(MHproposal.form$arguments$constraints$bd$condAllDegExact), as.integer(length(MHproposal.form$arguments$constraints$bd$attribs)), 
+            as.integer(proposal.form$arguments$constraints$bd$attribs), 
+            as.integer(proposal.form$arguments$constraints$bd$maxout), as.integer(proposal.form$arguments$constraints$bd$maxin),
+            as.integer(proposal.form$arguments$constraints$bd$minout), as.integer(proposal.form$arguments$constraints$bd$minin),
+            as.integer(proposal.form$arguments$constraints$bd$condAllDegExact), as.integer(length(proposal.form$arguments$constraints$bd$attribs)), 
             # MCMC settings.              
             as.integer(control$SA.burnin),
             as.integer(control$SA.interval),
