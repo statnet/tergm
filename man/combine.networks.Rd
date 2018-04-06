@@ -82,15 +82,15 @@ preserved.
 
 data(samplk)
 
-o1 <- combine.networks(list(samplk1, samplk2, samplk3))
+o1 <- tergm:::combine.networks(list(samplk1, samplk2, samplk3))
 image(as.matrix(o1))
 head(get.vertex.attribute(o1, ".NetworkID"))
-o2 <- combine.networks(list(o1, o1))
+o2 <- tergm:::combine.networks(list(o1, o1))
 image(as.matrix(o2))
 head(get.vertex.attribute(o2, ".NetworkID", unlist=FALSE))
 
 data(florentine)
-f1 <- combine.networks(list(business=flobusiness, marriage=flomarriage), blockName.vattr=".NetworkName") 
+f1 <- tergm:::combine.networks(list(business=flobusiness, marriage=flomarriage), blockName.vattr=".NetworkName") 
 image(as.matrix(f1))
 head(get.vertex.attribute(f1, ".NetworkID"))
 head(get.vertex.attribute(f1, ".NetworkName"))

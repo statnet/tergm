@@ -24,7 +24,7 @@ yl <- replicate(T,
                 },
                 simplify=FALSE)
 
-yc <- combine.networks(yl, detect.edgecov=TRUE)
+yc <- tergm:::combine.networks(yl, detect.edgecov=TRUE)
 ym <- as.matrix(yc)
 
 for(t in seq_len(T)){
@@ -52,7 +52,7 @@ yl <- replicate(T,
                 },
                 simplify=FALSE)
 
-yc <- combine.networks(yl, detect.edgecov=TRUE)
+yc <- tergm:::combine.networks(yl, detect.edgecov=TRUE)
 stopifnot(identical(yc%n%"bipartite",T*m))
 
 ym <- as.matrix(yc)
