@@ -17,11 +17,12 @@ Authors@R: c(
 LinkingTo: ergm
 Depends: ergm (>= 3.9), network (>= 1.13), networkDynamic (>= 0.8.1)
 Imports: robustbase (>= 0.9-10), coda, nlme, MASS, statnet.common (>= 4.1.0)
-Suggests: lattice, parallel
+Suggests: lattice, parallel, rmarkdown, knitr
 BugReports: https://github.com/statnet/tergm/issues
 Description: An integrated set of extensions to the 'ergm' package to analyze and simulate network evolution based on exponential-family random graph models (ERGM). 'tergm' is a part of the 'statnet' suite of packages for network analysis.
 License: GPL-3 + file LICENSE
 URL: http://www.statnet.org
+VignetteBuilder: rmarkdown, knitr
 RoxygenNote: 6.0.1.9000
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
