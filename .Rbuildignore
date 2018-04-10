@@ -5,5 +5,7 @@
 .travis.yml
 appveyor.yml
 .gdb_history
+Rplots.pdf
 ^vignettes/cache/
 ^vignettes/figure/
+^vignettes/*.tex
