@@ -34,7 +34,7 @@ options(width=60)
 % \VignetteIndexEntry{STERGM Vignette}
 % \VignetteEngine{knitr::knitr}
 
-<<echo=FALSE>>=
+<<echo=FALSE,message=FALSE>>=
 library('tergm')
 @
 
@@ -435,8 +435,8 @@ colMeans(attributes(stergm.sim.1)$stats)
 
 And we can also easily look at a time series and histogram for each statistic:
 
-<<statsform1, fig.height=3>>=
-plot(attributes(stergm.sim.1)$stats)
+<<statsform1, fig.height=6>>=
+plot(attr(stergm.sim.1,"stats"))
 @
 
 We should also check to make sure that our mean duration is what we expect (10 time steps). This requires knowing an additional function: \texttt{as.data.frame}, 
@@ -552,12 +552,12 @@ stergm.sim.2 <- simulate(flobusiness,
 
 Then check the results in terms of cross-sectional network structure and mean relational duration?
 
-<<simform, fig.height=3>>=
+<<simform, fig.height=6>>=
 summary(flobusiness~edges+gwesp(0,fixed=T))
 colMeans(attributes(stergm.sim.2)$stats)
 stergm.sim.dm.2 <- as.data.frame(stergm.sim.2)
 mean(stergm.sim.dm.2$duration)
-plot(attributes(stergm.sim.2)$stats)
+plot(attr(stergm.sim.2, "stats"))
 @
 
 \section{Example 3: Two network cross-sections}
