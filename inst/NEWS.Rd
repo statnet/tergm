@@ -78,9 +78,9 @@
 
   \subsection{OTHER USER-VISIBLE CHANGES}{
     \itemize{
-      By request from Sam Jennes,
-      \code{\link{stergm.getMCMCsample.slave}} has been split out of
-      \code{\link{stergm.getMCMCsample}} and exported.
+      \item By request from Sam Jennes,
+	\code{\link{stergm.getMCMCsample.slave}} has been split out of
+	\code{\link{stergm.getMCMCsample}} and exported.
     }
   }
 }
