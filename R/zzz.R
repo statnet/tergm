@@ -7,7 +7,7 @@
 #
 #  Copyright 2008-2017 Statnet Commons
 #######################################################################
-#' @import statnet.common
+#' @importFrom statnet.common statnetStartupMessage NVL all_identical append_rhs.formula check.control.class nonsimp_update.formula paste.and set.control.class term.list.formula vector.namesmatch
 .onAttach <- function(lib, pkg){
   sm <- statnetStartupMessage("tergm", c("statnet"), FALSE)
   if(!is.null(sm)) packageStartupMessage(sm)
