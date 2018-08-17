@@ -372,7 +372,7 @@ desired cross-sectional structure and mean relational duration.  This ability se
 areas that requires us to simulate phenomena on dynamic networks, whether they entail the diffusion of information or disease, or some other process.  
 
 <<>>=
-stergm.sim.1 <- simulate.stergm(stergm.fit.1, nsim=1, 
+stergm.sim.1 <- simulate(stergm.fit.1, nsim=1, 
     time.slices = 1000)
 @
 
