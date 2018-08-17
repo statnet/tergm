@@ -9,9 +9,10 @@ Random Graph Model}
 \usage{
 \method{simulate}{stergm}(object, nsim = 1, seed = NULL,
   coef.form = object$formation.fit$coef,
-  coef.diss = object$dissolution.fit$coef, constraints = object$constraints,
-  monitor = object$targets, time.slices = 1, time.start = NULL,
-  time.burnin = 0, time.interval = 1, control = control.simulate.stergm(),
+  coef.diss = object$dissolution.fit$coef,
+  constraints = object$constraints, monitor = object$targets,
+  time.slices = 1, time.start = NULL, time.burnin = 0,
+  time.interval = 1, control = control.simulate.stergm(),
   statsonly = NULL, output = c("networkDynamic", "stats", "changes",
   "final"), nw.start = NULL, stats.form = FALSE, stats.diss = FALSE,
   duration.dependent = NULL, verbose = FALSE, ...)
@@ -29,11 +30,13 @@ Random Graph Model}
   formation = attr(object, "formation"), dissolution = attr(object,
   "dissolution"), coef.form = attr(object, "coef.form"),
   coef.diss = attr(object, "coef.diss"), constraints = NVL(attr(object,
-  "constraints"), ~.), monitor = attr(object, "monitor"), time.slices = 1,
-  time.start = NULL, time.burnin = 0, time.interval = 1,
-  time.offset = 1, control = control.simulate.network(), statsonly = NULL,
+  "constraints"), ~.), monitor = attr(object, "monitor"),
+  time.slices = 1, time.start = NULL, time.burnin = 0,
+  time.interval = 1, time.offset = 1,
+  control = control.simulate.network(), statsonly = NULL,
   output = c("networkDynamic", "stats", "changes"), stats.form = FALSE,
-  stats.diss = FALSE, duration.dependent = NULL, verbose = FALSE, ...)
+  stats.diss = FALSE, duration.dependent = NULL, verbose = FALSE,
+  ...)
 }
 \arguments{
 \item{object}{an object of type \code{\link{stergm}} giving a model fit or

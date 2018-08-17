@@ -6,9 +6,11 @@
 \title{A \code{\link{logLik}} method for \code{\link[=ergm.object]{stergm}}.}
 \usage{
 \method{logLik}{stergm}(object, add = FALSE, force.reeval = FALSE,
-  eval.loglik = add || force.reeval, control = control.logLik.stergm(), ...)
+  eval.loglik = add || force.reeval, control = control.logLik.stergm(),
+  ...)
 
-\method{logLikNull}{stergm}(object, control = control.logLik.stergm(), ...)
+\method{logLikNull}{stergm}(object, control = control.logLik.stergm(),
+  ...)
 }
 \arguments{
 \item{object}{A \code{\link{stergm}} fit, returned by

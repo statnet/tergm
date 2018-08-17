@@ -223,11 +223,11 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     zs <- if(!is.null(cl)){
       requireNamespace('parallel')
       if(verbose) {cat("Calling stergm.getMCMCsample:\n"); print(gc())}
-      out <- parallel::clusterApply(cl, seq_along(states), function(i) stergm.getMCMCsample(states[[i]]$nw, model.form, model.diss, model.mon, proposal.form, proposal.diss, states[[i]]$eta.form, states[[i]]$eta.diss, control.phase1, verbose))
+      out <- parallel::clusterApply(cl, seq_along(states), function(i) stergm_MCMC_sample(states[[i]]$nw, model.form, model.diss, model.mon, proposal.form, proposal.diss, eta.form=states[[i]]$eta.form, eta.diss=states[[i]]$eta.diss, control=control.phase1, verbose=verbose))
       if(verbose) print(gc())
       out
     }else{
-      list(stergm.getMCMCsample(states[[1]]$nw, model.form, model.diss, model.mon, proposal.form, proposal.diss, states[[1]]$eta.form, states[[1]]$eta.diss, control.phase1, verbose))
+      list(stergm_MCMC_sample(states[[1]]$nw, model.form, model.diss, model.mon, proposal.form, proposal.diss, eta.form=states[[1]]$eta.form, eta.diss=states[[1]]$eta.diss, control=control.phase1, verbose=verbose))
     }
     
     cat("Done.\n")

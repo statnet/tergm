@@ -1,5 +1,5 @@
 Package: tergm
-Version: 3.5.0-1615
+Version: 3.5.0-1616
 Date: 2018-07-22
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
@@ -23,6 +23,37 @@ Description: An integrated set of extensions to the 'ergm' package to analyze an
 License: GPL-3 + file LICENSE
 URL: http://www.statnet.org
 VignetteBuilder: rmarkdown, knitr
-RoxygenNote: 6.0.1.9000
+RoxygenNote: 6.1.0
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
+Collate: 
+    'InitConstraint.R'
+    'InitErgmTerm.duration.R'
+    'InitMHP.DynMLE.R'
+    'InitMHP.DynMLE.blockdiag.R'
+    'InitMHP.DynMoME.R'
+    'coef.stergm.R'
+    'combine.networks.R'
+    'control.logLik.stergm.R'
+    'control.simulate.stergm.R'
+    'control.stergm.R'
+    'ergm.godfather.R'
+    'gof.stergm.R'
+    'impute.network.list.R'
+    'is.lasttoggle.R'
+    'logLik.stergm.R'
+    'mcmc.diagnostics.stergm.R'
+    'print.stergm.R'
+    'simulate.stergm.R'
+    'stergm.CMLE.R'
+    'stergm.EGMME.GD.R'
+    'stergm.EGMME.R'
+    'stergm.EGMME.SA.R'
+    'stergm.EGMME.initialfit.R'
+    'stergm.R'
+    'tergm-deprecated.R'
+    'stergm.getMCMCsample.R'
+    'stergm.utils.R'
+    'summary.statistics.networkDynamic.R'
+    'summary.stergm.R'
+    'zzz.R'

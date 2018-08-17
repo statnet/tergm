@@ -16,10 +16,10 @@
 
 \method{print}{stergm}(x, digits = max(3, getOption("digits") - 3), ...)
 
-stergm(nw, formation, dissolution, constraints = ~., estimate, times = NULL,
-  offset.coef.form = NULL, offset.coef.diss = NULL, targets = NULL,
-  target.stats = NULL, eval.loglik = TRUE, control = control.stergm(),
-  verbose = FALSE, ...)
+stergm(nw, formation, dissolution, constraints = ~., estimate,
+  times = NULL, offset.coef.form = NULL, offset.coef.diss = NULL,
+  targets = NULL, target.stats = NULL, eval.loglik = TRUE,
+  control = control.stergm(), verbose = FALSE, ...)
 
 \method{summary}{stergm}(object, ...)
 }
