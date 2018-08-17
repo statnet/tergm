@@ -4,7 +4,7 @@
 \alias{mcmc.diagnostics.stergm}
 \title{Conduct MCMC diagnostics on an ergm or stergm fit}
 \usage{
-\method{mcmc.diagnostics}{stergm}(object, center = TRUE, curved = TRUE,
+\method{mcmc.diagnostics}{stergm}(object, center = TRUE, esteq = TRUE,
   vars.per.page = 3, ...)
 }
 \arguments{
@@ -14,9 +14,9 @@
 \item{center}{Logical: If TRUE, ; center the samples on the
 observed statistics.}
 
-\item{curved}{Logical: If TRUE, summarize the curved statistics
+\item{esteq}{Logical: If TRUE, summarize the estimating equation values
 (evaluated at the MLE of any non-linear parameters), rather than
-the raw components of the curved statistics.}
+their canonical components.}
 
 \item{vars.per.page}{Number of rows (one variable per row) per
 plotting page.  Ignored if \code{latticeExtra} package is not
