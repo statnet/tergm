@@ -11,11 +11,6 @@ matrix:
     os: osx
 sudo: false
 cache: packages
-r_github_packages:
-- statnet/statnet.common
-- statnet/network
-- statnet/networkDynamic
-- statnet/ergm
 addons:
   apt:
     packages:
