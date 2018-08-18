@@ -9,6 +9,8 @@
 #######################################################################
 library(tergm)
 
+set.seed(0)
+
 logit<-function(p)log(p/(1-p))
 coef.form.f<-function(coef.diss,density) -log(((1+exp(coef.diss))/(density/(1-density)))-1)
 
