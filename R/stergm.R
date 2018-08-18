@@ -70,11 +70,17 @@
 #' Likelihood Estimation, modeling a transition between two networks, or
 #' "CMPLE" for Conditional Maximum PseudoLikelihood Estimation, using MPLE
 #' instead of MLE.  CMPLE is extremely inaccurate at this time.
-#' @param times For CMLE and CMPLE estimation, times or indexes at which the
-#' networks whose transition is to be modeled are observed. Default to
-#' \code{c(0,1)} if \code{nw} is a \code{\link[networkDynamic]{networkDynamic}}
-#' and to \code{1:length(nw)} (all transitions) if \code{nw} is a
-#' \code{\link{network.list}} or a \code{\link{list}}. Unused for EGMME.
+#' 
+#' @param times For CMLE and CMPLE estimation, times or indexes at
+#'   which the networks whose transition is to be modeled are
+#'   observed. Default to \code{c(0,1)} if \code{nw} is a
+#'   \code{\link[networkDynamic]{networkDynamic}} and to
+#'   \code{1:length(nw)} (all transitions) if \code{nw} is a
+#'   \code{\link{network.list}} or a \code{\link{list}}. Unused for
+#'   EGMME. Note that at this time, the selected time points will be
+#'   treated as temporally adjacent. Irregluarly spaced time series
+#'   are not supported at this time.
+#' 
 #' @param offset.coef.form Numeric vector to specify offset formation
 #' parameters.
 #' @param offset.coef.diss Numeric vector to specify offset dissolution
