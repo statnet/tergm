@@ -311,7 +311,7 @@
 #' # "Resume" the simulation.
 #' dynsim2<-simulate(dynsim,time.slices=S,verbose=TRUE)
 #' @importFrom stats simulate
-#' @export
+#' @export simulate.stergm
 simulate.stergm<-function(object, nsim=1, seed=NULL,
                           coef.form=object$formation.fit$coef,coef.diss=object$dissolution.fit$coef,
                           constraints = object$constraints,
@@ -325,6 +325,7 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
                           stats.diss = FALSE,
                           duration.dependent = NULL,
                           verbose=FALSE, ...){
+  .dep_method("simulate","stergm")
   check.control.class(c("simulate.stergm","simulate.network"), "simulate.stergm")
   
   control.transfer <- list(MCMC.prop.weights="MCMC.prop.weights",
@@ -369,7 +370,7 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
 
 
 #' @rdname simulate.stergm
-#' @export
+#' @export simulate.network
 simulate.network <- function(object, nsim=1, seed=NULL,
                              formation, dissolution,
                              coef.form,coef.diss,
@@ -383,6 +384,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                              stats.diss = FALSE,
                              duration.dependent=NULL,
                              verbose=FALSE,...) {
+  .dep_method("simulate","network")
   if(length(list(...))) stop("Unknown arguments: ",names(list(...)))
   check.control.class("simulate.network", "STERGM simulate.network")
 
@@ -598,7 +600,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   }
 }
 #' @rdname simulate.stergm
-#' @export
+#' @export simulate.networkDynamic
 simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     formation = attr(object, "formation"), dissolution = attr(object, "dissolution"),
                                     coef.form = attr(object, "coef.form"), coef.diss = attr(object, "coef.diss"),
@@ -612,6 +614,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     stats.diss = FALSE,
                                     duration.dependent = NULL,
                                     verbose=FALSE, ...){
+  .dep_method("simulate","networkDynamic")
   
   if(nsim>1) stop("Simulating more than one chain of networks is not supported at this time. If you want to simulate over multiple time steps, use the time.slices argument.")
 
