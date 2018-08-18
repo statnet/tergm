@@ -75,7 +75,7 @@
 stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
                                  proposal.form, proposal.diss, eta.form, eta.diss, control, 
                                  verbose, ...){
-  .Deprecated("stergm_MCMC_sample")
+  .dep_once("stergm_MCMC_sample")
   out <- stergm_MCMC_sample(nw, model.form, model.diss, model.mon,
                             proposal.form, proposal.diss,  control=control,
                             eta.form=eta.form, eta.diss=eta.diss, verbose=verbose, ...)
@@ -177,7 +177,7 @@ stergm_MCMC_sample <- function(nw, model.form, model.diss, model.mon,
 #' @describeIn tergm-deprecated Use [stergm_MCMC_slave()] instead.
 #' @export stergm.mcmcslave
 stergm.mcmcslave <- function(Clist.form, Clist.diss, Clist.mon, proposal.form, proposal.diss, eta.form, eta.diss, control, verbose){
-  .Deprecated("stergm_MCMC_slave")
+  .dep_once("stergm_MCMC_slave")
   stergm_MCMC_slave(Clist.form, Clist.diss, Clist.mon, proposal.form, proposal.diss, eta.form, eta.diss, control, verbose)
 }
 
