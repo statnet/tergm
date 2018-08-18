@@ -238,7 +238,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
                  stop("Method ", control$EGMME.main.method, " is not implemented.")
                 )
 
-  if(!is.null(cl)) ergm.stopCluster(cl)
+  ## if(!is.null(cl)) ergm.stopCluster(cl)
 
   out <- list(network = nw, formation = formation, dissolution = dissolution, targets = targets, target.stats=model.mon$target.stats, estimate=estimate, covar = Cout$covar, opt.history=Cout$opt.history, sample=Cout$sample, sample.obs=NULL, control=control, reference = ~Bernoulli, mc.se = Cout$mc.se, constraints = constraints,
               formation.fit = with(Cout, list(network=nw, formula=formation, coef = eta.form, covar=covar.form, etamap = model.form$etamap, offset = model.form$etamap$offsettheta, constraints=constraints, estimate=estimate, control=control, reference = ~Bernoulli, mc.se = mc.se.form)),
