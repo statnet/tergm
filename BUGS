@@ -1,1 +1,1 @@
-* Fitting CMLE for networkDynamic inputs is unreliable. To be safe, convert the snapshots to a network.list first.
+* A bug in ergm 3.9.4 means that stergm EGMME might not properly shut down any clusters it starts when parallel>0.
