@@ -32,7 +32,7 @@ is.lasttoggle <- function(nw,formation=NULL,dissolution=NULL,monitor=NULL,target
       monitor <- switch(monitor,
           formation = formation,
           dissolution = dissolution,
-          all = append_rhs.formula(~nw, unique(lapply(c(term.list.formula(formation[[3]]),term.list.formula(dissolution[[3]])), unset.offset.call)))
+          all = append_rhs.formula(~nw, unique(lapply(c(list_rhs.formula(formation),list_rhs.formula(dissolution)), unset.offset.call)))
       )
     }
     
