@@ -32,6 +32,7 @@ NULL
 })
 
 # Only evaluate deprecation warning once per function.
+#' @importFrom utils modifyList
 .dep_once <- local({
   warned <- c()
   function(...){
