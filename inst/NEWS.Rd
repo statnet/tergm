@@ -61,6 +61,43 @@
   % }
 %% }
 
+
+
+\section{Changes in version 3.5.0}{
+    \subsection{NEW FEATURES}{
+      \itemize{
+	
+	\item Compatibility with \code{\link[=ergm:ergm-package]{ergm}}
+	3.9 API changes.
+	
+     }
+     
+   }
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      
+      \item Documentation fixes.
+
+      \item A number of methods are no longer called directly but
+      through generics.
+      
+    }
+  }
+
+  \subsection{DEPRECATED & DEFUNCT}{
+    \itemize{
+      
+      \item \code{\link{stergm.getMCMCsample}} and
+      \code{\link{stergm.mcmcslave}} have been deprecatedin favor of
+      \code{\link{stergm_MCMC_sample}} and
+      \code{\link{stergm_MCMC_slave}}, respectively.
+
+    }
+  }
+}
+
+
 \section{Changes in version 3.4.1}{
     \subsection{NEW FEATURES}{
       \itemize{
