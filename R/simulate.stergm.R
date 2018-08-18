@@ -311,6 +311,7 @@
 #' # "Resume" the simulation.
 #' dynsim2<-simulate(dynsim,time.slices=S,verbose=TRUE)
 #' @importFrom stats simulate
+#' @S3method simulate stergm
 #' @export simulate.stergm
 simulate.stergm<-function(object, nsim=1, seed=NULL,
                           coef.form=object$formation.fit$coef,coef.diss=object$dissolution.fit$coef,
@@ -370,6 +371,7 @@ simulate.stergm<-function(object, nsim=1, seed=NULL,
 
 
 #' @rdname simulate.stergm
+#' @S3method simulate network
 #' @export simulate.network
 simulate.network <- function(object, nsim=1, seed=NULL,
                              formation, dissolution,
@@ -600,6 +602,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   }
 }
 #' @rdname simulate.stergm
+#' @S3method simulate networkDynamic
 #' @export simulate.networkDynamic
 simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     formation = attr(object, "formation"), dissolution = attr(object, "dissolution"),
