@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  http://statnet.org/attribution
 #
-#  Copyright 2008-2017 Statnet Commons
+#  Copyright 2008-2018 Statnet Commons
 #######################################################################
 #' @importFrom statnet.common statnetStartupMessage NVL all_identical append_rhs.formula check.control.class nonsimp_update.formula paste.and set.control.class term.list.formula vector.namesmatch
 .onAttach <- function(lib, pkg){
