@@ -52,7 +52,7 @@ void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int 
       *F_MH = MHProposalInitialize(F_MHProposaltype, F_MHProposalpackage, F_inputs, fVerbose, *nwp, attribs, maxout, maxin, minout, minin,
 				   condAllDegExact, attriblength);
       if((*F_MH)->discord==NULL){
-	discordl = (Network**) calloc(2,sizeof(Network*)); // A space for the sentinel NULL pointer.
+	discordl = (Network**) Calloc(2,Network*); // A space for the sentinel NULL pointer.
 	(*F_MH)->discord = discordl;
       }
       (*F_MH)->discord[0] = discord;
@@ -63,7 +63,7 @@ void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int 
 				   condAllDegExact, attriblength);
       if((*D_MH)->discord==NULL){
 	if(discordl==NULL)
-	  discordl = (Network**) calloc(2,sizeof(Network*)); // A space for the sentinel NULL pointer.
+	  discordl = (Network**) Calloc(2,Network*); // A space for the sentinel NULL pointer.
 	(*D_MH)->discord = discordl;
       }
       (*D_MH)->discord[0] = discord;
@@ -90,9 +90,9 @@ void MCMCDyn_finish_common(Network *nwp,
       NetworkDestroy(*nwp);
     }
     
-    free(F_MH->discord);
+    Free(F_MH->discord);
     F_MH->discord=NULL;
-    if(!same_discord) free(D_MH->discord);
+    if(!same_discord) Free(D_MH->discord);
     D_MH->discord=NULL; // Always set to NULL, since it may have been freed with F_MH->discord.
 
     if(F_MH) MHProposalDestroy(F_MH);
@@ -157,9 +157,9 @@ void MCMCDyn_wrapper(// Starting network.
     diffhead = (Vertex *) diffnetworkhead;
     diffto = (int *) diffnetworkto;
   }else{
-    difftime = (Vertex *) calloc(*maxchanges,sizeof(Vertex));
-    difftail = (Vertex *) calloc(*maxchanges,sizeof(Vertex));
-    diffhead = (Vertex *) calloc(*maxchanges,sizeof(Vertex));
+    difftime = (Vertex *) Calloc(*maxchanges,Vertex);
+    difftail = (Vertex *) Calloc(*maxchanges,Vertex);
+    diffhead = (Vertex *) Calloc(*maxchanges,Vertex);
     diffto = NULL;
   }
   
@@ -200,9 +200,9 @@ void MCMCDyn_wrapper(// Starting network.
   }
 
   if(!*log_changes){
-    free(difftime);
-    free(difftail);
-    free(diffhead);
+    Free(difftime);
+    Free(difftail);
+    Free(diffhead);
   }
 
   MCMCDyn_finish_common(nwp, F_m, D_m, M_m, F_MH, D_MH);

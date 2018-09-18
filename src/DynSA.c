@@ -49,9 +49,9 @@ void MCMCDynSArun_wrapper(// Observed network.
   if(*lasttoggle == 0) lasttoggle = NULL;
 
   Vertex *difftime, *difftail, *diffhead;
-  difftime = (Vertex *) calloc(*maxchanges,sizeof(Vertex));
-  difftail = (Vertex *) calloc(*maxchanges,sizeof(Vertex));
-  diffhead = (Vertex *) calloc(*maxchanges,sizeof(Vertex));
+  difftime = (Vertex *) Calloc(*maxchanges,Vertex);
+  difftail = (Vertex *) Calloc(*maxchanges,Vertex);
+  diffhead = (Vertex *) Calloc(*maxchanges,Vertex);
 
   memset(newnetworktail,0,*maxedges*sizeof(int));
   memset(newnetworkhead,0,*maxedges*sizeof(int));
@@ -94,9 +94,9 @@ void MCMCDynSArun_wrapper(// Observed network.
   }
 
   MCMCDyn_finish_common(nwp, F_m, D_m, M_m, F_MH, D_MH);
-  free(difftime);
-  free(difftail);
-  free(diffhead);
+  Free(difftime);
+  Free(difftail);
+  Free(diffhead);
 }
 
 

@@ -65,7 +65,7 @@ void MH_FormationMLETNT(MHProposal *MHp, Network *nwp)
     ndyads = DYADCOUNT(nnodes, nwp->bipartite, nwp[0].directed_flag);
 
     nedges0 = MHp->inputs[0];
-    MHp->discord = (Network**) calloc(2,sizeof(Network*)); // A space for the sentinel NULL pointer.
+    MHp->discord = (Network**) Calloc(2,Network*); // A space for the sentinel NULL pointer.
     MHp->discord[0] = discord = NetworkInitializeD(MHp->inputs+1, MHp->inputs+1+nedges0, nedges0, nnodes, nwp->directed_flag, nwp->bipartite, 0, 0, NULL);
    
     for(Edge i=0; i<nwp->nedges; i++){
@@ -137,7 +137,7 @@ void MH_DissolutionMLETNT(MHProposal *MHp, Network *nwp)
     odds = comp/(1.0-comp);
 
     nedges0 = MHp->inputs[0];
-    MHp->discord = (Network**) calloc(2,sizeof(Network*)); // A space for the sentinel NULL pointer.
+    MHp->discord = (Network**) Calloc(2,Network*); // A space for the sentinel NULL pointer.
     MHp->discord[0] = discord = NetworkInitializeD(MHp->inputs+1, MHp->inputs+1+nedges0, nedges0, nnodes, nwp->directed_flag, nwp->bipartite, 0, 0, NULL);
    
     for(Edge i=0; i<nwp->nedges; i++){
