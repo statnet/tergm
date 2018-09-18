@@ -640,7 +640,7 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
   eta.diss <- z$eta[-seq_len(Clist.form$nstats)]
   names(eta.diss) <- model.diss$coef.names
 
-  newnetwork<-newnw.extract(state$nw,z)
+  newnetwork<-as.network(pending_update_network(state$nw,z))
   newnetwork %n% "time" <- z$time
   newnetwork %n% "lasttoggle" <- z$lasttoggle
   

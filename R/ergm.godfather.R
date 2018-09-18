@@ -305,7 +305,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
   
   if(end.network){ 
     if(verbose) cat("Creating new network...\n")
-    newnetwork <- newnw.extract(nw,z)
+    newnetwork <- as.network(pending_update_network(nw,z))
     newnetwork %n% "time" <- z$time
     newnetwork %n% "lasttoggle" <- z$lasttoggle
 

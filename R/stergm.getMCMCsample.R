@@ -139,7 +139,7 @@ stergm_MCMC_sample <- function(nw, model.form, model.diss, model.mon,
   
   z <- stergm_MCMC_slave(Clist.form, Clist.diss, Clist.mon, proposal.form, proposal.diss, eta.form, eta.diss, control, verbose)
 
-  newnetwork<-newnw.extract(nw,z)
+  newnetwork<-as.network(pending_update_network(nw, z))
   if(is.durational(model.form) || is.durational(model.diss) || is.durational(model.mon)){
     newnetwork %n% "time" <- z$time
     newnetwork %n% "lasttoggle" <- z$lasttoggle
