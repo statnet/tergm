@@ -18,11 +18,11 @@ void MCMCDynSArun_wrapper(// Observed network.
 			     int *n_nodes, int *dflag, int *bipartite, 
 			     // Formation terms and proposals.
 			     int *F_nterms, char **F_funnames, char **F_sonames,
-			     char **F_MHproposaltype, char **F_MHproposalpackage,
+			     char **F_MHProposaltype, char **F_MHProposalpackage,
 			     double *F_inputs,
 			     // Dissolution terms and proposals.
 			     int *D_nterms, char **D_funnames, char **D_sonames, 
-			     char **D_MHproposaltype, char **D_MHproposalpackage,
+			     char **D_MHProposaltype, char **D_MHProposalpackage,
 			     double *D_inputs,
 			     // Parameter fitting.
 			     double *eta0,
@@ -48,9 +48,9 @@ void MCMCDynSArun_wrapper(// Observed network.
 MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 			      Network *nwp,
 			      // Formation terms and proposals.
-			      Model *F_m, MHproposal *F_MH,
+			      Model *F_m, MHProposal *F_MH,
 			      // Dissolution terms and proposals.
-			      Model *D_m, MHproposal *D_MH,
+			      Model *D_m, MHProposal *D_MH,
 			      // Model fitting.
 			      double *eta, 
 			      Model *M_m,

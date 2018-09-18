@@ -18,7 +18,7 @@
    void MH_FormationMLEblockdiag
    Propose ONLY edges not in the reference graph that within a block
 ***********************/
-void MH_FormationMLEblockdiag (MHproposal *MHp, Network *nwp) 
+void MH_FormationMLEblockdiag (MHProposal *MHp, Network *nwp) 
 {  
   static Edge nedges0;
   static Dyad ndyads;
@@ -66,7 +66,7 @@ void MH_FormationMLEblockdiag (MHproposal *MHp, Network *nwp)
    void MH_FormationMLEblockdiagB
    Propose ONLY edges not in the reference graph that within a block for bipartite graphs
 ***********************/
-void MH_FormationMLEblockdiagB (MHproposal *MHp, Network *nwp) 
+void MH_FormationMLEblockdiagB (MHProposal *MHp, Network *nwp) 
 {  
   static Edge nedges0;
   static Dyad ndyads;
@@ -113,13 +113,13 @@ void MH_FormationMLEblockdiagB (MHproposal *MHp, Network *nwp)
    void MH_FormationMLEblockdiagTNT
    Propose ONLY edges not in the reference graph and on the block-diagonal
 ***********************/
-void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp) 
+void MH_FormationMLEblockdiagTNT(MHProposal *MHp, Network *nwp) 
 {  
   static Vertex nnodes, blks;
   Vertex tail,head;
   static Edge ndyads, nedges0;
   static double comp=0.5, odds;
-  static Network discord;
+  Network *discord;
   static double *blkinfo, *blkpos, *blkcwt; 
 
   if(MHp->ntoggles == 0) { /* Initialize */
@@ -129,12 +129,11 @@ void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp)
 
     nedges0 = MHp->inputs[0];
     MHp->discord = (Network**) calloc(2,sizeof(Network*)); // A space for the sentinel NULL pointer.
-    MHp->discord[0] = &discord;
-    discord = NetworkInitializeD(MHp->inputs+1, MHp->inputs+1+nedges0, nedges0, nnodes, nwp->directed_flag, nwp->bipartite, 0, 0, NULL);
+    MHp->discord[0] = discord = NetworkInitializeD(MHp->inputs+1, MHp->inputs+1+nedges0, nedges0, nnodes, nwp->directed_flag, nwp->bipartite, 0, 0, NULL);
    
     for(Edge i=0; i<nwp->nedges; i++){
       FindithEdge(&tail, &head, i+1, nwp);
-      ToggleEdge(tail,head,&discord);
+      ToggleEdge(tail,head,discord);
     }
     
     blkinfo = MHp->inputs+1+nedges0*2;
@@ -144,8 +143,10 @@ void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp)
     blkcwt = blkinfo+2+blks+1;
     return;
   }
+
+  discord = MHp->discord[0];
   
-  Edge nedges = nwp->nedges, ndedges = discord.nedges;
+  Edge nedges = nwp->nedges, ndedges = discord->nedges;
   Dyad nempty = ndyads-nedges;
 
   if(nempty==0 && ndedges==0){ /* Attempting formation on a complete graph. */
@@ -157,7 +158,7 @@ void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp)
   double logratio=0;
   BD_LOOP({
       if(ndedges != 0 && (nempty == 0 || unif_rand() < comp)) { /* Select a discordant dyad at random */
-      GetRandEdge(&tail, &head, &discord);
+      GetRandEdge(&tail, &head, discord);
       
       if(nempty==0){
 	logratio = log(ndedges*(1-comp));
@@ -208,12 +209,12 @@ void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp)
    void MH_FormationMLEblockdiagTNT
    Propose ONLY edges not in the reference graph and on the block-diagonal
 ***********************/
-void MH_FormationMLEblockdiagTNTB(MHproposal *MHp, Network *nwp) 
+void MH_FormationMLEblockdiagTNTB(MHProposal *MHp, Network *nwp) 
 {  
   static Vertex nnodes, blks;
   static Edge ndyads, nedges0;
   static double comp=0.5, odds;
-  static Network discord;
+  Network *discord;
   static double *blkinfo, *eblkpos, *ablkpos, *blkcwt; 
 
   if(MHp->ntoggles == 0) { /* Initialize */
@@ -223,13 +224,12 @@ void MH_FormationMLEblockdiagTNTB(MHproposal *MHp, Network *nwp)
 
     nedges0 = MHp->inputs[0];
     MHp->discord = (Network**) calloc(2,sizeof(Network*)); // A space for the sentinel NULL pointer.
-    MHp->discord[0] = &discord;
-    discord = NetworkInitializeD(MHp->inputs+1, MHp->inputs+1+nedges0, nedges0, nnodes, nwp->directed_flag, nwp->bipartite, 0, 0, NULL);
+    MHp->discord[0] = discord = NetworkInitializeD(MHp->inputs+1, MHp->inputs+1+nedges0, nedges0, nnodes, nwp->directed_flag, nwp->bipartite, 0, 0, NULL);
    
     for(Edge i=0; i<nwp->nedges; i++){
       Vertex tail, head;
       FindithEdge(&tail,&head, i+1, nwp);
-      ToggleEdge(tail,head,&discord);
+      ToggleEdge(tail,head,discord);
     }
     
     blkinfo = MHp->inputs+1+nedges0*2;
@@ -240,8 +240,10 @@ void MH_FormationMLEblockdiagTNTB(MHproposal *MHp, Network *nwp)
     blkcwt = blkinfo+2+blks+1+blks+1;
     return;
   }
-  
-  Edge nedges = nwp->nedges, ndedges = discord.nedges;
+
+  discord = MHp->discord[0];
+      
+  Edge nedges = nwp->nedges, ndedges = discord->nedges;
   Dyad nempty = ndyads-nedges;
 
   if(nempty==0 && ndedges==0){ /* Attempting formation on a complete graph. */
@@ -253,7 +255,7 @@ void MH_FormationMLEblockdiagTNTB(MHproposal *MHp, Network *nwp)
   double logratio=0;
   BD_LOOP({
       if(ndedges != 0 && (nempty == 0 || unif_rand() < comp)) { /* Select a discordant dyad at random */
-      GetRandEdge(Mtail, Mhead, &discord);
+      GetRandEdge(Mtail, Mhead, discord);
       
       if(nempty==0){
 	logratio = log(ndedges*(1-comp));

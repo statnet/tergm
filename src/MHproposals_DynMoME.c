@@ -17,27 +17,27 @@
    void MH_Formation
    Propose ONLY edges not in the reference graph
 ***********************/
-void MH_Formation (MHproposal *MHp, Network *nwp) 
+void MH_Formation (MHProposal *MHp, Network *nwp) 
 {  
   static Dyad ndyads;
 
   if(MHp->ntoggles == 0) { /* Initialize */
     MHp->ntoggles=1;
-    ndyads = DYADCOUNT(nwp[0].nnodes, 0, nwp[0].directed_flag);
+    ndyads = DYADCOUNT(nwp->nnodes, 0, nwp->directed_flag);
     return;
   }
   
-  if(nwp[0].nedges==ndyads && nwp[1].nedges==0){ /* Attempting formation on a complete graph. */
+  if(nwp->nedges==ndyads && MHp->discord[0]->nedges==0){ /* Attempting formation on a complete graph. */
     Mtail[0]=MH_FAILED;
     Mhead[0]=MH_IMPOSSIBLE;
     return;
   }
   
   BD_LOOP({
-      /* A dyad eligible to be formed is either a nontie in nwp[0] or a tie in nwp[1]. */
-      if(unif_rand() < ((double)nwp[1].nedges)/(ndyads-nwp[0].nedges + nwp[1].nedges)){
-	// Tie in nwp[1]:
-	GetRandEdge(Mtail, Mhead, nwp+1);
+      /* A dyad eligible to be formed is either a nontie in nwp[0] or a tie in MHp->discord-> */
+      if(unif_rand() < ((double)MHp->discord[0]->nedges)/(ndyads-nwp->nedges + MHp->discord[0]->nedges)){
+	// Tie in MHp->discord[0]:
+	GetRandEdge(Mtail, Mhead, MHp->discord[0]);
       }else{
 	// Nontie in nwp[0]:
 	GetRandNonedge(Mtail, Mhead, nwp);
@@ -53,23 +53,20 @@ void MH_Formation (MHproposal *MHp, Network *nwp)
    networks
    Propose ONLY edges not in the reference graph
 ***********************/
-void MH_FormationTNT (MHproposal *MHp, Network *nwp) 
+void MH_FormationTNT (MHProposal *MHp, Network *nwp) 
 {  
-  Edge nedges, ndedges;
-  Dyad nempty;
   static double comp=0.5, odds;
   static Dyad ndyads;
   
   if(MHp->ntoggles == 0) { /* Initialize */
     MHp->ntoggles=1;
     odds = comp/(1.0-comp);
-    ndyads = DYADCOUNT(nwp[0].nnodes, nwp->bipartite, nwp[0].directed_flag);
+    ndyads = DYADCOUNT(nwp->nnodes, nwp->bipartite, nwp->directed_flag);
     return;
   }
   
-  nedges  = nwp[0].nedges;
-  ndedges = nwp[1].nedges;
-  nempty = ndyads-nedges;
+  Edge nedges  = nwp->nedges, ndedges = MHp->discord[0]->nedges;
+  Dyad nempty = ndyads-nedges;
 
   if(nempty==0 && ndedges==0){  /* Attempting formation on a complete graph. */
     Mtail[0]=MH_FAILED;
@@ -80,7 +77,7 @@ void MH_FormationTNT (MHproposal *MHp, Network *nwp)
   double logratio=0;
   BD_LOOP({
       if(ndedges != 0 && (nempty == 0 || unif_rand() < comp)) { /* Select a discordant dyad at random */
-	GetRandEdge(Mtail, Mhead, nwp+1);
+	GetRandEdge(Mtail, Mhead, MHp->discord[0]);
 	
 	if(nempty==0){
 	  logratio = log(ndedges*(1-comp));
@@ -107,23 +104,23 @@ void MH_FormationTNT (MHproposal *MHp, Network *nwp)
     });
   MHp->logratio += logratio;
   //   Rprintf("nedges %d reference nddyads %d h %d t %d MHp->ratio %f\n", 
-  //	    nwp[0].nedges, nwp[1].nedges, tail, head, MHp->ratio); 
+  //	    nwp->nedges, MHp->discord[0]->nedges, tail, head, MHp->ratio); 
 }
 
 /********************
    void MH_Dissolution
    Propose ONLY edges in the reference graph
-   Any candidate edge must be either in nwp[0] or in nwp[1]. This makes
+   Any candidate edge must be either in nwp[0] or in MHp->discord[0]-> This makes
    proposing easy.
 ***********************/
-void MH_Dissolution (MHproposal *MHp, Network *nwp) 
+void MH_Dissolution (MHProposal *MHp, Network *nwp) 
 {  
-  Edge nedges=nwp[0].nedges, ndedges=nwp[1].nedges;
-  
   if(MHp->ntoggles == 0) { /* Initialize */
     MHp->ntoggles=1;
     return;
   }
+
+  Edge nedges=nwp->nedges, ndedges=MHp->discord[0]->nedges;
   
   if(nedges==0 && ndedges==0){ /* Attempting dissolution on an empty network. */
     Mtail[0]=MH_FAILED;
@@ -131,16 +128,16 @@ void MH_Dissolution (MHproposal *MHp, Network *nwp)
     return;
   }
   
-  /* Make sure the edge is not in nwp[0] and nwp[1], which shouldn't
+  /* Make sure the edge is not in nwp[0] and MHp->discord[0], which shouldn't
      happen anyway, but better safe than sorry. */
   BD_LOOP({
       Edge rane = 1 + unif_rand() * (nedges+ndedges);
       if(rane<=nedges){
 	GetRandEdge(Mtail, Mhead, nwp);
-	if(EdgetreeSearch(Mtail[0],Mhead[0],nwp[1].outedges)==0 && CheckTogglesValid(MHp, nwp)) break;
+	if(EdgetreeSearch(Mtail[0],Mhead[0],MHp->discord[0]->outedges)==0 && CheckTogglesValid(MHp, nwp)) break;
       }else{
-	GetRandEdge(Mtail, Mhead, nwp+1);
-	if(EdgetreeSearch(Mtail[0],Mhead[0],nwp[0].outedges)==0 && CheckTogglesValid(MHp, nwp)) break;
+	GetRandEdge(Mtail, Mhead, MHp->discord[0]);
+	if(EdgetreeSearch(Mtail[0],Mhead[0],nwp->outedges)==0 && CheckTogglesValid(MHp, nwp)) break;
       }
     });
 }
@@ -153,10 +150,8 @@ void MH_Dissolution (MHproposal *MHp, Network *nwp)
    networks
    Propose ONLY edges in the reference graph
 ***********************/
-void MH_DissolutionTNT (MHproposal *MHp, Network *nwp) 
+void MH_DissolutionTNT (MHProposal *MHp, Network *nwp) 
 {  
-  Edge nedges=nwp[0].nedges, ndedges=nwp[1].nedges;
-  Edge nedges0 = nedges + ndedges;
   static double comp=0.5, odds;
   
   if(MHp->ntoggles == 0) { /* Initialize */
@@ -165,6 +160,9 @@ void MH_DissolutionTNT (MHproposal *MHp, Network *nwp)
     return;
   }
 
+  Edge nedges=nwp->nedges, ndedges=MHp->discord[0]->nedges;
+  Edge nedges0 = nedges + ndedges;
+  
   if(nedges==0 && ndedges==0){  /* Attempting dissolution on an empty graph. */
     Mtail[0]=MH_FAILED;
     Mhead[0]=MH_IMPOSSIBLE;
@@ -174,7 +172,7 @@ void MH_DissolutionTNT (MHproposal *MHp, Network *nwp)
   double logratio=0;
   BD_LOOP({
       if(ndedges != 0 && (nedges==0 || unif_rand() < comp)) { /* Select a discordant dyad at random */
-	GetRandEdge(Mtail, Mhead, nwp+1);
+	GetRandEdge(Mtail, Mhead, MHp->discord[0]);
 	
 	if(nedges==0){
 	  logratio = log(ndedges*(1-comp));
@@ -201,5 +199,5 @@ void MH_DissolutionTNT (MHproposal *MHp, Network *nwp)
     });
   MHp->logratio += logratio;
   //   Rprintf("nedges %d reference nddyads %d h %d t %d MHp->ratio %f\n", 
-  //	    nwp[0].nedges, nwp[1].nedges, tail, head, MHp->ratio); 
+  //	    nwp->nedges, MHp->discord[0]->nedges, tail, head, MHp->ratio); 
 }

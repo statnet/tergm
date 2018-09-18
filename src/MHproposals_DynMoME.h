@@ -15,10 +15,10 @@
 #include "model.h"
 #include "MHproposal.h"
 
-void MH_Formation(MHproposal *MHp, Network *nwp);
-void MH_FormationTNT(MHproposal *MHp, Network *nwp);
-void MH_Dissolution(MHproposal *MHp, Network *nwp);
-void MH_DissolutionTNT(MHproposal *MHp, Network *nwp);
+void MH_Formation(MHProposal *MHp, Network *nwp);
+void MH_FormationTNT(MHProposal *MHp, Network *nwp);
+void MH_Dissolution(MHProposal *MHp, Network *nwp);
+void MH_DissolutionTNT(MHProposal *MHp, Network *nwp);
 
 #endif 
 

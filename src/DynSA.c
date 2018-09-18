@@ -14,11 +14,11 @@ void MCMCDynSArun_wrapper(// Observed network.
 			     int *n_nodes, int *dflag, int *bipartite, 
 			     // Formation terms and proposals.
 			     int *F_nterms, char **F_funnames, char **F_sonames,
-			     char **F_MHproposaltype, char **F_MHproposalpackage,
+			     char **F_MHProposaltype, char **F_MHProposalpackage,
 			     double *F_inputs, 
 			     // Dissolution terms and proposals.
 			     int *D_nterms, char **D_funnames, char **D_sonames, 
-			     char **D_MHproposaltype, char **D_MHproposalpackage,
+			     char **D_MHProposaltype, char **D_MHProposalpackage,
 			     double *D_inputs,
 			     // Parameter fittig.
 			     double *eta0, 
@@ -42,9 +42,9 @@ void MCMCDynSArun_wrapper(// Observed network.
 			     int *fVerbose,
 			     int *status){
 
-  Network nw[2];
+  Network *nwp;
   Model *F_m, *D_m, *M_m;
-  MHproposal F_MH, D_MH;
+  MHProposal *F_MH, *D_MH;
   
   if(*lasttoggle == 0) lasttoggle = NULL;
 
@@ -57,20 +57,20 @@ void MCMCDynSArun_wrapper(// Observed network.
   memset(newnetworkhead,0,*maxedges*sizeof(int));
 
   MCMCDyn_init_common(tails, heads, *time, lasttoggle, *n_edges,
-		      *n_nodes, *dflag, *bipartite, nw,
+		      *n_nodes, *dflag, *bipartite, &nwp,
 		      *F_nterms, *F_funnames, *F_sonames, F_inputs, &F_m,
 		      *D_nterms, *D_funnames, *D_sonames, D_inputs, &D_m,
 		      *M_nterms, *M_funnames, *M_sonames, M_inputs, &M_m,
 		      attribs, maxout, maxin, minout,
 		      minin, *condAllDegExact, *attriblength,
-		      *F_MHproposaltype, *F_MHproposalpackage, &F_MH,
-		      *D_MHproposaltype, *D_MHproposalpackage, &D_MH,
+		      *F_MHProposaltype, *F_MHProposalpackage, &F_MH,
+		      *D_MHProposaltype, *D_MHProposalpackage, &D_MH,
 		      *fVerbose);
 
-  *status = MCMCDynSArun(nw,
+  *status = MCMCDynSArun(nwp,
 			    
-			 F_m, &F_MH,
-			 D_m, &D_MH,
+			 F_m, F_MH,
+			 D_m, D_MH,
 			 
 			 eta0, M_m,
 			 init_dev, 
@@ -87,13 +87,13 @@ void MCMCDynSArun_wrapper(// Observed network.
   /* record the final network to pass back to R */
 
   if(*status==MCMCDyn_OK){
-    newnetworktail[0]=newnetworkhead[0]=EdgeTree2EdgeList(newnetworktail+1,newnetworkhead+1,nw,*maxedges);
-    *time = nw->duration_info.time;
-    if(nw->duration_info.lasttoggle)
-    memcpy(lasttoggle, nw->duration_info.lasttoggle, sizeof(int)*DYADCOUNT(*n_nodes, *bipartite, *dflag));
+    newnetworktail[0]=newnetworkhead[0]=EdgeTree2EdgeList(newnetworktail+1,newnetworkhead+1,nwp,*maxedges);
+    *time = nwp->duration_info.time;
+    if(nwp->duration_info.lasttoggle)
+    memcpy(lasttoggle, nwp->duration_info.lasttoggle, sizeof(int)*DYADCOUNT(*n_nodes, *bipartite, *dflag));
   }
 
-  MCMCDyn_finish_common(nw, F_m, D_m, M_m, &F_MH, &D_MH);
+  MCMCDyn_finish_common(nwp, F_m, D_m, M_m, F_MH, D_MH);
   free(difftime);
   free(difftail);
   free(diffhead);
@@ -106,9 +106,9 @@ void MCMCDynSArun_wrapper(// Observed network.
 MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 			      Network *nwp,
 			      // Formation terms and proposals.
-			      Model *F_m, MHproposal *F_MH,
+			      Model *F_m, MHProposal *F_MH,
 			      // Dissolution terms and proposals.
-			      Model *D_m, MHproposal *D_MH,
+			      Model *D_m, MHProposal *D_MH,
 			      // Model fitting.
 			      double *eta, 
 			      Model *M_m,

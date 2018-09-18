@@ -15,9 +15,9 @@
 #include "model.h"
 #include "MHproposal.h"
 
-void MH_FormationMLE(MHproposal *MHp, Network *nwp);
-void MH_FormationMLETNT(MHproposal *MHp, Network *nwp);
-void MH_DissolutionMLETNT(MHproposal *MHp, Network *nwp);
+void MH_FormationMLE(MHProposal *MHp, Network *nwp);
+void MH_FormationMLETNT(MHProposal *MHp, Network *nwp);
+void MH_DissolutionMLETNT(MHProposal *MHp, Network *nwp);
 
 #endif 
 

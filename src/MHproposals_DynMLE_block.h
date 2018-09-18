@@ -15,8 +15,8 @@
 #include "model.h"
 #include "MHproposal.h"
 
-void MH_FormationMLEblockdiag(MHproposal *MHp, Network *nwp);
-void MH_FormationMLEblockdiagTNT(MHproposal *MHp, Network *nwp);
+void MH_FormationMLEblockdiag(MHProposal *MHp, Network *nwp);
+void MH_FormationMLEblockdiagTNT(MHProposal *MHp, Network *nwp);
 
 #endif 
 
