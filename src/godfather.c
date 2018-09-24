@@ -75,7 +75,7 @@ void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *
     
     // Now, pos is one past the end of the current time.
     MCMCDyn1Step_advance(n_toggles, 
-			 toggletails+pos-n_toggles, toggleheads+pos-n_toggles,
+			 (Vertex*)toggletails+pos-n_toggles, (Vertex*)toggleheads+pos-n_toggles,
 			 nwp, 
 			 NULL, NULL, 
 			 NULL, NULL,
@@ -89,7 +89,7 @@ void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *
   }
 
   if(*status == MCMCDyn_OK && *maxedges>0){
-    newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList(newnetworktails+1,newnetworkheads+1,nwp,*maxedges-1);
+    newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList((Vertex*)newnetworktails+1,(Vertex*)newnetworkheads+1,nwp,*maxedges-1);
     *time = nwp->duration_info.time;
     if(nwp->duration_info.lasttoggle)
     memcpy(lasttoggle, nwp->duration_info.lasttoggle, sizeof(int)*DYADCOUNT(*n_nodes, *bipartite, *directed_flag));

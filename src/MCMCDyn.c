@@ -34,7 +34,7 @@ void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int 
   if(D_nterms) *D_m=ModelInitialize(D_funnames, D_sonames, &D_inputs, D_nterms); else if(D_m) *D_m=NULL;
   if(M_nterms) *M_m=ModelInitialize(M_funnames, M_sonames, &M_inputs, M_nterms); else if(M_m) *M_m=NULL;
 
-  nwp[0]=NetworkInitialize(tails, heads, n_edges, 
+  nwp[0]=NetworkInitialize((Vertex*)tails, (Vertex*)heads, n_edges, 
                           n_nodes, dflag, bipartite, 1, time, lasttoggle);
 
   // This code initializes the discordance network. Note that both
@@ -192,7 +192,7 @@ void MCMCDyn_wrapper(// Starting network.
   /* record new generated network to pass back to R */
 
   if(*status == MCMCDyn_OK && *maxedges>0){
-    newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList(newnetworktails+1,newnetworkheads+1,nwp,*maxedges-1);
+    newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList((Vertex*)newnetworktails+1,(Vertex*)newnetworkheads+1,nwp,*maxedges-1);
     *time = nwp->duration_info.time;
 
     if(nwp->duration_info.lasttoggle)

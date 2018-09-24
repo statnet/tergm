@@ -87,7 +87,7 @@ void MCMCDynSArun_wrapper(// Observed network.
   /* record the final network to pass back to R */
 
   if(*status==MCMCDyn_OK){
-    newnetworktail[0]=newnetworkhead[0]=EdgeTree2EdgeList(newnetworktail+1,newnetworkhead+1,nwp,*maxedges);
+    newnetworktail[0]=newnetworkhead[0]=EdgeTree2EdgeList((Vertex*)newnetworktail+1,(Vertex*)newnetworkhead+1,nwp,*maxedges);
     *time = nwp->duration_info.time;
     if(nwp->duration_info.lasttoggle)
     memcpy(lasttoggle, nwp->duration_info.lasttoggle, sizeof(int)*DYADCOUNT(*n_nodes, *bipartite, *dflag));
