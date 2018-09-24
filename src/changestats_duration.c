@@ -159,7 +159,6 @@ D_CHANGESTAT_FN(d_edges_ageinterval_mon){
 }
 
 S_CHANGESTAT_FN(s_edges_ageinterval_mon){
-  int i;
   ZERO_ALL_CHANGESTATS(i);
   for (Edge k=1; k <= N_EDGES; k++){
     Vertex tail, head;
@@ -585,12 +584,11 @@ D_CHANGESTAT_FN(d_degree_mean_age_mon){
 
 
 S_CHANGESTAT_FN(s_degree_mean_age_mon){
-  int i;
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
   int transform = INPUT_PARAM[1]; // Transformation code.
 
-  ZERO_ALL_CHANGESTATS(i);
+  ZERO_ALL_CHANGESTATS();
 
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
     Vertex deg = INPUT_PARAM[j+2];
@@ -791,7 +789,6 @@ D_CHANGESTAT_FN(d_degree_by_attr_mean_age_mon){
 }
 
 S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon){
-  int i;
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
   int transform = INPUT_PARAM[1]; // Transformation code.
@@ -1015,7 +1012,6 @@ D_CHANGESTAT_FN(d_degrange_mean_age_mon){
 
 
 S_CHANGESTAT_FN(s_degrange_mean_age_mon){
-  int i;
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
   int transform = INPUT_PARAM[1]; // Transformation code.
@@ -1246,7 +1242,6 @@ D_CHANGESTAT_FN(d_degrange_by_attr_mean_age_mon){
 }
 
 S_CHANGESTAT_FN(s_degrange_by_attr_mean_age_mon){
-  int i;
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
   int transform = INPUT_PARAM[1]; // Transformation code.
