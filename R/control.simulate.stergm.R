@@ -52,6 +52,8 @@ control.simulate.network<-function(MCMC.burnin.min=1000,
                                    MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,                                  
                                    MCMC.init.maxedges=20000,
                                    MCMC.packagenames=c(),
+
+                                   term.options=NULL,
                                    
                                    MCMC.init.maxchanges=1000000){
     if(!is.null(MCMC.burnin) || !is.null(MCMC.burnin.mul)) stop("Control parameters MCMC.burnin and MCMC.burnin.mul are no longer used. See help for EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max, EGMME.MCMC.burnin.pval, EGMME.MCMC.burnin.pval, and CMLE.MCMC.burnin and CMLE.MCMC.interval for their replacements.")
@@ -111,6 +113,7 @@ control.simulate.network<-function(MCMC.burnin.min=1000,
 #'   change statistic functions in addition to those
 #'   autodetected. This argument should not be needed outside of very
 #'   strange setups.
+#' @param term.options A list of additional arguments to be passed to term initializers. It can also be set globally via `option(ergm.term=list(...))`.
 #' @param MCMC.init.maxedges Maximum number of edges expected in
 #'   network.
 #' @param MCMC.burnin,MCMC.burnin.mul No longer used. See
@@ -133,6 +136,8 @@ control.simulate.stergm<-function(MCMC.burnin.min=NULL,
                                   MCMC.init.maxedges=NULL,
                                   MCMC.packagenames=NULL,
 
+                                  term.options=NULL,
+                                  
                                   MCMC.init.maxchanges=NULL){
     if(!is.null(MCMC.burnin) || !is.null(MCMC.burnin.mul)) stop("Control parameters MCMC.burnin and MCMC.burnin.mul are no longer used. See help for EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max, EGMME.MCMC.burnin.pval, EGMME.MCMC.burnin.pval, and CMLE.MCMC.burnin and CMLE.MCMC.interval for their replacements.")
     control<-list()
