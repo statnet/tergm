@@ -1,6 +1,6 @@
 Package: tergm
-Version: 3.6.0-1657
-Date: 2018-09-24
+Version: 3.6.0-1658
+Date: 2018-11-23
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
 	person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="pavel@uow.edu.au", comment=c(ORCID="0000-0002-9101-3362")),
@@ -23,7 +23,7 @@ Description: An integrated set of extensions to the 'ergm' package to analyze an
 License: GPL-3 + file LICENSE
 URL: http://www.statnet.org
 VignetteBuilder: rmarkdown, knitr
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
 Collate: 

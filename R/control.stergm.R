@@ -280,6 +280,7 @@
 #'   error somewhere in the optimization process will cause it to
 #'   restart with a smaller gain value. Otherwise, the process will
 #'   stop. This is mainly used for debugging
+#' @param term.options A list of additional arguments to be passed to term initializers. It can also be set globally via `option(ergm.term=list(...))`.
 #' @param seed Seed value (integer) for the random number generator.
 #'   See \code{\link[base]{set.seed}}
 #' @param parallel Number of threads in which to run the
@@ -346,12 +347,15 @@ control.stergm<-function(init.form=NULL,
                          MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                          
                          SAN.maxit=10,
-                         SAN.control=control.san(coef=init.form,
+                         SAN.control=control.san(
+                           term.options=term.options,
                            SAN.prop.weights=MCMC.prop.weights.form,
                            SAN.prop.args=MCMC.prop.args.form,
                            SAN.init.maxedges=MCMC.init.maxedges,
-                           
-                           SAN.burnin=round(sqrt(EGMME.MCMC.burnin.min*EGMME.MCMC.burnin.max)),
+                           SAN.max.maxedges=Inf,
+
+                           SAN.nsteps=round(sqrt(EGMME.MCMC.burnin.min*EGMME.MCMC.burnin.max)),
+
                            SAN.packagenames=MCMC.packagenames,
                            
                            parallel=parallel,
@@ -413,6 +417,8 @@ control.stergm<-function(init.form=NULL,
                          SA.phase3.samplesize.runs=10, # This times the interval is the number of steps to estimate the standard errors.
                          SA.restart.on.err=TRUE, # Whether to wrap certain routines in try() statements so that they that an error is handled gracefully. Set to FALSE to debug errors in those routines.
 
+                         term.options=NULL,
+                         
                          seed=NULL,
                          parallel=0,
                          parallel.type=NULL,

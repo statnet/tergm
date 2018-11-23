@@ -129,46 +129,32 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
     nw.stats<-summary(targets)
     if(length(nw.stats)!=length(target.stats))
       stop("Incorrect length of the target.stats vector: should be ", length(nw.stats), " but is ",length(target.stats),".")
-    
-    if (!is.null(control$init.form) && length(target.stats) != length(control$init.form)) {
-      if (length(target.stats) != length(control$SAN.control$coef)) {
-        cat('SAN initial coefficients should have same length as targets. Setting them to SAN defaults.\n')
-        control$SAN.control$coef <- NULL
-      }
-    }
         
     if(verbose) cat("Constructing an approximate response network.\n")
     ## If target.stats are given, overwrite the given network and targets
     ## with SAN-ed network and targets.
     
-    newnw <- try({
-      for(srun in seq_len(control$SAN.maxit)){
-        nw<-suppressWarnings(
-          san(targets, target.stats=target.stats,
-                control=control$SAN.control,
-                constraints=constraints,
-                verbose=verbose))
-        targets<-nonsimp_update.formula(targets,nw~., from.new="nw")
-        nw.stats <- summary(targets)
-        srun <- srun + 1
-        if(verbose){
-          cat(paste("Finished SAN run",srun,"\n"))
-        }
-        if(verbose){
-          cat("SAN summary statistics:\n")
-          print(nw.stats)
-          cat("Meanstats Goal:\n")
-          print(target.stats)
-          cat("Difference: SAN target.stats - Goal target.stats =\n")
-          print(round(nw.stats-target.stats,0))
-        }
-        if(sum((nw.stats-target.stats)^2) <= 5) break
-      }
-      nw
-    }, silent=TRUE)
-    if(inherits(newnw,"try-error")){
-      cat("SAN failed or is not applicable. Increase burn-in if there are problems.\n")
-    }else nw <- newnw
+    nw <- TARGET_STATS <-
+        san(targets, target.stats=target.stats,
+            constraints=constraints,
+            control=control$SAN.control,
+            nsim=control$SAN.maxit,
+            only.last=TRUE,
+            verbose=verbose)
+    targets<-nonsimp_update.formula(targets,TARGET_STATS~., from.new="TARGET_STATS")
+    nw.stats <- summary(targets)
+    if(verbose){
+      cat(paste("Finished SAN run",srun,"\n"))
+    }
+    if(verbose){
+      cat("SAN summary statistics:\n")
+      print(nw.stats)
+      cat("Meanstats Goal:\n")
+      print(target.stats)
+      cat("Difference: SAN target.stats - Goal target.stats =\n")
+      print(round(nw.stats-target.stats,0))
+    }
+    
     formation <- nonsimp_update.formula(formation,nw~., from.new="nw")
     dissolution <- nonsimp_update.formula(dissolution,nw~., from.new="nw")
   }
@@ -181,9 +167,9 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
     warning("Dyad-dependent constraint imposed. Note that the constraint is applied to the post-formation and post-dissolution networks y+ and y-, not the next time-step's network. This behavior may change in the future.")
   }
   
-  model.form <- ergm_model(formation, nw, expanded=TRUE, role="formation")
-  model.diss <- ergm_model(dissolution, nw, expanded=TRUE, role="dissolution")
-  model.mon <- ergm_model(targets, nw, expanded=TRUE, role="target")
+  model.form <- ergm_model(formation, nw, expanded=TRUE, role="formation", term.options=control$term.options)
+  model.diss <- ergm_model(dissolution, nw, expanded=TRUE, role="dissolution", term.options=control$term.options)
+  model.mon <- ergm_model(targets, nw, expanded=TRUE, role="target", term.options=control$term.options)
 
   if(any(model.form$etamap$canonical==0) || any(model.diss$etamap$canonical==0) || any(model.mon$etamap$canonical==0)) stop("Equilibrium GMME for models based on curved ERGMs is not supported at this time.")
 

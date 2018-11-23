@@ -29,10 +29,10 @@ control.stergm(init.form = NULL, init.diss = NULL,
   EGMME.MCMC.burnin.min = 1000, EGMME.MCMC.burnin.max = 1e+05,
   EGMME.MCMC.burnin.pval = 0.5, EGMME.MCMC.burnin.add = 1,
   MCMC.burnin = NULL, MCMC.burnin.mul = NULL, SAN.maxit = 10,
-  SAN.control = control.san(coef = init.form, SAN.prop.weights =
-  MCMC.prop.weights.form, SAN.prop.args = MCMC.prop.args.form,
-  SAN.init.maxedges = MCMC.init.maxedges, SAN.burnin =
-  round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max)),
+  SAN.control = control.san(term.options = term.options, SAN.prop.weights
+  = MCMC.prop.weights.form, SAN.prop.args = MCMC.prop.args.form,
+  SAN.init.maxedges = MCMC.init.maxedges, SAN.max.maxedges = Inf,
+  SAN.nsteps = round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max)),
   SAN.packagenames = MCMC.packagenames, parallel = parallel, parallel.type
   = parallel.type, parallel.version.check = parallel.version.check),
   SA.restarts = 10, SA.burnin = 1000, SA.plot.progress = FALSE,
@@ -50,8 +50,8 @@ control.stergm(init.form = NULL, init.diss = NULL,
   SA.phase2.maxreljump = 4, SA.guard.mul = 4, SA.par.eff.pow = 1,
   SA.robust = FALSE, SA.oh.memory = 1e+05, SA.refine = c("mean",
   "linear", "none"), SA.se = TRUE, SA.phase3.samplesize.runs = 10,
-  SA.restart.on.err = TRUE, seed = NULL, parallel = 0,
-  parallel.type = NULL, parallel.version.check = TRUE)
+  SA.restart.on.err = TRUE, term.options = NULL, seed = NULL,
+  parallel = 0, parallel.type = NULL, parallel.version.check = TRUE)
 }
 \arguments{
 \item{init.form, init.diss}{numeric or \code{NA} vector equal in
@@ -368,6 +368,8 @@ to estimate the standard errors.}
 error somewhere in the optimization process will cause it to
 restart with a smaller gain value. Otherwise, the process will
 stop. This is mainly used for debugging}
+
+\item{term.options}{A list of additional arguments to be passed to term initializers. It can also be set globally via \code{option(ergm.term=list(...))}.}
 
 \item{seed}{Seed value (integer) for the random number generator.
 See \code{\link[base]{set.seed}}}
