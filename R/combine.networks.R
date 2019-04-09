@@ -10,16 +10,15 @@
 
 # create a single block-diagonal network by combining multible networks
 
-combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockname="NetworkID", detect.edgecov=TRUE, standardized=FALSE, require.last.attr=TRUE){
-  if(any(sapply(nwl, is.bipartite))) .combine.networks.bipartite(nwl=nwl, ignore.nattr=ignore.nattr, ignore.vattr=ignore.vattr, ignore.eattr=ignore.eattr, blockname=blockname, detect.edgecov=detect.edgecov, standardized=standardized, require.last.attr=require.last.attr)
-  else .combine.networks.unipartite(nwl=nwl, ignore.nattr=ignore.nattr, ignore.vattr=ignore.vattr, ignore.eattr=ignore.eattr, blockname=blockname, detect.edgecov=detect.edgecov, standardized=standardized, require.last.attr=require.last.attr)
+combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockname="NetworkID", detect.edgecov=TRUE, require.last.attr=TRUE){
+  if(any(sapply(nwl, is.bipartite))) .combine.networks.bipartite(nwl=nwl, ignore.nattr=ignore.nattr, ignore.vattr=ignore.vattr, ignore.eattr=ignore.eattr, blockname=blockname, detect.edgecov=detect.edgecov, require.last.attr=require.last.attr)
+  else .combine.networks.unipartite(nwl=nwl, ignore.nattr=ignore.nattr, ignore.vattr=ignore.vattr, ignore.eattr=ignore.eattr, blockname=blockname, detect.edgecov=detect.edgecov, require.last.attr=require.last.attr)
 }
 
 
-.combine.networks.unipartite <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockname="NetworkID", detect.edgecov=TRUE, standardized=FALSE, require.last.attr=TRUE){
+.combine.networks.unipartite <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockname="NetworkID", detect.edgecov=TRUE, require.last.attr=TRUE){
   if(any(diff(sapply(nwl, is.directed)))) stop("All networks must have the same directedness.")
 
-  if(!standardized) nwl <- lapply(nwl, standardize.network)
   ns <- sapply(nwl, network.size)
   blks <- c(0, cumsum(ns))
 
@@ -95,11 +94,10 @@ combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper",
 }
 
 
-.combine.networks.bipartite <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockname="NetworkID", detect.edgecov=TRUE, standardized=FALSE, require.last.attr=TRUE){
+.combine.networks.bipartite <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockname="NetworkID", detect.edgecov=TRUE, require.last.attr=TRUE){
   if(!all(sapply(nwl, is.bipartite))) stop("This function operates only on bipartite networks.")
   if(any(sapply(nwl, is.directed))) stop("Bipartite directed networks are not supported at this time.")
 
-  if(!standardized) nwl <- lapply(nwl, standardize.network)
   ns <- sapply(nwl, network.size)
   es <- sapply(nwl, "%n%", "bipartite")
   eblks <- c(0, cumsum(es))
