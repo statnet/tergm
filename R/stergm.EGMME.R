@@ -123,50 +123,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
       if(is.null(control[[control.transfer[[arg]]]]))
           control[control.transfer[[arg]]] <- list(control[[arg]])
 
-  
-  if(!is.null(target.stats)){
 
-    nw.stats<-summary(targets)
-    if(length(nw.stats)!=length(target.stats))
-      stop("Incorrect length of the target.stats vector: should be ", length(nw.stats), " but is ",length(target.stats),".")
-        
-    if(verbose) cat("Constructing an approximate response network.\n")
-    ## If target.stats are given, overwrite the given network and targets
-    ## with SAN-ed network and targets.
-    
-    nw <- TARGET_STATS <-
-        san(targets, target.stats=target.stats,
-            constraints=constraints,
-            control=control$SAN.control,
-            nsim=control$SAN.maxit,
-            only.last=TRUE,
-            verbose=verbose)
-    targets<-nonsimp_update.formula(targets,TARGET_STATS~., from.new="TARGET_STATS")
-    nw.stats <- summary(targets)
-    if(verbose){
-      cat(paste("Finished SAN run",srun,"\n"))
-    }
-    if(verbose){
-      cat("SAN summary statistics:\n")
-      print(nw.stats)
-      cat("Meanstats Goal:\n")
-      print(target.stats)
-      cat("Difference: SAN target.stats - Goal target.stats =\n")
-      print(round(nw.stats-target.stats,0))
-    }
-    
-    formation <- nonsimp_update.formula(formation,nw~., from.new="nw")
-    dissolution <- nonsimp_update.formula(dissolution,nw~., from.new="nw")
-  }
-
-  if (verbose) cat("Initializing Metropolis-Hastings proposals.\n")
-  proposal.form <- ergm_proposal(constraints, weights=control$MCMC.prop.weights.form, control$MCMC.prop.args.form, nw, class="f")
-  proposal.diss <- ergm_proposal(constraints, weights=control$MCMC.prop.weights.diss, control$MCMC.prop.args.diss, nw, class="d")
-
-  if(!is.dyad.independent(proposal.form$arguments$constraints) || !is.dyad.independent(proposal.diss$arguments$constraints)){
-    warning("Dyad-dependent constraint imposed. Note that the constraint is applied to the post-formation and post-dissolution networks y+ and y-, not the next time-step's network. This behavior may change in the future.")
-  }
-  
   model.form <- ergm_model(formation, nw, expanded=TRUE, role="formation", term.options=control$term.options)
   model.diss <- ergm_model(dissolution, nw, expanded=TRUE, role="dissolution", term.options=control$term.options)
   model.mon <- ergm_model(targets, nw, expanded=TRUE, role="target", term.options=control$term.options)
@@ -178,8 +135,48 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
   q<-length(model.mon$etamap$offsettheta)
   if(p.free>q) stop("Fitting ",p.free," free parameters on ",q," target statistics. The specification is underidentified.")
 
-  model.mon$nw.stats <- summary(model.mon$formula)
+  nw.stats<-summary(model.mon, nw=nw)
+  if(!is.null(target.stats)){
+    if(length(nw.stats)!=length(target.stats))
+      stop("Incorrect length of the target.stats vector: should be ", length(nw.stats), " but is ",length(target.stats),".")
+        
+    if(verbose) cat("Constructing an approximate response network.\n")
+    ## If target.stats are given, overwrite the given network and targets
+    ## with SAN-ed network and targets.
+    
+    nw <- TARGET_STATS <-
+        san(model.mon, basis=nw, target.stats=target.stats,
+            constraints=constraints,
+            control=control$SAN.control,
+            nsim=control$SAN.maxit,
+            only.last=TRUE,
+            verbose=verbose)
+
+    targets<-nonsimp_update.formula(targets,TARGET_STATS~., from.new="TARGET_STATS")
+    formation <- nonsimp_update.formula(formation,TARGET_STATS~., from.new="TARGET_STATS")
+    dissolution <- nonsimp_update.formula(dissolution,TARGET_STATS~., from.new="TARGET_STATS")
+    nw.stats <- summary(model.mon, nw)
+
+    if(verbose){
+      cat("SAN summary statistics:\n")
+      print(nw.stats)
+      cat("Meanstats Goal:\n")
+      print(target.stats)
+      cat("Difference: SAN target.stats - Goal target.stats =\n")
+      print(round(nw.stats-target.stats,0))
+    }
+  }
+
+  model.mon$nw.stats <- nw.stats
   model.mon$target.stats <- if(!is.null(target.stats)) vector.namesmatch(target.stats, names(model.mon$nw.stats)) else model.mon$nw.stats
+
+  if (verbose) cat("Initializing Metropolis-Hastings proposals.\n")
+  proposal.form <- ergm_proposal(constraints, weights=control$MCMC.prop.weights.form, control$MCMC.prop.args.form, nw, class="f")
+  proposal.diss <- ergm_proposal(constraints, weights=control$MCMC.prop.weights.diss, control$MCMC.prop.args.diss, nw, class="d")
+
+  if(!is.dyad.independent(proposal.form$arguments$constraints) || !is.dyad.independent(proposal.diss$arguments$constraints)){
+    warning("Dyad-dependent constraint imposed. Note that the constraint is applied to the post-formation and post-dissolution networks y+ and y-, not the next time-step's network. This behavior may change in the future.")
+  }
 
   # If some control$init is specified...
   
