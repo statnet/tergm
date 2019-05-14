@@ -139,9 +139,12 @@
 #'   \code{EGMME.MCMC.burnin.min} and \code{EGMME.MCMC.burnin.max} to
 #'   the desired number of steps.
 #' @param SAN.maxit When \code{target.stats} argument is passed to
-#'   \code{\link{ergm}}, the maximum number of attempts to use
-#'   \code{\link{san}} to obtain a network with statistics close to
-#'   those specified.
+#' [ergm()], the maximum number of attempts to use \code{\link{san}}
+#' to obtain a network with statistics close to those specified.
+#' @param SAN.nsteps.times Multiplier for \code{SAN.nsteps} relative to
+#' \code{MCMC.burnin}. This lets one control the amount of SAN burn-in
+#' (arguably, the most important of SAN parameters) without overriding the
+#' other SAN.control defaults.
 #' @param SAN.control SAN control parameters.  See
 #'   \code{\link{control.san}}
 #' @param SA.restarts Maximum number of times to restart a failed
@@ -346,15 +349,17 @@ control.stergm<-function(init.form=NULL,
 
                          MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                          
-                         SAN.maxit=10,
+                         SAN.maxit=4,
+                         SAN.nsteps.times=8,
                          SAN.control=control.san(
                            term.options=term.options,
+                           SAN.maxit=SAN.maxit,
                            SAN.prop.weights=MCMC.prop.weights.form,
                            SAN.prop.args=MCMC.prop.args.form,
                            SAN.init.maxedges=MCMC.init.maxedges,
                            SAN.max.maxedges=Inf,
 
-                           SAN.nsteps=round(sqrt(EGMME.MCMC.burnin.min*EGMME.MCMC.burnin.max)),
+                           SAN.nsteps=round(sqrt(EGMME.MCMC.burnin.min*EGMME.MCMC.burnin.max))*SAN.nsteps.times,
 
                            SAN.packagenames=MCMC.packagenames,
                            

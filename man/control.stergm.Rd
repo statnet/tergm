@@ -28,24 +28,25 @@ control.stergm(init.form = NULL, init.diss = NULL,
   EGMME.main.method = c("Gradient-Descent"),
   EGMME.MCMC.burnin.min = 1000, EGMME.MCMC.burnin.max = 1e+05,
   EGMME.MCMC.burnin.pval = 0.5, EGMME.MCMC.burnin.add = 1,
-  MCMC.burnin = NULL, MCMC.burnin.mul = NULL, SAN.maxit = 10,
-  SAN.control = control.san(term.options = term.options, SAN.prop.weights
-  = MCMC.prop.weights.form, SAN.prop.args = MCMC.prop.args.form,
+  MCMC.burnin = NULL, MCMC.burnin.mul = NULL, SAN.maxit = 4,
+  SAN.nsteps.times = 8, SAN.control = control.san(term.options =
+  term.options, SAN.maxit = SAN.maxit, SAN.prop.weights =
+  MCMC.prop.weights.form, SAN.prop.args = MCMC.prop.args.form,
   SAN.init.maxedges = MCMC.init.maxedges, SAN.max.maxedges = Inf,
-  SAN.nsteps = round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max)),
-  SAN.packagenames = MCMC.packagenames, parallel = parallel, parallel.type
-  = parallel.type, parallel.version.check = parallel.version.check),
-  SA.restarts = 10, SA.burnin = 1000, SA.plot.progress = FALSE,
-  SA.max.plot.points = 400, SA.plot.stats = FALSE,
-  SA.init.gain = 0.1, SA.gain.decay = 0.5, SA.runlength = 25,
-  SA.interval.mul = 2, SA.init.interval = 500, SA.min.interval = 20,
-  SA.max.interval = 500, SA.phase1.minruns = 4, SA.phase1.tries = 20,
-  SA.phase1.jitter = 0.1, SA.phase1.max.q = 0.1,
-  SA.phase1.backoff.rat = 1.05, SA.phase2.levels.max = 40,
-  SA.phase2.levels.min = 4, SA.phase2.max.mc.se = 0.001,
-  SA.phase2.repeats = 400, SA.stepdown.maxn = 200,
-  SA.stepdown.p = 0.05, SA.stop.p = 0.1, SA.stepdown.ct = 5,
-  SA.phase2.backoff.rat = 1.1, SA.keep.oh = 0.5,
+  SAN.nsteps = round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max)) *
+  SAN.nsteps.times, SAN.packagenames = MCMC.packagenames, parallel =
+  parallel, parallel.type = parallel.type, parallel.version.check =
+  parallel.version.check), SA.restarts = 10, SA.burnin = 1000,
+  SA.plot.progress = FALSE, SA.max.plot.points = 400,
+  SA.plot.stats = FALSE, SA.init.gain = 0.1, SA.gain.decay = 0.5,
+  SA.runlength = 25, SA.interval.mul = 2, SA.init.interval = 500,
+  SA.min.interval = 20, SA.max.interval = 500, SA.phase1.minruns = 4,
+  SA.phase1.tries = 20, SA.phase1.jitter = 0.1,
+  SA.phase1.max.q = 0.1, SA.phase1.backoff.rat = 1.05,
+  SA.phase2.levels.max = 40, SA.phase2.levels.min = 4,
+  SA.phase2.max.mc.se = 0.001, SA.phase2.repeats = 400,
+  SA.stepdown.maxn = 200, SA.stepdown.p = 0.05, SA.stop.p = 0.1,
+  SA.stepdown.ct = 5, SA.phase2.backoff.rat = 1.1, SA.keep.oh = 0.5,
   SA.keep.min.runs = 8, SA.keep.min = 0, SA.phase2.jitter.mul = 0.2,
   SA.phase2.maxreljump = 4, SA.guard.mul = 4, SA.par.eff.pow = 1,
   SA.robust = FALSE, SA.oh.memory = 1e+05, SA.refine = c("mean",
@@ -195,9 +196,13 @@ the desired number of steps.}
 \code{CMLE.MCMC.interval}.}
 
 \item{SAN.maxit}{When \code{target.stats} argument is passed to
-\code{\link{ergm}}, the maximum number of attempts to use
-\code{\link{san}} to obtain a network with statistics close to
-those specified.}
+\code{\link[=ergm]{ergm()}}, the maximum number of attempts to use \code{\link{san}}
+to obtain a network with statistics close to those specified.}
+
+\item{SAN.nsteps.times}{Multiplier for \code{SAN.nsteps} relative to
+\code{MCMC.burnin}. This lets one control the amount of SAN burn-in
+(arguably, the most important of SAN parameters) without overriding the
+other SAN.control defaults.}
 
 \item{SAN.control}{SAN control parameters.  See
 \code{\link{control.san}}}

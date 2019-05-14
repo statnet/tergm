@@ -148,7 +148,6 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
         san(model.mon, basis=nw, target.stats=target.stats,
             constraints=constraints,
             control=control$SAN.control,
-            nsim=control$SAN.maxit,
             only.last=TRUE,
             verbose=verbose)
 
