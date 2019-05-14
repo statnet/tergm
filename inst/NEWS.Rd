@@ -70,7 +70,9 @@
        \item Optimizations to make use of \code{\link[=ergm:ergm-package]{ergm}} 3.10 APIs.
 
        \item Improved utilization of \code{\link[ergm]{san}}.
-	
+
+       \item \code{\link{stergm}}'s \code{eval.loglik=} argument's default can now be controlled by a \code{\link{options}}-style option.
+
      }
      
    }
