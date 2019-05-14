@@ -18,8 +18,10 @@
 
 stergm(nw, formation, dissolution, constraints = ~., estimate,
   times = NULL, offset.coef.form = NULL, offset.coef.diss = NULL,
-  targets = NULL, target.stats = NULL, eval.loglik = TRUE,
-  control = control.stergm(), verbose = FALSE, ...)
+  targets = NULL, target.stats = NULL,
+  eval.loglik = NVL(getOption("tergm.eval.loglik"),
+  getOption("ergm.eval.loglik")), control = control.stergm(),
+  verbose = FALSE, ...)
 
 \method{summary}{stergm}(object, ...)
 }
@@ -104,8 +106,10 @@ from the respective model. Any offset terms are removed automatically.}
 statistics that EGMME will try to match.  Defaults to the statistics of
 \code{nw}. Unused for CMLE and CMPLE.}
 
-\item{eval.loglik}{Whether or not to calculate the log-likelihood of a CMLE
-STERGM fit. See \code{\link{ergm}} for details.}
+\item{eval.loglik}{Whether or not to calculate the log-likelihood
+of a CMLE STERGM fit. See \code{\link{ergm}} for details. Can be
+set globally via \code{option(tergm.eval.loglik=...)}, falling back to
+\code{getOption("ergm.eval.loglik")} if not set.}
 
 \item{control}{A list of control parameters for algorithm tuning.
 Constructed using \code{\link{control.stergm}}.}

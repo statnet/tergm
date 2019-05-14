@@ -93,8 +93,10 @@
 #' @param target.stats A vector specifying the values of the \code{targets}
 #' statistics that EGMME will try to match.  Defaults to the statistics of
 #' \code{nw}. Unused for CMLE and CMPLE.
-#' @param eval.loglik Whether or not to calculate the log-likelihood of a CMLE
-#' STERGM fit. See \code{\link{ergm}} for details.
+#' @param eval.loglik Whether or not to calculate the log-likelihood
+#'   of a CMLE STERGM fit. See \code{\link{ergm}} for details. Can be
+#'   set globally via `option(tergm.eval.loglik=...)`, falling back to
+#'   `getOption("ergm.eval.loglik")` if not set.
 #' @param control A list of control parameters for algorithm tuning.
 #' Constructed using \code{\link{control.stergm}}.
 #' @param verbose logical or integer; if TRUE or positive, the program will
@@ -187,7 +189,7 @@
 #' @export
 stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times=NULL, offset.coef.form=NULL, offset.coef.diss=NULL,
                    targets=NULL, target.stats=NULL,
-                   eval.loglik=TRUE,
+                   eval.loglik=NVL(getOption("tergm.eval.loglik"), getOption("ergm.eval.loglik")),
                    control=control.stergm(),
                    verbose=FALSE, ...) {
   check.control.class("stergm", "stergm")
