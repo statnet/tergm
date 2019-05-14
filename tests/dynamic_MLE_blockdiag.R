@@ -35,12 +35,12 @@ do.run <- function(dir, prop.weights="default"){
 y0<-network.initialize(n,dir=dir)
 y0 %v% "a" <- rep(seq_along(ns), ns)
 set.seed(321)
-y0<-standardize.network(simulate(y0~edges, constraints=~blockdiag("a"), coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))
+y0<-simulate(y0~edges, constraints=~blockdiag("a"), coef=theta, control=control.simulate(MCMC.burnin=n^2*2))
 
 cat("Complete data:\n")
 
 set.seed(123)
-y1<-standardize.network(simulate(y0~edges, constraints=~blockdiag("a"), coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))
+y1<-simulate(y0~edges, constraints=~blockdiag("a"), coef=theta, control=control.simulate(MCMC.burnin=n^2*2))
 
 # Force CMPLE
 set.seed(543)

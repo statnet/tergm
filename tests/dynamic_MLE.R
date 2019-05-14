@@ -31,12 +31,12 @@ if(bip){ # Extreme theta creates networks with too few ties to properly test.
   
 y0<-network.initialize(n,dir=dir,bipartite=bip)
 set.seed(321)
-y0<-standardize.network(simulate(y0~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))
+y0<-simulate(y0~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2))
 
 cat("Complete data:\n")
 
 set.seed(123)
-y1<-standardize.network(simulate(y0~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))
+y1<-simulate(y0~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2))
 
 # Force CMPLE
 set.seed(543)

@@ -46,12 +46,12 @@ a <- c(sort(a[1:m]), sort(a[-(1:m)]))
 y0 %v% "a" <- a
 
 set.seed(321)
-y0<-standardize.network(simulate(y0~edges, constraints=~blockdiag("a"), coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))
+y0<-simulate(y0~edges, constraints=~blockdiag("a"), coef=theta, control=control.simulate(MCMC.burnin=n^2*2))
 
 cat("Complete data:\n")
 
 set.seed(123)
-y1<-standardize.network(simulate(y0~edges, constraints=~blockdiag("a"), coef=theta, control=control.simulate(MCMC.burnin=n^2*2)))
+y1<-simulate(y0~edges, constraints=~blockdiag("a"), coef=theta, control=control.simulate(MCMC.burnin=n^2*2))
 
 # Force CMPLE
 set.seed(543)
