@@ -61,9 +61,31 @@
   % }
 %% }
 
+\section{Changes in version 3.6.0}{
+    \subsection{NEW FEATURES}{
+     \itemize{
+	
+       \item Compatibility with \code{\link[=ergm:ergm-package]{ergm}} 3.10 API changes.
+       
+       \item Optimizations to make use of \code{\link[=ergm:ergm-package]{ergm}} 3.10 APIs.
+
+       \item Improved utilization of \code{\link[ergm]{san}}.
+	
+     }
+     
+   }
+
+  \subsection{BUG FIXES}{
+    \itemize{
+
+      \item Miscellaneous compiler warnings fixed.
+      
+    }
+  }
+}
 
 
-\section{Changes in version 3.5.1}{
+\section{Changes in version 3.5.2}{
     \subsection{NEW FEATURES}{
       \itemize{
 	
