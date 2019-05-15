@@ -67,7 +67,7 @@
 	
        \item Compatibility with \code{\link[=ergm:ergm-package]{ergm}} 3.10 API changes.
        
-       \item Optimizations to make use of \code{\link[=ergm:ergm-package]{ergm}} 3.10 APIs.
+       \item Optimizations to make use of \code{\link[=ergm:ergm-package]{ergm}} 3.10 APIs and parallel facilities.
 
        \item Improved utilization of \code{\link[ergm]{san}}.
 
