@@ -9,7 +9,7 @@
 #######################################################################
 #' @import stats
 stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss, model.mon,
-                            control, proposal.form, proposal.diss, cl=NULL,
+                            control, proposal.form, proposal.diss,
                             verbose=FALSE){
 
   
@@ -42,10 +42,10 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     n <- nrow(ys)
     #' @importFrom robustbase lmrob
     h.fits <-
-      if(!is.null(cl)){
+      if(!is.null(ergm.getCluster(control))){
         requireNamespace('parallel')
         if(verbose) {cat("Calling lm/lmrob:\n"); print(gc())}
-        out <- parallel::clusterApplyLB(cl, 1:q,
+        out <- parallel::clusterApplyLB(ergm.getCluster(control), 1:q,
                        function(i){
                          y<-ys[,i]
                          suppressWarnings(try({
@@ -252,6 +252,6 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
   }
   
   stergm.EGMME.SA(theta.form0, theta.diss0, nw, model.form, model.diss, model.mon,
-                  control, proposal.form, proposal.diss, eval.optpars, cl=cl,
+                  control, proposal.form, proposal.diss, eval.optpars,
                   verbose)
 }

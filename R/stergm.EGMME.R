@@ -206,21 +206,18 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
   if(verbose) cat("Fitting STERGM Equilibrium GMME.\n")
 
   if(control$parallel){
-    cl <- ergm.getCluster(control, verbose=verbose)
-    if(verbose && !is.null(cl)) cat("Using parallel cluster.\n")
-    on.exit(suppressWarnings(try(ergm.stopCluster(cl),silent=TRUE)))
-  }else cl <- NULL
+    ergm.getCluster(control, verbose=verbose)
+    if(verbose && !is.null(ergm.getCluster(control))) cat("Using parallel cluster.\n")
+  }
   
   Cout <- switch(control$EGMME.main.method,
                  "Gradient-Descent" = stergm.EGMME.GD(initialfit$formation.fit$coef,
                    initialfit$dissolution.fit$coef, nw, model.form, model.diss, model.mon,
                    control=control, proposal.form=proposal.form,
-                   proposal.diss=proposal.diss, cl=cl,
+                   proposal.diss=proposal.diss,
                   verbose),
                  stop("Method ", control$EGMME.main.method, " is not implemented.")
                 )
-
-  ## if(!is.null(cl)) ergm.stopCluster(cl)
 
   out <- list(network = nw, formation = formation, dissolution = dissolution, targets = targets, target.stats=model.mon$target.stats, estimate=estimate, covar = Cout$covar, opt.history=Cout$opt.history, sample=Cout$sample, sample.obs=NULL, control=control, reference = ~Bernoulli, mc.se = Cout$mc.se, constraints = constraints,
               formation.fit = with(Cout, list(network=nw, formula=formation, coef = eta.form, covar=covar.form, etamap = model.form$etamap, offset = model.form$etamap$offsettheta, constraints=constraints, estimate=estimate, control=control, reference = ~Bernoulli, mc.se = mc.se.form)),
