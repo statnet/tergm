@@ -1,1 +1,0 @@
-* A bug in ergm 3.9.4 means that stergm EGMME might not properly shut down any clusters it starts when parallel>0.
