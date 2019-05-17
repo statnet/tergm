@@ -21,7 +21,7 @@ Depends:
 Imports:
     robustbase (>= 0.93.5),
     coda (>= 0.19.2),
-    nlme (>= 3.1.140),
+    nlme (>= 3.1-140),
     MASS (>= 7.3.51.4),
     statnet.common (>= 4.2.0)
 LinkingTo:
