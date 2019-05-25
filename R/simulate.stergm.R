@@ -1,11 +1,11 @@
 #  File R/simulate.stergm.R in package tergm, part of the Statnet suite
-#  of packages for network analysis, http://statnet.org .
+#  of packages for network analysis, https://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
 #  open source, and has the attribution requirements (GPL Section 7) at
-#  http://statnet.org/attribution
+#  https://statnet.org/attribution
 #
-#  Copyright 2008-2017 Statnet Commons
+#  Copyright 2008-2019 Statnet Commons
 #######################################################################
 #========================================================================
 # This file contains the following 3 functions for simulating stergms
@@ -311,7 +311,7 @@
 #' # "Resume" the simulation.
 #' dynsim2<-simulate(dynsim,time.slices=S,verbose=TRUE)
 #' @importFrom stats simulate
-#' @export simulate.stergm
+#' @export
 simulate.stergm<-function(object, nsim=1, seed=NULL,
                           coef.form=object$formation.fit$coef,coef.diss=object$dissolution.fit$coef,
                           constraints = object$constraints,
@@ -427,7 +427,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
     monitor <- switch(monitor,
                       formation = formation,
                       dissolution = dissolution,
-                      all = append_rhs.formula(~nw, unique(lapply(c(term.list.formula(formation[[3]]),term.list.formula(dissolution[[3]])), unset.offset.call)))
+                      all = append_rhs.formula(~nw, unique(lapply(c(list_rhs.formula(formation),list_rhs.formula(dissolution)), unset.offset.call)))
                       )
   }
   
@@ -442,13 +442,13 @@ simulate.network <- function(object, nsim=1, seed=NULL,
 
 
 
-  model.form <- ergm_model(formation, nw, role="formation")
+  model.form <- ergm_model(formation, nw, role="formation", term.options=control$term.options)
   if(!missing(coef.form) && nparam(model.form)!=length(coef.form)) stop("coef.form has ", length(coef.form), " elements, while the model requires ",nparam(model.form)," parameters.")
 
-  model.diss <- ergm_model(dissolution, nw, role="dissolution")
+  model.diss <- ergm_model(dissolution, nw, role="dissolution", term.options=control$term.options)
   if(!missing(coef.diss) && nparam(model.diss)!=length(coef.diss)) stop("coef.diss has ", length(coef.diss), " elements, while the model requires ",nparam(model.diss)," parameters.")
 
-  model.mon <- if(!is.null(monitor)) ergm_model(monitor, nw, role="target") else NULL
+  model.mon <- if(!is.null(monitor)) ergm_model(monitor, nw, role="target", term.options=control$term.options) else NULL
   
   if(missing(coef.form)) {
     coef.form <- rep(0,nparam(model.form, canonical=TRUE))
@@ -477,9 +477,9 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   out <- replicate(nsim, {
     nw <- .set.default.net.obs.period(nw, time.start)
     nw %n% "time" <- start <- .get.last.obs.time(nw, time.start)
-    z <- stergm.getMCMCsample(nw, model.form, model.diss, model.mon,
+    z <- stergm_MCMC_sample(nw, model.form, model.diss, model.mon,
                               proposal.form, proposal.diss,
-                              eta.form, eta.diss, control, verbose)
+                              eta.form=eta.form, eta.diss=eta.diss, control=control, verbose=verbose)
     
     stats.form <- if(control$collect.form) mcmc(sweep(z$statsmatrix.form,2,summary(formation),"+"),start=time.burnin+1,thin=time.interval)
     stats.diss <- if(control$collect.diss) mcmc(sweep(z$statsmatrix.diss,2,summary(dissolution),"+"),start=time.burnin+1,thin=time.interval)

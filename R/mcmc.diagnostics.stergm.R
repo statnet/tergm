@@ -1,11 +1,11 @@
 #  File R/mcmc.diagnostics.stergm.R in package tergm, part of the Statnet suite
-#  of packages for network analysis, http://statnet.org .
+#  of packages for network analysis, https://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
 #  open source, and has the attribution requirements (GPL Section 7) at
-#  http://statnet.org/attribution
+#  https://statnet.org/attribution
 #
-#  Copyright 2008-2017 Statnet Commons
+#  Copyright 2008-2019 Statnet Commons
 #######################################################################
 
 
@@ -36,9 +36,9 @@
 #'   \code{\link{stergm}}.
 #' @param center Logical: If TRUE, ; center the samples on the
 #'   observed statistics.
-#' @param curved Logical: If TRUE, summarize the curved statistics
+#' @param esteq Logical: If TRUE, summarize the estimating equation values
 #'   (evaluated at the MLE of any non-linear parameters), rather than
-#'   the raw components of the curved statistics.
+#'   their canonical components.
 #' @param vars.per.page Number of rows (one variable per row) per
 #'   plotting page.  Ignored if \code{latticeExtra} package is not
 #'   installed.
@@ -65,24 +65,24 @@
 #' @export
 mcmc.diagnostics.stergm <- function(object, 
                                     center=TRUE,
-                                    curved=TRUE,
+                                    esteq=TRUE,
                                     vars.per.page=3, ...){
   if(!is.null(object$formation.fit$sample)){
     cat("\n==========================\n")
     cat("Formation fit diagnostics\n")
     cat("==========================\n\n")
-    mcmc.diagnostics(object$formation.fit, center=center, curved=curved, vars.per.page=vars.per.page, ...)
+    mcmc.diagnostics(object$formation.fit, center=center, esteq=esteq, vars.per.page=vars.per.page, ...)
   }
   if(!is.null(object$dissolution.fit$sample)){
     cat("\n==========================\n")
     cat("Dissolution fit diagnostics\n")
     cat("==========================\n\n")
-    mcmc.diagnostics(object$dissolution.fit, center=center, curved=curved, vars.per.page=vars.per.page, ...)
+    mcmc.diagnostics(object$dissolution.fit, center=center, esteq=esteq, vars.per.page=vars.per.page, ...)
   }
   if(!is.null(object$sample)){
     cat("\n==========================\n")
     cat("EGMME diagnostics\n")
     cat("==========================\n\n")
-    getS3method("mcmc.diagnostics","ergm")(object, center=center, curved=curved, vars.per.page=vars.per.page, ...)
+    getS3method("mcmc.diagnostics","ergm")(object, center=center, esteq=esteq, vars.per.page=vars.per.page, ...)
   }
 }

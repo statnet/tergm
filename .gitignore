@@ -20,6 +20,7 @@
 
 # produced vignettes
 vignettes/*.html
+vignettes/*.tex
 vignettes/*.pdf
 vignettes/figure
 vignettes/cache

@@ -7,7 +7,7 @@
 combine.networks(nwl, ignore.nattr = c("bipartite", "directed", "hyper",
   "loops", "mnext", "multiple", "n"), ignore.vattr = c(),
   ignore.eattr = c(), blockID.vattr = ".NetworkID",
-  blockName.vattr = NULL, detect.edgecov = FALSE, standardized = FALSE,
+  blockName.vattr = NULL, detect.edgecov = FALSE,
   keep.unshared.attr = FALSE)
 }
 \arguments{
@@ -29,10 +29,6 @@ that vertex originally belonged.}
 \item{detect.edgecov}{if \code{TRUE}, combine network attributes that
 look like dyadic covariate (\code{\link[ergm:edgecov]{ergm::edgecov}}) matrices into a
 block-diagonal matrix.}
-
-\item{standardized}{whether the passed networks can be assumed to
-have been run throgh \code{\link[ergm:standardize.network]{ergm::standardize.network()}}: their
-internal representation fulfills certain constraints.}
 
 \item{keep.unshared.attr}{whether to keep those network, vertex,
 and edge attributes not shared by all networks in the list; if

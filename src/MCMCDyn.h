@@ -1,11 +1,11 @@
 /*  File src/MCMCDyn.h in package tergm, part of the Statnet suite
- *  of packages for network analysis, http://statnet.org .
+ *  of packages for network analysis, https://statnet.org .
  *
  *  This software is distributed under the GPL-3 license.  It is free,
  *  open source, and has the attribution requirements (GPL Section 7) at
- *  http://statnet.org/attribution
+ *  https://statnet.org/attribution
  *
- *  Copyright 2008-2017 Statnet Commons
+ *  Copyright 2008-2019 Statnet Commons
  */
 #ifndef MCMCDYN_H
 #define MCMCDYN_H
@@ -25,7 +25,7 @@ typedef enum MCMCDynStatus_enum {
 
 
 void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int n_edges,
-			 int n_nodes, int dflag, int bipartite, Network *nw,
+			 int n_nodes, int dflag, int bipartite, Network **nw,
 			 
 			 int F_nterms, char *F_funnames, char *F_sonames, double *F_inputs, Model **F_m,
 			 int D_nterms, char *D_funnames, char *D_sonames, double *D_inputs, Model **D_m,
@@ -34,8 +34,8 @@ void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int 
 			 int *attribs, int *maxout, int *maxin, int *minout,
 			 int *minin, int condAllDegExact, int attriblength,
 			 
-			 char *F_MHproposaltype, char *F_MHproposalpackage, MHproposal *F_MH,
-			 char *D_MHproposaltype, char *D_MHproposalpackage, MHproposal *D_MH,
+			 char *F_MHProposaltype, char *F_MHProposalpackage, MHProposal **F_MH,
+			 char *D_MHProposaltype, char *D_MHProposalpackage, MHProposal **D_MH,
 			 int fVerbose);
 
 
@@ -43,19 +43,19 @@ void MCMCDyn_finish_common(Network *nw,
 			   Model *F_m,
 			   Model *D_m,
 			   Model *M_m,
-			   MHproposal *F_MH,
-			   MHproposal *D_MH);
+			   MHProposal *F_MH,
+			   MHProposal *D_MH);
 
 void MCMCDyn_wrapper(// Starting network.
 		     int *tails, int *heads, int *time, int *lasttoggle, int *n_edges,
 		     int *n_nodes, int *dflag, int *bipartite,
 		     // Formation terms and proposals.
 		     int *F_nterms, char **F_funnames, char **F_sonames, 
-		     char **F_MHproposaltype, char **F_MHproposalpackage,
+		     char **F_MHProposaltype, char **F_MHProposalpackage,
 		     double *F_inputs, double *F_eta, 
 		     // Dissolution terms and proposals.
 		     int *D_nterms, char **D_funnames, char **D_sonames,
-		     char **D_MHproposaltype, char **D_MHproposalpackage,
+		     char **D_MHProposaltype, char **D_MHProposalpackage,
 		     double *D_inputs, double *D_eta,
 		     // Monitored terms.
 		     int *M_nterms, char **M_funnames, char **M_sonames,  double *M_inputs,
@@ -81,10 +81,10 @@ void MCMCDyn_wrapper(// Starting network.
 MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 			    Network *nwp,
 			    // Formation terms and proposals.
-			    Model *F_m, MHproposal *F_MH,
+			    Model *F_m, MHProposal *F_MH,
 			    double *F_eta,
 			    // Dissolution terms and proposals.
-			    Model *D_m, MHproposal *D_MH,
+			    Model *D_m, MHProposal *D_MH,
 			    double *D_eta,
 			    // Monitored terms.
 			    Model *M_m,
@@ -103,9 +103,9 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
 			   Network *nwp,
 			   // Formation terms and proposals.
-			   Model *F_m, MHproposal *F_MH, double *F_eta,
+			   Model *F_m, MHProposal *F_MH, double *F_eta,
 			   // Dissolution terms and proposals.
-			   Model *D_m, MHproposal *D_MH, double *D_eta,
+			   Model *D_m, MHProposal *D_MH, double *D_eta,
 			   // Monitored statistics.
 			   Model *M_m,
 			   // Space for output.

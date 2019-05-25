@@ -1,13 +1,15 @@
 #  File tests/simulate_networkDynamic.R in package tergm, part of the Statnet suite
-#  of packages for network analysis, http://statnet.org .
+#  of packages for network analysis, https://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
 #  open source, and has the attribution requirements (GPL Section 7) at
-#  http://statnet.org/attribution
+#  https://statnet.org/attribution
 #
-#  Copyright 2008-2017 Statnet Commons
+#  Copyright 2008-2019 Statnet Commons
 #######################################################################
 library(tergm)
+
+set.seed(0)
 
 logit<-function(p)log(p/(1-p))
 coef.form.f<-function(coef.diss,density) -log(((1+exp(coef.diss))/(density/(1-density)))-1)
@@ -50,13 +52,13 @@ if (!all(unlist((dynsim2%n%'net.obs.period')$observations)==c(0,1,1,11,11,21))){
 
 # check a realistic example of starting a sim from scratch
 mean.rel.dur <- 10
-msm.sim <- network.initialize(1000,directed=F)
+msm.sim <- network.initialize(100,directed=F)
 activate.vertices(msm.sim,-Inf,Inf)
 set.network.attribute(msm.sim,'net.obs.period',list(observations=list(c(-1,0)),
                                                     mode="discrete", time.increment=1,time.unit="step"))
 formation <- ~edges
 dissolution <- ~offset(edges)
-target.stats <- 400
+target.stats <- 40
 coef.diss <- log(mean.rel.dur-1)
 formation.with.stnet <- update.formula(formation,msm.startnet~.)
 msm.startnet <- network.collapse(msm.sim,at=0)
@@ -95,13 +97,13 @@ if(!all(unlist((msm.sim%n%'net.obs.period')$observations)==c(-1,  0,  0,  1,  1,
 
 # test a sim with vertex dynamics applied after the sim stage
 mean.rel.dur <- 10
-msm.sim <- network.initialize(1000,directed=F)
+msm.sim <- network.initialize(100,directed=F)
 activate.vertices(msm.sim,-Inf,Inf)
 set.network.attribute(msm.sim,'net.obs.period',list(observations=list(c(-1,0)),
                                                     mode="discrete", time.increment=1,time.unit="step"))
 formation <- ~edges
 dissolution <- ~offset(edges)
-target.stats <- 400
+target.stats <- 40
 coef.diss <- log(mean.rel.dur-1)
 formation.with.stnet <- update.formula(formation,msm.startnet~.)
 # simulate a set of edges to use as the starting point for the network
@@ -144,7 +146,7 @@ msm.sim<-deactivate.vertices(msm.sim,v=sample(which(is.active(msm.sim,v=1:networ
 add.vertices.active(msm.sim,nv=1,onset=1,terminus=Inf)
 
 # check for correct activity
-if(!all(sapply(-1:2,function(t){network.size.active(msm.sim,at=t)})==c(1000,995,986,986))){
+if(!all(sapply(-1:2,function(t){network.size.active(msm.sim,at=t)})==c(100,95,86,86))){
   stop('vertex dynamics did not seem to generate correct activity in stergm sim')
 }
 
@@ -200,12 +202,12 @@ if(any(changes[,2:3]==1)){
 
 
 mean.rel.dur <- 10
-msm.sim <- as.networkDynamic(network.initialize(1000,directed=F))
+msm.sim <- as.networkDynamic(network.initialize(100,directed=F))
 #set.network.attribute(msm.sim,'net.obs.period',list(observations=list(c(-1,0)),
 #                                                    mode="discrete", time.increment=1,time.unit="step"))
 formation <- ~edges
 dissolution <- ~offset(edges)
-target.stats <- 400
+target.stats <- 40
 coef.diss <- log(mean.rel.dur-1)
 formation.with.stnet <- update.formula(formation,msm.startnet~.)
 # simulate a set of edges to use as the starting point for the network
@@ -294,7 +296,7 @@ if(!all(is.na(dynsim%v%"tergm_pid"))){
 
 # ---- check summary.statistics.networkDynamic ---
 # this was giving error in #958
-my.nD <- network.initialize(100,directed=F)
+my.nD <- network.initialize(10,directed=F)
 activate.vertices(my.nD, onset=0, terminus = 10)
 class(my.nD)
 summary(my.nD~isolates, at=1)
@@ -302,12 +304,12 @@ summary(my.nD~isolates, at=1)
 
 # --- checking simulate with Inf coefficients ---
 # was giving error to #995
-n <- 50
+n <- 10
 nw <- network.initialize(n, directed = FALSE)
 nw <- set.vertex.attribute(nw, "loc", rep(0:1, each = n/2))
 
 fit <- ergm(nw ~ edges + offset(nodemix("loc", base=c(1, 3))),
-            target.stats = 15,
+            target.stats = 3,
             offset.coef = -Inf)
 coef.form <- fit$coef
 coef.form[1] <- coef.form[1] - log(40-1)
@@ -318,6 +320,6 @@ diag.sim <- simulate(fit.sim,
                      dissolution = ~offset(edges),
                      coef.form = coef.form,
                      coef.diss = log(40-1),
-                     time.slices = 100,
+                     time.slices = 10,
                      monitor = "formation",
                      nsim = 1)

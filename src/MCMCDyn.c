@@ -1,13 +1,14 @@
 /*  File src/MCMCDyn.c in package tergm, part of the Statnet suite
- *  of packages for network analysis, http://statnet.org .
+ *  of packages for network analysis, https://statnet.org .
  *
  *  This software is distributed under the GPL-3 license.  It is free,
  *  open source, and has the attribution requirements (GPL Section 7) at
- *  http://statnet.org/attribution
+ *  https://statnet.org/attribution
  *
- *  Copyright 2008-2017 Statnet Commons
+ *  Copyright 2008-2019 Statnet Commons
  */
 #include "MCMCDyn.h"
+#include <stdbool.h>
 
 /*****************
  Note on undirected networks:  For j<k, edge {j,k} should be stored
@@ -16,7 +17,7 @@
 *****************/
 
 void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int n_edges,
-			 int n_nodes, int dflag, int bipartite, Network *nw,
+			 int n_nodes, int dflag, int bipartite, Network **nwp,
 			 
 			 int F_nterms, char *F_funnames, char *F_sonames, double *F_inputs, Model **F_m,
 			 int D_nterms, char *D_funnames, char *D_sonames, double *D_inputs, Model **D_m,
@@ -25,41 +26,82 @@ void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int 
 			 int *attribs, int *maxout, int *maxin, int *minout,
 			 int *minin, int condAllDegExact, int attriblength,
 			 
-			 char *F_MHproposaltype, char *F_MHproposalpackage, MHproposal *F_MH,
-			 char *D_MHproposaltype, char *D_MHproposalpackage, MHproposal *D_MH,
+			 char *F_MHProposaltype, char *F_MHProposalpackage, MHProposal **F_MH,
+			 char *D_MHProposaltype, char *D_MHProposalpackage, MHProposal **D_MH,
 			 int fVerbose){
   
   if(F_nterms) *F_m=ModelInitialize(F_funnames, F_sonames, &F_inputs, F_nterms); else if(F_m) *F_m=NULL;
   if(D_nterms) *D_m=ModelInitialize(D_funnames, D_sonames, &D_inputs, D_nterms); else if(D_m) *D_m=NULL;
   if(M_nterms) *M_m=ModelInitialize(M_funnames, M_sonames, &M_inputs, M_nterms); else if(M_m) *M_m=NULL;
 
-  nw[0]=NetworkInitialize(tails, heads, n_edges, 
+  nwp[0]=NetworkInitialize((Vertex*)tails, (Vertex*)heads, n_edges, 
                           n_nodes, dflag, bipartite, 1, time, lasttoggle);
-  if(F_MH || D_MH) nw[1]=NetworkInitialize(NULL, NULL, 0,
-					   n_nodes, dflag, bipartite, 0, 0, NULL);
 
-  if(F_MH) MH_init(F_MH, F_MHproposaltype, F_MHproposalpackage, F_inputs, fVerbose, nw, attribs, maxout, maxin, minout, minin,
-			    condAllDegExact, attriblength);
-  if(D_MH) MH_init(D_MH, D_MHproposaltype, D_MHproposalpackage, D_inputs, fVerbose, nw, attribs, maxout, maxin, minout, minin,
-			    condAllDegExact, attriblength);
+  // This code initializes the discordance network. Note that both
+  // F_MH and D_MH should expect MH->discord[0] to be the discordance
+  // network relative to the last time step. However, they may want to
+  // maintain other discordance networks, in which case they might
+  // choose to allocate their own MH->discord vectors. If they do,
+  // discordl won't be allocated.
+  if(F_MH || D_MH){
+    Network *discord=NetworkInitialize(NULL, NULL, 0,
+				       n_nodes, dflag, bipartite, 0, 0, NULL);
+    Network **discordl=NULL;
+  
+    if(F_MH){
+      *F_MH = MHProposalInitialize(F_MHProposaltype, F_MHProposalpackage, F_inputs, fVerbose, *nwp, attribs, maxout, maxin, minout, minin,
+				   condAllDegExact, attriblength);
+      if((*F_MH)->discord==NULL){
+	discordl = (Network**) Calloc(2,Network*); // A space for the sentinel NULL pointer.
+	(*F_MH)->discord = discordl;
+      }
+      (*F_MH)->discord[0] = discord;
+    }
+    
+    if(D_MH){
+      *D_MH = MHProposalInitialize(D_MHProposaltype, D_MHProposalpackage, D_inputs, fVerbose, *nwp, attribs, maxout, maxin, minout, minin,
+				   condAllDegExact, attriblength);
+      if((*D_MH)->discord==NULL){
+	if(discordl==NULL)
+	  discordl = (Network**) Calloc(2,Network*); // A space for the sentinel NULL pointer.
+	(*D_MH)->discord = discordl;
+      }
+      (*D_MH)->discord[0] = discord;
+    }
+  }
 
   GetRNGstate();  /* R function enabling uniform RNG. It needs to come after NetworkInitialize and MH_init, since they may call GetRNGstate as well. */  
 
 }
 
-void MCMCDyn_finish_common(Network *nw,
+void MCMCDyn_finish_common(Network *nwp,
 			   Model *F_m,
 			   Model *D_m,
 			   Model *M_m,
-			   MHproposal *F_MH,
-			   MHproposal *D_MH){
-  if(F_MH) MH_free(F_MH);
-  if(D_MH) MH_free(D_MH);
+			   MHProposal *F_MH,
+			   MHProposal *D_MH){
+  if(F_MH || D_MH){
+    bool same_discord = F_MH->discord==D_MH->discord;
+    for(Network **nwp=F_MH->discord; *nwp!=NULL; nwp++){
+      NetworkDestroy(*nwp);
+    }
+    // First discordance network has already been destroyed.
+    for(Network **nwp=D_MH->discord+1; *nwp!=NULL; nwp++){
+      NetworkDestroy(*nwp);
+    }
+    
+    Free(F_MH->discord);
+    F_MH->discord=NULL;
+    if(!same_discord) Free(D_MH->discord);
+    D_MH->discord=NULL; // Always set to NULL, since it may have been freed with F_MH->discord.
+
+    if(F_MH) MHProposalDestroy(F_MH);
+    if(D_MH) MHProposalDestroy(D_MH);
+  }
   if(F_m) ModelDestroy(F_m);
   if(D_m) ModelDestroy(D_m);
   if(M_m) ModelDestroy(M_m);
-  NetworkDestroy(nw);
-  if(F_MH || D_MH) NetworkDestroy(&nw[1]);
+  NetworkDestroy(nwp);
   PutRNGstate();  /* Disable RNG before returning */
 
 }
@@ -74,11 +116,11 @@ void MCMCDyn_wrapper(// Starting network.
 		     int *n_nodes, int *dflag, int *bipartite,
 		     // Formation terms and proposals.
 		     int *F_nterms, char **F_funnames, char **F_sonames, 
-		     char **F_MHproposaltype, char **F_MHproposalpackage,
+		     char **F_MHProposaltype, char **F_MHProposalpackage,
 		     double *F_inputs, double *F_eta, 
 		     // Dissolution terms and proposals.
 		     int *D_nterms, char **D_funnames, char **D_sonames,
-		     char **D_MHproposaltype, char **D_MHproposalpackage,
+		     char **D_MHProposaltype, char **D_MHProposalpackage,
 		     double *D_inputs, double *D_eta,
 		     // Monitored terms.
 		     int *M_nterms, char **M_funnames, char **M_sonames,  double *M_inputs,
@@ -100,9 +142,9 @@ void MCMCDyn_wrapper(// Starting network.
 		     // Verbosity.
 		     int *fVerbose,
 		     int *status){
-  Network nw[2];
+  Network *nwp;
   Model *F_m, *D_m, *M_m;
-  MHproposal F_MH, D_MH;
+  MHProposal *F_MH, *D_MH;
 
   if(*lasttoggle == 0) lasttoggle = NULL;
 
@@ -115,9 +157,9 @@ void MCMCDyn_wrapper(// Starting network.
     diffhead = (Vertex *) diffnetworkhead;
     diffto = (int *) diffnetworkto;
   }else{
-    difftime = (Vertex *) calloc(*maxchanges,sizeof(Vertex));
-    difftail = (Vertex *) calloc(*maxchanges,sizeof(Vertex));
-    diffhead = (Vertex *) calloc(*maxchanges,sizeof(Vertex));
+    difftime = (Vertex *) Calloc(*maxchanges,Vertex);
+    difftail = (Vertex *) Calloc(*maxchanges,Vertex);
+    diffhead = (Vertex *) Calloc(*maxchanges,Vertex);
     diffto = NULL;
   }
   
@@ -129,19 +171,19 @@ void MCMCDyn_wrapper(// Starting network.
   }
 
   MCMCDyn_init_common(tails, heads, *time, lasttoggle, *n_edges,
-		      *n_nodes, *dflag, *bipartite, nw,
+		      *n_nodes, *dflag, *bipartite, &nwp,
 		      *F_nterms, *F_funnames, *F_sonames, F_inputs, &F_m,
 		      *D_nterms, *D_funnames, *D_sonames, D_inputs, &D_m,
 		      *M_nterms, *M_nterms ? *M_funnames : NULL, *M_nterms ? *M_sonames : NULL, M_inputs, &M_m,   // I am not sure  whether the ?:s are necessary here, but if it keeps us from dereferencing a NULL pointer...
 		      attribs, maxout, maxin, minout,
 		      minin, *condAllDegExact, *attriblength, 
-		      *F_MHproposaltype, *F_MHproposalpackage, &F_MH,
-		      *D_MHproposaltype, *D_MHproposalpackage, &D_MH,
+		      *F_MHProposaltype, *F_MHProposalpackage, &F_MH,
+		      *D_MHProposaltype, *D_MHProposalpackage, &D_MH,
 		      *fVerbose);
 
-  *status = MCMCSampleDyn(nw,
-			  F_m, &F_MH, F_eta,
-			  D_m, &D_MH, D_eta,
+  *status = MCMCSampleDyn(nwp,
+			  F_m, F_MH, F_eta,
+			  D_m, D_MH, D_eta,
 			  M_m,
 			  *F_collect?F_sample:NULL, *D_collect?D_sample:NULL, M_m?M_sample:NULL, *maxedges, *maxchanges, *log_changes, difftime, difftail, diffhead, diffto,
 			  *nsteps, *min_MH_interval, *max_MH_interval, *MH_pval, *MH_interval_add, *burnin, *interval,
@@ -150,20 +192,20 @@ void MCMCDyn_wrapper(// Starting network.
   /* record new generated network to pass back to R */
 
   if(*status == MCMCDyn_OK && *maxedges>0){
-    newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList(newnetworktails+1,newnetworkheads+1,nw,*maxedges-1);
-    *time = nw->duration_info.time;
+    newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList((Vertex*)newnetworktails+1,(Vertex*)newnetworkheads+1,nwp,*maxedges-1);
+    *time = nwp->duration_info.time;
 
-    if(nw->duration_info.lasttoggle)
-    memcpy(lasttoggle, nw->duration_info.lasttoggle, sizeof(int)*DYADCOUNT(*n_nodes, *bipartite, *dflag));
+    if(nwp->duration_info.lasttoggle)
+    memcpy(lasttoggle, nwp->duration_info.lasttoggle, sizeof(int)*DYADCOUNT(*n_nodes, *bipartite, *dflag));
   }
 
   if(!*log_changes){
-    free(difftime);
-    free(difftail);
-    free(diffhead);
+    Free(difftime);
+    Free(difftail);
+    Free(diffhead);
   }
 
-  MCMCDyn_finish_common(nw, F_m, D_m, M_m, &F_MH, &D_MH);
+  MCMCDyn_finish_common(nwp, F_m, D_m, M_m, F_MH, D_MH);
 }
 
 /*********************
@@ -179,10 +221,10 @@ void MCMCDyn_wrapper(// Starting network.
 MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 			    Network *nwp,
 			    // Formation terms and proposals.
-			    Model *F_m, MHproposal *F_MH,
+			    Model *F_m, MHProposal *F_MH,
 			    double *F_eta,
 			    // Dissolution terms and proposals.
-			    Model *D_m, MHproposal *D_MH,
+			    Model *D_m, MHProposal *D_MH,
 			    double *D_eta,
 			    // Monitored terms.
 			    Model *M_m,
@@ -292,7 +334,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
    in this phase, while "O_stats" and "O_m" are for the other process (whose
    statistcs are still affected and need to be updated).
 */
- void MCMCDyn1Step_sample(MHproposal *MH,
+ void MCMCDyn1Step_sample(MHProposal *MH,
 			  double *par,
 			  unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
 			  Network *nwp,
@@ -311,7 +353,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
   
   unsigned int step=0; // So that we could print out the number of steps later.
   for(unsigned int finished = 0, extrasteps = 0; step < max_MH_interval && finished < extrasteps+1; step++) {
-    unsigned int prev_discord = nwp[1].nedges;
+    unsigned int prev_discord = MH->discord[0]->nedges;
 
     MH->logratio = 0;
     (*(MH->func))(MH, nwp); /* Call MH function to propose toggles */
@@ -353,13 +395,17 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
       /* Hold off updating timesteamps until the changes are committed,
       which doesn't happen until later. */
       for (unsigned int i=0; i < MH->ntoggles; i++){
-        ToggleEdge(MH->toggletail[i], MH->togglehead[i], &nwp[0]);
-        ToggleEdge(MH->toggletail[i], MH->togglehead[i], &nwp[1]);  /* Toggle the discord for this edge */
+        ToggleEdge(MH->toggletail[i], MH->togglehead[i], nwp);
+	
+	if(MH->discord)
+	  for(Network **nwd=MH->discord; *nwd!=NULL; nwd++){
+	    ToggleEdge(MH->toggletail[i],  MH->togglehead[i], *nwd);
+	  }
       }
       /* Do NOT record network statistics for posterity yet. */
     }
 
-    int i = nwp[1].nedges - prev_discord;
+    int i = MH->discord[0]->nedges - prev_discord;
     s *= sdecay; si *= sdecay;
     s++; si += i;
     s2 *= sdecay*sdecay; si2 *= sdecay;
@@ -373,7 +419,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
       double zi = mi / sqrt(vi * s2/(s*s)); // denom = sqrt(sum(w^2 * v)/sum(w)^2)
       double pi = pnorm(zi, 0, 1, FALSE, FALSE); // Pr(Z > zi)
 
-      if(fVerbose>=5) Rprintf("%u: s=%2.2f s2=%2.2f d=%d i=%d si=%2.2f si2=%2.2f mi=%2.2f vi=%2.2f ni=%2.2f zi=%2.2f pi=%2.2f\n", step, s, s2, nwp[1].nedges, i, si, si2, mi, vi, (s*s)/s2, zi, pi);
+      if(fVerbose>=5) Rprintf("%u: s=%2.2f s2=%2.2f d=%d i=%d si=%2.2f si2=%2.2f mi=%2.2f vi=%2.2f ni=%2.2f zi=%2.2f pi=%2.2f\n", step, s, s2, MH->discord[0]->nedges, i, si, si2, mi, vi, (s*s)/s2, zi, pi);
   
       if(pi > MH_pval){
 	extrasteps = step*MH_interval_add+round(runif(0,1));
@@ -440,16 +486,16 @@ void MCMCDyn1Step_advance(unsigned int ntoggles,
 */
 int MCMCDyn1Step_record_reset(Edge maxchanges,
 			      Vertex *difftime, Vertex *difftail, Vertex *diffhead,
-			      Network *nwp, 
+			      Network **nwp, 
 			      Edge *nextdiffedge){
   Vertex tail, head;
-  const unsigned int t=nwp->duration_info.time+1; // Note that the toggle only takes effect on the next time step.
-  Edge ntoggles = nwp[1].nedges;
+  const unsigned int t=nwp[0]->duration_info.time+1; // Note that the toggle only takes effect on the next time step.
+  Edge ntoggles = nwp[1]->nedges;
   
   for(unsigned int i=0; i<ntoggles; i++){
-    FindithEdge(&tail, &head, 1, &nwp[1]); // Grab the next edge that changed;
-    ToggleEdge(tail, head, &nwp[1]); // delete it from nwp[1];
-    ToggleEdge(tail, head, nwp); // undo the toggle in nwp[0];
+    FindithEdge(&tail, &head, 1, nwp[1]); // Grab the next edge that changed;
+    ToggleEdge(tail, head, nwp[1]); // delete it from nwp[1];
+    ToggleEdge(tail, head, nwp[0]); // undo the toggle in nwp[0];
     
     if(*nextdiffedge<maxchanges){
       // and record the toggle.
@@ -472,9 +518,9 @@ int MCMCDyn1Step_record_reset(Edge maxchanges,
 MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
 		  Network *nwp,
 		  // Formation terms and proposals.
-		  Model *F_m, MHproposal *F_MH, double *F_eta,
+		  Model *F_m, MHProposal *F_MH, double *F_eta,
 		  // Dissolution terms and proposals.
-		  Model *D_m, MHproposal *D_MH, double *D_eta,
+		  Model *D_m, MHProposal *D_MH, double *D_eta,
 		  // Monitored statistics.
 		  Model *M_m,
 		  // Space for output.
@@ -495,20 +541,20 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
 
   /* Run the dissolution process. */
   MCMCDyn1Step_sample(D_MH, D_eta, min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, nwp, D_m, fVerbose);
-  ntoggles_status = MCMCDyn1Step_record_reset(maxchanges, difftime, difftail, diffhead, nwp, &nde);
+  ntoggles_status = MCMCDyn1Step_record_reset(maxchanges, difftime, difftail, diffhead, (Network*[]){nwp,D_MH->discord[0]}, &nde);
   if(ntoggles_status<0) return MCMCDyn_TOO_MANY_CHANGES;
   if(diffto) for(unsigned int i = 1; i<=ntoggles_status; i++) diffto[nde-i] = 0;
   ntoggles = ntoggles_status;
   
   /* Run the formation process. */
   MCMCDyn1Step_sample(F_MH, F_eta, min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, nwp, F_m, fVerbose);
-  ntoggles_status = MCMCDyn1Step_record_reset(maxchanges, difftime, difftail, diffhead, nwp, &nde);
+  ntoggles_status = MCMCDyn1Step_record_reset(maxchanges, difftime, difftail, diffhead, (Network*[]){nwp,F_MH->discord[0]}, &nde);
   if(ntoggles_status<0) return MCMCDyn_TOO_MANY_CHANGES;
   if(diffto) for(unsigned int i = 1; i<=ntoggles_status; i++) diffto[nde-i] = 1;
   ntoggles += ntoggles_status;
   
   /* Commit both. */
-  MCMCDyn1Step_advance(ntoggles, difftail+nde-ntoggles, diffhead+nde-ntoggles, nwp, F_m, F_stats, D_m, D_stats, M_m, M_stats);  
+  MCMCDyn1Step_advance(ntoggles, difftail+nde-ntoggles, diffhead+nde-ntoggles, nwp, F_m, F_stats, D_m, D_stats, M_m, M_stats);
 
   // If we don't keep a log of toggles, reset the position to save space.
   if(log_changes)

@@ -1,11 +1,11 @@
 #  File R/combine.networks.R in package tergm, part of the Statnet suite
-#  of packages for network analysis, http://statnet.org .
+#  of packages for network analysis, https://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
 #  open source, and has the attribution requirements (GPL Section 7) at
-#  http://statnet.org/attribution
+#  https://statnet.org/attribution
 #
-#  Copyright 2008-2017 Statnet Commons
+#  Copyright 2008-2019 Statnet Commons
 #######################################################################
 
 #' A single block-diagonal network created by combining multiple networks
@@ -32,10 +32,6 @@
 #' @param detect.edgecov if `TRUE`, combine network attributes that
 #'   look like dyadic covariate ([`ergm::edgecov`]) matrices into a
 #'   block-diagonal matrix.
-#'
-#' @param standardized whether the passed networks can be assumed to
-#'   have been run throgh [ergm::standardize.network()]: their
-#'   internal representation fulfills certain constraints.
 #'
 #' @param keep.unshared.attr whether to keep those network, vertex,
 #'   and edge attributes not shared by all networks in the list; if
@@ -96,18 +92,15 @@
 #' image(as.matrix(f1))
 #' head(get.vertex.attribute(f1, ".NetworkID"))
 #' head(get.vertex.attribute(f1, ".NetworkName"))
-combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockID.vattr=".NetworkID", blockName.vattr=NULL, detect.edgecov=FALSE, standardized=FALSE, keep.unshared.attr=FALSE){
-  if(any(sapply(nwl, is.bipartite))) .combine.networks.bipartite(nwl=nwl, ignore.nattr=ignore.nattr, ignore.vattr=ignore.vattr, ignore.eattr=ignore.eattr, blockID.vattr=blockID.vattr, blockName.vattr=blockName.vattr, detect.edgecov=detect.edgecov, standardized=standardized, keep.unshared.attr=keep.unshared.attr)
-  else .combine.networks.unipartite(nwl=nwl, ignore.nattr=ignore.nattr, ignore.vattr=ignore.vattr, ignore.eattr=ignore.eattr, blockID.vattr=blockID.vattr, blockName.vattr=blockName.vattr, detect.edgecov=detect.edgecov, standardized=standardized, keep.unshared.attr=keep.unshared.attr)
+combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockID.vattr=".NetworkID", blockName.vattr=NULL, detect.edgecov=FALSE, keep.unshared.attr=FALSE){
+  if(any(sapply(nwl, is.bipartite))) .combine.networks.bipartite(nwl=nwl, ignore.nattr=ignore.nattr, ignore.vattr=ignore.vattr, ignore.eattr=ignore.eattr, blockID.vattr=blockID.vattr, blockName.vattr=blockName.vattr, detect.edgecov=detect.edgecov, keep.unshared.attr=keep.unshared.attr)
+  else .combine.networks.unipartite(nwl=nwl, ignore.nattr=ignore.nattr, ignore.vattr=ignore.vattr, ignore.eattr=ignore.eattr, blockID.vattr=blockID.vattr, blockName.vattr=blockName.vattr, detect.edgecov=detect.edgecov, keep.unshared.attr=keep.unshared.attr)
 }
 
 
-.combine.networks.unipartite <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockID.vattr=".NetworkID", blockName.vattr=NULL, detect.edgecov=FALSE, standardized=FALSE, keep.unshared.attr=FALSE){
+.combine.networks.unipartite <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockID.vattr=".NetworkID", blockName.vattr=NULL, detect.edgecov=FALSE, keep.unshared.attr=FALSE){
   if(any(diff(sapply(nwl, is.directed)))) stop("All networks must have the same directedness.")
-  if(keep.unshared.attr && detect.edgecov) stop("Detection of edge covariates is not compatible with retaining unshared attributes.")
-  attrset <- if(keep.unshared.attr) union else intersect
-  
-  if(!standardized) nwl <- lapply(nwl, standardize.network)
+
   ns <- sapply(nwl, network.size)
   blks <- c(0, cumsum(ns))
 
@@ -205,13 +198,12 @@ combine.networks <- function(nwl, ignore.nattr=c("bipartite","directed","hyper",
 }
 
 
-.combine.networks.bipartite <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockID.vattr=".NetworkID", blockName.vattr=NULL, detect.edgecov=FALSE, standardized=FALSE, keep.unshared.attr=FALSE){
+.combine.networks.bipartite <- function(nwl, ignore.nattr=c("bipartite","directed","hyper","loops","mnext","multiple","n"), ignore.vattr=c(), ignore.eattr=c(), blockID.vattr=".NetworkID", blockName.vattr=NULL, detect.edgecov=FALSE, keep.unshared.attr=FALSE){
   if(!all(sapply(nwl, is.bipartite))) stop("This function operates only on bipartite networks.")
   if(any(sapply(nwl, is.directed))) stop("Bipartite directed networks are not supported at this time.")
   if(keep.unshared.attr && detect.edgecov) stop("Detection of edge covariates is not compatible with retaining unshared attributes.")
   attrset <- if(keep.unshared.attr) union else intersect
 
-  if(!standardized) nwl <- lapply(nwl, standardize.network)
   ns <- sapply(nwl, network.size)
   es <- sapply(nwl, "%n%", "bipartite")
   eblks <- c(0, cumsum(es))

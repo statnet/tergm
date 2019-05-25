@@ -1,11 +1,11 @@
 #  File R/ergm.godfather.R in package tergm, part of the Statnet suite
-#  of packages for network analysis, http://statnet.org .
+#  of packages for network analysis, https://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
 #  open source, and has the attribution requirements (GPL Section 7) at
-#  http://statnet.org/attribution
+#  https://statnet.org/attribution
 #
-#  Copyright 2008-2017 Statnet Commons
+#  Copyright 2008-2019 Statnet Commons
 #######################################################################
 #=========================================================================
 # This file contains the following 2 functions for computing changestat
@@ -305,7 +305,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
   
   if(end.network){ 
     if(verbose) cat("Creating new network...\n")
-    newnetwork <- newnw.extract(nw,z)
+    newnetwork <- as.network(pending_update_network(nw,z))
     newnetwork %n% "time" <- z$time
     newnetwork %n% "lasttoggle" <- z$lasttoggle
 

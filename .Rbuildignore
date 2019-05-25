@@ -8,4 +8,4 @@ appveyor.yml
 Rplots.pdf
 ^vignettes/cache/
 ^vignettes/figure/
-^vignettes/*.tex
+^vignettes/.*.tex$

@@ -1,11 +1,11 @@
 #  File R/stergm.getMCMCsample.R in package tergm, part of the Statnet suite
-#  of packages for network analysis, http://statnet.org .
+#  of packages for network analysis, https://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
 #  open source, and has the attribution requirements (GPL Section 7) at
-#  http://statnet.org/attribution
+#  https://statnet.org/attribution
 #
-#  Copyright 2008-2017 Statnet Commons
+#  Copyright 2008-2019 Statnet Commons
 #######################################################################
 ############################################################################
 # The <stergm.getMCMCsample> function collects a sample of networks and
@@ -69,6 +69,18 @@
 #
 ############################################################################
 
+#' @include tergm-deprecated.R
+#' @describeIn tergm-deprecated Use [stergm_MCMC_sample()] instead.
+#' @export stergm.getMCMCsample
+stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
+                                 proposal.form, proposal.diss, eta.form, eta.diss, control, 
+                                 verbose, ...){
+  .Deprecated("stergm_MCMC_sample")
+  out <- stergm_MCMC_sample(nw, model.form, model.diss, model.mon,
+                            proposal.form, proposal.diss,  control=control,
+                            eta.form=eta.form, eta.diss=eta.diss, verbose=verbose, ...)
+
+}
 
 
 
@@ -76,7 +88,7 @@
 #' Collects a sample of networks and returns the formation and dissolution
 #' statistics of each sample
 #' 
-#' \code{stergm.getMCMCsample} is a low-level internal function not intended to
+#' \code{stergm_MCMC_sample} is a low-level internal function not intended to
 #' be called directly by end users. It collects a sample of networks and
 #' returns the formation and dissolution statistics of each sample, along with
 #' a toggle matrix of the changes needed from the original network to each in
@@ -85,7 +97,7 @@
 #' This function is normally called inside \code{\link{simulate.stergm}} to
 #' prepare inputs for the C sampling code and return its results
 #' 
-#' @aliases stergm.getMCMCsample stergm.getMCMCsample.slave
+#' @aliases stergm_MCMC_sample stergm_MCMC_slave
 #' @param nw a \code{\link{network}} object
 #' @param model.form,model.diss,model.mon formation, dissolution, and
 #' monitoring model, as returned by \code{\link{ergm_model}}
@@ -108,10 +120,14 @@
 #' param list }
 #' @seealso \code{\link{simulate.stergm}}
 #' @keywords internal
-#' @export stergm.getMCMCsample
-stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
-                                  proposal.form, proposal.diss, eta.form, eta.diss, control, 
-                                  verbose){
+#' @export
+stergm_MCMC_sample <- function(nw, model.form, model.diss, model.mon,
+                               proposal.form, proposal.diss, control,
+                               theta.form=NULL, theta.diss=NULL,
+                               verbose=FALSE,...,
+                               eta.form=ergm.eta(theta.form, model.form$etamap),
+                               eta.diss=ergm.eta(theta.diss, model.diss$etamap)
+                               ){
 
 
   #
@@ -121,9 +137,9 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
   Clist.diss <- ergm.Cprepare(nw, model.diss)
   Clist.mon <- if(!is.null(model.mon)) ergm.Cprepare(nw, model.mon) else NULL
   
-  z <- stergm.getMCMCsample.slave(Clist.form, Clist.diss, Clist.mon, proposal.form, proposal.diss, eta.form, eta.diss, control, verbose)
+  z <- stergm_MCMC_slave(Clist.form, Clist.diss, Clist.mon, proposal.form, proposal.diss, eta.form, eta.diss, control, verbose)
 
-  newnetwork<-newnw.extract(nw,z)
+  newnetwork<-as.network(pending_update_network(nw, z))
   if(is.durational(model.form) || is.durational(model.diss) || is.durational(model.mon)){
     newnetwork %n% "time" <- z$time
     newnetwork %n% "lasttoggle" <- z$lasttoggle
@@ -157,14 +173,22 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
        maxchanges=control$MCMC.maxchanges)
 }
 
-#' @rdname stergm.getMCMCsample
-#' @description \code{stergm.getMCMCsample.slave} is an even
+#' @include tergm-deprecated.R
+#' @describeIn tergm-deprecated Use [stergm_MCMC_slave()] instead.
+#' @export stergm.mcmcslave
+stergm.mcmcslave <- function(Clist.form, Clist.diss, Clist.mon, proposal.form, proposal.diss, eta.form, eta.diss, control, verbose){
+  .Deprecated("stergm_MCMC_slave")
+  stergm_MCMC_slave(Clist.form, Clist.diss, Clist.mon, proposal.form, proposal.diss, eta.form, eta.diss, control, verbose)
+}
+
+#' @rdname stergm_MCMC_sample
+#' @description \code{stergm_MCMC_slave} is an even
 #'   lower-level function that actually calls the C code.
 #' @param Clist.form,Clist.diss,Clist.mon formation, dissolution, and
 #'   monitoring "Clist", as returned by \code{\link{ergm.Cprepare}}
 #' @useDynLib tergm
-#' @export stergm.getMCMCsample.slave
-stergm.getMCMCsample.slave <- function(Clist.form, Clist.diss, Clist.mon, proposal.form, proposal.diss, eta.form, eta.diss, control, verbose){
+#' @export
+stergm_MCMC_slave <- function(Clist.form, Clist.diss, Clist.mon, proposal.form, proposal.diss, eta.form, eta.diss, control, verbose){
   collect.form<-if(!is.null(control$collect.form)) control$collect.form else TRUE
   collect.diss<-if(!is.null(control$collect.diss)) control$collect.diss else TRUE
   maxedges <- control$MCMC.init.maxedges

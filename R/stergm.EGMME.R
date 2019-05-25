@@ -1,11 +1,11 @@
 #  File R/stergm.EGMME.R in package tergm, part of the Statnet suite
-#  of packages for network analysis, http://statnet.org .
+#  of packages for network analysis, https://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
 #  open source, and has the attribution requirements (GPL Section 7) at
-#  http://statnet.org/attribution
+#  https://statnet.org/attribution
 #
-#  Copyright 2008-2017 Statnet Commons
+#  Copyright 2008-2019 Statnet Commons
 #######################################################################
 ################################################################################
 # The <stergm> function fits stergms from a specified formation and dissolution
@@ -123,67 +123,10 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
       if(is.null(control[[control.transfer[[arg]]]]))
           control[control.transfer[[arg]]] <- list(control[[arg]])
 
-  
-  if(!is.null(target.stats)){
 
-    nw.stats<-summary(targets)
-    if(length(nw.stats)!=length(target.stats))
-      stop("Incorrect length of the target.stats vector: should be ", length(nw.stats), " but is ",length(target.stats),".")
-    
-    if (!is.null(control$init.form) && length(target.stats) != length(control$init.form)) {
-      if (length(target.stats) != length(control$SAN.control$coef)) {
-        cat('SAN initial coefficients should have same length as targets. Setting them to SAN defaults.\n')
-        control$SAN.control$coef <- NULL
-      }
-    }
-        
-    if(verbose) cat("Constructing an approximate response network.\n")
-    ## If target.stats are given, overwrite the given network and targets
-    ## with SAN-ed network and targets.
-    
-    newnw <- try({
-      for(srun in seq_len(control$SAN.maxit)){
-        nw<-suppressWarnings(
-          san(targets, target.stats=target.stats,
-                control=control$SAN.control,
-                constraints=constraints,
-                verbose=verbose))
-        targets<-nonsimp_update.formula(targets,nw~., from.new="nw")
-        nw.stats <- summary(targets)
-        srun <- srun + 1
-        if(verbose){
-          cat(paste("Finished SAN run",srun,"\n"))
-        }
-        if(verbose){
-          cat("SAN summary statistics:\n")
-          print(nw.stats)
-          cat("Meanstats Goal:\n")
-          print(target.stats)
-          cat("Difference: SAN target.stats - Goal target.stats =\n")
-          print(round(nw.stats-target.stats,0))
-        }
-        if(sum((nw.stats-target.stats)^2) <= 5) break
-      }
-      nw
-    }, silent=TRUE)
-    if(inherits(newnw,"try-error")){
-      cat("SAN failed or is not applicable. Increase burn-in if there are problems.\n")
-    }else nw <- newnw
-    formation <- nonsimp_update.formula(formation,nw~., from.new="nw")
-    dissolution <- nonsimp_update.formula(dissolution,nw~., from.new="nw")
-  }
-
-  if (verbose) cat("Initializing Metropolis-Hastings proposals.\n")
-  proposal.form <- ergm_proposal(constraints, weights=control$MCMC.prop.weights.form, control$MCMC.prop.args.form, nw, class="f")
-  proposal.diss <- ergm_proposal(constraints, weights=control$MCMC.prop.weights.diss, control$MCMC.prop.args.diss, nw, class="d")
-
-  if(!is.dyad.independent(proposal.form$arguments$constraints) || !is.dyad.independent(proposal.diss$arguments$constraints)){
-    warning("Dyad-dependent constraint imposed. Note that the constraint is applied to the post-formation and post-dissolution networks y+ and y-, not the next time-step's network. This behavior may change in the future.")
-  }
-  
-  model.form <- ergm_model(formation, nw, expanded=TRUE, role="formation")
-  model.diss <- ergm_model(dissolution, nw, expanded=TRUE, role="dissolution")
-  model.mon <- ergm_model(targets, nw, expanded=TRUE, role="target")
+  model.form <- ergm_model(formation, nw, expanded=TRUE, role="formation", term.options=control$term.options)
+  model.diss <- ergm_model(dissolution, nw, expanded=TRUE, role="dissolution", term.options=control$term.options)
+  model.mon <- ergm_model(targets, nw, expanded=TRUE, role="target", term.options=control$term.options)
 
   if(any(model.form$etamap$canonical==0) || any(model.diss$etamap$canonical==0) || any(model.mon$etamap$canonical==0)) stop("Equilibrium GMME for models based on curved ERGMs is not supported at this time.")
 
@@ -192,8 +135,47 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
   q<-length(model.mon$etamap$offsettheta)
   if(p.free>q) stop("Fitting ",p.free," free parameters on ",q," target statistics. The specification is underidentified.")
 
-  model.mon$nw.stats <- summary(model.mon$formula)
+  nw.stats<-summary(model.mon, nw=nw)
+  if(!is.null(target.stats)){
+    if(length(nw.stats)!=length(target.stats))
+      stop("Incorrect length of the target.stats vector: should be ", length(nw.stats), " but is ",length(target.stats),".")
+        
+    if(verbose) cat("Constructing an approximate response network.\n")
+    ## If target.stats are given, overwrite the given network and targets
+    ## with SAN-ed network and targets.
+    
+    nw <- TARGET_STATS <-
+        san(model.mon, basis=nw, target.stats=target.stats,
+            constraints=constraints,
+            control=control$SAN.control,
+            only.last=TRUE,
+            verbose=verbose)
+
+    targets<-nonsimp_update.formula(targets,TARGET_STATS~., from.new="TARGET_STATS")
+    formation <- nonsimp_update.formula(formation,TARGET_STATS~., from.new="TARGET_STATS")
+    dissolution <- nonsimp_update.formula(dissolution,TARGET_STATS~., from.new="TARGET_STATS")
+    nw.stats <- summary(model.mon, nw)
+
+    if(verbose){
+      cat("SAN summary statistics:\n")
+      print(nw.stats)
+      cat("Meanstats Goal:\n")
+      print(target.stats)
+      cat("Difference: SAN target.stats - Goal target.stats =\n")
+      print(round(nw.stats-target.stats,0))
+    }
+  }
+
+  model.mon$nw.stats <- nw.stats
   model.mon$target.stats <- if(!is.null(target.stats)) vector.namesmatch(target.stats, names(model.mon$nw.stats)) else model.mon$nw.stats
+
+  if (verbose) cat("Initializing Metropolis-Hastings proposals.\n")
+  proposal.form <- ergm_proposal(constraints, weights=control$MCMC.prop.weights.form, control$MCMC.prop.args.form, nw, class="f")
+  proposal.diss <- ergm_proposal(constraints, weights=control$MCMC.prop.weights.diss, control$MCMC.prop.args.diss, nw, class="d")
+
+  if(!is.dyad.independent(proposal.form$arguments$constraints) || !is.dyad.independent(proposal.diss$arguments$constraints)){
+    warning("Dyad-dependent constraint imposed. Note that the constraint is applied to the post-formation and post-dissolution networks y+ and y-, not the next time-step's network. This behavior may change in the future.")
+  }
 
   # If some control$init is specified...
   
@@ -224,21 +206,18 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
   if(verbose) cat("Fitting STERGM Equilibrium GMME.\n")
 
   if(control$parallel){
-    cl <- ergm.getCluster(control, verbose=verbose)
-    if(verbose && !is.null(cl)) cat("Using parallel cluster.\n")
-    on.exit(suppressWarnings(try(ergm.stopCluster(cl),silent=TRUE)))
-  }else cl <- NULL
+    ergm.getCluster(control, verbose=verbose)
+    if(verbose && !is.null(ergm.getCluster(control))) cat("Using parallel cluster.\n")
+  }
   
   Cout <- switch(control$EGMME.main.method,
                  "Gradient-Descent" = stergm.EGMME.GD(initialfit$formation.fit$coef,
                    initialfit$dissolution.fit$coef, nw, model.form, model.diss, model.mon,
                    control=control, proposal.form=proposal.form,
-                   proposal.diss=proposal.diss, cl=cl,
+                   proposal.diss=proposal.diss,
                   verbose),
                  stop("Method ", control$EGMME.main.method, " is not implemented.")
                 )
-
-  if(!is.null(cl)) ergm.stopCluster(cl)
 
   out <- list(network = nw, formation = formation, dissolution = dissolution, targets = targets, target.stats=model.mon$target.stats, estimate=estimate, covar = Cout$covar, opt.history=Cout$opt.history, sample=Cout$sample, sample.obs=NULL, control=control, reference = ~Bernoulli, mc.se = Cout$mc.se, constraints = constraints,
               formation.fit = with(Cout, list(network=nw, formula=formation, coef = eta.form, covar=covar.form, etamap = model.form$etamap, offset = model.form$etamap$offsettheta, constraints=constraints, estimate=estimate, control=control, reference = ~Bernoulli, mc.se = mc.se.form)),

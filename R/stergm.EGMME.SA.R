@@ -1,14 +1,14 @@
 #  File R/stergm.EGMME.SA.R in package tergm, part of the Statnet suite
-#  of packages for network analysis, http://statnet.org .
+#  of packages for network analysis, https://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
 #  open source, and has the attribution requirements (GPL Section 7) at
-#  http://statnet.org/attribution
+#  https://statnet.org/attribution
 #
-#  Copyright 2008-2017 Statnet Commons
+#  Copyright 2008-2019 Statnet Commons
 #######################################################################
 stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss, model.mon,
-                            control, proposal.form, proposal.diss, eval.optpars, cl=cl,
+                            control, proposal.form, proposal.diss, eval.optpars,
                             verbose=FALSE){
 
   ###### Set the constants and convenience variables. ######
@@ -39,13 +39,13 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     jitters.all <- history$jitters.all
     
     if(verbose) cat("Running stochastic optimization... ")
-    zs <- if(!is.null(cl)){
+    zs <- if(!is.null(ergm.getCluster(control))){
       requireNamespace('parallel')
       # Conveniently, the first argument of stergm.EGMME.SA.Phase2.C
       # is the state of the optimization, so giving clusterApply a
       # list of states will call it for each thread's state.
       if(verbose) {cat("Calling stergm.EGMME.SA.Phase2.C:\n"); print(gc())}
-      out <- parallel::clusterApply(cl, states, stergm.EGMME.SA.Phase2.C, model.form, model.diss, model.mon, proposal.form, proposal.diss, control, verbose=verbose)
+      out <- parallel::clusterApply(ergm.getCluster(control), states, stergm.EGMME.SA.Phase2.C, model.form, model.diss, model.mon, proposal.form, proposal.diss, control, verbose=verbose)
       if(verbose) print(gc())
       out
     }else{
@@ -198,7 +198,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
   for(restart in 1:control$SA.restarts){    
     nw.diff <- model.mon$nw.stats - model.mon$target.stats  # nw.diff keeps track of the difference between the current network and the target statistics.
     
-    states <- replicate(if(!is.null(cl)) control$parallel else 1,
+    states <- replicate(nthreads(control),
                         {
                           list(nw=nw,
                                eta.form = ergm.eta(theta.form0, model.form$etamap),
@@ -220,14 +220,14 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     cat("Burning in... ")
     
-    zs <- if(!is.null(cl)){
+    zs <- if(!is.null(ergm.getCluster(control))){
       requireNamespace('parallel')
       if(verbose) {cat("Calling stergm.getMCMCsample:\n"); print(gc())}
-      out <- parallel::clusterApply(cl, seq_along(states), function(i) stergm.getMCMCsample(states[[i]]$nw, model.form, model.diss, model.mon, proposal.form, proposal.diss, states[[i]]$eta.form, states[[i]]$eta.diss, control.phase1, verbose))
+      out <- parallel::clusterApply(ergm.getCluster(control), seq_along(states), function(i) stergm_MCMC_sample(states[[i]]$nw, model.form, model.diss, model.mon, proposal.form, proposal.diss, eta.form=states[[i]]$eta.form, eta.diss=states[[i]]$eta.diss, control=control.phase1, verbose=verbose))
       if(verbose) print(gc())
       out
     }else{
-      list(stergm.getMCMCsample(states[[1]]$nw, model.form, model.diss, model.mon, proposal.form, proposal.diss, states[[1]]$eta.form, states[[1]]$eta.diss, control.phase1, verbose))
+      list(stergm_MCMC_sample(states[[1]]$nw, model.form, model.diss, model.mon, proposal.form, proposal.diss, eta.form=states[[1]]$eta.form, eta.diss=states[[1]]$eta.diss, control=control.phase1, verbose=verbose))
     }
     
     cat("Done.\n")
@@ -482,7 +482,7 @@ stergm.EGMME.SA <- function(theta.form0, theta.diss0, nw, model.form, model.diss
       eta.free <- switch(control$SA.refine,
                          mean = colMeans(history$oh[,1:p,drop=FALSE][,!offsets,drop=FALSE]),
                          linear = interpolate.par(out$oh.fit,out$w),
-                         none = if(is.null(cl)) c(eta.form,eta.diss)[!offsets] else stop("No interpolation does not make sense with multithreaded fitting."))
+                         none = if(is.null(ergm.getCluster(control))) c(eta.form,eta.diss)[!offsets] else stop("No interpolation does not make sense with multithreaded fitting."))
       if(p.form.free) eta.form[!model.form$etamap$offsettheta] <- eta.free[seq_len(p.form.free)]
       if(p.diss.free) eta.diss[!model.diss$etamap$offsettheta] <- eta.free[p.form.free+seq_len(p.diss.free)]
       
@@ -640,7 +640,7 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
   eta.diss <- z$eta[-seq_len(Clist.form$nstats)]
   names(eta.diss) <- model.diss$coef.names
 
-  newnetwork<-newnw.extract(state$nw,z)
+  newnetwork<-as.network(pending_update_network(state$nw,z))
   newnetwork %n% "time" <- z$time
   newnetwork %n% "lasttoggle" <- z$lasttoggle
   

@@ -1,11 +1,11 @@
 /*  File src/godfather.c in package tergm, part of the Statnet suite
- *  of packages for network analysis, http://statnet.org .
+ *  of packages for network analysis, https://statnet.org .
  *
  *  This software is distributed under the GPL-3 license.  It is free,
  *  open source, and has the attribution requirements (GPL Section 7) at
- *  http://statnet.org/attribution
+ *  https://statnet.org/attribution
  *
- *  Copyright 2008-2017 Statnet Commons
+ *  Copyright 2008-2019 Statnet Commons
  */
 #include "godfather.h"
 
@@ -32,13 +32,13 @@ void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *
 		       int *newnetworkheads, 
 		       int *fVerbose, 
 		       int *status){
-  Network nw;
+  Network *nwp;
   Model *m;
 
   if(*lasttoggle == 0) lasttoggle = NULL;
 
   MCMCDyn_init_common(tails, heads, *time, lasttoggle, *n_edges,
-		      *n_nodes, *directed_flag, *bipartite, &nw,
+		      *n_nodes, *directed_flag, *bipartite, &nwp,
 		      0, NULL, NULL, NULL, NULL,
 		      0, NULL, NULL, NULL, NULL,
 		      *nterms, *funnames, *sonames, inputs, &m,
@@ -75,8 +75,8 @@ void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *
     
     // Now, pos is one past the end of the current time.
     MCMCDyn1Step_advance(n_toggles, 
-			 toggletails+pos-n_toggles, toggleheads+pos-n_toggles,
-			 &nw, 
+			 (Vertex*)toggletails+pos-n_toggles, (Vertex*)toggleheads+pos-n_toggles,
+			 nwp, 
 			 NULL, NULL, 
 			 NULL, NULL,
 			 m, changestats);
@@ -84,18 +84,18 @@ void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *
 
   }
 
-  if(*maxedges!=0 && nw.nedges >= *maxedges-1){
+  if(*maxedges!=0 && nwp->nedges >= *maxedges-1){
     *status = MCMCDyn_TOO_MANY_EDGES;
   }
 
   if(*status == MCMCDyn_OK && *maxedges>0){
-    newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList(newnetworktails+1,newnetworkheads+1,&nw,*maxedges-1);
-    *time = nw.duration_info.time;
-    if(nw.duration_info.lasttoggle)
-    memcpy(lasttoggle, nw.duration_info.lasttoggle, sizeof(int)*DYADCOUNT(*n_nodes, *bipartite, *directed_flag));
+    newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList((Vertex*)newnetworktails+1,(Vertex*)newnetworkheads+1,nwp,*maxedges-1);
+    *time = nwp->duration_info.time;
+    if(nwp->duration_info.lasttoggle)
+    memcpy(lasttoggle, nwp->duration_info.lasttoggle, sizeof(int)*DYADCOUNT(*n_nodes, *bipartite, *directed_flag));
   }
 
   /* Clean up and return */
-  MCMCDyn_finish_common(&nw, NULL, NULL, m, NULL, NULL);
+  MCMCDyn_finish_common(nwp, NULL, NULL, m, NULL, NULL);
 }
 

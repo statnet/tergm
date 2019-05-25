@@ -1,11 +1,11 @@
 #  File R/stergm.CMLE.R in package tergm, part of the Statnet suite
-#  of packages for network analysis, http://statnet.org .
+#  of packages for network analysis, https://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
 #  open source, and has the attribution requirements (GPL Section 7) at
-#  http://statnet.org/attribution
+#  https://statnet.org/attribution
 #
-#  Copyright 2008-2017 Statnet Commons
+#  Copyright 2008-2019 Statnet Commons
 #######################################################################
 stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.coef.form, offset.coef.diss,
                         eval.loglik,
@@ -50,9 +50,6 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
     if(!all(sapply(c(y0s,y1s),is.network))) stop("nw must be a networkDynamic, a network.list, or a list of networks.")
   }
 
-  y0s <- lapply(y0s,standardize.network)
-  y1s <- lapply(y1s,standardize.network)
-
   nwl <- c(y0s[1], y1s)
   class(nwl) <- "network.list"
 
@@ -64,8 +61,8 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   if(any(y0s.NA)) stop("Transitioned-from network(s) at time(s) ", paste.and(times[-length(times)][y0s.NA]), " has missing dyads that cannot be imputed using the selected imputation options. Fix or add imputation options via CMLE.NA.impute control parameter.")
 
   if(length(times)>2){
-    y0 <- combine.networks(y0s, standardized=TRUE,blockID.vattr=".stergm.CMLE.time.index",detect.edgecov=TRUE)
-    y1 <- combine.networks(y1s, standardized=TRUE,blockID.vattr=".stergm.CMLE.time.index",detect.edgecov=TRUE)
+    y0 <- combine.networks(y0s, blockID.vattr=".stergm.CMLE.time.index",detect.edgecov=TRUE)
+    y1 <- combine.networks(y1s, blockID.vattr=".stergm.CMLE.time.index",detect.edgecov=TRUE)
 
     if(!control$CMLE.term.check.override){
       # Check that these networks can be combined for this model.
@@ -83,8 +80,8 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   }else{
     # We are about to do logical operations on networks, so make sure
     # tail-head orderings match up.
-    y0 <- standardize.network(y0s[[1]])
-    y1 <- standardize.network(y1s[[1]])
+    y0 <- y0s[[1]]
+    y1 <- y1s[[1]]
   }
   
   # Construct the formation and dissolution networks; the

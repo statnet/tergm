@@ -1,11 +1,11 @@
 #  File R/control.stergm.R in package tergm, part of the Statnet suite
-#  of packages for network analysis, http://statnet.org .
+#  of packages for network analysis, https://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
 #  open source, and has the attribution requirements (GPL Section 7) at
-#  http://statnet.org/attribution
+#  https://statnet.org/attribution
 #
-#  Copyright 2008-2017 Statnet Commons
+#  Copyright 2008-2019 Statnet Commons
 #######################################################################
 ###########################################################################
 # The <control.stergm> function allows the ergm fitting process to be tuned
@@ -139,9 +139,12 @@
 #'   \code{EGMME.MCMC.burnin.min} and \code{EGMME.MCMC.burnin.max} to
 #'   the desired number of steps.
 #' @param SAN.maxit When \code{target.stats} argument is passed to
-#'   \code{\link{ergm}}, the maximum number of attempts to use
-#'   \code{\link{san}} to obtain a network with statistics close to
-#'   those specified.
+#' [ergm()], the maximum number of attempts to use \code{\link{san}}
+#' to obtain a network with statistics close to those specified.
+#' @param SAN.nsteps.times Multiplier for \code{SAN.nsteps} relative to
+#' \code{MCMC.burnin}. This lets one control the amount of SAN burn-in
+#' (arguably, the most important of SAN parameters) without overriding the
+#' other SAN.control defaults.
 #' @param SAN.control SAN control parameters.  See
 #'   \code{\link{control.san}}
 #' @param SA.restarts Maximum number of times to restart a failed
@@ -280,6 +283,7 @@
 #'   error somewhere in the optimization process will cause it to
 #'   restart with a smaller gain value. Otherwise, the process will
 #'   stop. This is mainly used for debugging
+#' @param term.options A list of additional arguments to be passed to term initializers. It can also be set globally via `option(ergm.term=list(...))`.
 #' @param seed Seed value (integer) for the random number generator.
 #'   See \code{\link[base]{set.seed}}
 #' @param parallel Number of threads in which to run the
@@ -345,13 +349,18 @@ control.stergm<-function(init.form=NULL,
 
                          MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                          
-                         SAN.maxit=10,
-                         SAN.control=control.san(coef=init.form,
+                         SAN.maxit=4,
+                         SAN.nsteps.times=8,
+                         SAN.control=control.san(
+                           term.options=term.options,
+                           SAN.maxit=SAN.maxit,
                            SAN.prop.weights=MCMC.prop.weights.form,
                            SAN.prop.args=MCMC.prop.args.form,
                            SAN.init.maxedges=MCMC.init.maxedges,
-                           
-                           SAN.burnin=round(sqrt(EGMME.MCMC.burnin.min*EGMME.MCMC.burnin.max)),
+                           SAN.max.maxedges=Inf,
+
+                           SAN.nsteps=round(sqrt(EGMME.MCMC.burnin.min*EGMME.MCMC.burnin.max))*SAN.nsteps.times,
+
                            SAN.packagenames=MCMC.packagenames,
                            
                            parallel=parallel,
@@ -413,6 +422,8 @@ control.stergm<-function(init.form=NULL,
                          SA.phase3.samplesize.runs=10, # This times the interval is the number of steps to estimate the standard errors.
                          SA.restart.on.err=TRUE, # Whether to wrap certain routines in try() statements so that they that an error is handled gracefully. Set to FALSE to debug errors in those routines.
 
+                         term.options=NULL,
+                         
                          seed=NULL,
                          parallel=0,
                          parallel.type=NULL,

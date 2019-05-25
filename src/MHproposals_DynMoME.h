@@ -1,11 +1,11 @@
 /*  File src/MHproposals_DynMoME.h in package tergm, part of the Statnet suite
- *  of packages for network analysis, http://statnet.org .
+ *  of packages for network analysis, https://statnet.org .
  *
  *  This software is distributed under the GPL-3 license.  It is free,
  *  open source, and has the attribution requirements (GPL Section 7) at
- *  http://statnet.org/attribution
+ *  https://statnet.org/attribution
  *
- *  Copyright 2008-2017 Statnet Commons
+ *  Copyright 2008-2019 Statnet Commons
  */
 #ifndef MHproposals_DynMoME_H
 #define MHproposals_DynMoME_H
@@ -15,10 +15,10 @@
 #include "model.h"
 #include "MHproposal.h"
 
-void MH_Formation(MHproposal *MHp, Network *nwp);
-void MH_FormationTNT(MHproposal *MHp, Network *nwp);
-void MH_Dissolution(MHproposal *MHp, Network *nwp);
-void MH_DissolutionTNT(MHproposal *MHp, Network *nwp);
+void MH_Formation(MHProposal *MHp, Network *nwp);
+void MH_FormationTNT(MHProposal *MHp, Network *nwp);
+void MH_Dissolution(MHProposal *MHp, Network *nwp);
+void MH_DissolutionTNT(MHProposal *MHp, Network *nwp);
 
 #endif 
 
