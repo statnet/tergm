@@ -28,7 +28,7 @@ LinkingTo:
     ergm
 Suggests:
     lattice (>= 0.20.38),
-    parallel (>= 3.6.0),
+    parallel (>= 3.5.0),
     rmarkdown (>= 1.12),
     knitr (>= 1.22)
 BugReports: https://github.com/statnet/tergm/issues
