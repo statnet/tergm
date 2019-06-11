@@ -61,6 +61,16 @@
   % }
 %% }
 
+
+\section{Changes in version 3.6.1}{
+  \subsection{OTHER USER-VISIBLE CHANGES}{
+    \itemize{
+      \item The package no longer (incorrectly) requires \R 3.6.0 or the very-very latest version of \code{nlme}.
+    }
+  }
+}
+
+
 \section{Changes in version 3.6.0}{
     \subsection{NEW FEATURES}{
      \itemize{
