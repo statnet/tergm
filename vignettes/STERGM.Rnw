@@ -793,7 +793,6 @@ place to report them. Happy stergming!
 \\
 References:\\
 \\
-Pavel N. Krivitsky and Mark S. Handcock. A Separable Model for Dynamic
-Networks. 2010. \url{http://arxiv.org/abs/1011.1937}
+Krivitsky PN and Handcock MS (2014) A Separable Model for Dynamic Networks. \emph{Journal of the Royal Statistical Society, Series B}, 76(1): 29-46. \doi{10.1111/rssb.12014}
 
 \end{document}
