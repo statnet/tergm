@@ -1,5 +1,5 @@
 Package: tergm
-Version: 4.0.0-1688
+Version: 4.0.0-1689
 Date: 2019-08-30
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
@@ -44,6 +44,7 @@ Encoding: UTF-8
 Collate: 
     'InitConstraint.R'
     'InitErgmTerm.duration.R'
+    'InitErgmTerm.netseries.R'
     'InitMHP.DynMLE.R'
     'InitMHP.DynMLE.blockdiag.R'
     'InitMHP.DynMoME.R'
