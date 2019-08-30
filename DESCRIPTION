@@ -1,6 +1,6 @@
 Package: tergm
-Version: 4.0.0-1614
-Date: 2018-04-10
+Version: 4.0.0-1692
+Date: 2019-08-30
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
 	person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="pavel@uow.edu.au", comment=c(ORCID="0000-0002-9101-3362")),
@@ -28,7 +28,7 @@ LinkingTo:
     ergm
 Suggests:
     lattice (>= 0.20.38),
-    parallel (>= 3.5.0),
+    parallel,
     rmarkdown (>= 1.12),
     knitr (>= 1.22)
 BugReports: https://github.com/statnet/tergm/issues
