@@ -8,3 +8,4 @@
  *  Copyright 2008-2019 Statnet Commons
  */
 #include "ergm_stubs.c"
+#include "ergm.multi_stubs.c"
