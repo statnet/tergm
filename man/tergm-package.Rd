@@ -55,7 +55,7 @@ Exponential-Family Random Graph Models
   
   For detailed information on how to download and install the software,
   go to the Statnet project website:
-  \url{statnet.org}.
+  \url{http://statnet.org}.
   A tutorial, support newsgroup, references and links to further resources are provided there.
 }
 \author{
@@ -76,9 +76,7 @@ Exponential-Family Random Graph Models
   of Social Networks. \emph{Electronic Journal of Statistics}, 2010, 4,
   585-605. \href{http://dx.doi.org/10.1214/09-EJS548}{\code{doi:10.1214/09-EJS548}}
   
-  \item Krivitsky PN, Handcock MS (2013). A Separable Model for Dynamic
-  Networks. \emph{Journal of the Royal Statistical Society, Series B},
-  In Press. \url{http://arxiv.org/abs/1011.1937}
+  \item Krivitsky PN & Handcock MS (2014) A Separable Model for Dynamic Networks. \emph{Journal of the Royal Statistical Society, Series B}, 76(1): 29-46. \doi{10.1111/rssb.12014}
 
 \item  Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
   Egocentric Data with Durational Information. \emph{Pennsylvania State
@@ -100,13 +98,13 @@ Exponential-Family Random Graph Models
  \pkg{ergm}: A Package to Fit, Simulate and Diagnose
  Exponential-Family Models for Networks.
  Statnet Project, Seattle, WA.
- Version 3, \url{statnet.org}.
+ Version 3, \url{http://statnet.org}.
 
  \item Handcock MS, Hunter DR, Butts CT, Goodreau SM, Krivitsky P, Morris M (2012).
  \pkg{statnet}: Software Tools for the Statistical Modeling of
  Network Data.
  Statnet Project, Seattle, WA.
- Version 3, \url{statnet.org}.
+ Version 3, \url{http://statnet.org}.
 
  \item Hunter, D. R. and Handcock, M. S. (2006)
  Inference in curved exponential family models for networks,

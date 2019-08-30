@@ -134,8 +134,9 @@
 #' \code{\link{summary.stergm}} returns a summary of the relevant parts of the
 #' \code{\link{stergm}} object in concise summary format.
 #' @seealso ergm, network, \%v\%, \%n\%, \code{\link{ergm-terms}}
-#' @references \itemize{ \item Krivitsky PN, Handcock MS (2010). A Separable
-#' Model for Dynamic Networks. \url{http://arxiv.org/abs/1011.1937}
+#' @references \itemize{
+#'
+#' \item Krivitsky P.N. and Handcock M.S. (2014) A Separable Model for Dynamic Networks. \emph{Journal of the Royal Statistical Society, Series B}, 76(1): 29-46. \doi{10.1111/rssb.12014}
 #' 
 #' \item Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
 #' Egocentric Data with Durational Information. \emph{Pennsylvania State
