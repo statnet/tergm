@@ -2,9 +2,9 @@
 % Please edit documentation in R/InitErgmTerm.netseries.R
 \name{NetSeries}
 \alias{NetSeries}
-\title{A network series representation.}
+\title{A network series specification for modelling for conditional modeling.}
 \usage{
-NetSeries(...)
+NetSeries(..., order = 1, NA.impute = NULL)
 }
 \arguments{
 \item{...}{series specification, in one of three formats:
@@ -13,6 +13,13 @@ NetSeries(...)
 \item Several networks as arguments.
 \item A \code{\link{networkDynamic}} object and a numeric vector of time indices.
 }}
+
+\item{order}{how many previous networks to store as an accessible
+covariate of the model.}
+
+\item{NA.impute}{How missing dyads in transitioned-from networks
+are be imputed when using conditional estimation. See argument
+\code{imputers} of \code{\link{impute.network.list}} for details.}
 }
 \value{
 A network object with temporal metadata.

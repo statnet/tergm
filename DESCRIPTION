@@ -1,6 +1,6 @@
 Package: tergm
-Version: 4.0.0-1692
-Date: 2019-08-30
+Version: 4.0.0-1694
+Date: 2019-09-02
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
 	person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="pavel@uow.edu.au", comment=c(ORCID="0000-0002-9101-3362")),
@@ -67,4 +67,6 @@ Collate:
     'stergm.utils.R'
     'summary.statistics.networkDynamic.R'
     'summary.stergm.R'
+    'tergm.CMLE.R'
+    'tergm.R'
     'zzz.R'
