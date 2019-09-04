@@ -136,7 +136,7 @@ InitErgmTerm.Form1 <- function(nw, arglist, response=NULL,  ...){
   
   gs <- summary(m, (nw%n%".PrevNets")[[1]])
   
-  c(list(name="formation",
+  c(list(name="on_union_net_Network",
          coef.names = paste0("Form",'(',param_names(m, canonical=TRUE),')'),
          auxiliaries = ~.union.net((nw%n%".PrevNets")[[1]], implementation="Network"),
          inputs=inputs,
@@ -183,7 +183,7 @@ InitErgmTerm.Diss1 <- function(nw, arglist, response=NULL,  ...){
   
   gs <- summary(m)
   
-  c(list(name="dissolution",
+  c(list(name="on_intersect_net_Network",
          coef.names = paste0("Diss",'(',param_names(m, canonical=TRUE),')'),
          auxiliaries = ~.intersect.net((nw%n%".PrevNets")[[1]], implementation="Network"),
          inputs=inputs,

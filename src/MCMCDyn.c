@@ -125,14 +125,14 @@ void MCMCDyn_wrapper(// Starting network.
 
   if(*status == MCMCDyn_OK && *maxedges>0){
     newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList((Vertex*)newnetworktails+1,(Vertex*)newnetworkheads+1,nwp,*maxedges-1);
-    *time = nwp->duration_info.time;
+    *time = nwp->duration_info->time;
     
-    if(nwp->duration_info.lasttoggle){
-      lasttoggle[0] = kh_size(nwp->duration_info.lasttoggle);
+    if(nwp->duration_info){
+      lasttoggle[0] = kh_size(nwp->duration_info->lasttoggle);
       TailHead dyad;
       int ts;
       unsigned int i=1;
-      kh_foreach(nwp->duration_info.lasttoggle, dyad, ts, {
+      kh_foreach(nwp->duration_info->lasttoggle, dyad, ts, {
           lasttoggle[i] = dyad.tail;
           lasttoggle[i+lasttoggle[0]] = dyad.head;
           lasttoggle[i+lasttoggle[0]+lasttoggle[0]] = ts;
@@ -357,8 +357,17 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
     else Rprintf("Convergence achieved after %u M-H steps.\n",step);
   }
   
-  const unsigned int t=nwp->duration_info.time+1; // Note that the toggle only takes effect on the next time step.
-  TailHead dyad;
+
+  /* If the term has an extension, send it a "TICK" signal and the set
+     of dyads that changed. */
+  EXEC_THROUGH_TERMS(m,{
+      if(mtp->x_func)
+        (*(mtp->x_func))(TICK, discord, mtp, nwp); 
+    });
+
+  const unsigned int t=nwp->duration_info->time+1; // Note that the toggle only takes effect on the next time step.
+
+    TailHead dyad;
   kh_foreach_key(discord, dyad,{    
       if(*nextdiffedge<maxchanges){
         // and record the toggle.
@@ -374,7 +383,7 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
     });
   kh_clear(DyadSet, discord);
 
-  nwp->duration_info.time++;
+  nwp->duration_info->time++;
 
   return MCMCDyn_OK;
 }

@@ -14,6 +14,7 @@
 #include "ergm_MHproposal.h"
 #include "ergm_changestat.h"
 #include "ergm_model.h"
+#include "tergm_model.h"
 
 // TODO: This might be worth moving into a common "constants.h".
 typedef enum MCMCDynStatus_enum {
@@ -22,7 +23,6 @@ typedef enum MCMCDynStatus_enum {
   MCMCDyn_MH_FAILED = 2,
   MCMCDyn_TOO_MANY_CHANGES = 3
 } MCMCDynStatus;
-
 
 void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int n_edges,
 			 int n_nodes, int dflag, int bipartite, Network **nwp,
