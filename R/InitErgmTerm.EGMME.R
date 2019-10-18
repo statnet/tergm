@@ -23,7 +23,8 @@ InitErgmTerm.FormE <- function(nw, arglist, response=NULL,  ...) {
          auxiliaries = ~.union.lt.net(),
          inputs=inputs,
          emptynwstats=gs,
-         dependence=!is.dyad.independent(m)),
+         dependence=!is.dyad.independent(m),
+         duration=TRUE),
     passthrough.curved.ergm_model(m, function(x) paste0('Form(',x,')')))
 }
 
@@ -36,6 +37,7 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
 
   list(name="_union_lt_net_Network",
        coef.names=c(),
+       duration=TRUE,
        dependence=FALSE)
 }
 
@@ -63,7 +65,8 @@ InitErgmTerm.DissE <- function(nw, arglist, response=NULL,  ...) {
          auxiliaries = ~.intersect.lt.net(),
          inputs=inputs,
          emptynwstats=gs,
-         dependence=!is.dyad.independent(m)),
+         dependence=!is.dyad.independent(m),
+         duration=TRUE),
     passthrough.curved.ergm_model(m, function(x) paste0('Diss(',x,')')))
 }
 
@@ -76,5 +79,6 @@ InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
 
   list(name="_intersect_lt_net_Network",
        coef.names=c(),
+       duration=TRUE,
        dependence=FALSE)
 }
