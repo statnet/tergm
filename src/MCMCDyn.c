@@ -360,10 +360,15 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
 
   /* If the term has an extension, send it a "TICK" signal and the set
      of dyads that changed. */
-  EXEC_THROUGH_TERMS(m,{
+  memset(m->workspace, 0, m->n_stats*sizeof(double)); /* Zero all change stats. */
+  EXEC_THROUGH_TERMS_INTO(m, m->workspace, {
+      mtp->dstats = dstats; /* Stuck the change statistic here.*/
       if(mtp->x_func)
         (*(mtp->x_func))(TICK, discord, mtp, nwp); 
     });
+  /* Record network statistics for posterity. */
+  for (unsigned int i = 0; i < m->n_stats; i++)
+    stats[i] += m->workspace[i];
 
   const unsigned int t=nwp->duration_info->time+1; // Note that the toggle only takes effect on the next time step.
 
