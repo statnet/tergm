@@ -64,7 +64,6 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
 		  // terms and proposals.
 		  Model *m, MHProposal *MH, double *eta,
 		  // Space for output.
-		  unsigned log_changes,
 		  double *stats,
 		  unsigned int maxchanges, Edge *nextdiffedge,
 		  Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
@@ -73,4 +72,14 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
 		  // Verbosity.
 		  int fVerbose);
 
+MCMCDynStatus MCMCDyn1Step_advance(// Observed and discordant network.
+                                   Network *nwp, StoreDyadSet *discord,
+                                   // terms and proposals.
+                                   Model *m,
+                                   // Space for output.
+                                   double *stats,
+                                   unsigned int maxchanges, Edge *nextdiffedge,
+                                   Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
+                                   // Verbosity.
+                                   int fVerbose);
 #endif

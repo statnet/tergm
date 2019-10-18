@@ -185,7 +185,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
   for(i=0;i<burnin;i++){
     MCMCDynStatus status = MCMCDyn1Step(nwp, discord,
 					m, MHp, eta,
-					log_changes, stats,
+					stats,
 					maxchanges, &nextdiffedge, difftime, difftail, diffhead, diffto,
 					min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, fVerbose);
     // Check that we didn't run out of log space.
@@ -217,7 +217,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
     for(j=0;j<interval;j++){
       MCMCDynStatus status = MCMCDyn1Step(nwp, discord,
 					  m, MHp, eta,
-					  log_changes, stats,
+					  stats,
 					  maxchanges, &nextdiffedge, difftime, difftail, diffhead, diffto,
 					  min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, fVerbose);
       
@@ -253,7 +253,6 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
 		  // terms and proposals.
 		  Model *m, MHProposal *MHp, double *eta,
 		  // Space for output.
-		  unsigned log_changes,
 		  double *stats,
 		  unsigned int maxchanges, Edge *nextdiffedge,
 		  Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
@@ -356,7 +355,23 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
     if(step>=max_MH_interval ) Rprintf("Convergence not achieved after %u M-H steps.\n",step);
     else Rprintf("Convergence achieved after %u M-H steps.\n",step);
   }
-  
+
+  return MCMCDyn1Step_advance(nwp, discord, m, stats,
+                              maxchanges, nextdiffedge, difftime, difftail, diffhead, diffto,
+                              fVerbose);
+}
+
+
+MCMCDynStatus MCMCDyn1Step_advance(// Observed and discordant network.
+                                   Network *nwp, StoreDyadSet *discord,
+                                   // terms and proposals.
+                                   Model *m,
+                                   // Space for output.
+                                   double *stats,
+                                   unsigned int maxchanges, Edge *nextdiffedge,
+                                   Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
+                                   // Verbosity.
+                                   int fVerbose){
 
   /* If the term has an extension, send it a "TICK" signal and the set
      of dyads that changed. */
@@ -372,7 +387,7 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
 
   const unsigned int t=nwp->duration_info->time+1; // Note that the toggle only takes effect on the next time step.
 
-    TailHead dyad;
+  TailHead dyad;
   kh_foreach_key(discord, dyad,{    
       if(*nextdiffedge<maxchanges){
         // and record the toggle.
