@@ -70,4 +70,5 @@ Collate:
     'summary.stergm.R'
     'tergm.CMLE.R'
     'tergm.R'
+    'tergm.getMCMCsample.r'
     'zzz.R'
