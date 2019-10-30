@@ -22,6 +22,7 @@
 #' @aliases tergm_MCMC_sample tergm_MCMC_slave
 #' @param nw a \code{\link{network}} object
 #' @param model the model, as returned by \code{\link{ergm_model}}
+#' @param model.mon the optional monitoring model, as returned by \code{\link{ergm_model}}
 #' @param proposal a list of parameters needed for
 #' proposals
 #' @param eta vector of natural parameters.
@@ -39,23 +40,29 @@
 #' @seealso \code{\link{simulate.tergm}}
 #' @keywords internal
 #' @export
-tergm_MCMC_sample <- function(nw, model,
+tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
                                proposal, control,
                                theta,
                                verbose=FALSE,...,
                                eta = ergm.eta(theta, model$etamap)
                                ){
+  # this is where we combine models and pad out eta 
+  # with 0s as necessary to accomodate the monitoring model
+  model.comb <- c(model, model.mon)
+  eta.comb <- c(eta, rep(0, NVL(model.mon$etamap$etalength, 0)))
 
+  # always collect if monitoring model is passed
+  control$collect <- NVL(control$collect, TRUE) || !is.null(model.mon)
 
   #
   #   Check for truncation of the returned edge list
-  #
-  Clist <- ergm.Cprepare(nw, model)
+  #  
+  Clist <- ergm.Cprepare(nw, model.comb)
   
-  z <- tergm_MCMC_slave(Clist, proposal, eta, control, verbose)
+  z <- tergm_MCMC_slave(Clist, proposal, eta.comb, control, verbose)
 
   newnetwork<-as.network(pending_update_network(nw, z))
-  if(is.durational(model)){
+  if(is.durational(model.comb)){
     newnetwork %n% "time" <- z$time
     newnetwork %n% "lasttoggle" <- z$lasttoggle
   }
@@ -76,9 +83,19 @@ tergm_MCMC_sample <- function(nw, model,
 
   statsmatrix <- z$statsmatrix
   
-  if(!is.null(statsmatrix)) colnames(statsmatrix) <- model$coef.names
+  if(!is.null(statsmatrix)) colnames(statsmatrix) <- model.comb$coef.names
 
-  list(statsmatrix=statsmatrix,
+  # this is where we separate monitored stats from fd stats if model.mon is passed
+  if(is.null(model.mon)) {
+    statsmatrix.fd <- statsmatrix
+    statsmatrix.mon <- NULL
+  } else {
+    statsmatrix.fd <- statsmatrix[,1:(NCOL(statsmatrix) - model.mon$etamap$etalength),drop=FALSE]
+    statsmatrix.mon <- statsmatrix[,(NCOL(statsmatrix) - model.mon$etamap$etalength + 1):NCOL(statsmatrix),drop=FALSE]
+  }
+
+  list(statsmatrix.fd=statsmatrix.fd,
+       statsmatrix.mon=statsmatrix.mon,
        newnetwork=newnetwork,
        changed=diffedgelist,
        maxchanges=control$MCMC.maxchanges)
