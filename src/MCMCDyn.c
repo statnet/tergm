@@ -90,8 +90,6 @@ void MCMCDyn_wrapper(// Starting network.
   MHProposal *MHp;
   StoreDyadSet *discord;
 
-  if(*lasttoggle == 0) lasttoggle = NULL;
-
   Vertex *difftime=NULL, *difftail=NULL, *diffhead=NULL;
   int *diffto=NULL;
 
@@ -320,8 +318,10 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
         DyadSetToggle(MHp->toggletail[i], MHp->togglehead[i], discord);
       }
       /* Record network statistics for posterity. */
-      for (unsigned int i = 0; i < m->n_stats; i++)
-        stats[i] += m->workspace[i];
+      if(stats) {
+        for (unsigned int i = 0; i < m->n_stats; i++)
+          stats[i] += m->workspace[i];
+      }
     }
 
     int i = kh_size(discord) - prev_discord;
@@ -382,9 +382,10 @@ MCMCDynStatus MCMCDyn1Step_advance(// Observed and discordant network.
         (*(mtp->x_func))(TICK, discord, mtp, nwp); 
     });
   /* Record network statistics for posterity. */
-  for (unsigned int i = 0; i < m->n_stats; i++)
-    stats[i] += m->workspace[i];
-
+  if(stats) {
+    for (unsigned int i = 0; i < m->n_stats; i++)
+      stats[i] += m->workspace[i];
+  }
   const unsigned int t=nwp->duration_info->time+1; // Note that the toggle only takes effect on the next time step.
 
   TailHead dyad;
