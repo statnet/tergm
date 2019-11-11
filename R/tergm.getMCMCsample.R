@@ -116,11 +116,15 @@ tergm_MCMC_slave <- function(Clist, proposal, eta, control, verbose){
   repeat{
     #FIXME: Separate MCMC control parameters and properly attach them.
     
+    # lasttoggle must hold the inputs while also having room for the outputs
+    lasttoggle <- NVL(Clist$lasttoggle,0)
+    lasttoggle <- c(lasttoggle, rep(0, 3*maxedges + 1 - length(lasttoggle)))
+    
     z <- .C("MCMCDyn_wrapper",
             # Observed network.
             as.integer(Clist$tails), as.integer(Clist$heads),
             time = if(is.null(Clist$time)) as.integer(0) else as.integer(Clist$time),
-            lasttoggle = as.integer(NVL(Clist$lasttoggle,0)),  
+            lasttoggle = as.integer(lasttoggle),  
             as.integer(Clist$nedges),
             as.integer(Clist$n),
             as.integer(Clist$dir), as.integer(Clist$bipartite),
@@ -175,7 +179,11 @@ tergm_MCMC_slave <- function(Clist, proposal, eta, control, verbose){
   for(i in rev(seq_along(zn))){ # Do in reverse, to preserve indexing.
     if(! zn[i] %in% c("time", "lasttoggle", "newnwtails", "newnwheads", "diffnwtime", "diffnwtails", "diffnwheads", "diffnwdirs", "status"))
       z[[i]] <- NULL
-  }  
+  }
+
+  # subselect the portion of z$lasttoggle that corresponds to actual edges and not just buffer
+  z$lasttoggle <- z$lasttoggle[1:(3*z$lasttoggle[1] + 1)]
+  
   c(z,
     list(statsmatrix = statsmatrix))
 }
