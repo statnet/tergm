@@ -321,11 +321,9 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
   
   if(!is.null(monitor)) monitor<-nonsimp_update.formula(monitor,nw~., from.new="nw")
   
-  if(is.null(duration.dependent)){ # in the case of simulating from nw directly 
-    duration.dependent <- is.lasttoggle(nw,formula,monitor=monitor)
-    if(duration.dependent)
-      nw %n% "lasttoggle" <- NVL(nw %n% "lasttoggle",rep(round(-.Machine$integer.max/2), network.dyadcount(nw)))  else nw %n% "lasttoggle" <- NULL
-      
+  if(is.null(nw %n% "lasttoggle")) {
+    nwel <- as.edgelist(nw)
+    nw %n% "lasttoggle" <- c(NROW(nwel), nwel[,1], nwel[,2], rep(round(-.Machine$integer.max/2), NROW(nwel)))
   }
 
   model <- ergm_model(formula, nw, role=NULL, term.options=control$term.options)
