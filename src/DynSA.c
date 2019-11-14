@@ -146,8 +146,8 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
     // Jitter parameters
     for(unsigned int j=0; j<p; j++){
       if(jitter[j]!=0){
-    last_jitter[j] = rnorm(0,jitter[j]);
-    eta[j] += last_jitter[j];
+        last_jitter[j] = rnorm(0,jitter[j]);
+        eta[j] += last_jitter[j];
       }else last_jitter[j] = 0;
     }
 
@@ -165,7 +165,7 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
         return MCMCDyn_TOO_MANY_CHANGES;
       
       if(nwp->nedges >= maxedges-1)
-    return MCMCDyn_TOO_MANY_EDGES;
+        return MCMCDyn_TOO_MANY_EDGES;
     }
 
     // Sampling run
@@ -182,42 +182,42 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
         return MCMCDyn_TOO_MANY_CHANGES;
       
       if(nwp->nedges >= maxedges-1)
-    return MCMCDyn_TOO_MANY_EDGES;
+        return MCMCDyn_TOO_MANY_EDGES;
     
       for(unsigned int k=0;k<nstatsmonitor; k++){
-    meandev[k]+=dev[k]*1;
-    n+=1;
+        meandev[k]+=dev[k]*1;
+        n+=1;
       }
       if (fVerbose>2){
-    for(unsigned int k=0; k<p; k++){
-      Rprintf("eta[%d] = %f\n", k, eta[k]);
-    }
-    for(unsigned int k=0; k<nstatsmonitor; k++){
-      Rprintf("M_dev[%d] = %f\n", k, dev[k]);
-    }
+        for(unsigned int k=0; k<p; k++){
+          Rprintf("eta[%d] = %f\n", k, eta[k]);
+        }
+        for(unsigned int k=0; k<nstatsmonitor; k++){
+          Rprintf("M_dev[%d] = %f\n", k, dev[k]);
+        }
 
-    Rprintf("\n");
+        Rprintf("\n");
       }
 
       // Record configurations and estimating equation values.
       for(unsigned int j=0; j<p; j++){
-    opt_history[hist_pos*rowsize+j] = eta[j];
+        opt_history[hist_pos*rowsize+j] = eta[j];
       }
       for(unsigned int j=0; j<p; j++){
-    opt_history[hist_pos*rowsize+p+j] = last_jitter[j];
+        opt_history[hist_pos*rowsize+p+j] = last_jitter[j];
       }
       for(unsigned int j=0; j<nstatsmonitor; j++){
-    opt_history[hist_pos*rowsize+p+p+j] = dev[j];
+        opt_history[hist_pos*rowsize+p+p+j] = dev[j];
       }
       hist_pos++;
     }
     
     if(fVerbose>1){
       for(unsigned int k=0; k<p; k++){
-    Rprintf("eta[%d] = %f\n", k, eta[k]);
+        Rprintf("eta[%d] = %f\n", k, eta[k]);
       }
       for(unsigned int k=0; k<nstatsmonitor; k++){
-    Rprintf("meandev[%d] = %f\n", k, meandev[k]/n);
+        Rprintf("meandev[%d] = %f\n", k, meandev[k]/n);
       }
       
       Rprintf("\n");
@@ -231,8 +231,8 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
     // If the statistics are getting worse by too much, stop updating eta and collect data for the rest of the run.
     for(unsigned int j=0; j<nstatsmonitor; j++){
       if(fabs(meandev[j]) > dev_guard[j]){
-    memset(WinvGradient, 0, nstatsmonitor*p*sizeof(double));
-    memset(dejitter, 0, p*p*sizeof(double));
+        memset(WinvGradient, 0, nstatsmonitor*p*sizeof(double));
+        memset(dejitter, 0, p*p*sizeof(double));
       }
     }
 
@@ -242,19 +242,19 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
     //          = eta[t] - a*(G^-1)*W*d[t] + a*(G^-1)*W*G*jit[t]
     for(unsigned int k=0; k<nstatsmonitor; k++){
       for(unsigned int j=0; j<p; j++){
-          eta[j] -= WinvGradient[k*p+j] * meandev[k];
+        eta[j] -= WinvGradient[k*p+j] * meandev[k];
       }
     }
     for(unsigned int k=0; k<p; k++){
       for(unsigned int j=0; j<p; j++){
-          eta[j] += dejitter[k*p+j] * last_jitter[k];
+        eta[j] += dejitter[k*p+j] * last_jitter[k];
       }
     }
 
     // Undo jitter
     for(unsigned int j=0; j<p; j++){
       if(jitter[j]!=0){
-          eta[j] -= last_jitter[j];
+        eta[j] -= last_jitter[j];
       }
     }
 
@@ -262,7 +262,7 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
     for(unsigned int j=0; j<p; j++){
       double change = eta[j] - init_eta[j];
       if(fabs(change) > par_guard[j]){
-    eta[j] = init_eta[j] + (change>0?+1:-1)*par_guard[j]; 
+        eta[j] = init_eta[j] + (change>0?+1:-1)*par_guard[j]; 
       }
     }
   }
