@@ -117,7 +117,7 @@ tergm_MCMC_slave <- function(Clist, proposal, eta, control, verbose){
     #FIXME: Separate MCMC control parameters and properly attach them.
     
     # lasttoggle must hold the inputs while also having room for the outputs
-    lasttoggle <- NVL(Clist$lasttoggle,0)
+    lasttoggle <- c(NROW(Clist$lasttoggle), Clist$lasttoggle)    
     lasttoggle <- c(lasttoggle, rep(0, 3*maxedges + 1 - length(lasttoggle)))
     
     z <- .C("MCMCDyn_wrapper",
@@ -182,7 +182,7 @@ tergm_MCMC_slave <- function(Clist, proposal, eta, control, verbose){
   }
 
   # subselect the portion of z$lasttoggle that corresponds to actual edges and not just buffer
-  z$lasttoggle <- z$lasttoggle[1:(3*z$lasttoggle[1] + 1)]
+  z$lasttoggle <- matrix(z$lasttoggle[2:(3*z$lasttoggle[1] + 1)],nrow=z$lasttoggle[1])
   
   c(z,
     list(statsmatrix = statsmatrix))

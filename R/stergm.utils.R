@@ -99,9 +99,7 @@ to.networkDynamic.lasttoggle <- function(nw){
   nwd <- nw
   if(!is.null(nw %n% "lasttoggle")){
     
-    nwlt <- nw %n% "lasttoggle"
-    
-    lt.edges <- matrix(nwlt[-1], ncol = 3, nrow = nwlt[1])
+    lt.edges <- nw %n% "lasttoggle"
 
     lt.edges <- lt.edges[lt.edges[,3]>round(-.Machine$integer.max/2),,drop=FALSE] 
 
