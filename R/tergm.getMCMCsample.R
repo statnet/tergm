@@ -181,8 +181,8 @@ tergm_MCMC_slave <- function(Clist, proposal, eta, control, verbose){
       z[[i]] <- NULL
   }
 
-  # subselect the portion of z$lasttoggle that corresponds to actual edges and not just buffer
-  z$lasttoggle <- matrix(z$lasttoggle[2:(3*z$lasttoggle[1] + 1)],nrow=z$lasttoggle[1])
+  # subselect the portion of z$lasttoggle that corresponds to actual edges and not just buffer; no edges gets a matrix with zero rows
+  z$lasttoggle <- if(z$lasttoggle[1] > 0) matrix(z$lasttoggle[2:(3*z$lasttoggle[1] + 1)],nrow=z$lasttoggle[1]) else matrix(0,nrow=0,ncol=3)
   
   c(z,
     list(statsmatrix = statsmatrix))
