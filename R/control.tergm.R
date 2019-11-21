@@ -31,7 +31,7 @@
 #'   interpreted as follows: \itemize{ \item Elements corresponding to
 #'   terms enclosed in \code{offset()} are used as the fixed offset
 #'   coefficients. These should match the offset values given in
-#'   \code{offset.coef.form}.
+#'   \code{offset.coef}.
 #' 
 #'   \item Elements that do not correspond to offset terms and are not
 #'   \code{NA} are used as starting values in the estimation.
