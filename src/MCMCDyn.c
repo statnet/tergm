@@ -25,7 +25,7 @@ void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int 
 			 int *minin, int condAllDegExact, int attriblength,
 			 
 			 char *MHProposaltype, char *MHProposalpackage, MHProposal **MHp,
-                         StoreDyadSet **discord,
+                         StoreDyadMapInt **discord,
 			 int fVerbose){
   GetRNGstate();  /* R function enabling uniform RNG. It needs to come after NetworkInitialize and MH_init, since they may call GetRNGstate as well. */  
   
@@ -42,17 +42,17 @@ void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int 
                                 condAllDegExact, attriblength, (*m)->termarray->aux_storage);
   }
 
-  *discord = kh_init(DyadSet); (*discord)->directed = dflag;
+  *discord = kh_init(DyadMapInt); (*discord)->directed = dflag;
 }
 
 void MCMCDyn_finish_common(Network *nwp,
 			   Model *m,
 			   MHProposal *MHp,
-                           StoreDyadSet *discord){
+                           StoreDyadMapInt *discord){
   if(MHp) MHProposalDestroy(MHp,nwp);
   ModelDestroy(nwp,m);
   NetworkDestroy(nwp);
-  kh_destroy(DyadSet, discord);
+  kh_destroy(DyadMapInt, discord);
   PutRNGstate();  /* Disable RNG before returning */
 
 }
@@ -88,7 +88,7 @@ void MCMCDyn_wrapper(// Starting network.
   Network *nwp;
   Model *m;
   MHProposal *MHp;
-  StoreDyadSet *discord;
+  StoreDyadMapInt *discord;
 
   Vertex *difftime=NULL, *difftail=NULL, *diffhead=NULL;
   int *diffto=NULL;
@@ -153,7 +153,7 @@ void MCMCDyn_wrapper(// Starting network.
  the statistics array. 
 *********************/
 MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
-			    Network *nwp, StoreDyadSet *discord,
+			    Network *nwp, StoreDyadMapInt *discord,
 			    // terms and proposals.
 			    Model *m, MHProposal *MHp,
 			    double *eta,
@@ -227,6 +227,8 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
       if(maxedges!=0 && nwp->nedges >= maxedges-1)
 	return MCMCDyn_TOO_MANY_EDGES;
 
+      // Periodically expire older timestamps.
+      if(nwp->duration_info->time%TIMESTAMP_HORIZON_FREQ==0) ExpireTimestamps(TIMESTAMP_HORIZON_EDGE, TIMESTAMP_HORIZON_NONEDGE, nwp);
     }
     
     //Rprintf("MCMCSampleDyn loop numdissolve %d\n", *numdissolve);
@@ -241,13 +243,34 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
   return MCMCDyn_OK;
 }
 
+
+/* The following outlines what happens during each time step:
+
+   1. All statistics with x_ functions are sent a TICK signal.
+   2. Any updates to statistics are recorded.
+   3. Timer is incremented.
+   4. A toggle proposal is made.
+   5. Change statistics are calculated.
+   6. If proposal is rejected, continue to 10.
+   7. Relevant dyad is toggled in nwp.
+   8. If it hasn't been toggled during this time step, its lasttoggle information, if any, is saved in discord, and its lasttoggle information is updated.
+   9. If it has been toggled during this time step, its lasttoggle information, if any, is restored from discord. Discord's backup is deleted.
+   10. Continue from 4 until sufficiently long run.
+   11. All statistics with x_ functions are sent a TOCK signal.
+   12. Any updates to statistics are recorded.
+   13. Toggles in discord are logged.
+   14. discord is cleared.
+
+ */
+
+
 /*********************
  void MCMCDyn1Step
 
  Simulate evolution of a dynamic network for 1 step.
 *********************/
 MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
-                           Network *nwp, StoreDyadSet *discord,
+                           Network *nwp, StoreDyadMapInt *discord,
 		  // terms and proposals.
 		  Model *m, MHProposal *MHp, double *eta,
 		  // Space for output.
@@ -258,6 +281,21 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
 		  unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
 		  // Verbosity.
 		  int fVerbose){
+
+  /* If the term has an extension, send it a "TICK" signal. */
+  memset(m->workspace, 0, m->n_stats*sizeof(double)); /* Zero all change stats. */
+  EXEC_THROUGH_TERMS_INTO(m, m->workspace, {
+      mtp->dstats = dstats; /* Stuck the change statistic here.*/
+      if(mtp->x_func)
+        (*(mtp->x_func))(TICK, NULL, mtp, nwp);
+    });
+  /* Record network statistics for posterity. */
+  if(stats) {
+    for (unsigned int i = 0; i < m->n_stats; i++)
+      stats[i] += m->workspace[i];
+  }
+
+  nwp->duration_info->time++; // Advance the clock.
 
   /* Run the process. */
   
@@ -315,7 +353,26 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
          which doesn't happen until later. */
       for (unsigned int i=0; i < MHp->ntoggles; i++){
         GET_EDGE_UPDATE_STORAGE_TOGGLE(MHp->toggletail[i], MHp->togglehead[i], nwp, m, MHp);
-        DyadSetToggle(MHp->toggletail[i], MHp->togglehead[i], discord);
+
+        {
+          TailHead dyad = THKey(discord,MHp->toggletail[i], MHp->togglehead[i]);
+          khint_t i = kh_get(DyadMapInt,discord,dyad);
+          if(i == kh_none){
+            // If the dyad has *not* been toggled in this time step, then save its last toggle info (if any) and make a provisional change in lasttoggle.
+            // Here, current time is used as a placeholder for no last toggle info.
+            kh_set(DyadMapInt, discord, dyad, kh_getval(DyadMapInt, nwp->duration_info->lasttoggle, dyad, nwp->duration_info->time));
+            kh_set(DyadMapInt, nwp->duration_info->lasttoggle, dyad, nwp->duration_info->time);
+          }else{
+            // If the dyad *has* been toggled in this timestep, then untoggle it by restoring its change in lasttoggle.
+            if(kh_value(discord, i) != nwp->duration_info->time){
+              kh_set(DyadMapInt, nwp->duration_info->lasttoggle, dyad, kh_value(discord, i));
+            }else{
+              kh_unset(DyadMapInt, nwp->duration_info->lasttoggle, dyad);
+            }
+
+            kh_del(DyadMapInt, discord, i);
+          }
+        }
       }
       /* Record network statistics for posterity. */
       if(stats) {
@@ -363,7 +420,7 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
 
 
 MCMCDynStatus MCMCDyn1Step_advance(// Observed and discordant network.
-                                   Network *nwp, StoreDyadSet *discord,
+                                   Network *nwp, StoreDyadMapInt *discord,
                                    // terms and proposals.
                                    Model *m,
                                    // Space for output.
@@ -373,38 +430,36 @@ MCMCDynStatus MCMCDyn1Step_advance(// Observed and discordant network.
                                    // Verbosity.
                                    int fVerbose){
 
-  /* If the term has an extension, send it a "TICK" signal and the set
+  /* If the term has an extension, send it a "TOCK" signal and the set
      of dyads that changed. */
   memset(m->workspace, 0, m->n_stats*sizeof(double)); /* Zero all change stats. */
   EXEC_THROUGH_TERMS_INTO(m, m->workspace, {
       mtp->dstats = dstats; /* Stuck the change statistic here.*/
       if(mtp->x_func)
-        (*(mtp->x_func))(TICK, discord, mtp, nwp); 
+        (*(mtp->x_func))(TOCK, discord, mtp, nwp);
     });
   /* Record network statistics for posterity. */
   if(stats) {
     for (unsigned int i = 0; i < m->n_stats; i++)
       stats[i] += m->workspace[i];
   }
-  const unsigned int t=nwp->duration_info->time+1; // Note that the toggle only takes effect on the next time step.
+
+  const unsigned int t=nwp->duration_info->time;
 
   TailHead dyad;
   kh_foreach_key(discord, dyad,{    
       if(*nextdiffedge<maxchanges){
         // and record the toggle.
-        if(difftime) difftime[*nextdiffedge] = t; // Effective toggle time is t+1.
+        if(difftime) difftime[*nextdiffedge] = t;
         if(difftail) difftail[*nextdiffedge] = dyad.tail;
         if(diffhead) diffhead[*nextdiffedge] = dyad.head;
         if(diffto) diffto[*nextdiffedge] = GetEdge(dyad.tail,dyad.head,nwp);
         (*nextdiffedge)++;
-        TouchEdge(dyad.tail,dyad.head,nwp);
       }else{
         return(MCMCDyn_TOO_MANY_CHANGES);
       }
     });
-  kh_clear(DyadSet, discord);
-
-  nwp->duration_info->time++;
+  kh_clear(DyadMapInt, discord);
 
   return MCMCDyn_OK;
 }

@@ -40,7 +40,7 @@ void MCMCDynSArun_wrapper(// Observed network.
   Network *nwp;
   Model *m;
   MHProposal *MHp;
-  StoreDyadSet *discord;
+  StoreDyadMapInt *discord;
     
   Vertex *difftime, *difftail, *diffhead;
   difftime = (Vertex *) Calloc(*maxchanges,Vertex);
@@ -112,7 +112,7 @@ void MCMCDynSArun_wrapper(// Observed network.
  void MCMCSampleDynPhase12
 *********************/
 MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
-                  Network *nwp, StoreDyadSet *discord,
+                  Network *nwp, StoreDyadMapInt *discord,
                   // Formation terms and proposals.
                   Model *m, MHProposal *MHp,
                   int nstatsmonitor,
@@ -170,6 +170,9 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 
     // Sampling run
     for(unsigned int j=0;j < SA_interval;j++){
+      // Periodically expire older timestamps.
+      if(nwp->duration_info->time%TIMESTAMP_HORIZON_FREQ==0) ExpireTimestamps(TIMESTAMP_HORIZON_EDGE, TIMESTAMP_HORIZON_NONEDGE, nwp);
+
       MCMCDynStatus status = MCMCDyn1Step(nwp, discord,
                       m, MHp, eta,
                       inputdev,

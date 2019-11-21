@@ -33,17 +33,17 @@ void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int 
 			 int *minin, int condAllDegExact, int attriblength,
 			 
 			 char *MHProposaltype, char *MHProposalpackage, MHProposal **MH,
-                         StoreDyadSet **discord,
+                         StoreDyadMapInt **discord,
 			 int fVerbose);
 
 
 void MCMCDyn_finish_common(Network *nwp,
 			   Model *m,
 			   MHProposal *MH,
-                           StoreDyadSet *discord);
+                           StoreDyadMapInt *discord);
 
 MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
-			    Network *nwp, StoreDyadSet *discord,
+			    Network *nwp, StoreDyadMapInt *discord,
 			    // terms and proposals.
 			    Model *m, MHProposal *MH,
 			    double *eta,
@@ -60,7 +60,7 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 			    int fVerbose);
 
 MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
-                           Network *nwp, StoreDyadSet *discord,
+                           Network *nwp, StoreDyadMapInt *discord,
 		  // terms and proposals.
 		  Model *m, MHProposal *MH, double *eta,
 		  // Space for output.
@@ -73,7 +73,7 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
 		  int fVerbose);
 
 MCMCDynStatus MCMCDyn1Step_advance(// Observed and discordant network.
-                                   Network *nwp, StoreDyadSet *discord,
+                                   Network *nwp, StoreDyadMapInt *discord,
                                    // terms and proposals.
                                    Model *m,
                                    // Space for output.

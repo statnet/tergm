@@ -19,8 +19,11 @@
 I_CHANGESTAT_FN(i__intersect_lt_net_Network){
   I_AUXNET(NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL));
   TailHead dyad;
-  kh_foreach_key(nwp->duration_info->lasttoggle, dyad, {
-      if(IS_OUTEDGE(dyad.tail, dyad.head)){
+  int lt;
+  const int t = nwp->duration_info->time;
+  kh_foreach(nwp->duration_info->lasttoggle, dyad, lt, {
+      // Time difference of 0 means that the edge was absent either in this time step or in the previous time step.
+      if(t-lt!=0 && IS_OUTEDGE(dyad.tail, dyad.head)){
         ToggleKnownEdge(dyad.tail,dyad.head, auxnet->onwp, FALSE);
       }
     });
@@ -30,8 +33,11 @@ I_CHANGESTAT_FN(i__intersect_lt_net_Network){
 
 U_CHANGESTAT_FN(u__intersect_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
-  // only toggle if the edge is in y0. otherwise changing y1 won't matter.
-  if(HASDMI(tail, head, auxnet->inwp->duration_info->lasttoggle))
+  // Only toggle if the edge is in y0. Otherwise, changing y1 won't
+  // matter. We infer that the edge was in y0 if either it's in y1 and
+  // elapsed time > 0 (i.e., not just added) or it's not in y1 but
+  // elapsed time is 0 (i.e., just removed).
+  if(edgeflag != (ElapsedTime(tail, head, nwp)==0))
     ToggleEdge(tail, head, auxnet->onwp);
 }
 
@@ -46,9 +52,13 @@ F_CHANGESTAT_FN(f__intersect_lt_net_Network){
 // The storage auxnet->onwp should be initialized as y0|y1 at the end.
 I_CHANGESTAT_FN(i__union_lt_net_Network){
   I_AUXNET(NetworkCopy(nwp));
+  STORAGE = (void *) auxnet->onwp->duration_info; // So that we don't lose this pointer.
   TailHead dyad;
-  kh_foreach_key(nwp->duration_info->lasttoggle, dyad, {
-      if(!IS_OUTEDGE(dyad.tail, dyad.head)){
+  int lt;
+  const int t = nwp->duration_info->time;
+  kh_foreach(nwp->duration_info->lasttoggle, dyad, lt, {
+      // Time difference of 0 means that edge was present either in this time step or in the previous time step.
+      if(t-lt==0 || !IS_OUTEDGE(dyad.tail, dyad.head)){
         ToggleKnownEdge(dyad.tail,dyad.head, auxnet->onwp, FALSE);
       }
     });
@@ -58,13 +68,16 @@ I_CHANGESTAT_FN(i__union_lt_net_Network){
 
 U_CHANGESTAT_FN(u__union_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
-  // If the edge is in y0, changing y1 won't matter.
-  if(!HASDMI(tail, head, auxnet->inwp->duration_info->lasttoggle))
+  // If the edge is in y0, changing y1 won't matter. We infer that the
+  // edge was not y0 if either it's in y1 and elapsed time is 0 (i.e.,
+  // just added) or it's not in y1 but elapsed time is not 0 (i.e.,
+  // not just added).
+  if(edgeflag == (ElapsedTime(tail, head, nwp)==0))
     ToggleEdge(tail, head, auxnet->onwp);
 }
 
 F_CHANGESTAT_FN(f__union_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
-  auxnet->onwp->duration_info = NULL; // So that we don't deallocate someone else's structure.
+  auxnet->onwp->duration_info = (Dur_Inf*) STORAGE; // Because NetworkCopy() allocated it.
   NetworkDestroy(auxnet->onwp);
 }
