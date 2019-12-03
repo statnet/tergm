@@ -36,10 +36,7 @@ void MCMCDynSArun_wrapper(// Observed network.
                  // Verbosity.
                  int *fVerbose,
                  int *status){
-
-  Network *nwp;
-  Model *m;
-  MHProposal *MHp;
+  ErgmState *s;
   StoreDyadMapInt *discord;
     
   Vertex *difftime, *difftail, *diffhead;
@@ -51,19 +48,20 @@ void MCMCDynSArun_wrapper(// Observed network.
   memset(newnetworkhead,0,*maxedges*sizeof(int));
 
   MCMCDyn_init_common(tails, heads, *time, lasttoggle, *n_edges,
-              *n_nodes, *dflag, *bipartite, &nwp,
-              *nterms, *funnames, *sonames, inputs, &m,
-              attribs, maxout, maxin, minout,
-              minin, *condAllDegExact, *attriblength,
-              *MHProposaltype, *MHProposalpackage, &MHp, &discord,
-              *fVerbose);
+                      *n_nodes, *dflag, *bipartite,
+                      *nterms, *funnames, *sonames, inputs,
+                      attribs, maxout, maxin, minout,
+                      minin, *condAllDegExact, *attriblength,
+                      *MHProposaltype, *MHProposalpackage,
+                      &s, &discord);
+  Network *nwp = s->nwp;
+  Model *m = s->m;
 
   double *inputdev = Calloc(m->n_stats, double);
   memcpy(inputdev + m->n_stats - *nstatsmonitor, init_dev, (*nstatsmonitor)*sizeof(double));
 
-  *status = MCMCDynSArun(nwp, discord,
+  *status = MCMCDynSArun(s, discord,
   
-             m, MHp,
              *nstatsmonitor,
     
              eta0,
@@ -100,21 +98,18 @@ void MCMCDynSArun_wrapper(// Observed network.
     }
   }
 
-  MCMCDyn_finish_common(nwp, m, MHp, discord);
   Free(difftime);
   Free(difftail);
   Free(diffhead);
   Free(inputdev);
+  MCMCDyn_finish_common(s, discord);
 }
 
 
 /*********************
  void MCMCSampleDynPhase12
 *********************/
-MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
-                  Network *nwp, StoreDyadMapInt *discord,
-                  // Formation terms and proposals.
-                  Model *m, MHProposal *MHp,
+MCMCDynStatus MCMCDynSArun(ErgmState *s, StoreDyadMapInt *discord,
                   int nstatsmonitor,
                   // Model fitting.
                   double *eta, 
@@ -130,6 +125,9 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
                   unsigned int SA_burnin, unsigned int SA_interval, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
                   // Verbosity.
                   int fVerbose){
+  Network *nwp = s->nwp;
+  Model *m = s->m;
+
   Edge nextdiffedge=1;
   unsigned int hist_pos=0, p=m->n_stats - nstatsmonitor, n, rowsize = p*2 + nstatsmonitor;
   double *meandev=(double*)R_alloc(nstatsmonitor,sizeof(double)), *last_jitter=(double*)R_alloc(p,sizeof(double)), *init_eta=(double*)R_alloc(p,sizeof(double));
@@ -153,8 +151,8 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 
     // Burn in
     for(unsigned int j=0;j < SA_burnin;j++){
-      MCMCDynStatus status = MCMCDyn1Step(nwp, discord,
-                      m, MHp, eta,
+      MCMCDynStatus status = MCMCDyn1Step(s, discord,
+                      eta,
                       inputdev,
                       maxchanges, &nextdiffedge,
                       difftime, difftail, diffhead, NULL,
@@ -173,8 +171,8 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
       // Periodically expire older timestamps.
       if(nwp->duration_info->time%TIMESTAMP_HORIZON_FREQ==0) ExpireTimestamps(TIMESTAMP_HORIZON_EDGE, TIMESTAMP_HORIZON_NONEDGE, nwp);
 
-      MCMCDynStatus status = MCMCDyn1Step(nwp, discord,
-                      m, MHp, eta,
+      MCMCDynStatus status = MCMCDyn1Step(s, discord,
+                      eta,
                       inputdev,
                       maxchanges, &nextdiffedge,
                       difftime, difftail, diffhead, NULL,
@@ -272,4 +270,3 @@ MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
 
   return MCMCDyn_OK;
 }
-

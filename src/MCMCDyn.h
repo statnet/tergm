@@ -15,6 +15,7 @@
 #include "ergm_changestat.h"
 #include "ergm_model.h"
 #include "tergm_model.h"
+#include "ergm_state.h"
 
 // TODO: This might be worth moving into a common "constants.h".
 typedef enum MCMCDynStatus_enum {
@@ -25,27 +26,20 @@ typedef enum MCMCDynStatus_enum {
 } MCMCDynStatus;
 
 void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int n_edges,
-			 int n_nodes, int dflag, int bipartite, Network **nwp,
+			 int n_nodes, int dflag, int bipartite,
 			 
-			 int nterms, char *funnames, char *sonames, double *inputs, Model **m,
+			 int nterms, char *funnames, char *sonames, double *inputs,
 			 
 			 int *attribs, int *maxout, int *maxin, int *minout,
 			 int *minin, int condAllDegExact, int attriblength,
 			 
-			 char *MHProposaltype, char *MHProposalpackage, MHProposal **MH,
-                         StoreDyadMapInt **discord,
-			 int fVerbose);
+			 char *MHProposaltype, char *MHProposalpackage,
+                         ErgmState **s, StoreDyadMapInt **discord);
 
 
-void MCMCDyn_finish_common(Network *nwp,
-			   Model *m,
-			   MHProposal *MH,
-                           StoreDyadMapInt *discord);
+void MCMCDyn_finish_common(ErgmState *s, StoreDyadMapInt *discord);
 
-MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
-			    Network *nwp, StoreDyadMapInt *discord,
-			    // terms and proposals.
-			    Model *m, MHProposal *MH,
+MCMCDynStatus MCMCSampleDyn(ErgmState *s, StoreDyadMapInt *discord,
 			    double *eta,
 			    // Space for output.
 			    double *stats,
@@ -59,23 +53,20 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 			    // Verbosity.
 			    int fVerbose);
 
-MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
-                           Network *nwp, StoreDyadMapInt *discord,
-		  // terms and proposals.
-		  Model *m, MHProposal *MH, double *eta,
-		  // Space for output.
-		  double *stats,
-		  unsigned int maxchanges, Edge *nextdiffedge,
-		  Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
-		  // MCMC settings.
-		  unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
-		  // Verbosity.
-		  int fVerbose);
+MCMCDynStatus MCMCDyn1Step(ErgmState *s,
+                           // Observed and discordant network.
+                           StoreDyadMapInt *discord,
+                           double *eta,
+                           // Space for output.
+                           double *stats,
+                           unsigned int maxchanges, Edge *nextdiffedge,
+                           Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
+                           // MCMC settings.
+                           unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
+                           // Verbosity.
+                           int fVerbose);
 
-MCMCDynStatus MCMCDyn1Step_advance(// Observed and discordant network.
-                                   Network *nwp, StoreDyadMapInt *discord,
-                                   // terms and proposals.
-                                   Model *m,
+MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s, StoreDyadMapInt *discord,
                                    // Space for output.
                                    double *stats,
                                    unsigned int maxchanges, Edge *nextdiffedge,

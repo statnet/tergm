@@ -8,8 +8,6 @@
  *  Copyright 2008-2019 Statnet Commons
  */
 #include "MCMCDyn.h"
-#include <stdbool.h>
-
 /*****************
  Note on undirected networks:  For j<k, edge {j,k} should be stored
  as (j,k) rather than (k,j).  In other words, only directed networks
@@ -17,44 +15,41 @@
 *****************/
 
 void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int n_edges,
-			 int n_nodes, int dflag, int bipartite, Network **nwp,
+			 int n_nodes, int dflag, int bipartite,
 			 
-			 int nterms, char *funnames, char *sonames, double *inputs, Model **m,
+			 int nterms, char *funnames, char *sonames, double *inputs,
 			 
 			 int *attribs, int *maxout, int *maxin, int *minout,
 			 int *minin, int condAllDegExact, int attriblength,
 			 
-			 char *MHProposaltype, char *MHProposalpackage, MHProposal **MHp,
-                         StoreDyadMapInt **discord,
-			 int fVerbose){
-  GetRNGstate();  /* R function enabling uniform RNG. It needs to come after NetworkInitialize and MH_init, since they may call GetRNGstate as well. */  
-  
-  *m=ModelInitialize(funnames, sonames, &inputs, nterms);
+			 char *MHProposaltype, char *MHProposalpackage,
 
-  *nwp=NetworkInitialize((Vertex*)tails, (Vertex*)heads, n_edges, 
-                          n_nodes, dflag, bipartite, 1, time, lasttoggle);
-  
-  /* Trigger initial storage update */
-  InitStats(*nwp, *m);
-
-  if(MHp){
-    *MHp = MHProposalInitialize(MHProposaltype, MHProposalpackage, inputs, fVerbose, *nwp, attribs, maxout, maxin, minout, minin,
-                                condAllDegExact, attriblength, (*m)->termarray->aux_storage);
-  }
+                         ErgmState **s,
+                         StoreDyadMapInt **discord){
+  GetRNGstate();  /* R function enabling uniform RNG. It needs to come after NetworkInitialize and MH_init, since they may call GetRNGstate as well. */
+  *s = ErgmStateInit(// Network settings
+                     n_nodes, dflag, bipartite,
+                     // Model settings
+                     nterms, funnames, sonames, FALSE,
+                     // Proposal settings
+                     MHProposaltype, MHProposalpackage,
+                     attribs, maxout, maxin, minout,
+                     minin, condAllDegExact, attriblength,
+                     // Numeric inputs
+                     inputs,
+                     // Network state
+                     n_edges,
+                     (Vertex *) tails, (Vertex *) heads,
+                     1, time, lasttoggle);
 
   *discord = kh_init(DyadMapInt); (*discord)->directed = dflag;
 }
 
-void MCMCDyn_finish_common(Network *nwp,
-			   Model *m,
-			   MHProposal *MHp,
+void MCMCDyn_finish_common(ErgmState *s,
                            StoreDyadMapInt *discord){
-  if(MHp) MHProposalDestroy(MHp,nwp);
-  ModelDestroy(nwp,m);
-  NetworkDestroy(nwp);
+  ErgmStateDestroy(s);
   kh_destroy(DyadMapInt, discord);
   PutRNGstate();  /* Disable RNG before returning */
-
 }
 
 /*****************
@@ -85,9 +80,7 @@ void MCMCDyn_wrapper(// Starting network.
 		     // Verbosity.
 		     int *fVerbose,
 		     int *status){
-  Network *nwp;
-  Model *m;
-  MHProposal *MHp;
+  ErgmState *s;
   StoreDyadMapInt *discord;
 
   Vertex *difftime=NULL, *difftail=NULL, *diffhead=NULL;
@@ -105,16 +98,17 @@ void MCMCDyn_wrapper(// Starting network.
   }
 
   MCMCDyn_init_common(tails, heads, *time, lasttoggle, *n_edges,
-		      *n_nodes, *dflag, *bipartite, &nwp,
-		      *nterms, *funnames, *sonames, inputs, &m,
+		      *n_nodes, *dflag, *bipartite,
+		      *nterms, *funnames, *sonames, inputs,
 		      attribs, maxout, maxin, minout,
 		      minin, *condAllDegExact, *attriblength, 
-		      *MHProposaltype, *MHProposalpackage, &MHp,
-                      &discord,
-		      *fVerbose);
+		      *MHProposaltype, *MHProposalpackage,
+                      &s,
+                      &discord);
+  Network *nwp = s->nwp;
 
-  *status = MCMCSampleDyn(nwp, discord,
-			  m, MHp, eta,
+  *status = MCMCSampleDyn(s, discord,
+			  eta,
 			  *collect?sample:NULL, *maxedges, *maxchanges, *log_changes, difftime, difftail, diffhead, diffto,
 			  *nsteps, *min_MH_interval, *max_MH_interval, *MH_pval, *MH_interval_add, *burnin, *interval,
 			  *fVerbose);
@@ -139,7 +133,7 @@ void MCMCDyn_wrapper(// Starting network.
     }
   }
 
-  MCMCDyn_finish_common(nwp, m, MHp, discord);
+  MCMCDyn_finish_common(s, discord);
 }
 
 /*********************
@@ -152,10 +146,7 @@ void MCMCDyn_wrapper(// Starting network.
  networks in the sample.  Put all the sampled statistics into
  the statistics array. 
 *********************/
-MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
-			    Network *nwp, StoreDyadMapInt *discord,
-			    // terms and proposals.
-			    Model *m, MHProposal *MHp,
+MCMCDynStatus MCMCSampleDyn(ErgmState *s, StoreDyadMapInt *discord,
 			    double *eta,
 			    // Space for output.
 			    double *stats,
@@ -168,6 +159,8 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 			    unsigned int burnin, unsigned int interval, 
 			    // Verbosity.
 			    int fVerbose){
+  Network *nwp = s->nwp;
+  Model *m = s->m;
 
   int i, j;
   Edge nextdiffedge=1;
@@ -181,8 +174,8 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
   /* Burn in step. */
 
   for(i=0;i<burnin;i++){
-    MCMCDynStatus status = MCMCDyn1Step(nwp, discord,
-					m, MHp, eta,
+    MCMCDynStatus status = MCMCDyn1Step(s, discord,
+					eta,
 					stats,
 					maxchanges, &nextdiffedge, difftime, difftail, diffhead, diffto,
 					min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, fVerbose);
@@ -213,8 +206,8 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 
     /* This then adds the change statistics to these values */
     for(j=0;j<interval;j++){
-      MCMCDynStatus status = MCMCDyn1Step(nwp, discord,
-					  m, MHp, eta,
+      MCMCDynStatus status = MCMCDyn1Step(s, discord,
+					  eta,
 					  stats,
 					  maxchanges, &nextdiffedge, difftime, difftail, diffhead, diffto,
 					  min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, fVerbose);
@@ -269,18 +262,19 @@ MCMCDynStatus MCMCSampleDyn(// Observed and discordant network.
 
  Simulate evolution of a dynamic network for 1 step.
 *********************/
-MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
-                           Network *nwp, StoreDyadMapInt *discord,
-		  // terms and proposals.
-		  Model *m, MHProposal *MHp, double *eta,
-		  // Space for output.
-		  double *stats,
-		  unsigned int maxchanges, Edge *nextdiffedge,
-		  Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
-		  // MCMC settings.
-		  unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
-		  // Verbosity.
-		  int fVerbose){
+MCMCDynStatus MCMCDyn1Step(ErgmState *s, StoreDyadMapInt *discord,
+                           double *eta,
+                           // Space for output.
+                           double *stats,
+                           unsigned int maxchanges, Edge *nextdiffedge,
+                           Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
+                           // MCMC settings.
+                           unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
+                           // Verbosity.
+                           int fVerbose){
+  Network *nwp = s->nwp;
+  Model *m = s->m;
+  MHProposal *MHp = s->MHp;
 
   /* If the term has an extension, send it a "TICK" signal. */
   memset(m->workspace, 0, m->n_stats*sizeof(double)); /* Zero all change stats. */
@@ -299,8 +293,8 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
   double 
     si = 0, // sum of increments
     si2 = 0, // sum of squared increments
-    s = 0, // sum of weights 
-    s2 = 0 // sum of squared weights
+    sw = 0, // sum of weights 
+    sw2 = 0 // sum of squared weights
     ;
   double sdecay = 1 - 1.0/min_MH_interval;
   
@@ -348,7 +342,7 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
       /* Hold off updating timesteamps until the changes are committed,
          which doesn't happen until later. */
       for (unsigned int i=0; i < MHp->ntoggles; i++){
-        GET_EDGE_UPDATE_STORAGE_TOGGLE(MHp->toggletail[i], MHp->togglehead[i], nwp, m, MHp);
+                             GET_EDGE_UPDATE_STORAGE_TOGGLE(MHp->toggletail[i], MHp->togglehead[i], nwp, m, MHp);
 
         {
           TailHead dyad = THKey(discord,MHp->toggletail[i], MHp->togglehead[i]);
@@ -378,20 +372,20 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
     }
 
     int i = kh_size(discord) - prev_discord;
-    s *= sdecay; si *= sdecay;
-    s++; si += i;
-    s2 *= sdecay*sdecay; si2 *= sdecay;
-    s2++; si2 += i*i;
+    sw *= sdecay; si *= sdecay;
+    sw++; si += i;
+    sw2 *= sdecay*sdecay; si2 *= sdecay;
+    sw2++; si2 += i*i;
          
     if(step >= min_MH_interval && !finished) { 
       // Now, perform the test:
-      double mi = (double)si / s, mi2 = (double)si2 / s;
+      double mi = (double)si / sw, mi2 = (double)si2 / sw;
       
       double vi = mi2 - mi*mi;
-      double zi = mi / sqrt(vi * s2/(s*s)); // denom = sqrt(sum(w^2 * v)/sum(w)^2)
+      double zi = mi / sqrt(vi * sw2/(sw*sw)); // denom = sqrt(sum(w^2 * v)/sum(w)^2)
       double pi = pnorm(zi, 0, 1, FALSE, FALSE); // Pr(Z > zi)
 
-      if(fVerbose>=5) Rprintf("%u: s=%2.2f s2=%2.2f d=%d i=%d si=%2.2f si2=%2.2f mi=%2.2f vi=%2.2f ni=%2.2f zi=%2.2f pi=%2.2f\n", step, s, s2, kh_size(discord), i, si, si2, mi, vi, (s*s)/s2, zi, pi);
+      if(fVerbose>=5) Rprintf("%u: sw=%2.2f sw2=%2.2f d=%d i=%d si=%2.2f si2=%2.2f mi=%2.2f vi=%2.2f ni=%2.2f zi=%2.2f pi=%2.2f\n", step, sw, sw2, kh_size(discord), i, si, si2, mi, vi, (sw*sw)/sw2, zi, pi);
   
       if(pi > MH_pval){
 	extrasteps = step*MH_interval_add+round(runif(0,1));
@@ -409,22 +403,21 @@ MCMCDynStatus MCMCDyn1Step(// Observed and discordant network.
     else Rprintf("Convergence achieved after %u M-H steps.\n",step);
   }
 
-  return MCMCDyn1Step_advance(nwp, discord, m, stats,
+  return MCMCDyn1Step_advance(s, discord, stats,
                               maxchanges, nextdiffedge, difftime, difftail, diffhead, diffto,
                               fVerbose);
 }
 
 
-MCMCDynStatus MCMCDyn1Step_advance(// Observed and discordant network.
-                                   Network *nwp, StoreDyadMapInt *discord,
-                                   // terms and proposals.
-                                   Model *m,
+MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s, StoreDyadMapInt *discord,
                                    // Space for output.
                                    double *stats,
                                    unsigned int maxchanges, Edge *nextdiffedge,
                                    Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
                                    // Verbosity.
                                    int fVerbose){
+  Network *nwp = s->nwp;
+  Model *m = s->m;
 
   /* If the term has an extension, send it a "TOCK" signal and the set
      of dyads that changed. */

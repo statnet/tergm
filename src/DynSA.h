@@ -40,10 +40,7 @@ void MCMCDynSArun_wrapper(// Observed network.
                  // Verbosity.
                  int *fVerbose,
                  int *status);
-MCMCDynStatus MCMCDynSArun(// Observed and discordant network.
-                  Network *nwp, StoreDyadMapInt *discord,
-                  // Formation terms and proposals.
-                  Model *m, MHProposal *MHp,
+MCMCDynStatus MCMCDynSArun(ErgmState *s, StoreDyadMapInt *discord,
                   int nstatsmonitor,
                   // Model fitting.
                   double *eta, 
