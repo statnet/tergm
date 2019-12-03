@@ -32,18 +32,19 @@ void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *
                int *newnetworkheads, 
                int *fVerbose, 
                int *status){
-  Network *nwp;
-  Model *m;
+  ErgmState *s;
   StoreDyadMapInt *discord;
 
   MCMCDyn_init_common(tails, heads, *time, lasttoggle, *n_edges,
-              *n_nodes, *directed_flag, *bipartite, &nwp,
-              *nterms, *funnames, *sonames, inputs, &m,
+              *n_nodes, *directed_flag, *bipartite,
+              *nterms, *funnames, *sonames, inputs,
               NULL, NULL, NULL, NULL,
               NULL, 0, 0,
-              NULL, NULL, NULL,
-              &discord,
-              *fVerbose);
+              NULL, NULL,
+              &s, &discord);
+  
+  Network *nwp = s->nwp;
+  Model *m = s->m;  
   
   /*********************
   changestats are modified in groups of m->n_stats, and they
@@ -103,7 +104,7 @@ void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *
       pos++;
     }
     
-    MCMCDyn1Step_advance(nwp, discord, m, changestats,
+    MCMCDyn1Step_advance(s, discord, changestats,
                          0, NULL, NULL, NULL, NULL, NULL,
                          *fVerbose);
                          
@@ -133,5 +134,5 @@ void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *
   }
 
   /* Clean up and return */
-  MCMCDyn_finish_common(nwp, m, NULL, discord);
+  MCMCDyn_finish_common(s, discord);
 }
