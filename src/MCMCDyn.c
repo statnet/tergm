@@ -429,21 +429,23 @@ MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s, StoreDyadMapInt *discord,
       stats[i] += m->workspace[i];
   }
 
-  const unsigned int t=nwp->duration_info->time;
+  if(nextdiffedge) {
+    const unsigned int t=nwp->duration_info->time;
 
-  TailHead dyad;
-  kh_foreach_key(discord, dyad,{    
-      if(*nextdiffedge<maxchanges){
-        // and record the toggle.
-        if(difftime) difftime[*nextdiffedge] = t;
-        if(difftail) difftail[*nextdiffedge] = dyad.tail;
-        if(diffhead) diffhead[*nextdiffedge] = dyad.head;
-        if(diffto) diffto[*nextdiffedge] = GetEdge(dyad.tail,dyad.head,nwp);
-        (*nextdiffedge)++;
-      }else{
-        return(MCMCDyn_TOO_MANY_CHANGES);
-      }
-    });
+    TailHead dyad;
+    kh_foreach_key(discord, dyad,{    
+        if(*nextdiffedge<maxchanges){
+          // and record the toggle.
+          if(difftime) difftime[*nextdiffedge] = t;
+          if(difftail) difftail[*nextdiffedge] = dyad.tail;
+          if(diffhead) diffhead[*nextdiffedge] = dyad.head;
+          if(diffto) diffto[*nextdiffedge] = GetEdge(dyad.tail,dyad.head,nwp);
+          (*nextdiffedge)++;
+        }else{
+          return(MCMCDyn_TOO_MANY_CHANGES);
+        }
+      });
+  }
   kh_clear(DyadMapInt, discord);
 
   return MCMCDyn_OK;
