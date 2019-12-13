@@ -82,20 +82,6 @@ void MCMCDynSArun_wrapper(// Observed network.
 
   if(*status==MCMCDyn_OK){
     newnetworktail[0]=newnetworkhead[0]=EdgeTree2EdgeList((Vertex*)newnetworktail+1,(Vertex*)newnetworkhead+1,nwp,*maxedges);
-    *time = nwp->duration_info->time;
-
-    if(nwp->duration_info){
-      lasttoggle[0] = kh_size(nwp->duration_info->lasttoggle);
-      TailHead dyad;
-      int ts;
-      unsigned int i=1;
-      kh_foreach(nwp->duration_info->lasttoggle, dyad, ts, {
-        lasttoggle[i] = dyad.tail;
-        lasttoggle[i+lasttoggle[0]] = dyad.head;
-        lasttoggle[i+lasttoggle[0]+lasttoggle[0]] = ts;
-        i++;
-      });
-    }
   }
 
   Free(difftime);
@@ -168,9 +154,6 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s, StoreDyadMapInt *discord,
 
     // Sampling run
     for(unsigned int j=0;j < SA_interval;j++){
-      // Periodically expire older timestamps.
-      if(nwp->duration_info->time%TIMESTAMP_HORIZON_FREQ==0) ExpireTimestamps(TIMESTAMP_HORIZON_EDGE, TIMESTAMP_HORIZON_NONEDGE, nwp);
-
       MCMCDynStatus status = MCMCDyn1Step(s, discord,
                       eta,
                       inputdev,

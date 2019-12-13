@@ -5,8 +5,17 @@
 \alias{tergm_MCMC_slave}
 \title{Collects a sample of networks and returns the statistics of each sample}
 \usage{
-tergm_MCMC_sample(nw, model, model.mon = NULL, proposal, control, theta,
-  verbose = FALSE, ..., eta = ergm.eta(theta, model$etamap))
+tergm_MCMC_sample(
+  nw,
+  model,
+  model.mon = NULL,
+  proposal,
+  control,
+  theta,
+  verbose = FALSE,
+  ...,
+  eta = ergm.eta(theta, model$etamap)
+)
 
 tergm_MCMC_slave(Clist, proposal, eta, control, verbose)
 }

@@ -8,6 +8,7 @@
  *  Copyright 2008-2019 Statnet Commons
  */
 #include "MCMCDyn.h"
+#include "ergm_util.h"
 /*****************
  Note on undirected networks:  For j<k, edge {j,k} should be stored
  as (j,k) rather than (k,j).  In other words, only directed networks
@@ -24,8 +25,7 @@ void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int 
 			 
 			 char *MHProposaltype, char *MHProposalpackage,
 
-                         ErgmState **s,
-                         StoreDyadMapInt **discord){
+                         ErgmState **s){
   GetRNGstate();  /* R function enabling uniform RNG. It needs to come after NetworkInitialize and MH_init, since they may call GetRNGstate as well. */
   *s = ErgmStateInit(// Network settings
                      n_nodes, dflag, bipartite,
@@ -42,13 +42,10 @@ void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int 
                      (Vertex *) tails, (Vertex *) heads,
                      1, time, lasttoggle);
 
-  *discord = kh_init(DyadMapInt); (*discord)->directed = dflag;
 }
 
-void MCMCDyn_finish_common(ErgmState *s,
-                           StoreDyadMapInt *discord){
+void MCMCDyn_finish_common(ErgmState *s){
   ErgmStateDestroy(s);
-  kh_destroy(DyadMapInt, discord);
   PutRNGstate();  /* Disable RNG before returning */
 }
 
@@ -81,7 +78,6 @@ void MCMCDyn_wrapper(// Starting network.
 		     int *fVerbose,
 		     int *status){
   ErgmState *s;
-  StoreDyadMapInt *discord;
 
   Vertex *difftime=NULL, *difftail=NULL, *diffhead=NULL;
   int *diffto=NULL;
@@ -103,11 +99,10 @@ void MCMCDyn_wrapper(// Starting network.
 		      attribs, maxout, maxin, minout,
 		      minin, *condAllDegExact, *attriblength, 
 		      *MHProposaltype, *MHProposalpackage,
-                      &s,
-                      &discord);
+                      &s);
   Network *nwp = s->nwp;
 
-  *status = MCMCSampleDyn(s, discord,
+  *status = MCMCSampleDyn(s,
 			  eta,
 			  *collect?sample:NULL, *maxedges, *maxchanges, *log_changes, difftime, difftail, diffhead, diffto,
 			  *nsteps, *min_MH_interval, *max_MH_interval, *MH_pval, *MH_interval_add, *burnin, *interval,
@@ -117,23 +112,9 @@ void MCMCDyn_wrapper(// Starting network.
 
   if(*status == MCMCDyn_OK && *maxedges>0){
     newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList((Vertex*)newnetworktails+1,(Vertex*)newnetworkheads+1,nwp,*maxedges-1);
-    *time = nwp->duration_info->time;
-    
-    if(nwp->duration_info){
-      lasttoggle[0] = kh_size(nwp->duration_info->lasttoggle);
-      TailHead dyad;
-      int ts;
-      unsigned int i=1;
-      kh_foreach(nwp->duration_info->lasttoggle, dyad, ts, {
-          lasttoggle[i] = dyad.tail;
-          lasttoggle[i+lasttoggle[0]] = dyad.head;
-          lasttoggle[i+lasttoggle[0]+lasttoggle[0]] = ts;
-          i++;
-        });
-    }
   }
 
-  MCMCDyn_finish_common(s, discord);
+  MCMCDyn_finish_common(s);
 }
 
 /*********************
@@ -146,7 +127,7 @@ void MCMCDyn_wrapper(// Starting network.
  networks in the sample.  Put all the sampled statistics into
  the statistics array. 
 *********************/
-MCMCDynStatus MCMCSampleDyn(ErgmState *s, StoreDyadMapInt *discord,
+MCMCDynStatus MCMCSampleDyn(ErgmState *s,
 			    double *eta,
 			    // Space for output.
 			    double *stats,
@@ -174,7 +155,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s, StoreDyadMapInt *discord,
   /* Burn in step. */
 
   for(i=0;i<burnin;i++){
-    MCMCDynStatus status = MCMCDyn1Step(s, discord,
+    MCMCDynStatus status = MCMCDyn1Step(s,
 					eta,
 					stats,
 					maxchanges, &nextdiffedge, difftime, difftail, diffhead, diffto,
@@ -206,7 +187,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s, StoreDyadMapInt *discord,
 
     /* This then adds the change statistics to these values */
     for(j=0;j<interval;j++){
-      MCMCDynStatus status = MCMCDyn1Step(s, discord,
+      MCMCDynStatus status = MCMCDyn1Step(s,
 					  eta,
 					  stats,
 					  maxchanges, &nextdiffedge, difftime, difftail, diffhead, diffto,
@@ -219,9 +200,6 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s, StoreDyadMapInt *discord,
       // If we need to return a network, then stop right there, since the network is too big to return, so stop early.
       if(maxedges!=0 && nwp->nedges >= maxedges-1)
 	return MCMCDyn_TOO_MANY_EDGES;
-
-      // Periodically expire older timestamps.
-      if(nwp->duration_info->time%TIMESTAMP_HORIZON_FREQ==0) ExpireTimestamps(TIMESTAMP_HORIZON_EDGE, TIMESTAMP_HORIZON_NONEDGE, nwp);
     }
     
     //Rprintf("MCMCSampleDyn loop numdissolve %d\n", *numdissolve);
@@ -239,30 +217,29 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s, StoreDyadMapInt *discord,
 
 /* The following outlines what happens during each time step:
 
-   1. All statistics with x_ functions are sent a TICK signal.
+   1. All statistics with x_ functions are sent a TICK signal. This triggers _lasttoggle auxiliary to increment the timer.
    2. Any updates to statistics are recorded.
-   3. Timer is incremented.
-   4. A toggle proposal is made.
-   5. Change statistics are calculated.
-   6. If proposal is rejected, continue to 10.
-   7. Relevant dyad is toggled in nwp.
-   8. If it hasn't been toggled during this time step, its lasttoggle information, if any, is saved in discord, and its lasttoggle information is updated.
-   9. If it has been toggled during this time step, its lasttoggle information, if any, is restored from discord. Discord's backup is deleted.
-   10. Continue from 4 until sufficiently long run.
-   11. All statistics with x_ functions are sent a TOCK signal.
-   12. Any updates to statistics are recorded.
-   13. Toggles in discord are logged.
-   14. discord is cleared.
+   3. A toggle proposal is made.
+   4. Change statistics are calculated.
+   5. If proposal is rejected, continue to 9.
+   7. Relevant dyad is toggled in nwp. This triggers _lasttoggle to do the following:
+      * If it hasn't been toggled during this time step, its lasttoggle information, if any, is saved in discord, and its lasttoggle information is updated.
+      * If it has been toggled during this time step, its lasttoggle information, if any, is restored from discord. Discord's backup is deleted.
+   8. Continue from 4 until sufficiently long run.
+   9. Toggles in discord are logged.
+   10. All statistics with x_ functions are sent a TOCK signal. This triggers _lasttoggle auxiliary to clear discord.
+   11. Any updates to statistics are recorded.
 
  */
 
+// TODO: Provide a way for these to access discord. (Use extra.aux to request the auxiliary.)
 
 /*********************
  void MCMCDyn1Step
 
  Simulate evolution of a dynamic network for 1 step.
 *********************/
-MCMCDynStatus MCMCDyn1Step(ErgmState *s, StoreDyadMapInt *discord,
+MCMCDynStatus MCMCDyn1Step(ErgmState *s,
                            double *eta,
                            // Space for output.
                            double *stats,
@@ -285,7 +262,6 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s, StoreDyadMapInt *discord,
       stats[i] += m->workspace[i];
   }
 
-  nwp->duration_info->time++; // Advance the clock.
 
   /* Run the process. */
   
@@ -326,9 +302,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s, StoreDyadMapInt *discord,
     
     //  Rprintf("change stats:"); 
     /* Calculate inner product */
-    double ip = 0;
-    for (unsigned int i=0; i<m->n_stats; i++){
-      ip += eta[i] * m->workspace[i];
+    double ip = innerprod(eta, m->workspace, m->n_stats);
       //  Rprintf("%f ", m->workspace[i]); 
     }
     //  Rprintf("\n ip %f dedges %f\n", ip, m->workspace[0]); 
@@ -343,31 +317,10 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s, StoreDyadMapInt *discord,
          which doesn't happen until later. */
       for (unsigned int i=0; i < MHp->ntoggles; i++){
                              GET_EDGE_UPDATE_STORAGE_TOGGLE(MHp->toggletail[i], MHp->togglehead[i], nwp, m, MHp);
-
-        {
-          TailHead dyad = THKey(discord,MHp->toggletail[i], MHp->togglehead[i]);
-          khint_t i = kh_get(DyadMapInt,discord,dyad);
-          if(i == kh_none){
-            // If the dyad has *not* been toggled in this time step, then save its last toggle info (if any) and make a provisional change in lasttoggle.
-            // Here, current time is used as a placeholder for no last toggle info.
-            kh_set(DyadMapInt, discord, dyad, kh_getval(DyadMapInt, nwp->duration_info->lasttoggle, dyad, nwp->duration_info->time));
-            kh_set(DyadMapInt, nwp->duration_info->lasttoggle, dyad, nwp->duration_info->time);
-          }else{
-            // If the dyad *has* been toggled in this timestep, then untoggle it by restoring its change in lasttoggle.
-            if(kh_value(discord, i) != nwp->duration_info->time){
-              kh_set(DyadMapInt, nwp->duration_info->lasttoggle, dyad, kh_value(discord, i));
-            }else{
-              kh_unset(DyadMapInt, nwp->duration_info->lasttoggle, dyad);
-            }
-
-            kh_del(DyadMapInt, discord, i);
-          }
-        }
       }
       /* Record network statistics for posterity. */
       if(stats) {
-        for (unsigned int i = 0; i < m->n_stats; i++)
-          stats[i] += m->workspace[i];
+        addonto(stats, m->workspace, m->n_stats);
       }
     }
 
@@ -419,18 +372,6 @@ MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s, StoreDyadMapInt *discord,
   Network *nwp = s->nwp;
   Model *m = s->m;
 
-  /* If the term has an extension, send it a "TOCK" signal and the set
-     of dyads that changed. */
-  memset(m->workspace, 0, m->n_stats*sizeof(double)); /* Zero all change stats. */
-  SIGNAL_TERMS_INTO(m, m->workspace, TOCK, discord);
-  /* Record network statistics for posterity. */
-  if(stats) {
-    for (unsigned int i = 0; i < m->n_stats; i++)
-      stats[i] += m->workspace[i];
-  }
-
-  const unsigned int t=nwp->duration_info->time;
-
   TailHead dyad;
   kh_foreach_key(discord, dyad,{    
       if(*nextdiffedge<maxchanges){
@@ -444,7 +385,15 @@ MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s, StoreDyadMapInt *discord,
         return(MCMCDyn_TOO_MANY_CHANGES);
       }
     });
-  kh_clear(DyadMapInt, discord);
+
+  /* If the term has an extension, send it a "TOCK" signal and the set
+     of dyads that changed. */
+  memset(m->workspace, 0, m->n_stats*sizeof(double)); /* Zero all change stats. */
+  SIGNAL_TERMS_INTO(m, m->workspace, TOCK, NULL);
+  /* Record network statistics for posterity. */
+  if(stats) {
+    addonto(stats, m->workspace, m->n_stats);
+  }
 
   return MCMCDyn_OK;
 }

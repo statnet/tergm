@@ -7,31 +7,69 @@
 \title{Draw from the distribution of a Temporal Exponential Family
 Random Graph Model}
 \usage{
-\method{simulate}{tergm}(object, nsim = 1, seed = NULL,
-  coef = object$fit$coef, constraints = object$constraints,
-  monitor = object$targets, time.slices = 1, time.start = NULL,
-  time.burnin = 0, time.interval = 1,
-  control = control.simulate.tergm(), output = c("networkDynamic",
-  "stats", "changes", "final"), nw.start = NULL, stats = FALSE,
-  duration.dependent = NULL, verbose = FALSE, ...)
-
-\method{simulate_formula}{network}(object, nsim = 1, seed = NULL,
-  coef = NULL, constraints = ~., monitor = NULL, time.slices = 1,
-  time.start = NULL, time.burnin = 0, time.interval = 1,
-  time.offset = 1, control = control.simulate.network.tergm(),
+\method{simulate}{tergm}(
+  object,
+  nsim = 1,
+  seed = NULL,
+  coef = object$fit$coef,
+  constraints = object$constraints,
+  monitor = object$targets,
+  time.slices = 1,
+  time.start = NULL,
+  time.burnin = 0,
+  time.interval = 1,
+  control = control.simulate.tergm(),
   output = c("networkDynamic", "stats", "changes", "final"),
-  stats = FALSE, duration.dependent = NULL, verbose = FALSE, ...,
-  basis = eval_lhs.formula(object), dynamic = FALSE)
+  nw.start = NULL,
+  stats = FALSE,
+  duration.dependent = NULL,
+  verbose = FALSE,
+  ...
+)
 
-\method{simulate_formula}{networkDynamic}(object, nsim = 1,
-  seed = NULL, coef = attr(basis, "coef"),
+\method{simulate_formula}{network}(
+  object,
+  nsim = 1,
+  seed = NULL,
+  coef = NULL,
+  constraints = ~.,
+  monitor = NULL,
+  time.slices = 1,
+  time.start = NULL,
+  time.burnin = 0,
+  time.interval = 1,
+  time.offset = 1,
+  control = control.simulate.network.tergm(),
+  output = c("networkDynamic", "stats", "changes", "final"),
+  stats = FALSE,
+  duration.dependent = NULL,
+  verbose = FALSE,
+  ...,
+  basis = eval_lhs.formula(object),
+  dynamic = FALSE
+)
+
+\method{simulate_formula}{networkDynamic}(
+  object,
+  nsim = 1,
+  seed = NULL,
+  coef = attr(basis, "coef"),
   constraints = NVL(attr(basis, "constraints"), ~.),
-  monitor = attr(basis, "monitor"), time.slices = 1,
-  time.start = NULL, time.burnin = 0, time.interval = 1,
-  time.offset = 1, control = control.simulate.network.tergm(),
-  output = c("networkDynamic", "stats", "changes"), stats = FALSE,
-  duration.dependent = NULL, verbose = FALSE, ...,
-  basis = eval_lhs.formula(object), dynamic = FALSE)
+  monitor = attr(basis, "monitor"),
+  time.slices = 1,
+  time.start = NULL,
+  time.burnin = 0,
+  time.interval = 1,
+  time.offset = 1,
+  control = control.simulate.network.tergm(),
+  output = c("networkDynamic", "stats", "changes"),
+  stats = FALSE,
+  duration.dependent = NULL,
+  verbose = FALSE,
+  ...,
+  basis = eval_lhs.formula(object),
+  dynamic = FALSE
+)
 }
 \arguments{
 \item{object}{for \code{simulate.tergm}, an object of type \code{\link{tergm}} giving a model fit;

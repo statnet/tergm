@@ -7,36 +7,78 @@
 \title{Draw from the distribution of an Separable Temporal Exponential Family
 Random Graph Model}
 \usage{
-\method{simulate}{stergm}(object, nsim = 1, seed = NULL,
+\method{simulate}{stergm}(
+  object,
+  nsim = 1,
+  seed = NULL,
   coef.form = object$formation.fit$coef,
   coef.diss = object$dissolution.fit$coef,
-  constraints = object$constraints, monitor = object$targets,
-  time.slices = 1, time.start = NULL, time.burnin = 0,
-  time.interval = 1, control = control.simulate.stergm(),
-  statsonly = NULL, output = c("networkDynamic", "stats", "changes",
-  "final"), nw.start = NULL, stats.form = FALSE, stats.diss = FALSE,
-  duration.dependent = NULL, verbose = FALSE, ...)
-
-\method{simulate}{network}(object, nsim = 1, seed = NULL, formation,
-  dissolution, coef.form, coef.diss, constraints = ~., monitor = NULL,
-  time.slices = 1, time.start = NULL, time.burnin = 0,
-  time.interval = 1, time.offset = 1,
-  control = control.simulate.network(), statsonly = NULL,
+  constraints = object$constraints,
+  monitor = object$targets,
+  time.slices = 1,
+  time.start = NULL,
+  time.burnin = 0,
+  time.interval = 1,
+  control = control.simulate.stergm(),
+  statsonly = NULL,
   output = c("networkDynamic", "stats", "changes", "final"),
-  stats.form = FALSE, stats.diss = FALSE, duration.dependent = NULL,
-  verbose = FALSE, ...)
+  nw.start = NULL,
+  stats.form = FALSE,
+  stats.diss = FALSE,
+  duration.dependent = NULL,
+  verbose = FALSE,
+  ...
+)
 
-\method{simulate}{networkDynamic}(object, nsim = 1, seed = NULL,
-  formation = attr(object, "formation"), dissolution = attr(object,
-  "dissolution"), coef.form = attr(object, "coef.form"),
-  coef.diss = attr(object, "coef.diss"), constraints = NVL(attr(object,
-  "constraints"), ~.), monitor = attr(object, "monitor"),
-  time.slices = 1, time.start = NULL, time.burnin = 0,
-  time.interval = 1, time.offset = 1,
-  control = control.simulate.network(), statsonly = NULL,
-  output = c("networkDynamic", "stats", "changes"), stats.form = FALSE,
-  stats.diss = FALSE, duration.dependent = NULL, verbose = FALSE,
-  ...)
+\method{simulate}{network}(
+  object,
+  nsim = 1,
+  seed = NULL,
+  formation,
+  dissolution,
+  coef.form,
+  coef.diss,
+  constraints = ~.,
+  monitor = NULL,
+  time.slices = 1,
+  time.start = NULL,
+  time.burnin = 0,
+  time.interval = 1,
+  time.offset = 1,
+  control = control.simulate.network(),
+  statsonly = NULL,
+  output = c("networkDynamic", "stats", "changes", "final"),
+  stats.form = FALSE,
+  stats.diss = FALSE,
+  duration.dependent = NULL,
+  verbose = FALSE,
+  ...
+)
+
+\method{simulate}{networkDynamic}(
+  object,
+  nsim = 1,
+  seed = NULL,
+  formation = attr(object, "formation"),
+  dissolution = attr(object, "dissolution"),
+  coef.form = attr(object, "coef.form"),
+  coef.diss = attr(object, "coef.diss"),
+  constraints = NVL(attr(object, "constraints"), ~.),
+  monitor = attr(object, "monitor"),
+  time.slices = 1,
+  time.start = NULL,
+  time.burnin = 0,
+  time.interval = 1,
+  time.offset = 1,
+  control = control.simulate.network(),
+  statsonly = NULL,
+  output = c("networkDynamic", "stats", "changes"),
+  stats.form = FALSE,
+  stats.diss = FALSE,
+  duration.dependent = NULL,
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{an object of type \code{\link{stergm}} giving a model fit or

@@ -5,18 +5,33 @@
 \alias{control.simulate.network.tergm}
 \title{Auxiliary for Controlling Temporal ERGM Simulation}
 \usage{
-control.simulate.tergm(MCMC.burnin.min = NULL, MCMC.burnin.max = NULL,
-  MCMC.burnin.pval = NULL, MCMC.burnin.add = NULL,
-  MCMC.prop.weights = NULL, MCMC.prop.args = NULL,
-  MCMC.init.maxedges = NULL, MCMC.packagenames = NULL,
-  term.options = NULL, MCMC.init.maxchanges = NULL)
+control.simulate.tergm(
+  MCMC.burnin.min = NULL,
+  MCMC.burnin.max = NULL,
+  MCMC.burnin.pval = NULL,
+  MCMC.burnin.add = NULL,
+  MCMC.prop.weights = NULL,
+  MCMC.prop.args = NULL,
+  MCMC.init.maxedges = NULL,
+  MCMC.packagenames = NULL,
+  term.options = NULL,
+  MCMC.init.maxchanges = NULL
+)
 
-control.simulate.network.tergm(MCMC.burnin.min = 1000,
-  MCMC.burnin.max = 1e+05, MCMC.burnin.pval = 0.5,
-  MCMC.burnin.add = 1, MCMC.burnin = NULL, MCMC.burnin.mul = NULL,
-  MCMC.prop.weights = "default", MCMC.prop.args = NULL,
-  MCMC.init.maxedges = 20000, MCMC.packagenames = c(),
-  term.options = NULL, MCMC.init.maxchanges = 1e+06)
+control.simulate.network.tergm(
+  MCMC.burnin.min = 1000,
+  MCMC.burnin.max = 1e+05,
+  MCMC.burnin.pval = 0.5,
+  MCMC.burnin.add = 1,
+  MCMC.burnin = NULL,
+  MCMC.burnin.mul = NULL,
+  MCMC.prop.weights = "default",
+  MCMC.prop.args = NULL,
+  MCMC.init.maxedges = 20000,
+  MCMC.packagenames = c(),
+  term.options = NULL,
+  MCMC.init.maxchanges = 1e+06
+)
 }
 \arguments{
 \item{MCMC.burnin.min, MCMC.burnin.max, MCMC.burnin.pval, MCMC.burnin.add}{Number of Metropolis-Hastings steps

@@ -38,7 +38,7 @@ Description: An integrated set of extensions to the 'ergm' package to analyze an
 License: GPL-3 + file LICENSE
 URL: http://www.statnet.org
 VignetteBuilder: rmarkdown, knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
 Collate: 
@@ -55,6 +55,7 @@ Collate:
     'ergm.godfather.R'
     'gof.stergm.R'
     'impute.network.list.R'
+    'is.durational.R'
     'is.lasttoggle.R'
     'mcmc.diagnostics.stergm.R'
     'print.stergm.R'

@@ -4,11 +4,19 @@
 \alias{tergm}
 \title{Temporal Exponential-Family Random Graph Models}
 \usage{
-tergm(formula, constraints = ~., estimate, times = NULL,
-  offset.coef = NULL, targets = NULL, target.stats = NULL,
-  eval.loglik = NVL(getOption("tergm.eval.loglik"),
-  getOption("ergm.eval.loglik")), control = control.tergm(),
-  verbose = FALSE, ...)
+tergm(
+  formula,
+  constraints = ~.,
+  estimate,
+  times = NULL,
+  offset.coef = NULL,
+  targets = NULL,
+  target.stats = NULL,
+  eval.loglik = NVL(getOption("tergm.eval.loglik"), getOption("ergm.eval.loglik")),
+  control = control.tergm(),
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
 \item{formula}{an ERGM formula.}
@@ -171,5 +179,5 @@ University Department of Statistics Technical Report}, 2012(2012-01).
 }
 }
 \seealso{
-ergm, network, \%v\%, \%n\%, \code{\link{ergm-terms}}
+ergm, network, \\%v\\%, \\%n\\%, \code{\link{ergm-terms}}
 }

@@ -82,3 +82,23 @@ InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
        duration=TRUE,
        dependence=FALSE)
 }
+
+InitErgmTerm..lasttoggle <- function(nw, arglist, ...){
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c(),
+                      vartypes = c(),
+                      defaultvalues = list(),
+                      required = c())
+
+  list(name="_lasttoggle",
+       coef.names=c(),
+       duration=TRUE,
+       dependence=FALSE,
+       ext.encode = function(el, nw0) list(time=as.integer(nw0 %n% "time"), lasttoggle=as.integer(nw0 %n% "lasttoggle")),
+       ext.decode = function(ext.state, el, nw0){
+         nw0 %n% "time" <- ext.state$time
+         nw0 %n% "lasttoggle" <- matrix(ext.state$lasttoggle, ncol=3)
+         list(el=el, nw0=nw0)
+       }
+       )
+}

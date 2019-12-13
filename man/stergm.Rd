@@ -16,12 +16,22 @@
 
 \method{print}{stergm}(x, digits = max(3, getOption("digits") - 3), ...)
 
-stergm(nw, formation, dissolution, constraints = ~., estimate,
-  times = NULL, offset.coef.form = NULL, offset.coef.diss = NULL,
-  targets = NULL, target.stats = NULL,
-  eval.loglik = NVL(getOption("tergm.eval.loglik"),
-  getOption("ergm.eval.loglik")), control = control.stergm(),
-  verbose = FALSE, ...)
+stergm(
+  nw,
+  formation,
+  dissolution,
+  constraints = ~.,
+  estimate,
+  times = NULL,
+  offset.coef.form = NULL,
+  offset.coef.diss = NULL,
+  targets = NULL,
+  target.stats = NULL,
+  eval.loglik = NVL(getOption("tergm.eval.loglik"), getOption("ergm.eval.loglik")),
+  control = control.stergm(),
+  verbose = FALSE,
+  ...
+)
 
 \method{summary}{stergm}(object, ...)
 }
@@ -238,7 +248,7 @@ University Department of Statistics Technical Report}, 2012(2012-01).
 }
 }
 \seealso{
-ergm, network, \%v\%, \%n\%, \code{\link{ergm-terms}}
+ergm, network, \\%v\\%, \\%n\\%, \code{\link{ergm-terms}}
 }
 \keyword{models}
 \keyword{regression}

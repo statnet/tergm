@@ -4,10 +4,17 @@
 \alias{tergm.godfather}
 \title{A function to apply a given series of changes to a network.}
 \usage{
-tergm.godfather(formula, changes = NULL, toggles = changes[, -4, drop =
-  FALSE], start = NULL, end = NULL, end.network = FALSE,
-  stats.start = FALSE, verbose = FALSE,
-  control = control.tergm.godfather())
+tergm.godfather(
+  formula,
+  changes = NULL,
+  toggles = changes[, -4, drop = FALSE],
+  start = NULL,
+  end = NULL,
+  end.network = FALSE,
+  stats.start = FALSE,
+  verbose = FALSE,
+  control = control.tergm.godfather()
+)
 }
 \arguments{
 \item{formula}{An \code{\link{summary.formula}}-style formula, with

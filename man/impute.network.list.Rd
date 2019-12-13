@@ -4,8 +4,12 @@
 \alias{impute.network.list}
 \title{Impute missing dyads in a series of networks}
 \usage{
-impute.network.list(nwl, imputers = c(), nwl.prepend = list(),
-  nwl.append = list())
+impute.network.list(
+  nwl,
+  imputers = c(),
+  nwl.prepend = list(),
+  nwl.append = list()
+)
 }
 \arguments{
 \item{nwl}{A list of \code{\link{network}} objects or a

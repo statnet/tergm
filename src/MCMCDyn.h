@@ -34,12 +34,12 @@ void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int 
 			 int *minin, int condAllDegExact, int attriblength,
 			 
 			 char *MHProposaltype, char *MHProposalpackage,
-                         ErgmState **s, StoreDyadMapInt **discord);
+                         ErgmState **s);
 
 
-void MCMCDyn_finish_common(ErgmState *s, StoreDyadMapInt *discord);
+void MCMCDyn_finish_common(ErgmState *s);
 
-MCMCDynStatus MCMCSampleDyn(ErgmState *s, StoreDyadMapInt *discord,
+MCMCDynStatus MCMCSampleDyn(ErgmState *s,
 			    double *eta,
 			    // Space for output.
 			    double *stats,
@@ -54,8 +54,6 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s, StoreDyadMapInt *discord,
 			    int fVerbose);
 
 MCMCDynStatus MCMCDyn1Step(ErgmState *s,
-                           // Observed and discordant network.
-                           StoreDyadMapInt *discord,
                            double *eta,
                            // Space for output.
                            double *stats,
@@ -66,7 +64,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
                            // Verbosity.
                            int fVerbose);
 
-MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s, StoreDyadMapInt *discord,
+MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
                                    // Space for output.
                                    double *stats,
                                    unsigned int maxchanges, Edge *nextdiffedge,

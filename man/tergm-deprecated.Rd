@@ -6,11 +6,31 @@
 \alias{stergm.mcmcslave}
 \title{Functions that will no longer be supported in future releases of the package}
 \usage{
-stergm.getMCMCsample(nw, model.form, model.diss, model.mon, proposal.form,
-  proposal.diss, eta.form, eta.diss, control, verbose, ...)
+stergm.getMCMCsample(
+  nw,
+  model.form,
+  model.diss,
+  model.mon,
+  proposal.form,
+  proposal.diss,
+  eta.form,
+  eta.diss,
+  control,
+  verbose,
+  ...
+)
 
-stergm.mcmcslave(Clist.form, Clist.diss, Clist.mon, proposal.form,
-  proposal.diss, eta.form, eta.diss, control, verbose)
+stergm.mcmcslave(
+  Clist.form,
+  Clist.diss,
+  Clist.mon,
+  proposal.form,
+  proposal.diss,
+  eta.form,
+  eta.diss,
+  control,
+  verbose
+)
 }
 \description{
 Functions that have been superceed, were never documented, or will be removed from the package for other reasons
