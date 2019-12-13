@@ -1,4 +1,4 @@
-#  File R/ergm.godfather.R in package tergm, part of the Statnet suite
+#  File R/tergm.godfather.R in package tergm, part of the Statnet suite
 #  of packages for network analysis, https://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
@@ -7,63 +7,6 @@
 #
 #  Copyright 2008-2019 Statnet Commons
 #######################################################################
-#=========================================================================
-# This file contains the following 2 functions for computing changestat
-# summaries of dynamic networks ??
-#   <ergm.godfather>
-#   <control.godfather>
-#=========================================================================
-
-
-
-
-###########################################################################
-# <ergm.godfather>:  make the network a proposal it can't refuse. 
-# Each toggle has a timestamp, and this function forces the network to make
-# all of the changes at each unique timestamp value (in increasing order)
-# keeping track of the change statistics that result. Thus, the final
-# product is a matrix of change statistics in which the number of rows is
-# determined by the # of unique timestamps and the number of columns is
-# determined by the ERGM terms as usual.
-#
-# --PARAMETERS--
-#   formula   : an ergm formula (i.e., nw ~ terms)
-#   timestamps: a vector of timestamps for the given 'toggles'
-#   toggles   : an edgelist of toggles that corresponds in length to
-#               'timestamps'
-#   sim       : a stergm sample, as returned by <stergm.getMCMCsample>
-#               if 'sim' is not provided, both 'toggles' and
-#               'timestamps' should be
-#   start     : the start time; this is ignored if 'sim' is provided;
-#               default=min(timestamps)
-#   end       : the end time; this is ignored if 'sim' is provided;
-#               default=max(timestamps)
-#   accumulate: whether to proceed to the next timestamp without making
-#               the proposed toggles (T or F); FALSE will force all toggles
-#               to be realized on the network given in 'formula'
-#               ?? if this is TRUE
-#   verbose   : whether this and the C function should be verbose (T or F)
-#               default=FALSE
-#   control   : a list of additional tuning parameters for this function,
-#               as returned by <control.godfather>;
-#               default=<control.godfather>()
-#
-# --RETURNED--
-#   the dynamic changestats summary as a list of the following:
-#    stats     : a matrix, where the i,j entry represents the change in the
-#                jth summary statistic between the original network and the
-#                network at the ith unique timestamp
-#    timestamps: the vector  c(NA, start:end)), where start and end are
-#                specified either by attributes of 'sim' or by the 'start'
-#                and 'end' inputs or default to the minimum and maximum
-#                timestamps
-#    newnetwork: the network after all toggles have been made if requested
-#                by 'return_new_network' in <control.godfather>;
-#                NULL otherwise
-#
-############################################################################
-
-
 
 #' A function to apply a given series of changes to a network.
 #' 
@@ -97,7 +40,7 @@
 #'   \code{start} (before any changes are applied) as the first row of
 #'   the statistics matrix.  Defaults to \code{FALSE}, to produce
 #'   output similar to that of
-#'   \code{\link[=simulate.stergm]{simulate}} for STERGMs when
+#'   \code{\link[=simulate.tergm]{simulate}} for TERGMs when
 #'   \code{output="stats"}, where initial network's statistics are not
 #'   returned.
 #' @param verbose Whether to print progress messages.
@@ -116,72 +59,8 @@
 #' \code{\link{lasttoggle}} "extension", representing the final network, with a
 #' matrix of statistics described in the previous paragraph attached to it as
 #' an \code{attr}-style attribute \code{"stats"}.
-#' @seealso simulate.stergm, simulate.network, simulate.networkDynamic
-#' @examples
-#' 
-#' 
-#' g1 <- network.initialize(10, dir=FALSE)
-#' g1[1,2] <- 1
-#' g1[3,4] <- 1
-#' g1 %n% "time" <- 0
-#' g1 %n% "lasttoggle" <- -1-rgeom(network.dyadcount(g1),1/4)
-#' 
-#' dc <- matrix(rnorm(100),10,10); dc <- dc+t(dc)
-#' 
-#' # Simulate a network, tracking its statistics.
-#' simnet <- simulate(g1, formation=~edges, dissolution=~edges, coef.form=-1, coef.diss=1,
-#'                    time.slices=50, monitor=~degree(1)+mean.age+degree.mean.age(1)+
-#'                                             mean.age(log=TRUE)+degree.mean.age(1,log=TRUE)+
-#'                                             degrange(1,3)+mean.age+degrange.mean.age(1,3)+
-#'                                             mean.age(log=TRUE)+degrange.mean.age(1,3,log=TRUE)+
-#'                                             edge.ages+edgecov(dc)+edgecov.ages(dc),
-#'                    output="networkDynamic")
-#' 
-#' sim.stats <- attr(simnet, "stats")
-#' 
-#' print(head(sim.stats))
-#' sim.stats <- as.matrix(sim.stats)
-#' 
-#' # Replay the simulation using a networkDynamic, monitoring a potentially different set of
-#' # statistics (but same in this case).
-#' gf1.stats <- tergm.godfather(simnet~degree(1)+mean.age+degree.mean.age(1)+
-#'                                     mean.age(log=TRUE)+degree.mean.age(1,log=TRUE)+
-#'                                     degrange(1,3)+mean.age+degrange.mean.age(1,3)+
-#'                                     mean.age(log=TRUE)+degrange.mean.age(1,3,log=TRUE)+
-#'                                     edge.ages+edgecov(dc)+edgecov.ages(dc),
-#'                              start=0, end=50)
-#' 
-#' print(head(gf1.stats))
-#' gf1.stats <- as.matrix(gf1.stats)
-#' 
-#' # Replay the simulation using the initial network + list of changes.
-#' 
-#' gf2.stats <- tergm.godfather(g1~degree(1)+mean.age+degree.mean.age(1)+
-#'                                 mean.age(log=TRUE)+degree.mean.age(1,log=TRUE)+
-#'                                 degrange(1,3)+mean.age+degrange.mean.age(1,3)+
-#'                                 mean.age(log=TRUE)+degrange.mean.age(1,3,log=TRUE)+
-#'                                 edge.ages+edgecov(dc)+edgecov.ages(dc),
-#'                              start=0, end=50, changes=attr(simnet,"changes"))
-#' 
-#' print(head(gf2.stats))
-#' gf2.stats <- as.matrix(gf2.stats)
-#' 
-#' # We can also compare them to the network statistics summarized.
-#' summ.stats <- summary(simnet~degree(1)+mean.age+degree.mean.age(1)+
-#'                              mean.age(log=TRUE)+degree.mean.age(1,log=TRUE)+
-#'                              degrange(1,3)+mean.age+degrange.mean.age(1,3)+
-#'                              mean.age(log=TRUE)+degrange.mean.age(1,3,log=TRUE)+
-#'                              edge.ages+edgecov(dc)+edgecov.ages(dc), at=1:50)
-#' 
-#' print(head(summ.stats))
-#' 
-#' tol <- sqrt(.Machine$double.eps)
-#' # If they aren't all identical, we are in trouble.
-#' stopifnot(all.equal(sim.stats,gf1.stats),
-#'           all.equal(sim.stats,gf2.stats),
-#'           all.equal(sim.stats,summ.stats))
-#' 
-#' 
+#' @seealso simulate.tergm, simulate_formula.network, simulate_formula.networkDynamic
+#'
 #' @export tergm.godfather
 tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALSE],
                            start=NULL, end=NULL,
@@ -229,8 +108,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
       stop("Network size and/or composition appears to change in the interval between start and end. This is not supported by ergm.godfather() at this time.")
 
     # Finally, we are ready to extract the network.
-  duration.dependent <- if(is.durational(formula)){1} else {0}
-  nw <- network.extract.with.lasttoggle(nw, at=start, duration.dependent)
+    nw <- network.extract.with.lasttoggle(nw, at=start, TRUE)
 
   }else{
     if(is.null(toggles)) stop("Either pass a networkDynamic, or provide change or toggle information.")
@@ -249,8 +127,8 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
     # it's <= end because we do "observe" the network at end, so we
     # need to apply the toggles that take effect then.
     toggles <- toggles[toggles[,1]>start & toggles[,1]<=end,,drop=FALSE]
-    
-    if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- rep(round(-.Machine$integer.max/2), network.dyadcount(nw))
+
+    if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- cbind(as.edgelist(nw), round(-.Machine$integer.max/2))
     nw %n% "time" <- start
   }
 
@@ -258,20 +136,26 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
   toggles <- toggles[order(toggles[,1],toggles[,2],toggles[,3]),,drop=FALSE]
 
   formula <- nonsimp_update.formula(formula, nw~., from.new="nw")
-  m <- ergm_model(formula, nw, expanded=TRUE, role="target")
+  m <- ergm_model(formula, nw, role=NULL)
   Clist <- ergm.Cprepare(nw, m)
   m$obs <- summary(m, nw)
   if(end.network){
     maxedges.sd <- sqrt(nrow(toggles)*0.25)*2 # I.e., if each toggle has probability 1/2 of being in a particular direction, this is the s.d. of the number of edges added.
     maxedges <- Clist$nedges + maxedges.sd*control$GF.init.maxedges.mul
+  } else { # something arbitrary just for testing (shouldn't be needed once lasttoggle changes are finalized)
+    maxedges <- round(NROW(Clist$lasttoggle) + network.edgecount(nw) + NROW(toggles) + 100)
   }
 
   if(verbose) cat("Applying changes...\n")
   repeat{
+    
+    lasttoggle <- c(NROW(Clist$lasttoggle), Clist$lasttoggle)    
+    lasttoggle <- c(lasttoggle, rep(0, 3*maxedges + 1 - length(lasttoggle)))
+    
     z <- .C("godfather_wrapper",
             as.integer(Clist$tails), as.integer(Clist$heads),
             time = if(is.null(Clist$time)) as.integer(0) else as.integer(Clist$time),
-            lasttoggle = as.integer(NVL(Clist$lasttoggle,0)),             
+            lasttoggle = as.integer(lasttoggle),             
             as.integer(Clist$nedges),
             as.integer(Clist$n),
             as.integer(Clist$dir), as.integer(Clist$bipartite),
@@ -307,6 +191,9 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
     if(verbose) cat("Creating new network...\n")
     newnetwork <- as.network(pending_update_network(nw,z))
     newnetwork %n% "time" <- z$time
+    
+    z$lasttoggle <- if(z$lasttoggle[1] > 0) matrix(z$lasttoggle[2:(3*z$lasttoggle[1] + 1)],nrow=z$lasttoggle[1]) else matrix(0,nrow=0,ncol=3)
+    
     newnetwork %n% "lasttoggle" <- z$lasttoggle
 
     attr(newnetwork,"stats")<-stats

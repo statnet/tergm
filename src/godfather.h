@@ -11,7 +11,7 @@
 #define godfather_H
 
 #include <R.h>
-#include "model.h"
+#include "ergm_model.h"
 #include "MCMCDyn.h"
 
 /* Function prototypes */
