@@ -24,6 +24,7 @@ Imports:
     nlme (>= 3.1.139),
     MASS (>= 7.3.51.4),
     statnet.common (>= 4.2.0),
+    purrr,
     ergm.multi
 LinkingTo:
     ergm,

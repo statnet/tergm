@@ -46,34 +46,35 @@ is.durational.character <- function(object,...) FALSE # for mon="all"
 #' @describeIn is.durational Test if the model has duration-dependent terms, which call for [lasttoggle] data structures.
 #' @export
 is.durational.ergm_model <- function(object, ...){
-	any(object$duration)
+#' @import purrr
+  map(object$terms, "duration") %>% NVL(FALSE) %>% max
 }
 
 #' @describeIn is.durational Test if the ergm_state has duration-dependent terms, which call for [lasttoggle] data structures.
 #' @export
 is.durational.ergm_state <- function(object, ...){
-	any(object$model$duration)
+  is.durational(object$model)
 }
 
 #' @rdname is.durational
 #' @param response,basis See [ergm()].
 #' @export
 is.durational.formula<-function(object,response=NULL,basis=NULL,...){
-	# If basis is not null, replace network in formula by basis.
-	# In either case, let nw be network object from formula.
-	if(is.null(nw <- basis)) {
-		nw <- ergm.getnetwork(object)
-	}
-	
-	nw <- as.network(nw)
-	if(!is.network(nw)){
-		stop("A network object on the LHS of the formula or via",
-				" the 'basis' argument must be given")
-	}
-	
-	# work around when durational dependent terms do not has role="target"
-#	if(	deparse(substitute(object))=="monitor")
-	m<-ergm_model(object, nw, response=response, role=NULL, ...)
-	is.durational(m)
+  # If basis is not null, replace network in formula by basis.
+  # In either case, let nw be network object from formula.
+  if(is.null(nw <- basis)) {
+    nw <- ergm.getnetwork(object)
+  }
+  
+  nw <- as.network(nw, populate=FALSE)
+  if(!is.network(nw)){
+    stop("A network object on the LHS of the formula or via",
+         " the 'basis' argument must be given")
+  }
+  
+  # work around when durational dependent terms do not has role="target"
+  #	if(	deparse(substitute(object))=="monitor")
+  m<-ergm_model(object, nw, response=response, role=NULL, ...)
+  is.durational(m)
 }
 
