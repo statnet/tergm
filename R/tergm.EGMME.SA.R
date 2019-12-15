@@ -547,74 +547,49 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
 tergm.EGMME.SA.Phase2.C <- function(state, model, model.mon,
                              proposal, control, verbose) {
   model.comb <- c(model, model.mon)
-  Clist <- ergm.Cprepare(state$nw, model.comb)
+  #Clist <- ergm.Cprepare(state$nw, model.comb)
   eta.comb <- c(ergm:::.deinf(state$eta), rep(0,model.mon$etamap$etalength))
 
-  maxedges <- max(control$MCMC.init.maxedges, Clist$nedges)
-  maxchanges <- max(control$MCMC.init.maxchanges, Clist$nedges)
+  ergmstate <- ergm_state(nw=state$nw, model=model.comb, proposal=proposal)
+
+  maxedges <- max(control$MCMC.init.maxedges, network.edgecount(ergmstate))
+  maxchanges <- max(control$MCMC.init.maxchanges, network.edgecount(ergmstate))
   
-  repeat{
-    lasttoggle <- c(NROW(Clist$lasttoggle), Clist$lasttoggle)    
-    lasttoggle <- c(lasttoggle, rep(0, 3*maxedges + 1 - length(lasttoggle)))  
-  
-    z <- .C("MCMCDynSArun_wrapper",
-            # Observed/starting network. 
-            as.integer(Clist$tails), as.integer(Clist$heads),
-            time = as.integer(Clist$time),
-            lasttoggle = as.integer(lasttoggle),  
-            as.integer(Clist$nedges),
-            as.integer(Clist$n),
-            as.integer(Clist$dir), as.integer(Clist$bipartite),
-            # terms and proposals. 
-            as.integer(Clist$nterms), as.character(Clist$fnamestring), as.character(Clist$snamestring),
-            as.character(proposal$name), as.character(proposal$pkgname),
-            as.double(Clist$inputs),
-            # Parameter fitting.
-            eta=as.double(eta.comb),
-            nw.diff=as.double(state$nw.diff),
-            as.integer(control$SA.runlength),
-            as.double(control$GainM),
-            as.double(control$jitter), as.double(control$dejitter), # Add a little bit of noise to parameter guesses.
-            as.double(control$dev.guard),
-            as.double(control$par.guard),
-            # Degree bounds.
-            as.integer(proposal$arguments$constraints$bd$attribs), 
-            as.integer(proposal$arguments$constraints$bd$maxout), as.integer(proposal$arguments$constraints$bd$maxin),
-            as.integer(proposal$arguments$constraints$bd$minout), as.integer(proposal$arguments$constraints$bd$minin),
-            as.integer(proposal$arguments$constraints$bd$condAllDegExact), as.integer(length(proposal$arguments$constraints$bd$attribs)), 
-            # MCMC settings.              
-            as.integer(control$SA.burnin),
-            as.integer(control$SA.interval),
-            as.integer(control$MCMC.burnin.min), as.integer(control$MCMC.burnin.max), as.double(control$MCMC.burnin.pval), as.double(control$MCMC.burnin.add),
-            # Space for output.
-            as.integer(maxedges),
-            as.integer(maxchanges),
-            newnwtails = integer(maxedges), newnwheads = integer(maxedges), 
-            opt.history=double((2*Clist$nstats - model.mon$etamap$etalength)*control$SA.runlength*control$SA.interval),
-            # Verbosity.
-            as.integer(max(verbose-1,0)),
-            status = integer(1), # 0 = OK, MCMCDyn_TOO_MANY_EDGES = 1, MCMCDyn_MH_FAILED = 2, MCMCDyn_TOO_MANY_CHANGES = 3
-            PACKAGE="tergm")
-    if(z$status==0) break;
-    if(z$status==1){
-      maxedges <- 5*maxedges
-      if(verbose>0) message("Too many edges encountered in the simulation. Increasing capacity to ", maxedges)
-    }
-    if(z$status==3){
-      maxchanges <- 5*maxchanges
-      if(verbose>0) message("Too many changes elapsed in the simulation. Increasing capacity to ", maxchanges)
-    }
-  }
+  z <- .Call("MCMCDynSArun_wrapper",
+             state,
+             as.integer(model.mon$nstats),
+             # Parameter fitting.
+             as.double(eta.comb),
+             as.double(state$nw.diff),
+             as.integer(control$SA.runlength),
+             as.double(control$GainM),
+             as.double(control$jitter),
+             as.double(control$dejitter), # Add a little bit of noise to parameter guesses.
+             as.double(control$dev.guard),
+             as.double(control$par.guard),
+             # MCMC settings.              
+             as.integer(control$SA.burnin),
+             as.integer(control$SA.interval),
+             as.integer(control$MCMC.burnin.min),
+             as.integer(control$MCMC.burnin.max),
+             as.double(control$MCMC.burnin.pval),
+             as.double(control$MCMC.burnin.add),
+             as.integer(maxedges),
+             as.integer(maxchanges),
+             as.integer(max(verbose-1,0)),
+             PACKAGE="tergm")
+
+  if(z$status != 0) stop("DynSA errored with code ", z$status)
+
+  z$state <- update(z$state)
 
   eta <- z$eta[seq_len(model$etamap$etalength)]
   names(eta) <- model$coef.names
 
-  newnetwork<-as.network(pending_update_network(state$nw,z))
-  newnetwork %n% "time" <- z$time
-  newnetwork %n% "lasttoggle" <- if(z$lasttoggle[1] > 0) matrix(z$lasttoggle[2:(3*z$lasttoggle[1] + 1)],nrow=z$lasttoggle[1]) else matrix(0,nrow=0,ncol=3)
+  newnetwork <- as.network(z$state)
   
   list(nw.diff=z$nw.diff,
        newnetwork=newnetwork,
        eta=eta,
-       opt.history=matrix(z$opt.history,ncol=2*Clist$nstats - model.mon$etamap$etalength,byrow=TRUE))
+       opt.history=matrix(z$opt.history,ncol=2*model.comb$etamap$etalength - model.mon$etamap$etalength,byrow=TRUE))
 }

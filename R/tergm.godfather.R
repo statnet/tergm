@@ -137,51 +137,29 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
 
   formula <- nonsimp_update.formula(formula, nw~., from.new="nw")
   m <- ergm_model(formula, nw, role=NULL)
-  Clist <- ergm.Cprepare(nw, m)
+  
+  state <- ergm_state(nw=nw, model=m)
+#  Clist <- ergm.Cprepare(nw, m)
   m$obs <- summary(m, nw)
-  if(end.network){
-    maxedges.sd <- sqrt(nrow(toggles)*0.25)*2 # I.e., if each toggle has probability 1/2 of being in a particular direction, this is the s.d. of the number of edges added.
-    maxedges <- Clist$nedges + maxedges.sd*control$GF.init.maxedges.mul
-  } else { # something arbitrary just for testing (shouldn't be needed once lasttoggle changes are finalized)
-    maxedges <- round(NROW(Clist$lasttoggle) + network.edgecount(nw) + NROW(toggles) + 100)
-  }
 
   if(verbose) cat("Applying changes...\n")
-  repeat{
-    
-    lasttoggle <- c(NROW(Clist$lasttoggle), Clist$lasttoggle)    
-    lasttoggle <- c(lasttoggle, rep(0, 3*maxedges + 1 - length(lasttoggle)))
-    
-    z <- .C("godfather_wrapper",
-            as.integer(Clist$tails), as.integer(Clist$heads),
-            time = if(is.null(Clist$time)) as.integer(0) else as.integer(Clist$time),
-            lasttoggle = as.integer(lasttoggle),             
-            as.integer(Clist$nedges),
-            as.integer(Clist$n),
-            as.integer(Clist$dir), as.integer(Clist$bipartite),
-            as.integer(Clist$nterms), 
-            as.character(Clist$fnamestring),
-            as.character(Clist$snamestring),
-            as.double(Clist$inputs),
-            as.integer(nrow(toggles)), as.integer(toggles[,1]),
-            as.integer(toggles[,2]), as.integer(toggles[,3]),
-            as.integer(start), as.integer(end),
-            s = double((1+end-start) * Clist$nstats),
-            if(end.network) as.integer(maxedges) else as.integer(0),
-            newnwtails = if(end.network) integer(maxedges+1) else integer(0),
-            newnwheads = if(end.network) integer(maxedges+1) else integer(0),
-            as.integer(verbose),
-            status = integer(1), # 0 = OK, MCMCDyn_TOO_MANY_EDGES = 1
-            PACKAGE="tergm")
 
-    if(z$status==0) break;
-    if(z$status==1){
-      maxedges <- 5*maxedges
-      if(verbose>0) message("Too many edges encountered in the simulation. Increasing capacity to ", maxedges)
-    }
-  }
+  z <- .Call("godfather_wrapper",
+             state,
+             as.integer(nrow(toggles)),
+             as.integer(toggles[,1]),
+             as.integer(toggles[,2]),
+             as.integer(toggles[,3]),
+             as.integer(start),
+             as.integer(end),
+             as.integer(verbose),
+             PACKAGE="tergm")
 
-  stats <- matrix(z$s + m$obs, ncol=Clist$nstats, byrow=TRUE)
+  if(z$status!=0) stop("tergm godfather errored with code ", z$status)
+
+  z$state <- update(z$state)
+
+  stats <- matrix(z$s + m$obs, ncol=nparam(state,canonical=TRUE), byrow=TRUE)
   colnames(stats) <- m$coef.names
   if(!stats.start) stats <- stats[-1,,drop=FALSE]
   #' @importFrom coda mcmc
@@ -189,13 +167,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
   
   if(end.network){ 
     if(verbose) cat("Creating new network...\n")
-    newnetwork <- as.network(pending_update_network(nw,z))
-    newnetwork %n% "time" <- z$time
-    
-    z$lasttoggle <- if(z$lasttoggle[1] > 0) matrix(z$lasttoggle[2:(3*z$lasttoggle[1] + 1)],nrow=z$lasttoggle[1]) else matrix(0,nrow=0,ncol=3)
-    
-    newnetwork %n% "lasttoggle" <- z$lasttoggle
-
+    newnetwork <- as.network(z$state)
     attr(newnetwork,"stats")<-stats
     newnetwork
   }else stats
