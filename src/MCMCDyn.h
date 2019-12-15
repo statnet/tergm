@@ -25,33 +25,34 @@ typedef enum MCMCDynStatus_enum {
   MCMCDyn_TOO_MANY_CHANGES = 3
 } MCMCDynStatus;
 
-void MCMCDyn_init_common(int *tails, int *heads, int time, int *lasttoggle, int n_edges,
-			 int n_nodes, int dflag, int bipartite,
-			 
-			 int nterms, char *funnames, char *sonames, double *inputs,
-			 
-			 int *attribs, int *maxout, int *maxin, int *minout,
-			 int *minin, int condAllDegExact, int attriblength,
-			 
-			 char *MHProposaltype, char *MHProposalpackage,
-                         ErgmState **s);
-
-
-void MCMCDyn_finish_common(ErgmState *s);
+SEXP MCMCDyn_wrapper(ARGS_STATE, // ergm_state
+                SEXP eta,      // double
+                SEXP nsteps,   // integer
+                SEXP min_MH_interval, // integer
+                SEXP max_MH_interval, // integer
+                SEXP MH_pval,  // double
+                SEXP MH_interval_add, // double
+                SEXP burnin, // integer
+                SEXP interval, // integer
+                SEXP collect, // integer (logical)
+                SEXP maxedges, // integer
+                SEXP maxchanges, // integer
+                SEXP log_changes, // integer (logical)
+                SEXP fVerbose);
 
 MCMCDynStatus MCMCSampleDyn(ErgmState *s,
-			    double *eta,
-			    // Space for output.
-			    double *stats,
-			    Edge maxedges,
-			    Edge maxchanges,
-			    int log_changes,
-			    Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,		    
-			    // MCMC settings.
-			    unsigned int nsteps, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
-			    unsigned int burnin, unsigned int interval, 
-			    // Verbosity.
-			    int fVerbose);
+                double *eta,
+                // Space for output.
+                double *stats,
+                int maxedges,
+                int maxchanges,
+                int log_changes,
+                Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,            
+                // MCMC settings.
+                unsigned int nsteps, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
+                unsigned int burnin, unsigned int interval, 
+                // Verbosity.
+                int fVerbose);
 
 MCMCDynStatus MCMCDyn1Step(ErgmState *s,
                            double *eta,

@@ -8,6 +8,7 @@
  *  Copyright 2008-2019 Statnet Commons
  */
 #include "godfather.h"
+#include "ergm_util.h"
 
 /*****************
  void godfather_wrapper
@@ -20,31 +21,27 @@
  find the changestats that result from starting from an empty network
  and then adding all of the edges to make up an observed network of interest.
 *****************/
-void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *n_edges,
-               int *n_nodes, int *directed_flag, int *bipartite, 
-               int *nterms, char **funnames, char **sonames, double *inputs,
-               int *total_toggles, int *toggletimes, 
-               int *toggletails, int *toggleheads,
-               int *start_time, int *end_time,
-               double *changestats, 
-               int *maxedges,
-               int *newnetworktails, 
-               int *newnetworkheads, 
-               int *fVerbose, 
-               int *status){
-  ErgmState *s;
-  StoreDyadMapInt *discord;
-
-  MCMCDyn_init_common(tails, heads, *time, lasttoggle, *n_edges,
-              *n_nodes, *directed_flag, *bipartite,
-              *nterms, *funnames, *sonames, inputs,
-              NULL, NULL, NULL, NULL,
-              NULL, 0, 0,
-              NULL, NULL,
-              &s, &discord);
+SEXP godfather_wrapper(SEXP stateR,
+               SEXP total_toggles_arg,
+               SEXP toggletimes_arg, 
+               SEXP toggletails_arg,
+               SEXP toggleheads_arg,
+               SEXP start_time_arg,
+               SEXP end_time_arg,
+               SEXP fVerbose_arg){
+  GetRNGstate();  /* R function enabling uniform RNG */
+  ErgmState *s = ErgmStateInit(YES_STATE);
   
   Network *nwp = s->nwp;
   Model *m = s->m;  
+  
+  int *total_toggles = INTEGER(total_toggles_arg);
+  int *toggletimes = INTEGER(toggletimes_arg); 
+  int *toggletails = INTEGER(toggletails_arg);
+  int *toggleheads = INTEGER(toggleheads_arg);
+  int *start_time = INTEGER(start_time_arg);
+  int *end_time = INTEGER(end_time_arg);
+  int *fVerbose = INTEGER(fVerbose_arg);
   
   /*********************
   changestats are modified in groups of m->n_stats, and they
@@ -54,6 +51,8 @@ void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *
   all be zero
   *********************/
   
+  SEXP changestatsRV = PROTECT(allocVector(REALSXP, (*end_time - *start_time + 1)*m->n_stats));
+  double *changestats = REAL(changestatsRV);
   memset(changestats, 0, m->n_stats*sizeof(double));
   
   /* Now start obtaining change statistics */
@@ -74,28 +73,33 @@ void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *
       ChangeStats(1, (Vertex *)(toggletails+pos), (Vertex *)(toggleheads+pos), nwp, m);
     
       GET_EDGE_UPDATE_STORAGE_TOGGLE(toggletails[pos], toggleheads[pos], nwp, m, NULL);
+  
+      addonto(changestats, m->workspace, m->n_stats);
 
+      pos++;
     }
-        
-    addonto(changestats, m->workspace, m->n_stats);
-
-    pos++;
-  }
     
-    MCMCDyn1Step_advance(s, discord, changestats,
+    MCMCDyn1Step_advance(s, changestats,
                          0, NULL, NULL, NULL, NULL, NULL,
                          *fVerbose);
-                         
   }
 
-  if(*maxedges!=0 && nwp->nedges >= *maxedges-1){
-    *status = MCMCDyn_TOO_MANY_EDGES;
+  SEXP status = PROTECT(ScalarInteger(MCMCDyn_OK));
+  const char *outn[] = {"status", "s", "state", ""};
+  SEXP outl = PROTECT(mkNamed(VECSXP, outn));
+  SET_VECTOR_ELT(outl, 0, status);
+  SET_VECTOR_ELT(outl, 1, changestatsRV);
+  
+  /* record new generated network to pass back to R */
+  if(asInteger(status) == MCMCDyn_OK){
+    s->stats = REAL(changestatsRV) + (*end_time - *start_time)*m->n_stats;
+    SET_VECTOR_ELT(outl, 2, ErgmStateRSave(stateR, s));
   }
 
-  if(*status == MCMCDyn_OK && *maxedges>0){
-    newnetworktails[0]=newnetworkheads[0]=EdgeTree2EdgeList((Vertex*)newnetworktails+1,(Vertex*)newnetworkheads+1,nwp,*maxedges-1);
-  }
+  // save state for output as in MCMCDyn
 
-  /* Clean up and return */
-  MCMCDyn_finish_common(s, discord);
+  ErgmStateDestroy(s);  
+  PutRNGstate();  /* Disable RNG before returning */
+  UNPROTECT(3);  
+  return NULL;
 }

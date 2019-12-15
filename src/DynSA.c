@@ -9,93 +9,87 @@
  */
 #include "DynSA.h"
 
-void MCMCDynSArun_wrapper(// Observed network.
-                 int *tails, int *heads, int *time, int *lasttoggle, int *n_edges,
-                 int *n_nodes, int *dflag, int *bipartite, 
-                 // Formation terms and proposals.
-                 int *nterms, char **funnames, char **sonames,
-                 char **MHProposaltype, char **MHProposalpackage,
-                 double *inputs, int *nstatsmonitor,
-                 // Parameter fittig.
-                 double *eta0, 
-                 double *init_dev,
-                 int *runlength,
-                 double *WinvGradient,
-                 double *jitter, double *dejitter,
-                 double *dev_guard,
-                 double *par_guard,
-                 // Degree bounds.
-                 int *attribs, int *maxout, int *maxin, int *minout,
-                 int *minin, int *condAllDegExact, int *attriblength,
+SEXP MCMCDynSArun_wrapper(SEXP stateR,
+                 SEXP nstatsmonitor,
+                 SEXP eta0,
+                 SEXP init_dev,
+                 SEXP runlength,
+                 SEXP WinvGradient,
+                 SEXP jitter,
+                 SEXP dejitter,
+                 SEXP dev_guard,
+                 SEXP par_guard,
                  // MCMC settings.
-                 int *SA_burnin, int *SA_interval, int *min_MH_interval, int *max_MH_interval, double *MH_pval, double *MH_interval_add,
-                 // Space for output.
-                 int *maxedges, int *maxchanges,
-                 int *newnetworktail, int *newnetworkhead, 
-                 double *opt_history,
-                 // Verbosity.
-                 int *fVerbose,
-                 int *status){
-  ErgmState *s;
-  StoreDyadMapInt *discord;
-    
-  Vertex *difftime, *difftail, *diffhead;
-  difftime = (Vertex *) Calloc(*maxchanges,Vertex);
-  difftail = (Vertex *) Calloc(*maxchanges,Vertex);
-  diffhead = (Vertex *) Calloc(*maxchanges,Vertex);
+                 SEXP SA_burnin, 
+                 SEXP SA_interval,
+                 SEXP min_MH_interval,
+                 SEXP max_MH_interval,
+                 SEXP MH_pval, 
+                 SEXP MH_interval_add,
+                 SEXP maxedges,
+                 SEXP maxchanges,
+                 SEXP fVerbose){    
+  GetRNGstate();  /* R function enabling uniform RNG */
+  ErgmState *s = ErgmStateInit(YES_STATE);
 
-  memset(newnetworktail,0,*maxedges*sizeof(int));
-  memset(newnetworkhead,0,*maxedges*sizeof(int));
-
-  MCMCDyn_init_common(tails, heads, *time, lasttoggle, *n_edges,
-                      *n_nodes, *dflag, *bipartite,
-                      *nterms, *funnames, *sonames, inputs,
-                      attribs, maxout, maxin, minout,
-                      minin, *condAllDegExact, *attriblength,
-                      *MHProposaltype, *MHProposalpackage,
-                      &s, &discord);
-  Network *nwp = s->nwp;
   Model *m = s->m;
+  MHProposal *MHp = s->MHp;
 
   double *inputdev = Calloc(m->n_stats, double);
-  memcpy(inputdev + m->n_stats - *nstatsmonitor, init_dev, (*nstatsmonitor)*sizeof(double));
-
-  *status = MCMCDynSArun(s, discord,
+  memcpy(inputdev + m->n_stats - asInteger(nstatsmonitor), REAL(init_dev), asInteger(nstatsmonitor)*sizeof(double));
   
-             *nstatsmonitor,
+  SEXP opt_history = PROTECT(allocVector(REALSXP, (2*m->n_stats - asInteger(nstatsmonitor))*asInteger(runlength)*asInteger(SA_interval)));
+  memset(REAL(opt_history), 0, (2*m->n_stats - asInteger(nstatsmonitor))*asInteger(runlength)*asInteger(SA_interval));
+  
+  SEXP eta = PROTECT(allocVector(REALSXP, m->n_stats));
+  memcpy(REAL(eta), eta0, m->n_stats*sizeof(double));
+  
+  SEXP status;
+  if(MHp) status = PROTECT(ScalarInteger(MCMCDynSArun(s,
+  
+             asInteger(nstatsmonitor),
     
-             eta0,
+             REAL(eta),
              inputdev, 
-             *runlength,
-             WinvGradient, jitter, dejitter, dev_guard, par_guard,
+             asInteger(runlength),
+             REAL(WinvGradient), REAL(jitter), REAL(dejitter), REAL(dev_guard), REAL(par_guard),
              
-             *maxedges, *maxchanges,
-             difftime, difftail, diffhead,
-             opt_history,
+             asInteger(maxedges), asInteger(maxchanges),
+             REAL(opt_history),
              
-             *SA_burnin, *SA_interval, *min_MH_interval, *max_MH_interval, *MH_pval, *MH_interval_add,
-             *fVerbose);
+             asInteger(SA_burnin), asInteger(SA_interval), asInteger(min_MH_interval), asInteger(max_MH_interval), asReal(MH_pval), asReal(MH_interval_add),
+             asInteger(fVerbose))));
+  else status = PROTECT(ScalarInteger(MCMCDyn_MH_FAILED));
   
-  memcpy(init_dev, inputdev + m->n_stats - *nstatsmonitor, (*nstatsmonitor)*sizeof(double));
+  SEXP nw_diff = PROTECT(allocVector(REALSXP, asInteger(nstatsmonitor)));
+  memcpy(REAL(nw_diff), inputdev + m->n_stats - asInteger(nstatsmonitor), asInteger(nstatsmonitor)*sizeof(double));
   
-  /* record the final network to pass back to R */
-
-  if(*status==MCMCDyn_OK){
-    newnetworktail[0]=newnetworkhead[0]=EdgeTree2EdgeList((Vertex*)newnetworktail+1,(Vertex*)newnetworkhead+1,nwp,*maxedges);
-  }
-
-  Free(difftime);
-  Free(difftail);
-  Free(diffhead);
   Free(inputdev);
-  MCMCDyn_finish_common(s, discord);
+  
+  const char *outn[] = {"status", "opt.history", "state", "eta", "nw.diff", ""};
+  SEXP outl = PROTECT(mkNamed(VECSXP, outn));
+  SET_VECTOR_ELT(outl, 0, status);
+  SET_VECTOR_ELT(outl, 1, opt_history);
+  
+  /* record new generated network to pass back to R */
+  if(asInteger(status) == MCMCDyn_OK){
+    SET_VECTOR_ELT(outl, 2, ErgmStateRSave(stateR, s));
+  }
+  
+  SET_VECTOR_ELT(outl, 3, eta);
+  SET_VECTOR_ELT(outl, 4, nw_diff);
+
+  ErgmStateDestroy(s);  
+  PutRNGstate();  /* Disable RNG before returning */
+  UNPROTECT(5);
+  return outl;
 }
 
 
 /*********************
  void MCMCSampleDynPhase12
 *********************/
-MCMCDynStatus MCMCDynSArun(ErgmState *s, StoreDyadMapInt *discord,
+MCMCDynStatus MCMCDynSArun(ErgmState *s,
                   int nstatsmonitor,
                   // Model fitting.
                   double *eta, 
@@ -104,8 +98,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s, StoreDyadMapInt *discord,
                   double *WinvGradient, double *jitter, double *dejitter, double *dev_guard, double *par_guard,
                   
                   // Space for output.
-                  Edge maxedges, Edge maxchanges,
-                  Vertex *difftime, Vertex *difftail, Vertex *diffhead,
+                  int maxedges, int maxchanges,
                   double *opt_history,
                   // MCMC settings.
                   unsigned int SA_burnin, unsigned int SA_interval, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
@@ -114,7 +107,6 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s, StoreDyadMapInt *discord,
   Network *nwp = s->nwp;
   Model *m = s->m;
 
-  Edge nextdiffedge=1;
   unsigned int hist_pos=0, p=m->n_stats - nstatsmonitor, n, rowsize = p*2 + nstatsmonitor;
   double *meandev=(double*)R_alloc(nstatsmonitor,sizeof(double)), *last_jitter=(double*)R_alloc(p,sizeof(double)), *init_eta=(double*)R_alloc(p,sizeof(double));
   memcpy(init_eta, eta, (m->n_stats - nstatsmonitor)*sizeof(double));
@@ -137,11 +129,11 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s, StoreDyadMapInt *discord,
 
     // Burn in
     for(unsigned int j=0;j < SA_burnin;j++){
-      MCMCDynStatus status = MCMCDyn1Step(s, discord,
+      MCMCDynStatus status = MCMCDyn1Step(s,
                       eta,
                       inputdev,
-                      maxchanges, &nextdiffedge,
-                      difftime, difftail, diffhead, NULL,
+                      maxchanges, NULL,
+                      NULL, NULL, NULL, NULL,
                       min_MH_interval, max_MH_interval, MH_pval, MH_interval_add,
                       fVerbose);
 
@@ -154,11 +146,11 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s, StoreDyadMapInt *discord,
 
     // Sampling run
     for(unsigned int j=0;j < SA_interval;j++){
-      MCMCDynStatus status = MCMCDyn1Step(s, discord,
+      MCMCDynStatus status = MCMCDyn1Step(s,
                       eta,
                       inputdev,
-                      maxchanges, &nextdiffedge,
-                      difftime, difftail, diffhead, NULL,
+                      maxchanges, NULL,
+                      NULL, NULL, NULL, NULL,
                       min_MH_interval, max_MH_interval, MH_pval, MH_interval_add,
                       fVerbose);
 

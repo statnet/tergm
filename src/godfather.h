@@ -15,18 +15,14 @@
 #include "MCMCDyn.h"
 
 /* Function prototypes */
-void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *n_edges,
-		       int *n_nodes, int *directed_flag, int *bip, 
-		       int *nterms, char **funnames, char **sonames, double *inputs,
-		       int *total_toggles, int *toggletimes, 
-		       int *toggletails, int *toggleheads,
-		       int *start_time, int *end_time,
-		       double *changestats, 
-		       int *maxedges,
-		       int *newnetworktails, 
-		       int *newnetworkheads, 
-		       int *fVerbose, 
-		       int *status);
+SEXP godfather_wrapper(SEXP stateR,
+               SEXP total_toggles_arg,
+               SEXP toggletimes_arg, 
+               SEXP toggletails_arg,
+               SEXP toggleheads_arg,
+               SEXP start_time_arg,
+               SEXP end_time_arg,
+               SEXP fVerbose_arg);
       
 #endif
 

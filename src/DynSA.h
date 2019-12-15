@@ -13,34 +13,28 @@
 #include "MCMCDyn.h"
 #include "ergm_MHproposal.h"
 
-void MCMCDynSArun_wrapper(// Observed network.
-                 int *tails, int *heads, int *time, int *lasttoggle, int *n_edges,
-                 int *n_nodes, int *dflag, int *bipartite, 
-                 // Formation terms and proposals.
-                 int *nterms, char **funnames, char **sonames,
-                 char **MHProposaltype, char **MHProposalpackage,
-                 double *inputs, int *nstatmonitor,
-                 // Parameter fitting.
-                 double *eta0,
-                 double *init_dev,
-                 int *runlength,
-                 double *WinvGradient,
-                 double *jitter, double *dejitter,
-                 double *dev_guard,
-                 double *par_guard,
-                 // Degree bounds.
-                 int *attribs, int *maxout, int *maxin, int *minout,
-                 int *minin, int *condAllDegExact, int *attriblength,
+SEXP MCMCDynSArun_wrapper(SEXP stateR,
+                 SEXP nstatsmonitor,
+                 SEXP eta0,
+                 SEXP init_dev,
+                 SEXP runlength,
+                 SEXP WinvGradient,
+                 SEXP jitter,
+                 SEXP dejitter,
+                 SEXP dev_guard,
+                 SEXP par_guard,
                  // MCMC settings.
-                 int *SA_burnin, int *SA_interval, int *min_MH_interval, int *max_MH_interval, double *MH_pval, double *MH_interval_add,
-                 // Space for output.
-                 int *maxedges, int *maxchanges,
-                 int *newnetworktail, int *newnetworkhead, 
-                 double *opt_history,
-                 // Verbosity.
-                 int *fVerbose,
-                 int *status);
-MCMCDynStatus MCMCDynSArun(ErgmState *s, StoreDyadMapInt *discord,
+                 SEXP SA_burnin, 
+                 SEXP SA_interval,
+                 SEXP min_MH_interval,
+                 SEXP max_MH_interval,
+                 SEXP MH_pval, 
+                 SEXP MH_interval_add,
+                 SEXP maxedges,
+                 SEXP maxchanges,
+                 SEXP fVerbose);
+                 
+MCMCDynStatus MCMCDynSArun(ErgmState *s,
                   int nstatsmonitor,
                   // Model fitting.
                   double *eta, 
@@ -50,8 +44,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s, StoreDyadMapInt *discord,
                   double *dev_guard, double *par_guard,
                   
                   // Space for output.
-                  Edge maxedges, Edge maxchanges,
-                  Vertex *difftime, Vertex *difftail, Vertex *diffhead,
+                  int maxedges, int maxchanges,
                   double *opt_history,
                   // MCMC settings.
                   unsigned int SA_burnin, unsigned int SA_interval, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
