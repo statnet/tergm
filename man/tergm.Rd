@@ -4,19 +4,11 @@
 \alias{tergm}
 \title{Temporal Exponential-Family Random Graph Models}
 \usage{
-tergm(
-  formula,
-  constraints = ~.,
-  estimate,
-  times = NULL,
-  offset.coef = NULL,
-  targets = NULL,
-  target.stats = NULL,
-  eval.loglik = NVL(getOption("tergm.eval.loglik"), getOption("ergm.eval.loglik")),
-  control = control.tergm(),
-  verbose = FALSE,
-  ...
-)
+tergm(formula, constraints = ~., estimate, times = NULL,
+  offset.coef = NULL, targets = NULL, target.stats = NULL,
+  SAN.offsets = NULL, eval.loglik = NVL(getOption("tergm.eval.loglik"),
+  getOption("ergm.eval.loglik")), control = control.tergm(),
+  verbose = FALSE, ...)
 }
 \arguments{
 \item{formula}{an ERGM formula.}
@@ -72,12 +64,14 @@ are not supported at this time.}
 \item{targets}{One-sided \code{\link{ergm}}-style formula specifying
 statistics whose moments are used for the EGMME. Unused for CMLE and CMPLE.
 Targets is required for EGMME estimation. It may contain any valid ergm
-terms. If specified as "formation" or "dissolution", it copies the formula
-from the respective model. Any offset terms are removed automatically.}
+terms. Any offset terms are used only during the preliminary SAN run;
+they are removed automatically for the EGMME proper.}
 
 \item{target.stats}{A vector specifying the values of the \code{targets}
 statistics that EGMME will try to match.  Defaults to the statistics of
 \code{nw}. Unused for CMLE and CMPLE.}
+
+\item{SAN.offsets}{Offset coefficients (if any) to use during the SAN run.}
 
 \item{eval.loglik}{Whether or not to calculate the log-likelihood
 of a CMLE TERGM fit. See \code{\link{ergm}} for details. Can be
@@ -179,5 +173,5 @@ University Department of Statistics Technical Report}, 2012(2012-01).
 }
 }
 \seealso{
-ergm, network, \\%v\\%, \\%n\\%, \code{\link{ergm-terms}}
+ergm, network, \%v\%, \%n\%, \code{\link{ergm-terms}}
 }
