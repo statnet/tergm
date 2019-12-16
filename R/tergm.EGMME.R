@@ -9,7 +9,7 @@
 #######################################################################
 
 tergm.EGMME <- function(nw, formula, constraints, offset.coef,
-                   targets, target.stats, estimate,
+                   targets, target.stats, SAN.offsets, estimate,
                  control,
                  verbose) {
 
@@ -35,11 +35,11 @@ tergm.EGMME <- function(nw, formula, constraints, offset.coef,
 
   targets <- nonsimp_update.formula(targets,nw~., from.new="nw")
   formula <- nonsimp_update.formula(formula,nw~., from.new="nw")
+  SAN.formula <- targets # including any offsets
 
-  # target formula should not have offsets. removing them
   if (any(ergm_model(targets, nw, role=NULL)$etamap$offset)) {
-    message("Targets formula should not contain offset terms;
-                they have been been removed.")
+    message("Targets contains offset terms;
+                they will only be used during the SAN run.")
     targets <- statnet.common:::filter_rhs.formula(targets, function(x) !inherits(x, "call") || !(x[[1]] == "offset"))
   }
 
@@ -54,8 +54,8 @@ tergm.EGMME <- function(nw, formula, constraints, offset.coef,
 
   model <- ergm_model(formula, nw, expanded=TRUE, role=NULL, term.options=control$term.options)
   model.mon <- ergm_model(targets, nw, expanded=TRUE, role="target", term.options=control$term.options)
-
-  if(any(model$etamap$canonical==0) || any(model.mon$etamap$canonical==0)) stop("Equilibrium GMME for models based on curved ERGMs is not supported at this time.")
+  model.SAN <- ergm_model(SAN.formula, nw, expanded=TRUE, role="target", term.options=control$term.options)
+  if(any(model$etamap$canonical==0) || any(model.mon$etamap$canonical==0) || any(model.SAN$etamap$canonical==0)) stop("Equilibrium GMME for models based on curved ERGMs is not supported at this time.")
 
   p.free<-sum(!model$etamap$offsettheta)
   if(p.free==0) stop("Model specification has no free parameters (all are offsets).")
@@ -72,11 +72,12 @@ tergm.EGMME <- function(nw, formula, constraints, offset.coef,
     ## with SAN-ed network and targets.
     
     nw <- TARGET_STATS <-
-        san(model.mon, basis=nw, target.stats=target.stats,
+        san(model.SAN, basis=nw, target.stats=target.stats,
             constraints=constraints,
             control=control$SAN.control,
             only.last=TRUE,
-            verbose=verbose)
+            verbose=verbose,
+            offset.coef=SAN.offsets)
 
     targets<-nonsimp_update.formula(targets,TARGET_STATS~., from.new="TARGET_STATS")
     formula <- nonsimp_update.formula(formula,TARGET_STATS~., from.new="TARGET_STATS")

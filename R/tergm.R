@@ -78,8 +78,9 @@
 #' @param targets One-sided \code{\link{ergm}}-style formula specifying
 #' statistics whose moments are used for the EGMME. Unused for CMLE and CMPLE.
 #' Targets is required for EGMME estimation. It may contain any valid ergm
-#' terms. If specified as "formation" or "dissolution", it copies the formula
-#' from the respective model. Any offset terms are removed automatically.
+#' terms. Any offset terms are used only during the preliminary SAN run;
+#' they are removed automatically for the EGMME proper.
+#' @param SAN.offsets Offset coefficients (if any) to use during the SAN run.
 #' @param target.stats A vector specifying the values of the \code{targets}
 #' statistics that EGMME will try to match.  Defaults to the statistics of
 #' \code{nw}. Unused for CMLE and CMPLE.
@@ -179,7 +180,7 @@
 #' @import networkDynamic
 #' @export
 tergm <- function(formula, constraints = ~., estimate, times=NULL, offset.coef=NULL,
-                   targets=NULL, target.stats=NULL,
+                   targets=NULL, target.stats=NULL, SAN.offsets = NULL,
                    eval.loglik=NVL(getOption("tergm.eval.loglik"), getOption("ergm.eval.loglik")),
                    control=control.tergm(),
                    verbose=FALSE, ...) {
@@ -197,7 +198,7 @@ tergm <- function(formula, constraints = ~., estimate, times=NULL, offset.coef=N
                 CMPLE=tergm.CMLE(formula=formula, times=times, constraints=constraints, estimate="MPLE", offset.coef=offset.coef, target.stats=target.stats, eval.loglik=eval.loglik,control=control, verbose=verbose, ...),
                 EGMME=tergm.EGMME(formula, constraints,
                   offset.coef,
-                  targets, target.stats, estimate, control, verbose)
+                  targets, target.stats, SAN.offsets, estimate, control, verbose)
                 )
   
   
