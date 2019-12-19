@@ -9,8 +9,7 @@
 #######################################################################
 
 
-InitErgmTerm.edges.ageinterval<-function(nw, arglist, role=NULL, ...) {
-  if(!is.null(role) && !any(role %in% c("dissolution","target"))) stop("Term edges.ageinterval can only be used in a dissolution model or as a target statistic.")
+InitErgmTerm.edges.ageinterval<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("from","to"),
                       vartypes = c("numeric","numeric"),
@@ -26,25 +25,25 @@ InitErgmTerm.edges.ageinterval<-function(nw, arglist, role=NULL, ...) {
 else if(any(from>=to)) stop("Term edges.ageinterval must have from<to.")
 
   if(any(from<1)) stop("An extant edge cannot have an \"age\" of less than 1.")
-  list(name=if(role=="target") "edges_ageinterval_mon" else "edges_ageinterval",
+  list(name="edges_ageinterval_mon",
        coef.names = paste("edges.age",from,"to",to,sep=""),
        inputs=c(rbind(from, ifelse(to==Inf, 0, to))),
        duration=TRUE,
-       dependence=FALSE)
+       dependence=FALSE,
+       auxiliaries = ~.lasttoggle)
 }
 
-InitErgmTerm.edge.ages<-function(nw, arglist, role=NULL, ...) {
-  if(!is.null(role) && !any(role %in% c("target"))) stop("Term edge.ages can only be used as a target statistic.")
+InitErgmTerm.edge.ages<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist)
   
   list(name="edge_ages_mon",
        coef.names = "edge.ages",
        duration=TRUE,
-       dependence=FALSE)
+       dependence=FALSE,
+       auxiliaries = ~.lasttoggle)
 }
 
-InitErgmTerm.mean.age<-function(nw, arglist, role=NULL, ...) {
-  if(!is.null(role) && !any(role %in% c("target"))) stop("Term mean.age can only be used as a target statistic.")
+InitErgmTerm.mean.age<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("emptyval","log"),
                       vartypes = c("numeric","logical"),
@@ -57,12 +56,11 @@ InitErgmTerm.mean.age<-function(nw, arglist, role=NULL, ...) {
        inputs = c(a$emptyval,if(a$log) 1 else 0),
        emptynwstats = a$emptyval,
        duration=TRUE,
-       dependence=FALSE)
+       dependence=FALSE,
+       auxiliaries = ~.lasttoggle)
 }
 
-InitErgmTerm.edgecov.mean.age<-function(nw, arglist, role=NULL, ...) {
-  if(!is.null(role) && !any(role %in% c("target"))) stop("Term mean.age can only be used as a target statistic.")
-
+InitErgmTerm.edgecov.mean.age<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist, 
                       varnames = c("x", "attrname", "emptyval", "log"),
                       vartypes = c("matrix,network,character", "character", "numeric", "logical"),
@@ -89,12 +87,10 @@ InitErgmTerm.edgecov.mean.age<-function(nw, arglist, role=NULL, ...) {
   }
   inputs <- c(a$emptyval, if(a$log) 1 else 0, NCOL(xm), as.double(xm))
   attr(inputs, "ParamsBeforeCov") <- 3
-  list(name="edgecov_mean_age_mon", coef.names = cn, inputs = inputs, duration=TRUE, dependence=FALSE, emptynwstats = a$emptyval)
+  list(name="edgecov_mean_age_mon", coef.names = cn, inputs = inputs, duration=TRUE, dependence=FALSE, emptynwstats = a$emptyval, auxiliaries = ~.lasttoggle)
 }
 
-InitErgmTerm.edgecov.ages<-function(nw, arglist, role=NULL, ...) {
-  if(!is.null(role) && !any(role %in% c("target"))) stop("Term edgecov.ages can only be used as a target statistic.")
-
+InitErgmTerm.edgecov.ages<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist, 
                       varnames = c("x", "attrname"),
                       vartypes = c("matrix,network,character", "character"),
@@ -121,20 +117,19 @@ InitErgmTerm.edgecov.ages<-function(nw, arglist, role=NULL, ...) {
   }
   inputs <- c(NCOL(xm), as.double(xm))
   attr(inputs, "ParamsBeforeCov") <- 1
-  list(name="edgecov_ages_mon", coef.names = cn, inputs = inputs, duration=TRUE, dependence=FALSE)
+  list(name="edgecov_ages_mon", coef.names = cn, inputs = inputs, duration=TRUE, dependence=FALSE, auxiliaries = ~.lasttoggle)
 }
 
 ################################################################################
-InitErgmTerm.degree.mean.age<-function(nw, arglist, role=NULL, ...) {
-  if(!is.null(role) && !any(role %in% c("target"))) stop("Term degree.mean.age can only be used as a target statistic.")
+InitErgmTerm.degree.mean.age<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist, directed=FALSE,
                       varnames = c("d", "byarg", "emptyval", "log"),
-                      vartypes = c("numeric", "character", "numeric", "logical"),
+                      vartypes = c("numeric", ERGM_VATTR_SPEC, "numeric", "logical"),
                       defaultvalues = list(NULL, NULL, 0, FALSE),
                       required = c(TRUE, FALSE, FALSE, FALSE))
   d<-a$d; byarg <- a$byarg
   if(!is.null(byarg)) {
-    nodecov <- get.node.attr(nw, byarg, "degree.mean.age")
+    nodecov <- ergm_get_vattr(byarg, nw)
     u<-sort(unique(nodecov))
     if(any(is.na(nodecov))){u<-c(u,NA)}
     nodecov <- match(nodecov,u) # Recode to numeric
@@ -164,15 +159,14 @@ InitErgmTerm.degree.mean.age<-function(nw, arglist, role=NULL, ...) {
     inputs <- c(as.vector(du), nodecov)
   }
   list(name=name,coef.names=coef.names, inputs=c(a$emptyval, if(a$log) 1 else 0, inputs),
-       emptynwstats=rep(a$emptyval,length(coef.names)), duration=TRUE, dependence=TRUE)
+       emptynwstats=rep(a$emptyval,length(coef.names)), duration=TRUE, dependence=TRUE, auxiliaries = ~.lasttoggle)
 }
 
 ################################################################################
-InitErgmTerm.degrange.mean.age<-function(nw, arglist, role=NULL, ...) {
-  if(!is.null(role) && !any(role %in% c("target"))) stop("Term degrange.mean.age can only be used as a target statistic.")
+InitErgmTerm.degrange.mean.age<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist, directed=FALSE,
                       varnames = c("from", "to", "byarg", "emptyval", "log"),
-                      vartypes = c("numeric", "numeric", "character", "numeric", "logical"),
+                      vartypes = c("numeric", "numeric", ERGM_VATTR_SPEC, "numeric", "logical"),
                       defaultvalues = list(NULL, Inf, NULL, 0, FALSE),
                       required = c(TRUE, FALSE, FALSE, FALSE, FALSE))
   from<-a$from; to<-a$to; byarg <- a$byarg
@@ -184,7 +178,7 @@ InitErgmTerm.degrange.mean.age<-function(nw, arglist, role=NULL, ...) {
   else if(any(from>=to)) stop("Term degrange.mean.age must have from<to.")
   
   if(!is.null(byarg)) {
-    nodecov <- get.node.attr(nw, byarg, "degrange.mean.age")
+    nodecov <- ergm_get_vattr(byarg, nw)
     u<-sort(unique(nodecov))
     if(any(is.na(nodecov))){u<-c(u,NA)}
     nodecov <- match(nodecov,u) # Recode to numeric
@@ -218,7 +212,7 @@ InitErgmTerm.degrange.mean.age<-function(nw, arglist, role=NULL, ...) {
     inputs <- c(as.vector(du), nodecov)
   }
   list(name=name,coef.names=coef.names, inputs=c(a$emptyval, if(a$log) 1 else 0, inputs),
-       emptynwstats=rep(a$emptyval,length(coef.names)), duration=TRUE, dependence=TRUE)
+       emptynwstats=rep(a$emptyval,length(coef.names)), duration=TRUE, dependence=TRUE, auxiliaries = ~.lasttoggle)
 }
 
 
