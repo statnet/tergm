@@ -576,8 +576,8 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
   maxedges <- max(control$MCMC.init.maxedges, Clist.mon$nedges)
   maxchanges <- max(control$MCMC.init.maxchanges, Clist.mon$nedges)
 
-  eta.form <- ergm:::.deinf(state$eta.form)
-  eta.diss <- ergm:::.deinf(state$eta.diss)
+  eta.form <- deInf(state$eta.form)
+  eta.diss <- deInf(state$eta.diss)
   
   repeat{
     z <- .C("MCMCDynSArun_wrapper",

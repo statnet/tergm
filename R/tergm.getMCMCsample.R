@@ -118,7 +118,7 @@ tergm_MCMC_slave <- function(state, eta, control, verbose){
   
   z <- .Call("MCMCDyn_wrapper",
              state,
-             as.double(ergm:::.deinf(eta)),
+             as.double(deInf(eta)),
              # MCMC settings.
              as.integer(control$time.samplesize),
              as.integer(control$MCMC.burnin.min),
