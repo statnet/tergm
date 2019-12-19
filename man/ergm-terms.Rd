@@ -65,8 +65,9 @@
       with degree greater than or equal to 
       \code{from[i]} but strictly less than \code{to[i]}, of the amount of time elapsed
       since the tie's formation. The optional argument
-      \code{by} is a character string giving the name of an attribute in the
-      network's vertex attribute list. If specified, then separate degree 
+      \code{byarg} specifies a vertex attribute (see 
+      \link[ergm:node-attr]{Specifying Vertex Attributes and Levels}
+      for details). If specified, then separate degree 
       statistics are calculated for nodes having each separate
       value of the attribute.
       
@@ -78,7 +79,7 @@
       networks at the parameter configuration of interest has no actors
       with specified degree. }
 
-    \item{\code{degree.mean.age(d, by=NULL,
+    \item{\code{degree.mean.age(d, byarg=NULL,
 	emptyval=0)} (target-only)}{\emph{Average age of ties incident
 	on nodes having a given degree:}
       The \code{d} argument is a vector of distinct integers. This term adds one
@@ -86,8 +87,9 @@
       such statistic equals the average, among all ties incident on nodes
       with degree exactly \code{d[i]}, of the amount of time elapsed
       since the tie's formation. The optional argument
-      \code{by} is a character string giving the name of an attribute in the
-      network's vertex attribute list. If specified, then separate degree 
+      \code{byarg} specifies a vertex attribute (see 
+      \link[ergm:node-attr]{Specifying Vertex Attributes and Levels}
+      for details).  If specified, then separate degree 
       statistics are calculated for nodes having each separate
       value of the attribute.
       
