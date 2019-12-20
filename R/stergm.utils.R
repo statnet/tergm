@@ -49,49 +49,49 @@ get.dev <- local({
 }
 
 
-# A wrapper around network.extract
-# extracts the network at the specified time point and and attaches
-# a network attribute representing that time point
-# as well as numeric vector named "lasttoggle" representing the age of every (off-diagonal, 
-# non-bipartite crossing) possible dyad in the network.
+# A wrapper around network.extract.
+#
+# Extracts the network at the specified time point `at` and attaches
+# a network attribute representing the time point `at` and
+# a numeric matrix named "lasttoggle" representing the last toggle 
+# time of every edge that is extant at `at` as well as the last toggle
+# time for non-edges that were toggled off at time at.
+#
 # updates: lasttoggle is NULL when duration.dependent is FALSE
 network.extract.with.lasttoggle <- function(nwd, at, duration.dependent){
-	nw <- network.extract(nwd, at=at)
-  # check if the appropriate pid is defined, and if not, add it
-  if (is.null(nwd%n%'vertex.pid')){
-	  nw %v% "tergm_pid" <- which(is.active(nwd, at=at, v=seq_len(network.size(nwd))))
-  }
-	if(duration.dependent){
-		lttails <- lapply(nw$mel, "[[", "outl")
-		ltheads <- lapply(nw$mel, "[[", "inl")
-		ltlts <- lapply(lapply(lapply(nw$mel, "[[", "atl"), "[[", 
-						"active"), function(x) suppressWarnings(max(x[x <= at])))
-		
-		ltm <- if (is.bipartite(nw)) 
-					m <- matrix(-Inf, nw %n% "bipartite", network.size(nw) - 
-									nw %n% "bipartite")
-				else m <- matrix(-Inf, network.size(nw), network.size(nw))
-		for (i in seq_along(ltlts)) if (ltlts[[i]] != -Inf) {
-				e <- c(lttails[[i]], ltheads[[i]])
-				if (!all(e)) 
-					next
-				if (!is.directed(nw)) 
-					e <- c(min(e), max(e))
-				if (is.bipartite(nw)) 
-					e[2] <- e[2] - nw %n% "bipartite"
-				m[e[1], e[2]] <- ltlts[[i]] - 1
-			}
-		m[m == -Inf] <- round(-.Machine$integer.max/2)
-		lasttoggle <-to.lasttoggle.matrix(m, is.directed(nw), is.bipartite(nw))
-	} 
-	else {  # non-duration dependent model
-		lasttoggle <- NULL
-	}
+  nw <- network.extract(nwd, onset=at-1, terminus=at+1)
 
-        nw <- network.collapse(nwd, at=at) #  Convert to a network network.
-	nw %n% "time" <- at
-	nw %n% "lasttoggle" <- lasttoggle
-	nw
+  if(duration.dependent) {
+    lttails <- unlist(lapply(nw$mel, "[[", "outl"))
+    ltheads <- unlist(lapply(nw$mel, "[[", "inl"))
+    ltlts <- unlist(lapply(lapply(lapply(nw$mel, "[[", "atl"), "[[", 
+                    "active"), function(x) suppressWarnings(max(x[x <= at]))))
+
+    ltlts[ltlts == -Inf] <- round(-.Machine$integer.max/2)
+    ltlts <- as.integer(ltlts)
+
+    w <- lttails & ltheads
+
+    lttails <- lttails[w]
+    ltheads <- ltheads[w]
+    ltlts <- ltlts[w]
+    
+    if(!is.directed(nw)) {
+      lttmp <- lttails
+      w2 <- lttails > ltheads
+      lttails[w2] <- ltheads[w2]
+      ltheads[w2] <- lttmp[w2]
+    }
+
+    lasttoggle <- matrix(c(lttails, ltheads, ltlts), nrow=length(lttails), ncol=3)
+  } else {  # non-duration dependent model
+    lasttoggle <- NULL
+  }
+
+  nw <- network.collapse(nwd, at=at) #  Convert to a network network.
+  nw %n% "time" <- at
+  nw %n% "lasttoggle" <- lasttoggle
+  nw
 }
 
 
