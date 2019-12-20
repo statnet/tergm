@@ -1,38 +1,46 @@
+#include "tergm_model.h"
+#include "ergm_storage.h"
+#include "changestats_lasttoggle.h"
+#include "ergm_Rutil.h"
 
 /* _lasttoggle */
 
-I_CHANGESTAT(i__lasttoggle){
-  ALLOC_AUX_STORAGE(StoreTimeAndLasttoggle, 1, dur_inf);
-  dur_inf->time= asInteger(getListElement(mtp->ext_state, "time"));
+I_CHANGESTAT_FN(i__lasttoggle){
+  ALLOC_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
+  dur_inf->time = asInteger(getListElement(mtp->ext_state, "time"));
   dur_inf->lasttoggle = kh_init(DyadMapInt);
   dur_inf->discord = kh_init(DyadMapInt);
   dur_inf->discord->directed = dur_inf->lasttoggle->directed=DIRECTED;
   SEXP ltR = getListElement(mtp->ext_state, "lasttoggle");
-  Edge nlt = length(ltR)/3, *lt = INTEGER(ltR);
+  Edge nlt = length(ltR)/3, *lt = (Edge *) INTEGER(ltR);
   for(Edge i = 0; i < nlt; i++){
     Vertex tail=lt[i], head=lt[i+nlt];
     /* Note: we can't use helper macros here, since those treat 0 as deletion. */
-    kh_set(DyadMapInt,dur_inf->lasttoggle,THKey(dur_inf->lasttoggle,tail,head), lasttoggle[i+nlt+nlt]);
+    kh_set(DyadMapInt,dur_inf->lasttoggle,THKey(dur_inf->lasttoggle,tail,head), lt[i+nlt+nlt]);
   }
 }
 
-X_CHANGESTAT(x__lasttoggle){
+X_CHANGESTAT_FN(x__lasttoggle){
   switch(type){
   case TICK: // Start time step
-    GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
-    dur_inf->time++; // Advance the clock.
-    if(dur_inf->time%TIMESTAMP_HORIZON_FREQ == 0) ExpireTimestamps(dur_inf, TIMESTAMP_HORIZON_EDGE, TIMESTAMP_HORIZON_NONEDGE);
+    {
+      GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+      dur_inf->time++; // Advance the clock.
+      if(dur_inf->time%TIMESTAMP_HORIZON_FREQ == 0) ExpireTimestamps(dur_inf, TIMESTAMP_HORIZON_EDGE, TIMESTAMP_HORIZON_NONEDGE, nwp);
+    }
     break;
   case TOCK: // Finish time step
-    GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
-    kh_clear(DyadMapInt, dur_inf->discord);
+    {
+      GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+      kh_clear(DyadMapInt, dur_inf->discord);
+    }
     break;
   default:
     break;
   }
 }
 
-U_CHANGESTAT(u__lasttoggle){
+U_CHANGESTAT_FN(u__lasttoggle){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   TailHead dyad = THKey(dur_inf->discord,tail, head);
   khint_t i = kh_get(DyadMapInt,dur_inf->discord,dyad);
@@ -53,9 +61,9 @@ U_CHANGESTAT(u__lasttoggle){
   }
 }
 
-I_CHANGESTAT(w__lasttoggle){
+W_CHANGESTAT_FN(w__lasttoggle){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
-  SEXP es = PROTECT(mkNamed(VECSXP, (char *[]){"time","lasttoggle",""}));
+  SEXP es = PROTECT(mkNamed(VECSXP, (const char *[]){"time","lasttoggle",""}));
   SET_VECTOR_ELT(es, 0, ScalarInteger(dur_inf->time));
 
   {
@@ -80,7 +88,7 @@ I_CHANGESTAT(w__lasttoggle){
 }
 
 
-I_CHANGESTAT(f__lasttoggle){
+F_CHANGESTAT_FN(f__lasttoggle){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   kh_destroy(DyadMapInt, dur_inf->lasttoggle);
   kh_destroy(DyadMapInt, dur_inf->discord);
@@ -94,7 +102,7 @@ I_CHANGESTAT(f__lasttoggle){
  from the lasttoggle structure that had been toggled more than the
  specified number of steps ago.
  *****************/
-void ExpireTimestamps(StoreTimeAndLasttoggle *dur_inf, unsigned int edges, unsigned int nonedges){
+void ExpireTimestamps(StoreTimeAndLasttoggle *dur_inf, unsigned int edges, unsigned int nonedges, Network *nwp){
   if(edges==nonedges){ // Same horizon for edges and non-edges means that we don't need to check if an edge exists.
     int lt;
     kh_foreach_value(dur_inf->lasttoggle, lt, {

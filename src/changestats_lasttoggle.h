@@ -1,6 +1,7 @@
 #ifndef _CHANGESTATS_LASTTOGGLE_H_
 #define _CHANGESTATS_LASTTOGGLE_H_
 
+#include "ergm_changestat.h"
 #include "ergm_dyad_hashmap.h"
 
 /* Dur_Inf is a structure containing information about durations of
@@ -12,6 +13,8 @@ typedef struct StoreTimeAndLasttoggle_struct {
   StoreDyadMapInt *discord;
 } StoreTimeAndLasttoggle;
 
+void ExpireTimestamps(StoreTimeAndLasttoggle *dur_inf, unsigned int edges, unsigned int nonedges, Network *nwp);
+
 /*****************
  long int ElapsedTime
 
@@ -21,12 +24,10 @@ typedef struct StoreTimeAndLasttoggle_struct {
 
 /* *** don't forget tail->head, so this function now accepts tail before head */
 
-static inline int ElapsedTime(Vertex tail, Vertex head, StoreTimeAndEdgelist *dur_inf){
-  if(dur_inf){ /* Return INT_MAX if no duration info. */
-    khint_t i = kh_get(DyadMapInt, dur_inf->lasttoggle, THKey(dur_inf->lasttoggle,tail,head));
-    if(i==kh_none) return INT_MAX;
-    return dur_inf->time - kh_value(dur_inf->lasttoggle, i); // Possible int overflow here.
-  }else error("Attempting to access durational information on a network with no durational information. Memory has not been freed, so restart R soon.");
+static inline int ElapsedTime(Vertex tail, Vertex head, StoreTimeAndLasttoggle *dur_inf){
+  khint_t i = kh_get(DyadMapInt, dur_inf->lasttoggle, THKey(dur_inf->lasttoggle,tail,head));
+  if(i==kh_none) return INT_MAX;
+  return dur_inf->time - kh_value(dur_inf->lasttoggle, i); // Possible int overflow here.
 }
 
 #endif // _CHANGESTATS_LASTTOGGLE_H_

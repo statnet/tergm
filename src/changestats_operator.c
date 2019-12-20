@@ -1,4 +1,3 @@
-#include "ergm_changestat_operator.h"
 #include "tergm_changestats_auxnet.h"
 
 ON_AUXNET(_intersect_lt_net_Network)

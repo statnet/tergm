@@ -11,7 +11,7 @@
 #include "tergm_changestats_auxnet.h"
 #include "ergm_dyad_hashmap.h"
 #include "ergm_dyad_hashmap_utils.h"
-#include "ergm_changestat_operator.h"
+#include "tergm_model.h"
 
 // Initialize empty aux network. Then loop through the edges of y0 (ref_el).
 // If the edge also exists in y1, then keep it in auxnet->onwp.
@@ -40,6 +40,23 @@ U_CHANGESTAT_FN(u__intersect_lt_net_Network){
     ToggleEdge(tail, head, auxnet->onwp);
 }
 
+X_CHANGESTAT_FN(x__intersect_lt_net_Network){
+  switch(type){
+  case TOCK:
+    {
+      GET_AUX_STORAGE(StoreAuxnet, auxnet);
+      GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+      TailHead dyad;
+      kh_foreach_key(dur_inf->discord, dyad, {
+          if(IS_OUTEDGE(dyad.tail, dyad.head));
+          ToggleKnownEdge(dyad.tail, dyad.head, auxnet->onwp, FALSE);
+        });
+    }
+    break;
+  default: break;
+  }
+}
+
 F_CHANGESTAT_FN(f__intersect_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
   NetworkDestroy(auxnet->onwp);
@@ -66,12 +83,29 @@ U_CHANGESTAT_FN(u__union_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
   GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
   // If the edge is in y0, changing y1 won't matter. We infer that the
-  // edge was not y0 if either it's in y1 and elapsed time is 0 (i.e.,
-  // just added) or it's not in y1 but elapsed time is not 0 (i.e.,
-  // not just added).
+  // edge was not y0 if either it's in y1 and *is* in the discordant
+  // map or it's not in y1 and *is not* in the discordant map.
   if(edgeflag == (kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord,tail,head))!=kh_none))
     ToggleEdge(tail, head, auxnet->onwp);
 }
+
+X_CHANGESTAT_FN(x__union_lt_net_Network){
+  switch(type){
+  case TOCK:
+    {
+      GET_AUX_STORAGE(StoreAuxnet, auxnet);
+      GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+      TailHead dyad;
+      kh_foreach_key(dur_inf->discord, dyad, {
+          if(!IS_OUTEDGE(dyad.tail, dyad.head));
+          ToggleKnownEdge(dyad.tail, dyad.head, auxnet->onwp, TRUE);
+        });
+    }
+    break;
+  default: break;
+  }
+}
+
 
 F_CHANGESTAT_FN(f__union_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
