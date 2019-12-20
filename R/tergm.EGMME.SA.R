@@ -247,7 +247,7 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
     control$par.guard[!offsets] <- control$SA.phase1.jitter * 4
     
     ## Adjust the number of time steps between jumps using burn-in.
-    edge.ages <- unlist(sapply(states, function(state) state$nw%n%"time"-(state$nw %n% "lasttoggle")[,3]+1))
+    edge.ages <- unlist(sapply(states, function(state) state$nw%n%"time" - edgelist_with_lasttoggle(state$nw)[,3] + 1))
     control$SA.burnin<-control$SA.interval<- round(min(control$SA.max.interval, max(control$SA.min.interval, if(length(edge.ages)>0) control$SA.interval.mul*mean(edge.ages)))/2)
   
   if(is.nan(control$SA.burnin)|is.null(control$SA.burnin)|is.na(control$SA.burnin))

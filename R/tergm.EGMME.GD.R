@@ -119,7 +119,7 @@ tergm.EGMME.GD <- function(theta0, nw, model, model.mon,
     w <- ginv(v)
     
     ## Adjust the number of time steps between jumps.
-    edge.ages <- unlist(sapply(states, function(state) state$nw%n%"time"-(state$nw %n% "lasttoggle")[,3]+1))
+    edge.ages <- unlist(sapply(states, function(state) state$nw%n%"time" - edgelist_with_lasttoggle(state$nw)[,3] + 1))
     control$SA.burnin<-control$SA.interval<- round(min(control$SA.max.interval, max(control$SA.min.interval, if(length(edge.ages)>0) control$SA.interval.mul*mean(edge.ages)))/2)
     
     

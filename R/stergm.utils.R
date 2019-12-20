@@ -99,13 +99,12 @@ to.networkDynamic.lasttoggle <- function(nw){
   nwd <- nw
   if(!is.null(nw %n% "lasttoggle")){
     
-    lt.edges <- nw %n% "lasttoggle"
-
+    lt.edges <- edgelist_with_lasttoggle(nw)
+    
     lt.edges <- lt.edges[lt.edges[,3]>round(-.Machine$integer.max/2),,drop=FALSE] 
 
-    # The +1 after lt.edges[,3] is important: lasttoggle is shifted by -1 relative to
-    # networkDynamic (at least for now).
-    if(nrow(lt.edges)) nwd <- deactivate.edges(nwd, onset=-Inf, terminus=lt.edges[,3]+1, e=apply(lt.edges[,1:2,drop=FALSE],1,function(e) get.edgeIDs(nw, e[1], e[2])))
+    # removed the +1 after lt.edges[,3]
+    if(nrow(lt.edges)) nwd <- deactivate.edges(nwd, onset=-Inf, terminus=lt.edges[,3], e=apply(lt.edges[,1:2,drop=FALSE],1,function(e) get.edgeIDs(nw, e[1], e[2])))
   }
   nwd<-delete.network.attribute(nwd, "time")
   nwd<-delete.network.attribute(nwd, "lasttoggle")
@@ -194,3 +193,28 @@ networkDynamic.apply.changes <- function(nwd, changes){
 
   nwd
 }
+
+# extract edgelist with lasttoggle times for edges
+edgelist_with_lasttoggle <- function(nw) {
+  rv <- as.edgelist(nw)
+  
+  # handle no edges this way to avoid warning from cbind
+  if(NROW(rv) == 0) return(matrix(0L,0,3))
+  
+  rv <- cbind(rv, round(-.Machine$integer.max/2)) # default time
+  
+  lt <- nw %n% "lasttoggle"
+  
+  # if a non-default time exists, use it instead
+  for(i in seq_len(NROW(rv))) {
+    for(j in seq_len(NROW(lt))) {
+      if(rv[i,1] == lt[j,1] && rv[i,2] == lt[j,2]) {
+        rv[i,3] <- lt[j,3]
+        break
+      }
+    }
+  }
+  
+  rv
+}
+
