@@ -26,6 +26,7 @@ typedef enum MCMCDynStatus_enum {
 } MCMCDynStatus;
 
 MCMCDynStatus MCMCSampleDyn(ErgmState *s,
+                StoreDyadMapInt *discord,
                 double *eta,
                 // Space for output.
                 double *stats,
@@ -40,6 +41,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                 int verbose);
 
 MCMCDynStatus MCMCDyn1Step(ErgmState *s,
+                           StoreDyadMapInt *discord,
                            double *eta,
                            // Space for output.
                            double *stats,
@@ -51,6 +53,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
                            int verbose);
 
 MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
+                                   StoreDyadMapInt *discord,
                                    // Space for output.
                                    double *stats,
                                    unsigned int maxchanges, Edge *nextdiffedge,

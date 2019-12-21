@@ -9,6 +9,7 @@
  */
 #include "MCMCDyn.h"
 #include "ergm_util.h"
+#include "changestats_lasttoggle.h"
 /*****************
  Note on undirected networks:  For j<k, edge {j,k} should be stored
  as (j,k) rather than (k,j).  In other words, only directed networks
@@ -40,6 +41,13 @@ SEXP MCMCDyn_wrapper(ARGS_STATE, // ergm_state
   Model *m = s->m;
   MHProposal *MHp = s->MHp;
 
+  /* Each ModelTerm in termarray has an aux_storage pointer,
+     regardless of whether it asked for one; and the index of the
+     lasttoggle auxiliary is in model$slots.extra.aux$system . Once we
+     grab that, cast it to the lasttoggle data structure and extract
+     the discord hashtable. */
+  StoreDyadMapInt *discord = ((StoreTimeAndLasttoggle *)m->termarray->aux_storage[asInteger(getListElement(getListElement(m->R, "slots.extra.aux"), "system"))])->discord;
+
   SEXP sample = PROTECT(allocVector(REALSXP, (asInteger(nsteps) + 1)*m->n_stats));
   memset(REAL(sample), 0, (asInteger(nsteps) + 1)*m->n_stats*sizeof(double));
   memcpy(REAL(sample), s->stats, m->n_stats*sizeof(double));
@@ -55,6 +63,7 @@ SEXP MCMCDyn_wrapper(ARGS_STATE, // ergm_state
 
   SEXP status;
   if(MHp) status = PROTECT(ScalarInteger(MCMCSampleDyn(s,
+              discord,
               REAL(eta),
               asInteger(collect)?REAL(sample):NULL, asInteger(maxedges), asInteger(maxchanges), asInteger(log_changes), (Vertex *)INTEGER(difftime), (Vertex *)INTEGER(difftail), (Vertex *)INTEGER(diffhead), INTEGER(diffto),
               asInteger(nsteps), asInteger(min_MH_interval), asInteger(max_MH_interval), asReal(MH_pval), asReal(MH_interval_add), asInteger(burnin), asInteger(interval),
@@ -94,6 +103,7 @@ SEXP MCMCDyn_wrapper(ARGS_STATE, // ergm_state
  the statistics array. 
 *********************/
 MCMCDynStatus MCMCSampleDyn(ErgmState *s,
+                StoreDyadMapInt *discord,
                 double *eta,
                 // Space for output.
                 double *stats,
@@ -122,6 +132,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
 
   for(i=0;i<burnin;i++){
     MCMCDynStatus status = MCMCDyn1Step(s,
+                    discord,
                     eta,
                     stats,
                     maxchanges, &nextdiffedge, difftime, difftail, diffhead, diffto,
@@ -154,6 +165,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
     /* This then adds the change statistics to these values */
     for(j=0;j<interval;j++){
       MCMCDynStatus status = MCMCDyn1Step(s,
+                      discord,
                       eta,
                       stats,
                       maxchanges, &nextdiffedge, difftime, difftail, diffhead, diffto,
@@ -206,6 +218,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
  Simulate evolution of a dynamic network for 1 step.
 *********************/
 MCMCDynStatus MCMCDyn1Step(ErgmState *s,
+                           StoreDyadMapInt *discord,
                            double *eta,
                            // Space for output.
                            double *stats,
@@ -214,9 +227,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
                            // MCMC settings.
                            unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
                            // Verbosity.
-                           int verbose){
-  StoreDyadMapInt *discord = NULL;                             
-                               
+                           int verbose){                              
   Network *nwp = s->nwp;
   Model *m = s->m;
   MHProposal *MHp = s->MHp;
@@ -324,20 +335,20 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
     else Rprintf("Convergence achieved after %u M-H steps.\n",step);
   }
 
-  return MCMCDyn1Step_advance(s, stats,
+  return MCMCDyn1Step_advance(s, discord, stats,
                               maxchanges, nextdiffedge, difftime, difftail, diffhead, diffto,
                               verbose);
 }
 
 
 MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
+                                   StoreDyadMapInt *discord,
                                    // Space for output.
                                    double *stats,
                                    unsigned int maxchanges, Edge *nextdiffedge,
                                    Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
                                    // Verbosity.
                                    int verbose){
-  StoreDyadMapInt *discord = NULL;
   int t = 0;
   
   Network *nwp = s->nwp;

@@ -8,6 +8,7 @@
  *  Copyright 2008-2019 Statnet Commons
  */
 #include "DynSA.h"
+#include "changestats_lasttoggle.h"
 
 SEXP MCMCDynSArun_wrapper(SEXP stateR,
                  SEXP nstatsmonitor,
@@ -35,6 +36,13 @@ SEXP MCMCDynSArun_wrapper(SEXP stateR,
   Model *m = s->m;
   MHProposal *MHp = s->MHp;
 
+  /* Each ModelTerm in termarray has an aux_storage pointer,
+     regardless of whether it asked for one; and the index of the
+     lasttoggle auxiliary is in model$slots.extra.aux$system . Once we
+     grab that, cast it to the lasttoggle data structure and extract
+     the discord hashtable. */
+  StoreDyadMapInt *discord = ((StoreTimeAndLasttoggle *)m->termarray->aux_storage[asInteger(getListElement(getListElement(m->R, "slots.extra.aux"), "system"))])->discord;
+
   double *inputdev = Calloc(m->n_stats, double);
   memcpy(inputdev + m->n_stats - asInteger(nstatsmonitor), REAL(init_dev), asInteger(nstatsmonitor)*sizeof(double));
   
@@ -46,6 +54,7 @@ SEXP MCMCDynSArun_wrapper(SEXP stateR,
   
   SEXP status;
   if(MHp) status = PROTECT(ScalarInteger(MCMCDynSArun(s,
+             discord,
   
              asInteger(nstatsmonitor),
     
@@ -90,6 +99,7 @@ SEXP MCMCDynSArun_wrapper(SEXP stateR,
  void MCMCSampleDynPhase12
 *********************/
 MCMCDynStatus MCMCDynSArun(ErgmState *s,
+                  StoreDyadMapInt *discord,
                   int nstatsmonitor,
                   // Model fitting.
                   double *eta, 
@@ -130,6 +140,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s,
     // Burn in
     for(unsigned int j=0;j < SA_burnin;j++){
       MCMCDynStatus status = MCMCDyn1Step(s,
+                      discord,
                       eta,
                       inputdev,
                       maxchanges, NULL,
@@ -147,6 +158,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s,
     // Sampling run
     for(unsigned int j=0;j < SA_interval;j++){
       MCMCDynStatus status = MCMCDyn1Step(s,
+                      discord,
                       eta,
                       inputdev,
                       maxchanges, NULL,

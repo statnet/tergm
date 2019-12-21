@@ -136,8 +136,8 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
   toggles <- toggles[order(toggles[,1],toggles[,2],toggles[,3]),,drop=FALSE]
 
   formula <- nonsimp_update.formula(formula, nw~., from.new="nw")
-  m <- ergm_model(formula, nw, role=NULL)
-  
+  m <- ergm_model(formula, nw, role=NULL, term.options=control$term.options, extra.aux=list(system=~.lasttoggle))
+
   state <- ergm_state(nw=nw, model=m)
 #  Clist <- ergm.Cprepare(nw, m)
   m$obs <- summary(m, nw)

@@ -40,7 +40,7 @@ Random Graph Model}
   time.interval = 1,
   time.offset = 1,
   control = control.simulate.network.tergm(),
-  output = c("networkDynamic", "stats", "changes", "final"),
+  output = c("networkDynamic", "stats", "changes", "final", "ergm_state"),
   stats = FALSE,
   duration.dependent = NULL,
   verbose = FALSE,

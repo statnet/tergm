@@ -14,6 +14,7 @@
 #include "ergm_MHproposal.h"
                  
 MCMCDynStatus MCMCDynSArun(ErgmState *s,
+                  StoreDyadMapInt *discord,
                   int nstatsmonitor,
                   // Model fitting.
                   double *eta, 

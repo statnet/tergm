@@ -64,7 +64,7 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
   z <- tergm_MCMC_slave(state, eta.comb, control, verbose)
 
   # check that this is the correct replacement for as.network(pending_update_network(...))
-  newnetwork <- as.network(z$state)
+  state <- z$state
   
   diffedgelist<-if(control$changes) {
     if(z$diffnwtime[1]>0){
@@ -96,7 +96,7 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
 
   list(statsmatrix.fd=statsmatrix.fd,
        statsmatrix.mon=statsmatrix.mon,
-       newnetwork=newnetwork,
+       newnetwork=state,
        changed=diffedgelist,
        maxchanges=control$MCMC.maxchanges)
 }

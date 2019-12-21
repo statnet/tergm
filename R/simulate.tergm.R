@@ -244,9 +244,6 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
     duration.dependent <-   is.lasttoggle(nw.start,object$formula,monitor=object$monitor)
   }
   
-  if(!duration.dependent)
-    nw.start %n% "lasttoggle" <- NULL
-  
   simulate_formula.network(object=object$formula, basis=nw.start,nsim=nsim,coef=coef, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, output=output, stats=stats, duration.dependent=duration.dependent, verbose=verbose, ...)
 }
 
@@ -260,7 +257,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                              monitor = NULL,
                              time.slices = 1, time.start=NULL, time.burnin=0, time.interval=1, time.offset=1,
                              control=control.simulate.network.tergm(),
-                             output=c("networkDynamic", "stats", "changes", "final"),
+                             output=c("networkDynamic", "stats", "changes", "final", "ergm_state"),
                              stats = FALSE,
                              duration.dependent=NULL,
                              verbose=FALSE,
@@ -321,13 +318,12 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
   
   if(!is.null(monitor)) monitor<-nonsimp_update.formula(monitor,nw~., from.new="nw")
   
-  if(is.null(nw %n% "lasttoggle")) {
-    nwel <- as.edgelist(nw)
-    nwel <- cbind(nwel, round(-.Machine$integer.max/2))
-    nw %n% "lasttoggle" <- nwel
-  }
+  proposal <- ergm_proposal(constraints,control$MCMC.prop.args,nw,
+                            weights=control$MCMC.prop.weights, class="c",reference=reference)
 
-  model <- ergm_model(formula, nw, role=NULL, term.options=control$term.options)
+  model <- ergm_model(formula, nw, role=NULL, term.options=control$term.options, extra.aux=list(proposal=proposal$auxiliaries, system=~.lasttoggle))
+  proposal$aux.slots <- model$slots.extra.aux$proposal
+
   if(!missing(coef) && nparam(model)!=length(coef)) stop("coef has ", length(coef), " elements, while the model requires ",nparam(model)," parameters.")
 
   model.mon <- if(!is.null(monitor)) ergm_model(monitor, nw, role="target", term.options=control$term.options) else NULL
@@ -337,9 +333,6 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
     warning("No parameter values given, using Bernoulli model.")
   }
     
-  proposal <- ergm_proposal(constraints,control$MCMC.prop.args,nw,
-                                weights=control$MCMC.prop.weights)
-
   eta <- ergm.eta(coef, model$etamap)
   
   control$time.burnin <- time.burnin
@@ -404,6 +397,25 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                # TODO: this is a horrible hack, should really make the change inside simulate.stergm
                # assume that simulate.stergm has added +1 to all the time values, so subtract 1 for an offset of 0
                changes[,1]<-changes[,1]-1+time.offset
+               newnw <- as.network(z$newnetwork)
+               attributes(newnw) <- c(attributes(newnw), # Don't clobber existing attributes!
+                                      list(formula = formula,
+                                           stats.fd = stats.fd,
+                                           monitor = monitor,
+                                           stats = stats.mon,
+                                           coef = coef,
+                                           constraints=constraints,
+                                           start = nw%n%"time" + 0,
+                                           end = nw%n%"time" + time.slices,
+                                           changes = changes))
+               newnw
+             },
+             ergm_state = {
+               changes <- z$changed
+               # update the times on the list of changes returned to match the update time requested by time.offset
+               # TODO: this is a horrible hack, should really make the change inside simulate.stergm
+               # assume that simulate.stergm has added +1 to all the time values, so subtract 1 for an offset of 0
+               changes[,1]<-changes[,1]-1+time.offset
                newnw <- z$newnetwork
                attributes(newnw) <- c(attributes(newnw), # Don't clobber existing attributes!
                                       list(formula = formula,
@@ -418,7 +430,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                newnw
              })
   },
-                   simplify = FALSE)
+  simplify = FALSE)
 
   if(nsim==1){
     out<-out[[1]]
@@ -456,6 +468,9 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
              # If we've returned a list of networks, then it's a network list.
              # FIXME: Should we reserve network.list for serial network data?
              class(out) <- "network.list"
+             out
+           },
+           ergm_state = {
              out
            })
   }

@@ -9,6 +9,7 @@
  */
 #include "godfather.h"
 #include "ergm_util.h"
+#include "changestats_lasttoggle.h"
 
 /*****************
  void godfather_wrapper
@@ -35,6 +36,13 @@ SEXP godfather_wrapper(SEXP stateR,
   Network *nwp = s->nwp;
   Model *m = s->m;  
   
+  /* Each ModelTerm in termarray has an aux_storage pointer,
+     regardless of whether it asked for one; and the index of the
+     lasttoggle auxiliary is in model$slots.extra.aux$system . Once we
+     grab that, cast it to the lasttoggle data structure and extract
+     the discord hashtable. */
+  StoreDyadMapInt *discord = ((StoreTimeAndLasttoggle *)m->termarray->aux_storage[asInteger(getListElement(getListElement(m->R, "slots.extra.aux"), "system"))])->discord;
+
   int *total_toggles = INTEGER(total_toggles_arg);
   int *toggletimes = INTEGER(toggletimes_arg); 
   int *toggletails = INTEGER(toggletails_arg);
@@ -79,7 +87,7 @@ SEXP godfather_wrapper(SEXP stateR,
       pos++;
     }
     
-    MCMCDyn1Step_advance(s, changestats,
+    MCMCDyn1Step_advance(s, discord, changestats,
                          0, NULL, NULL, NULL, NULL, NULL,
                          *verbose);
   }

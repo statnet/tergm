@@ -52,7 +52,7 @@ tergm.EGMME <- function(nw, formula, constraints, offset.coef,
           control[control.transfer[[arg]]] <- list(control[[arg]])
 
 
-  model <- ergm_model(formula, nw, expanded=TRUE, role=NULL, term.options=control$term.options)
+  model <- ergm_model(formula, nw, expanded=TRUE, role=NULL, term.options=control$term.options, extra.aux=list(system=~.lasttoggle))
   model.mon <- ergm_model(targets, nw, expanded=TRUE, role="target", term.options=control$term.options)
   model.SAN <- ergm_model(SAN.formula, nw, expanded=TRUE, role="target", term.options=control$term.options)
   if(any(model$etamap$canonical==0) || any(model.mon$etamap$canonical==0) || any(model.SAN$etamap$canonical==0)) stop("Equilibrium GMME for models based on curved ERGMs is not supported at this time.")
