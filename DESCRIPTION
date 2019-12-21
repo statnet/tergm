@@ -62,8 +62,6 @@ Collate:
     'simulate.stergm.R'
     'simulate.tergm.R'
     'stergm.CMLE.R'
-    'stergm.EGMME.GD.R'
-    'stergm.EGMME.R'
     'stergm.EGMME.initialfit.R'
     'stergm.R'
     'tergm-deprecated.R'

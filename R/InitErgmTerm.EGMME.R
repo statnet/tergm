@@ -37,7 +37,7 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
 
   list(name="_union_lt_net_Network",
        coef.names=c(),
-       auxiliaries ~ .lasttoggle,
+       auxiliaries = ~ .lasttoggle,
        duration=TRUE,
        dependence=FALSE)
 }
@@ -80,7 +80,7 @@ InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
 
   list(name="_intersect_lt_net_Network",
        coef.names=c(),
-       auxiliaries ~ .lasttoggle,
+       auxiliaries = ~ .lasttoggle,
        duration=TRUE,
        dependence=FALSE)
 }
