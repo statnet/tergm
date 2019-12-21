@@ -132,14 +132,13 @@ InitErgmTerm.Form1 <- function(nw, arglist, response=NULL,  ...){
   else nw <- ergm.getnetwork(f)
   
   m <- ergm_model(f, nw, response=response,...)
-  inputs <- to_ergm_Cdouble(m)
   
   gs <- summary(m, (nw%n%".PrevNets")[[1]])
   
   c(list(name="on_union_net_Network", pkgname="ergm",
          coef.names = paste0("Form",'(',param_names(m, canonical=TRUE),')'),
          auxiliaries = ~.union.net((nw%n%".PrevNets")[[1]], implementation="Network"),
-         inputs=inputs,
+         submodel = m,
          emptynwstats=gs,
          dependence=!is.dyad.independent(m)),
     passthrough.curved.ergm_model(m, function(x) paste0('Form(',x,')')))
@@ -179,14 +178,13 @@ InitErgmTerm.Diss1 <- function(nw, arglist, response=NULL,  ...){
   else nw <- ergm.getnetwork(f)
   
   m <- ergm_model(f, nw, response=response,...)
-  inputs <- to_ergm_Cdouble(m)
   
   gs <- summary(m)
   
   c(list(name="on_intersect_net_Network", pkgname="ergm",
          coef.names = paste0("Diss",'(',param_names(m, canonical=TRUE),')'),
          auxiliaries = ~.intersect.net((nw%n%".PrevNets")[[1]], implementation="Network"),
-         inputs=inputs,
+         submodel = m,
          emptynwstats=gs,
          dependence=!is.dyad.independent(m)),
     passthrough.curved.ergm_model(m, function(x) paste0('Diss(',x,')')))

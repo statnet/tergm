@@ -12,7 +12,6 @@ InitErgmTerm.FormE <- function(nw, arglist, response=NULL,  ...) {
   else nw <- ergm.getnetwork(f)
   
   m <- ergm_model(f, nw, response=response,...)
-  inputs <- to_ergm_Cdouble(m)
 
   nw0 <- nw
   nw0[,] <- 0 # Delete edges but not lasttoggles.
@@ -21,7 +20,7 @@ InitErgmTerm.FormE <- function(nw, arglist, response=NULL,  ...) {
   c(list(name="on_union_lt_net_Network",
          coef.names = paste0("Form",'(',param_names(m, canonical=TRUE),')'),
          auxiliaries = ~.union.lt.net(),
-         inputs=inputs,
+         submodel = m,
          emptynwstats=gs,
          dependence=!is.dyad.independent(m),
          duration=TRUE),
@@ -57,14 +56,13 @@ InitErgmTerm.DissE <- function(nw, arglist, response=NULL,  ...) {
   else nw <- ergm.getnetwork(f)
   
   m <- ergm_model(f, nw, response=response,...)
-  inputs <- to_ergm_Cdouble(m)
   
   gs <- summary(m)
   
   c(list(name="on_intersect_lt_net_Network",
          coef.names = paste0("Diss",'(',param_names(m, canonical=TRUE),')'),
          auxiliaries = ~.intersect.lt.net(),
-         inputs=inputs,
+         submodel = m,
          emptynwstats=gs,
          dependence=!is.dyad.independent(m),
          duration=TRUE),
