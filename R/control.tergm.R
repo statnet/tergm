@@ -60,10 +60,8 @@
 #'   possible constraints.
 #' @param MCMC.prop.args An alternative,
 #'   direct way of specifying additional arguments to the proposal.
-#' @param MCMC.init.maxedges Maximum number of edges for which to
-#'   allocate space.
-#' @param MCMC.init.maxchanges Maximum number of changes in dynamic
-#'   network simulation for which to allocate space.
+#' @param MCMC.maxedges Maximum number of edges permitted to occur during the simulation.
+#' @param MCMC.maxchanges Maximum number of changes permitted to occur during the simulation.
 #' @param MCMC.packagenames Names of packages in which to look for
 #'   change statistic functions in addition to those
 #'   autodetected. This argument should not be needed outside of very
@@ -319,13 +317,13 @@ control.tergm<-function(init=NULL,
                          force.main = FALSE,                         
 
                          MCMC.prop.weights="default",MCMC.prop.args=NULL,
-                         MCMC.init.maxedges=20000,
-                         MCMC.init.maxchanges=20000,
+                         MCMC.maxedges=20000,
+                         MCMC.maxchanges=20000,
                          MCMC.packagenames=c(),
                          
                          CMLE.MCMC.burnin = 1024*16,
                          CMLE.MCMC.interval = 1024,
-                         CMLE.control=control.ergm(init=init, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights, MCMC.prop.args=MCMC.prop.args, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.control=control.ergm(init=init, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights, MCMC.prop.args=MCMC.prop.args, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
 
                          CMLE.NA.impute=c(),
                          CMLE.term.check.override=FALSE,
@@ -346,8 +344,7 @@ control.tergm<-function(init=NULL,
                            SAN.maxit=SAN.maxit,
                            SAN.prop.weights=MCMC.prop.weights,
                            SAN.prop.args=MCMC.prop.args,
-                           SAN.init.maxedges=MCMC.init.maxedges,
-                           SAN.max.maxedges=Inf,
+                           SAN.maxedges=MCMC.maxedges,
 
                            SAN.nsteps=round(sqrt(EGMME.MCMC.burnin.min*EGMME.MCMC.burnin.max))*SAN.nsteps.times,
 

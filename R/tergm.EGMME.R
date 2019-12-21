@@ -40,7 +40,7 @@ tergm.EGMME <- function(nw, formula, constraints, offset.coef,
   if (any(ergm_model(targets, nw, role=NULL)$etamap$offset)) {
     message("Targets contains offset terms;
                 they will only be used during the SAN run.")
-    targets <- statnet.common:::filter_rhs.formula(targets, function(x) !inherits(x, "call") || !(x[[1]] == "offset"))
+    targets <- statnet.common::filter_rhs.formula(targets, function(x) !inherits(x, "call") || !(x[[1]] == "offset"))
   }
 
   control.transfer <- list(EGMME.MCMC.burnin.min="MCMC.burnin.min",

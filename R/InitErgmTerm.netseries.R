@@ -55,6 +55,7 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
   if(order>1) stop("Higher-order network models are not supported at this time.")
   
   args <- list(...)
+  #' @importFrom methods is
   if(is(args[[1]], "networkDynamic")){
     nw <- args[[1]]
     times <- if(length(args)>=2) args[[2]]

@@ -59,7 +59,6 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
   #  
   
   state <- ergm_state(nw, model=model.comb, proposal=proposal)
-#  Clist <- ergm.Cprepare(nw, model.comb)
   
   z <- tergm_MCMC_slave(state, eta.comb, control, verbose)
 
@@ -104,8 +103,6 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
 #' @rdname tergm_MCMC_sample
 #' @description \code{tergm_MCMC_slave} is an even
 #'   lower-level function that actually calls the C code.
-#' @param Clist the "Clist" for the network and model under consideration, 
-#'   as returned by \code{\link{ergm.Cprepare}}
 #' @useDynLib tergm
 #' @export
 tergm_MCMC_slave <- function(state, eta, control, verbose){

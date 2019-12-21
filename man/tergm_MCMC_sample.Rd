@@ -35,9 +35,6 @@ proposals}
 \item{verbose}{logical; whether this and other functions should be verbose}
 
 \item{eta}{vector of natural parameters.}
-
-\item{Clist}{the "Clist" for the network and model under consideration,
-as returned by \code{\link{ergm.Cprepare}}}
 }
 \value{
 returns the MCMC sample as a list containing: \itemize{

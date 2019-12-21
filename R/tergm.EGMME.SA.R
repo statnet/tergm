@@ -547,7 +547,6 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
 tergm.EGMME.SA.Phase2.C <- function(state, model, model.mon,
                              proposal, control, verbose) {
   model.comb <- c(model, model.mon)
-  #Clist <- ergm.Cprepare(state$nw, model.comb)
   eta.comb <- c(deInf(state$eta), rep(0,model.mon$etamap$etalength))
 
   ergmstate <- ergm_state(nw=state$nw, model=model.comb, proposal=proposal)
