@@ -17,7 +17,7 @@ tergm_MCMC_sample(
   eta = ergm.eta(theta, model$etamap)
 )
 
-tergm_MCMC_slave(Clist, proposal, eta, control, verbose)
+tergm_MCMC_slave(state, eta, control, verbose)
 }
 \arguments{
 \item{nw}{a \code{\link{network}} object}
