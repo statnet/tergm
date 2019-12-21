@@ -28,7 +28,7 @@ SEXP godfather_wrapper(SEXP stateR,
                SEXP toggleheads_arg,
                SEXP start_time_arg,
                SEXP end_time_arg,
-               SEXP fVerbose_arg){
+               SEXP verbose_arg){
   GetRNGstate();  /* R function enabling uniform RNG */
   ErgmState *s = ErgmStateInit(YES_STATE);
   
@@ -41,7 +41,7 @@ SEXP godfather_wrapper(SEXP stateR,
   int *toggleheads = INTEGER(toggleheads_arg);
   int *start_time = INTEGER(start_time_arg);
   int *end_time = INTEGER(end_time_arg);
-  int *fVerbose = INTEGER(fVerbose_arg);
+  int *verbose = INTEGER(verbose_arg);
   
   /*********************
   changestats are modified in groups of m->n_stats, and they
@@ -81,7 +81,7 @@ SEXP godfather_wrapper(SEXP stateR,
     
     MCMCDyn1Step_advance(s, changestats,
                          0, NULL, NULL, NULL, NULL, NULL,
-                         *fVerbose);
+                         *verbose);
   }
 
   SEXP status = PROTECT(ScalarInteger(MCMCDyn_OK));

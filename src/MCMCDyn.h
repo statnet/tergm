@@ -25,21 +25,6 @@ typedef enum MCMCDynStatus_enum {
   MCMCDyn_TOO_MANY_CHANGES = 3
 } MCMCDynStatus;
 
-SEXP MCMCDyn_wrapper(ARGS_STATE, // ergm_state
-                SEXP eta,      // double
-                SEXP nsteps,   // integer
-                SEXP min_MH_interval, // integer
-                SEXP max_MH_interval, // integer
-                SEXP MH_pval,  // double
-                SEXP MH_interval_add, // double
-                SEXP burnin, // integer
-                SEXP interval, // integer
-                SEXP collect, // integer (logical)
-                SEXP maxedges, // integer
-                SEXP maxchanges, // integer
-                SEXP log_changes, // integer (logical)
-                SEXP fVerbose);
-
 MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                 double *eta,
                 // Space for output.
@@ -52,7 +37,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                 unsigned int nsteps, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
                 unsigned int burnin, unsigned int interval, 
                 // Verbosity.
-                int fVerbose);
+                int verbose);
 
 MCMCDynStatus MCMCDyn1Step(ErgmState *s,
                            double *eta,
@@ -63,7 +48,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
                            // MCMC settings.
                            unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
                            // Verbosity.
-                           int fVerbose);
+                           int verbose);
 
 MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
                                    // Space for output.
@@ -71,5 +56,5 @@ MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
                                    unsigned int maxchanges, Edge *nextdiffedge,
                                    Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
                                    // Verbosity.
-                                   int fVerbose);
+                                   int verbose);
 #endif

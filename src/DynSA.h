@@ -12,27 +12,6 @@
 
 #include "MCMCDyn.h"
 #include "ergm_MHproposal.h"
-
-SEXP MCMCDynSArun_wrapper(SEXP stateR,
-                 SEXP nstatsmonitor,
-                 SEXP eta0,
-                 SEXP init_dev,
-                 SEXP runlength,
-                 SEXP WinvGradient,
-                 SEXP jitter,
-                 SEXP dejitter,
-                 SEXP dev_guard,
-                 SEXP par_guard,
-                 // MCMC settings.
-                 SEXP SA_burnin, 
-                 SEXP SA_interval,
-                 SEXP min_MH_interval,
-                 SEXP max_MH_interval,
-                 SEXP MH_pval, 
-                 SEXP MH_interval_add,
-                 SEXP maxedges,
-                 SEXP maxchanges,
-                 SEXP fVerbose);
                  
 MCMCDynStatus MCMCDynSArun(ErgmState *s,
                   int nstatsmonitor,
@@ -49,5 +28,5 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s,
                   // MCMC settings.
                   unsigned int SA_burnin, unsigned int SA_interval, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
                   // Verbosity.
-                  int fVerbose);
+                  int verbose);
 #endif

@@ -28,7 +28,7 @@ SEXP MCMCDynSArun_wrapper(SEXP stateR,
                  SEXP MH_interval_add,
                  SEXP maxedges,
                  SEXP maxchanges,
-                 SEXP fVerbose){    
+                 SEXP verbose){    
   GetRNGstate();  /* R function enabling uniform RNG */
   ErgmState *s = ErgmStateInit(YES_STATE);
 
@@ -58,7 +58,7 @@ SEXP MCMCDynSArun_wrapper(SEXP stateR,
              REAL(opt_history),
              
              asInteger(SA_burnin), asInteger(SA_interval), asInteger(min_MH_interval), asInteger(max_MH_interval), asReal(MH_pval), asReal(MH_interval_add),
-             asInteger(fVerbose))));
+             asInteger(verbose))));
   else status = PROTECT(ScalarInteger(MCMCDyn_MH_FAILED));
   
   SEXP nw_diff = PROTECT(allocVector(REALSXP, asInteger(nstatsmonitor)));
@@ -103,7 +103,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s,
                   // MCMC settings.
                   unsigned int SA_burnin, unsigned int SA_interval, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
                   // Verbosity.
-                  int fVerbose){
+                  int verbose){
   Network *nwp = s->nwp;
   Model *m = s->m;
 
@@ -135,7 +135,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s,
                       maxchanges, NULL,
                       NULL, NULL, NULL, NULL,
                       min_MH_interval, max_MH_interval, MH_pval, MH_interval_add,
-                      fVerbose);
+                      verbose);
 
       if(status==MCMCDyn_TOO_MANY_CHANGES)
         return MCMCDyn_TOO_MANY_CHANGES;
@@ -152,7 +152,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s,
                       maxchanges, NULL,
                       NULL, NULL, NULL, NULL,
                       min_MH_interval, max_MH_interval, MH_pval, MH_interval_add,
-                      fVerbose);
+                      verbose);
 
       if(status==MCMCDyn_TOO_MANY_CHANGES)
         return MCMCDyn_TOO_MANY_CHANGES;
@@ -164,7 +164,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s,
         meandev[k]+=dev[k]*1;
         n+=1;
       }
-      if (fVerbose>2){
+      if (verbose>2){
         for(unsigned int k=0; k<p; k++){
           Rprintf("eta[%d] = %f\n", k, eta[k]);
         }
@@ -188,7 +188,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s,
       hist_pos++;
     }
     
-    if(fVerbose>1){
+    if(verbose>1){
       for(unsigned int k=0; k<p; k++){
         Rprintf("eta[%d] = %f\n", k, eta[k]);
       }

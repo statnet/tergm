@@ -13,16 +13,6 @@
 #include <R.h>
 #include "ergm_model.h"
 #include "MCMCDyn.h"
-
-/* Function prototypes */
-SEXP godfather_wrapper(SEXP stateR,
-               SEXP total_toggles_arg,
-               SEXP toggletimes_arg, 
-               SEXP toggletails_arg,
-               SEXP toggleheads_arg,
-               SEXP start_time_arg,
-               SEXP end_time_arg,
-               SEXP fVerbose_arg);
       
 #endif
 

@@ -33,7 +33,7 @@ SEXP MCMCDyn_wrapper(ARGS_STATE, // ergm_state
                 SEXP maxedges, // integer
                 SEXP maxchanges, // integer
                 SEXP log_changes, // integer (logical)
-                SEXP fVerbose){  // integer
+                SEXP verbose){  // integer
   GetRNGstate();  /* R function enabling uniform RNG */
   ErgmState *s = ErgmStateInit(YES_STATE);
 
@@ -58,7 +58,7 @@ SEXP MCMCDyn_wrapper(ARGS_STATE, // ergm_state
               REAL(eta),
               asInteger(collect)?REAL(sample):NULL, asInteger(maxedges), asInteger(maxchanges), asInteger(log_changes), (Vertex *)INTEGER(difftime), (Vertex *)INTEGER(difftail), (Vertex *)INTEGER(diffhead), INTEGER(diffto),
               asInteger(nsteps), asInteger(min_MH_interval), asInteger(max_MH_interval), asReal(MH_pval), asReal(MH_interval_add), asInteger(burnin), asInteger(interval),
-              asInteger(fVerbose))));
+              asInteger(verbose))));
   else status = PROTECT(ScalarInteger(MCMCDyn_MH_FAILED));
    
   const char *outn[] = {"status", "s", "state", "diffnwtime", "diffnwtails", "diffnwheads", "diffnwdirs", ""};
@@ -105,7 +105,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                 unsigned int nsteps, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
                 unsigned int burnin, unsigned int interval, 
                 // Verbosity.
-                int fVerbose){
+                int verbose){
   Network *nwp = s->nwp;
   Model *m = s->m;
 
@@ -113,7 +113,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
   Edge nextdiffedge=1;
 
 
-  /*if (fVerbose)
+  /*if (verbose)
     Rprintf("Total m->n_stats is %i; total nsteps is %d\n",
     m->n_stats,nsteps);*/
   
@@ -125,7 +125,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                     eta,
                     stats,
                     maxchanges, &nextdiffedge, difftime, difftail, diffhead, diffto,
-                    min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, fVerbose);
+                    min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, verbose);
     // Check that we didn't run out of log space.
     if(status==MCMCDyn_TOO_MANY_CHANGES)
       return MCMCDyn_TOO_MANY_CHANGES;
@@ -137,7 +137,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
   
   //Rprintf("MCMCSampleDyn post burnin numdissolve %d\n", *numdissolve);
   
-  if (fVerbose){
+  if (verbose){
     Rprintf("Returned from STERGM burnin\n");
   }
   
@@ -157,7 +157,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                       eta,
                       stats,
                       maxchanges, &nextdiffedge, difftime, difftail, diffhead, diffto,
-                      min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, fVerbose);
+                      min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, verbose);
       
       // Check that we didn't run out of log space.
       if(status==MCMCDyn_TOO_MANY_CHANGES)
@@ -169,7 +169,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
     }
     
     //Rprintf("MCMCSampleDyn loop numdissolve %d\n", *numdissolve);
-    if (fVerbose){
+    if (verbose){
       if( ((3*i) % nsteps)<3 && nsteps > 500){
         Rprintf("Advanced %d time steps.\n", i);
       }
@@ -214,7 +214,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
                            // MCMC settings.
                            unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
                            // Verbosity.
-                           int fVerbose){
+                           int verbose){
   StoreDyadMapInt *discord = NULL;                             
                                
   Network *nwp = s->nwp;
@@ -306,7 +306,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
       double zi = mi / sqrt(vi * sw2/(sw*sw)); // denom = sqrt(sum(w^2 * v)/sum(w)^2)
       double pi = pnorm(zi, 0, 1, FALSE, FALSE); // Pr(Z > zi)
 
-      if(fVerbose>=5) Rprintf("%u: sw=%2.2f sw2=%2.2f d=%d i=%d si=%2.2f si2=%2.2f mi=%2.2f vi=%2.2f ni=%2.2f zi=%2.2f pi=%2.2f\n", step, sw, sw2, kh_size(discord), i, si, si2, mi, vi, (sw*sw)/sw2, zi, pi);
+      if(verbose>=5) Rprintf("%u: sw=%2.2f sw2=%2.2f d=%d i=%d si=%2.2f si2=%2.2f mi=%2.2f vi=%2.2f ni=%2.2f zi=%2.2f pi=%2.2f\n", step, sw, sw2, kh_size(discord), i, si, si2, mi, vi, (sw*sw)/sw2, zi, pi);
   
       if(pi > MH_pval){
     extrasteps = step*MH_interval_add+round(runif(0,1));
@@ -319,14 +319,14 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
 
   /* Step finished: record changes. */
   
-  if(fVerbose>=4){
+  if(verbose>=4){
     if(step>=max_MH_interval ) Rprintf("Convergence not achieved after %u M-H steps.\n",step);
     else Rprintf("Convergence achieved after %u M-H steps.\n",step);
   }
 
   return MCMCDyn1Step_advance(s, stats,
                               maxchanges, nextdiffedge, difftime, difftail, diffhead, diffto,
-                              fVerbose);
+                              verbose);
 }
 
 
@@ -336,7 +336,7 @@ MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
                                    unsigned int maxchanges, Edge *nextdiffedge,
                                    Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
                                    // Verbosity.
-                                   int fVerbose){
+                                   int verbose){
   StoreDyadMapInt *discord = NULL;
   int t = 0;
   
