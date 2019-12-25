@@ -108,11 +108,12 @@ InitErgmTerm.Form <- function(nw, arglist, response=NULL,  ...) {
 
   f <- a$formula
   ult(f) <- call("Form1",call("~",ult(f))) # e.g., a~b -> a~Form1(~b)
+  environment(f) <- environment(a$formula)
   a$formula <- f
 
-  # Just call N() operator. (TODO: implement an API in ergm to standardise this and obviate the need to use :::.)
-  out <- ergm.multi:::InitErgmTerm.N(nw, a, response=response, ...)
-  out$pkgname <- "ergm.multi"
+  # Just call N() operator.
+  term <- as.call(c(list(as.name("N")),a))
+  out <- call.ErgmTerm(term, env=environment(f), nw=nw, response=response, ...)
   out
   # TODO: Fix coefficient names.
 }
@@ -154,11 +155,12 @@ InitErgmTerm.Diss <- function(nw, arglist, response=NULL,  ...) {
 
   f <- a$formula
   ult(f) <- call("Diss1",call("~",ult(f))) # e.g., a~b -> a~Form1(~b)
+  environment(f) <- environment(a$formula)
   a$formula <- f
 
-  # Just call N() operator. (TODO: implement an API in ergm to standardise this and obviate the need to use :::.)
-  out <- ergm.multi:::InitErgmTerm.N(nw, a, response=response, ...)
-  out$pkgname <- "ergm.multi"
+  # Just call N() operator.
+  term <- as.call(c(list(as.name("N")),a))
+  out <- call.ErgmTerm(term, env=environment(f), nw=nw, response=response, ...)
   out
   # TODO: Fix coefficient names.
 }
