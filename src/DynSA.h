@@ -12,9 +12,10 @@
 
 #include "MCMCDyn.h"
 #include "ergm_MHproposal.h"
-                 
+#include "changestats_lasttoggle.h"
+   
 MCMCDynStatus MCMCDynSArun(ErgmState *s,
-                  StoreDyadMapInt *discord,
+                  StoreTimeAndLasttoggle *dur_inf,
                   int nstatsmonitor,
                   // Model fitting.
                   double *eta, 

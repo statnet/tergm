@@ -41,7 +41,7 @@ SEXP MCMCDynSArun_wrapper(SEXP stateR,
      lasttoggle auxiliary is in model$slots.extra.aux$system . Once we
      grab that, cast it to the lasttoggle data structure and extract
      the discord hashtable. */
-  StoreDyadMapInt *discord = ((StoreTimeAndLasttoggle *)m->termarray->aux_storage[asInteger(getListElement(getListElement(m->R, "slots.extra.aux"), "system"))])->discord;
+  StoreTimeAndLasttoggle *dur_inf = (StoreTimeAndLasttoggle *)m->termarray->aux_storage[asInteger(getListElement(getListElement(m->R, "slots.extra.aux"), "system"))];
 
   double *inputdev = Calloc(m->n_stats, double);
   memcpy(inputdev + m->n_stats - asInteger(nstatsmonitor), REAL(init_dev), asInteger(nstatsmonitor)*sizeof(double));
@@ -54,7 +54,7 @@ SEXP MCMCDynSArun_wrapper(SEXP stateR,
   
   SEXP status;
   if(MHp) status = PROTECT(ScalarInteger(MCMCDynSArun(s,
-             discord,
+             dur_inf,
   
              asInteger(nstatsmonitor),
     
@@ -99,7 +99,7 @@ SEXP MCMCDynSArun_wrapper(SEXP stateR,
  void MCMCSampleDynPhase12
 *********************/
 MCMCDynStatus MCMCDynSArun(ErgmState *s,
-                  StoreDyadMapInt *discord,
+                  StoreTimeAndLasttoggle *dur_inf,
                   int nstatsmonitor,
                   // Model fitting.
                   double *eta, 
@@ -140,7 +140,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s,
     // Burn in
     for(unsigned int j=0;j < SA_burnin;j++){
       MCMCDynStatus status = MCMCDyn1Step(s,
-                      discord,
+                      dur_inf,
                       eta,
                       inputdev,
                       maxchanges, NULL,
@@ -158,7 +158,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s,
     // Sampling run
     for(unsigned int j=0;j < SA_interval;j++){
       MCMCDynStatus status = MCMCDyn1Step(s,
-                      discord,
+                      dur_inf,
                       eta,
                       inputdev,
                       maxchanges, NULL,

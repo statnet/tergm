@@ -16,6 +16,7 @@
 #include "ergm_model.h"
 #include "tergm_model.h"
 #include "ergm_state.h"
+#include "changestats_lasttoggle.h"
 
 // TODO: This might be worth moving into a common "constants.h".
 typedef enum MCMCDynStatus_enum {
@@ -26,7 +27,7 @@ typedef enum MCMCDynStatus_enum {
 } MCMCDynStatus;
 
 MCMCDynStatus MCMCSampleDyn(ErgmState *s,
-                StoreDyadMapInt *discord,
+                StoreTimeAndLasttoggle *dur_inf,
                 double *eta,
                 // Space for output.
                 double *stats,
@@ -41,7 +42,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                 int verbose);
 
 MCMCDynStatus MCMCDyn1Step(ErgmState *s,
-                           StoreDyadMapInt *discord,
+                           StoreTimeAndLasttoggle *dur_inf,
                            double *eta,
                            // Space for output.
                            double *stats,
@@ -53,7 +54,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
                            int verbose);
 
 MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
-                                   StoreDyadMapInt *discord,
+                                   StoreTimeAndLasttoggle *dur_inf,
                                    // Space for output.
                                    double *stats,
                                    unsigned int maxchanges, Edge *nextdiffedge,

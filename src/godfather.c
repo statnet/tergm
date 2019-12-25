@@ -41,7 +41,7 @@ SEXP godfather_wrapper(SEXP stateR,
      lasttoggle auxiliary is in model$slots.extra.aux$system . Once we
      grab that, cast it to the lasttoggle data structure and extract
      the discord hashtable. */
-  StoreDyadMapInt *discord = ((StoreTimeAndLasttoggle *)m->termarray->aux_storage[asInteger(getListElement(getListElement(m->R, "slots.extra.aux"), "system"))])->discord;
+  StoreTimeAndLasttoggle *dur_inf = (StoreTimeAndLasttoggle *)m->termarray->aux_storage[asInteger(getListElement(getListElement(m->R, "slots.extra.aux"), "system"))];
 
   int *total_toggles = INTEGER(total_toggles_arg);
   int *toggletimes = INTEGER(toggletimes_arg); 
@@ -87,7 +87,7 @@ SEXP godfather_wrapper(SEXP stateR,
       pos++;
     }
     
-    MCMCDyn1Step_advance(s, discord, changestats,
+    MCMCDyn1Step_advance(s, dur_inf, changestats,
                          0, NULL, NULL, NULL, NULL, NULL,
                          *verbose);
   }
