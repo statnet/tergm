@@ -101,7 +101,6 @@ F_CHANGESTAT_FN(f__lasttoggle){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   kh_destroy(DyadMapInt, dur_inf->lasttoggle);
   kh_destroy(DyadMapInt, dur_inf->discord);
-  Free(dur_inf);
 }
 
 /*****************

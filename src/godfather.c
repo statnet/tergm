@@ -109,5 +109,5 @@ SEXP godfather_wrapper(SEXP stateR,
   ErgmStateDestroy(s);  
   PutRNGstate();  /* Disable RNG before returning */
   UNPROTECT(3);  
-  return NULL;
+  return outl;
 }
