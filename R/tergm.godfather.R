@@ -138,7 +138,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
   formula <- nonsimp_update.formula(formula, nw~., from.new="nw")
   m <- ergm_model(formula, nw, role=NULL, term.options=control$term.options, extra.aux=list(system=~.lasttoggle))
 
-  state <- ergm_state(nw=nw, model=m)
+  state <- ergm_state(nw, model=m)
   m$obs <- summary(m, nw)
 
   if(verbose) cat("Applying changes...\n")
