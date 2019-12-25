@@ -11,6 +11,7 @@ typedef struct StoreTimeAndLasttoggle_struct {
   int time;
   StoreDyadMapInt *lasttoggle;
   StoreDyadMapInt *discord;
+  Rboolean ticktock;
 } StoreTimeAndLasttoggle;
 
 void ExpireTimestamps(StoreTimeAndLasttoggle *dur_inf, unsigned int edges, unsigned int nonedges, Network *nwp);

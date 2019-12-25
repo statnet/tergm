@@ -11,6 +11,7 @@ I_CHANGESTAT_FN(i__lasttoggle){
   dur_inf->lasttoggle = kh_init(DyadMapInt);
   dur_inf->discord = kh_init(DyadMapInt);
   dur_inf->discord->directed = dur_inf->lasttoggle->directed=DIRECTED;
+  dur_inf->ticktock = FALSE;
   SEXP ltR = getListElement(mtp->ext_state, "lasttoggle");
   Edge nlt = length(ltR)/3, *lt = (Edge *) INTEGER(ltR);
   for(Edge i = 0; i < nlt; i++){
@@ -25,14 +26,18 @@ X_CHANGESTAT_FN(x__lasttoggle){
   case TICK: // Start time step
     {
       GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+      if(dur_inf->ticktock) error("_lasttoggle was sent two TICK signals without a TOCK signal.");
       dur_inf->time++; // Advance the clock.
       if(dur_inf->time%TIMESTAMP_HORIZON_FREQ == 0) ExpireTimestamps(dur_inf, TIMESTAMP_HORIZON_EDGE, TIMESTAMP_HORIZON_NONEDGE, nwp);
+      dur_inf->ticktock = TRUE; // We are in the middle of a time step.
     }
     break;
   case TOCK: // Finish time step
     {
       GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+      if(!dur_inf->ticktock) error("_lasttoggle was sent a TOCK signal without a previous TICK signal.");
       kh_clear(DyadMapInt, dur_inf->discord);
+      dur_inf->ticktock = FALSE; // The time step is completed.
     }
     break;
   default:
@@ -42,6 +47,8 @@ X_CHANGESTAT_FN(x__lasttoggle){
 
 U_CHANGESTAT_FN(u__lasttoggle){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+  if(!dur_inf->ticktock) return; // If the network is being modified outside of time, do not update lasttoggle or discord.
+
   TailHead dyad = THKey(dur_inf->discord,tail, head);
   khint_t i = kh_get(DyadMapInt,dur_inf->discord,dyad);
   if(i == kh_none){
@@ -63,6 +70,8 @@ U_CHANGESTAT_FN(u__lasttoggle){
 
 W_CHANGESTAT_FN(w__lasttoggle){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+  if(dur_inf->ticktock) error("_lasttoggle auxiliary cannot write out its extended state in the middle of a time step.");
+
   SEXP es = PROTECT(mkNamed(VECSXP, (const char *[]){"time","lasttoggle",""}));
   SET_VECTOR_ELT(es, 0, ScalarInteger(dur_inf->time));
 
@@ -103,6 +112,7 @@ F_CHANGESTAT_FN(f__lasttoggle){
  specified number of steps ago.
  *****************/
 void ExpireTimestamps(StoreTimeAndLasttoggle *dur_inf, unsigned int edges, unsigned int nonedges, Network *nwp){
+  if(dur_inf->ticktock) error("_lasttoggle auxiliary cannot expire time stamps in the middle of a time step.");
   if(edges==nonedges){ // Same horizon for edges and non-edges means that we don't need to check if an edge exists.
     int lt;
     kh_foreach_value(dur_inf->lasttoggle, lt, {

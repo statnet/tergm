@@ -29,15 +29,17 @@ I_CHANGESTAT_FN(i__intersect_lt_net_Network){
       }
     });
 }
-
 U_CHANGESTAT_FN(u__intersect_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
   GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
-  // Only toggle if the edge is in y0. Otherwise, changing y1 won't
-  // matter. We infer that the edge was in y0 if either it's in y1 and
-  // *not* in the discordant map or not in y1 and is in the discordant map.
-  if(edgeflag != (kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord,tail,head))!=kh_none))
-    ToggleEdge(tail, head, auxnet->onwp);
+  // If the edge is not in y0, changing y1 won't matter. We infer that the
+  // edge was in y0 if either it's in y1 *and* last toggle time is
+  // not current time *or* it's not in y1 *and* last toggle time is
+  // current time.  Note that if the key is not found in lasttoggle,
+  // then it will return t+1 and therefore != t.
+  const int t = dur_inf->time;
+  if(edgeflag != (kh_getval(DyadMapInt, dur_inf->lasttoggle, THKey(dur_inf->lasttoggle,tail,head), t+1)==t))
+    ToggleKnownEdge(tail, head, auxnet->onwp, edgeflag);
 }
 
 X_CHANGESTAT_FN(x__intersect_lt_net_Network){
@@ -83,10 +85,13 @@ U_CHANGESTAT_FN(u__union_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
   GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
   // If the edge is in y0, changing y1 won't matter. We infer that the
-  // edge was not y0 if either it's in y1 and *is* in the discordant
-  // map or it's not in y1 and *is not* in the discordant map.
-  if(edgeflag == (kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord,tail,head))!=kh_none))
-    ToggleEdge(tail, head, auxnet->onwp);
+  // edge was not in y0 if either it's in y1 *and* last toggle time is
+  // current time *or* it's not in y1 *and* last toggle time is not
+  // current time.  Note that if the key is not found in lasttoggle,
+  // then it will return t+1 and therefore != t.
+  const int t = dur_inf->time;
+  if(edgeflag == (kh_getval(DyadMapInt, dur_inf->lasttoggle, THKey(dur_inf->lasttoggle,tail,head), t+1)==t))
+    ToggleKnownEdge(tail, head, auxnet->onwp, edgeflag);
 }
 
 X_CHANGESTAT_FN(x__union_lt_net_Network){
