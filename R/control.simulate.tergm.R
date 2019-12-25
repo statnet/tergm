@@ -48,14 +48,14 @@
 #'   networks.
 #' @param MCMC.prop.args An alternative,
 #'   direct way of specifying additional arguments to the proposal.
-#' @param MCMC.init.maxchanges Maximum number of toggles changes for
+#' @param MCMC.maxchanges Maximum number of toggles changes for
 #'   which to allocate space.
 #' @param MCMC.packagenames Names of packages in which to look for
 #'   change statistic functions in addition to those
 #'   autodetected. This argument should not be needed outside of very
 #'   strange setups.
 #' @param term.options A list of additional arguments to be passed to term initializers. It can also be set globally via `option(ergm.term=list(...))`.
-#' @param MCMC.init.maxedges Maximum number of edges expected in
+#' @param MCMC.maxedges Maximum number of edges expected in
 #'   network.
 #' @param MCMC.burnin,MCMC.burnin.mul No longer used. See
 #'   \code{MCMC.burnin.min}, \code{MCMC.burnin.max},
@@ -72,12 +72,12 @@ control.simulate.tergm<-function(MCMC.burnin.min=NULL,
                                   MCMC.burnin.pval=NULL,
                                   MCMC.burnin.add=NULL,
                                   MCMC.prop.weights=NULL,MCMC.prop.args=NULL,
-                                  MCMC.init.maxedges=NULL,
+                                  MCMC.maxedges=NULL,
                                   MCMC.packagenames=NULL,
 
                                   term.options=NULL,
                                   
-                                  MCMC.init.maxchanges=NULL){
+                                  MCMC.maxchanges=NULL){
     control<-list()
     for(arg in names(formals(sys.function())))
       control[arg]<-list(get(arg))
@@ -94,12 +94,12 @@ control.simulate.network.tergm<-function(MCMC.burnin.min=1000,
                                    MCMC.burnin.add=1,
                                    MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                                    MCMC.prop.weights="default",MCMC.prop.args=NULL,
-                                   MCMC.init.maxedges=20000,
+                                   MCMC.maxedges=20000,
                                    MCMC.packagenames=c(),
 
                                    term.options=NULL,
                                    
-                                   MCMC.init.maxchanges=1000000){
+                                   MCMC.maxchanges=1000000){
     control<-list()
     for(arg in names(formals(sys.function())))
       control[arg]<-list(get(arg))
