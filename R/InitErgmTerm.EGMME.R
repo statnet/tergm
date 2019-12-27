@@ -13,18 +13,31 @@ InitErgmTerm.FormE <- function(nw, arglist, response=NULL,  ...) {
   
   m <- ergm_model(f, nw, response=response,...)
 
+  wm <- wrap.curved.ergm_model(m, nw0, response=response, function(x) paste0('Form(',x,')'))
+  ext.encode <- wm$ext.encode
+  wm$ext.encode <- function(el, nw0){
+    c(ext.encode(el, nw0), list(list(time=as.integer(nw0 %n% "time"), lasttoggle=as.integer(nw0 %n% "lasttoggle"))))
+  }
+  
   nw0 <- nw
   nw0[,] <- 0 # Delete edges but not lasttoggles.
-  gs <- summary(m, nw0)
-  
+  ## TODO: Ideally, this term could grab the extended state from the
+  ## auxiliary, avoiding duplication. Fortunately, these functions
+  ## won't be called very often.
+  wm$emptynwstats <- function(ext.state){
+    mine <- ext.state[[length(ext.state)]]
+    t <- mine$time
+    lt <- matrix(mine$lasttoggle, ncol=3)
+    changed <-  lt[,3]==t # If an edge just got toggled, then it must be in the formation network.   
+    s <- ergm_state(nw0, el=lt[changed,1:2], model=m, ext.state=ext.state[-length(ext.state)])
+    summary(s)
+  }
+
   c(list(name="on_union_lt_net_Network",
-         coef.names = paste0("Form",'(',param_names(m, canonical=TRUE),')'),
          auxiliaries = ~.union.lt.net(),
          submodel = m,
-         emptynwstats=gs,
-         dependence=!is.dyad.independent(m),
          duration=TRUE),
-    passthrough.curved.ergm_model(m, function(x) paste0('Form(',x,')')))
+    wm)
 }
 
 InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
@@ -57,16 +70,11 @@ InitErgmTerm.DissE <- function(nw, arglist, response=NULL,  ...) {
   
   m <- ergm_model(f, nw, response=response,...)
   
-  gs <- summary(m)
-  
   c(list(name="on_intersect_lt_net_Network",
-         coef.names = paste0("Diss",'(',param_names(m, canonical=TRUE),')'),
          auxiliaries = ~.intersect.lt.net(),
          submodel = m,
-         emptynwstats=gs,
-         dependence=!is.dyad.independent(m),
          duration=TRUE),
-    passthrough.curved.ergm_model(m, function(x) paste0('Diss(',x,')')))
+    wrap.ergm_model(m, nw0, response=response, function(x) paste0('Diss(',x,')')))
 }
 
 InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
