@@ -13,14 +13,19 @@ InitErgmTerm.FormE <- function(nw, arglist, response=NULL,  ...) {
   
   m <- ergm_model(f, nw, response=response,...)
 
-  wm <- wrap.curved.ergm_model(m, nw0, response=response, function(x) paste0('Form(',x,')'))
-  ext.encode <- wm$ext.encode
-  wm$ext.encode <- function(el, nw0){
-    c(ext.encode(el, nw0), list(list(time=as.integer(nw0 %n% "time"), lasttoggle=as.integer(nw0 %n% "lasttoggle"))))
-  }
-  
   nw0 <- nw
   nw0[,] <- 0 # Delete edges but not lasttoggles.
+  wm <- wrap.ergm_model(m, nw0, response=response, function(x) paste0('Form(',x,')'))
+  ext.encode <- wm$ext.encode
+  wm$ext.encode <-
+    if(!is.null(ext.encode)){
+      function(el, nw0)
+        c(ext.encode(el, nw0), list(list(time=as.integer(nw0 %n% "time"), lasttoggle=as.integer(nw0 %n% "lasttoggle"))))
+    }else{
+      function(el, nw0)
+        list(list(time=as.integer(nw0 %n% "time"), lasttoggle=as.integer(nw0 %n% "lasttoggle")))
+    }
+
   ## TODO: Ideally, this term could grab the extended state from the
   ## auxiliary, avoiding duplication. Fortunately, these functions
   ## won't be called very often.
@@ -69,7 +74,9 @@ InitErgmTerm.DissE <- function(nw, arglist, response=NULL,  ...) {
   else nw <- ergm.getnetwork(f)
   
   m <- ergm_model(f, nw, response=response,...)
-  
+
+  nw0 <- nw
+  nw0[] <- FALSE
   c(list(name="on_intersect_lt_net_Network",
          auxiliaries = ~.intersect.lt.net(),
          submodel = m,
