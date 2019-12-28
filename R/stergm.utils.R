@@ -203,7 +203,7 @@ edgelist_with_lasttoggle <- function(nw) {
   
   rv <- cbind(rv, round(-.Machine$integer.max/2)) # default time
   
-  lt <- nw %n% "lasttoggle"
+  lt <- if(is(nw, "ergm_state")) nw$nw0 %n% "lasttoggle" else nw %n% "lasttoggle"
   
   # if a non-default time exists, use it instead
   for(i in seq_len(NROW(rv))) {
