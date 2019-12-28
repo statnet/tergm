@@ -112,7 +112,7 @@ tergm.EGMME <- function(nw, formula, constraints, offset.coef,
   if(!is.null(offset.coef)) control$init[model$etamap$offsettheta]<-offset.coef
   names(control$init) <- model$coef.names
 
-  initialfit <- tergm.EGMME.initialfit(control$init, nw, model, model.mon, control, verbose)
+  initialfit <- tergm.EGMME.initialfit(control$init, nw, model, formula, model.mon, targets, control, verbose)
   
   if(verbose) cat("Fitting TERGM Equilibrium GMME.\n")
 
