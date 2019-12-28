@@ -49,7 +49,6 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
   # this is where we combine models and pad out eta 
   # with 0s as necessary to accomodate the monitoring model
   model.comb <- c(model, model.mon)
-  summary.comb <- summary(model.comb, basis=nw)
   eta.comb <- c(eta, rep(0, NVL(model.mon$etamap$etalength, 0)))
 
   # always collect if monitoring model is passed
@@ -59,7 +58,7 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
   #   Check for truncation of the returned edge list
   #  
   
-  state <- ergm_state(nw, model=model.comb, proposal=proposal, stats=summary.comb)
+  state <- ergm_state(nw, model=model.comb, proposal=proposal, stats=rep(0,nparam(model.comb, canonical=TRUE)))
   
   z <- tergm_MCMC_slave(state, eta.comb, control, verbose)
 
