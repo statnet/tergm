@@ -31,4 +31,23 @@ static inline int ElapsedTime(Vertex tail, Vertex head, StoreTimeAndLasttoggle *
   return dur_inf->time - kh_value(dur_inf->lasttoggle, i); // Possible int overflow here.
 }
 
+static inline int ElapsedTimeToggle(Vertex tail, Vertex head, StoreTimeAndLasttoggle *dur_inf, Vertex toggletail, Vertex togglehead, int edgeflag){
+  if(tail != toggletail || head != togglehead) {
+    // if this *isn't* the dyad we're toggling then we can safely use ElapsedTime
+    return ElapsedTime(tail, head, dur_inf);
+  }
+  
+  TailHead dyad = THKey(dur_inf->discord,tail, head);
+  khint_t i = kh_get(DyadMapInt,dur_inf->discord,dyad);
+  if(i == kh_none){
+    // not in discord -> even number of toggles this timestep (including the current toggle)
+    if(edgeflag) return 0;
+    else return ElapsedTime(tail, head, dur_inf);
+  }else{
+    // in discord -> odd number of toggles this timestep (including the current toggle)
+    if(edgeflag) return kh_value(dur_inf->discord, i);
+    else return 0;
+  }
+}
+
 #endif // _CHANGESTATS_LASTTOGGLE_H_
