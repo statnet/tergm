@@ -45,7 +45,11 @@ static inline int ElapsedTimeToggle(Vertex tail, Vertex head, StoreTimeAndLastto
     else return ElapsedTime(tail, head, dur_inf);
   }else{
     // in discord -> odd number of toggles this timestep (including the current toggle)
-    if(edgeflag) return kh_value(dur_inf->discord, i);
+    if(edgeflag) {
+      int ltt = kh_value(dur_inf->discord, i);
+      if(ltt == dur_inf->time) return INT_MAX;
+      else return dur_inf->time - ltt;
+    }
     else return 0;
   }
 }
