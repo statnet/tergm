@@ -13,11 +13,14 @@ I_CHANGESTAT_FN(i__lasttoggle){
   dur_inf->discord->directed = dur_inf->lasttoggle->directed=DIRECTED;
   dur_inf->ticktock = FALSE;
   SEXP ltR = getListElement(mtp->ext_state, "lasttoggle");
-  Edge nlt = length(ltR)/3, *lt = (Edge *) INTEGER(ltR);
+  Edge nlt = length(ltR)/3;
+  int *lt = INTEGER(ltR);
   for(Edge i = 0; i < nlt; i++){
     Vertex tail=lt[i], head=lt[i+nlt];
+    int ltt = lt[i+nlt+nlt];
     /* Note: we can't use helper macros here, since those treat 0 as deletion. */
-    kh_set(DyadMapInt,dur_inf->lasttoggle,THKey(dur_inf->lasttoggle,tail,head), lt[i+nlt+nlt]);
+    kh_set(DyadMapInt,dur_inf->lasttoggle,THKey(dur_inf->lasttoggle,tail,head), ltt);
+    if(dur_inf->time == ltt) kh_set(DyadMapInt,dur_inf->discord,THKey(dur_inf->lasttoggle,tail,head), ltt);
   }
 }
 
@@ -27,6 +30,7 @@ X_CHANGESTAT_FN(x__lasttoggle){
     {
       GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
       if(dur_inf->ticktock) error("_lasttoggle was sent two TICK signals without a TOCK signal.");
+      kh_clear(DyadMapInt, dur_inf->discord); // Clear the discord data structure.
       dur_inf->time++; // Advance the clock.
       if(dur_inf->time%TIMESTAMP_HORIZON_FREQ == 0) ExpireTimestamps(dur_inf, TIMESTAMP_HORIZON_EDGE, TIMESTAMP_HORIZON_NONEDGE, nwp);
       dur_inf->ticktock = TRUE; // We are in the middle of a time step.
@@ -36,7 +40,6 @@ X_CHANGESTAT_FN(x__lasttoggle){
     {
       GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
       if(!dur_inf->ticktock) error("_lasttoggle was sent a TOCK signal without a previous TICK signal.");
-      kh_clear(DyadMapInt, dur_inf->discord);
       dur_inf->ticktock = FALSE; // The time step is completed.
     }
     break;
