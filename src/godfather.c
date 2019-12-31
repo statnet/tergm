@@ -67,7 +67,7 @@ SEXP godfather_wrapper(SEXP stateR,
 
   unsigned int pos = 0;
   // The reason it's = start_time but < end_time is that by the time t_stat arrives at end_time, the toggles for end_time will have already been applied.
-  for(unsigned int t_stat = *start_time; t_stat < *end_time; t_stat++){
+  for(int t_stat = *start_time; t_stat < *end_time; t_stat++){
     changestats += m->n_stats;
     memcpy(changestats, changestats-m->n_stats, m->n_stats*sizeof(double));
     
