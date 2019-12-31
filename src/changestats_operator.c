@@ -4,6 +4,7 @@ I_CHANGESTAT_FN(i_on_union_lt_net_Network){
   GET_STORAGE(Model, m);
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
   STORAGE = m = ModelInitialize(getListElement(mtp->R, "submodel"),  NULL, auxnet->onwp, FALSE);
+  DELETE_IF_UNUSED_IN_SUBMODEL(u_func, m);
 }
 
 C_CHANGESTAT_FN(c_on_union_lt_net_Network){

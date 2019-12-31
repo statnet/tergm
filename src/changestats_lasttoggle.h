@@ -31,7 +31,7 @@ static inline int ElapsedTime(Vertex tail, Vertex head, StoreTimeAndLasttoggle *
   return dur_inf->time - kh_value(dur_inf->lasttoggle, i); // Possible int overflow here.
 }
 
-#define JUST_CHANGED(dur_inf, tail, head) (kh_getval(DyadMapInt, (dur_inf)->lasttoggle, THKey((dur_inf)->lasttoggle,(tail),(head)), (dur_inf)->time+1)==(dur_inf)->time)
+#define JUST_CHANGED(dur_inf, tail, head) (ElapsedTime(tail, head, dur_inf)==0)
 
 static inline int ElapsedTimeToggle(Vertex tail, Vertex head, StoreTimeAndLasttoggle *dur_inf, Vertex toggletail, Vertex togglehead, int edgeflag){
   if(tail != toggletail || head != togglehead) {

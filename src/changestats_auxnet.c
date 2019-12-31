@@ -32,13 +32,21 @@ I_CHANGESTAT_FN(i__intersect_lt_net_Network){
 U_CHANGESTAT_FN(u__intersect_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
   GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
-  // If the edge is not in y0, changing y1 won't matter. We infer that the
-  // edge was in y0 if either it's in y1 *and* last toggle time is
-  // not current time *or* it's not in y1 *and* last toggle time is
-  // current time.  Note that if the key is not found in lasttoggle,
-  // then it will return t+1 and therefore != t.
-  if(edgeflag != JUST_CHANGED(dur_inf,tail,head))
-    ToggleKnownEdge(tail, head, auxnet->onwp, edgeflag);
+  if(dur_inf->ticktock){
+    // If the edge is not in y0, changing y1 won't matter. We infer that the
+    // edge was in y0 if either it's in y1 *and* last toggle time is
+    // not current time *or* it's not in y1 *and* last toggle time is
+    // current time.  Note that if the key is not found in lasttoggle,
+    // then it will return t+1 and therefore != t.
+    if(edgeflag!=JUST_CHANGED(dur_inf,tail,head))
+      ToggleKnownEdge(tail, head, auxnet->onwp, edgeflag);
+  }else{
+    // If we are in the "fiat" mode, then if the dyad just changed,
+    // then it can only flip between (0,1) and (1,0) and so stays at
+    // 0, but if not, then it flips between (0,0) and (1,1).
+    if(!JUST_CHANGED(dur_inf,tail,head))
+      ToggleKnownEdge(tail, head, auxnet->onwp, edgeflag);
+  }
 }
 
 X_CHANGESTAT_FN(x__intersect_lt_net_Network){
@@ -83,13 +91,21 @@ I_CHANGESTAT_FN(i__union_lt_net_Network){
 U_CHANGESTAT_FN(u__union_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
   GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
-  // If the edge is in y0, changing y1 won't matter. We infer that the
-  // edge was not in y0 if either it's in y1 *and* last toggle time is
-  // current time *or* it's not in y1 *and* last toggle time is not
-  // current time.  Note that if the key is not found in lasttoggle,
-  // then it will return t+1 and therefore != t.
-  if(edgeflag == JUST_CHANGED(dur_inf,tail,head))
-    ToggleKnownEdge(tail, head, auxnet->onwp, edgeflag);
+  if(dur_inf->ticktock){
+    // If the edge is in y0, changing y1 won't matter. We infer that the
+    // edge was not in y0 if either it's in y1 *and* last toggle time is
+    // current time *or* it's not in y1 *and* last toggle time is not
+    // current time.  Note that if the key is not found in lasttoggle,
+    // then it will return t+1 and therefore != t.
+    if(edgeflag == JUST_CHANGED(dur_inf,tail,head))
+      ToggleKnownEdge(tail, head, auxnet->onwp, edgeflag);
+  }else{
+    // If we are in the "fiat" mode, then if the dyad just changed,
+    // then it can only flip between (0,1) and (1,0) and so stays at
+    // 1, but if not, then it flips between (0,0) and (1,1).
+    if(JUST_CHANGED(dur_inf,tail,head))
+      ToggleKnownEdge(tail, head, auxnet->onwp, edgeflag);
+  }
 }
 
 X_CHANGESTAT_FN(x__union_lt_net_Network){
@@ -163,6 +179,6 @@ X_CHANGESTAT_FN(x__previous_lt_net_Network){
 }
 
 F_CHANGESTAT_FN(f__previous_lt_net_Network){
-  NetworkDestroy((Network *)AUX_STORAGE);
-  AUX_STORAGE = NULL;
+  GET_AUX_STORAGE(StoreAuxnet, auxnet);
+  NetworkDestroy(auxnet->onwp);
 }
