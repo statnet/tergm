@@ -21,7 +21,7 @@ tergm.CMLE <- function(formula, times, ...,
   }
 
   
-  nonsimp_update.formula(formula, NetSeries~., from.new="NetSeries")
+  formula <- nonsimp_update.formula(formula, NetSeries~., from.new="NetSeries")
   
   fit <- ergm(formula, ..., control=control$CMLE.control)
 

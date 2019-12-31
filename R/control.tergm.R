@@ -344,7 +344,6 @@ control.tergm<-function(init=NULL,
                            SAN.maxit=SAN.maxit,
                            SAN.prop.weights=MCMC.prop.weights,
                            SAN.prop.args=MCMC.prop.args,
-                           SAN.maxedges=MCMC.maxedges,
 
                            SAN.nsteps=round(sqrt(EGMME.MCMC.burnin.min*EGMME.MCMC.burnin.max))*SAN.nsteps.times,
 
