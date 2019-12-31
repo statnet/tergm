@@ -13,36 +13,11 @@ InitErgmTerm.FormE <- function(nw, arglist, response=NULL,  ...) {
   
   m <- ergm_model(f, nw, response=response,...)
 
-  nw0 <- nw
-  nw0[,] <- 0 # Delete edges but not lasttoggles.
-  wm <- wrap.ergm_model(m, nw0, response=response, function(x) paste0('Form(',x,')'))
-  ext.encode <- wm$ext.encode
-  wm$ext.encode <-
-    if(!is.null(ext.encode)){
-      function(el, nw0)
-        c(ext.encode(el, nw0), list(list(time=as.integer(nw0 %n% "time"), lasttoggle=as.integer(nw0 %n% "lasttoggle"))))
-    }else{
-      function(el, nw0)
-        list(list(time=as.integer(nw0 %n% "time"), lasttoggle=as.integer(nw0 %n% "lasttoggle")))
-    }
-
-  ## TODO: Ideally, this term could grab the extended state from the
-  ## auxiliary, avoiding duplication. Fortunately, these functions
-  ## won't be called very often.
-  wm$emptynwstats <- function(ext.state){
-    mine <- ext.state[[length(ext.state)]]
-    t <- mine$time
-    lt <- matrix(mine$lasttoggle, ncol=3)
-    changed <-  lt[,3]==t # If an edge just got toggled, then it must be in the formation network.   
-    s <- ergm_state(nw0, el=lt[changed,1:2], model=m, ext.state=ext.state[-length(ext.state)])
-    summary(s)
-  }
-
   c(list(name="on_union_lt_net_Network",
-         auxiliaries = ~.union.lt.net(),
+         auxiliaries = ~.union.lt.net + .lasttoggle + .previous.lt.net,
          submodel = m,
          duration=TRUE),
-    wm)
+    wrap.ergm_model(m, nw, response=response, function(x) paste0('Form(',x,')')))
 }
 
 InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
@@ -75,13 +50,11 @@ InitErgmTerm.DissE <- function(nw, arglist, response=NULL,  ...) {
   
   m <- ergm_model(f, nw, response=response,...)
 
-  nw0 <- nw
-  nw0[] <- FALSE
   c(list(name="on_intersect_lt_net_Network",
-         auxiliaries = ~.intersect.lt.net(),
+         auxiliaries = ~.intersect.lt.net() + .lasttoggle,
          submodel = m,
          duration=TRUE),
-    wrap.ergm_model(m, nw0, response=response, function(x) paste0('Diss(',x,')')))
+    wrap.ergm_model(m, nw, response=response, function(x) paste0('Diss(',x,')')))
 }
 
 InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
@@ -92,6 +65,21 @@ InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
                       required = c())
 
   list(name="_intersect_lt_net_Network",
+       coef.names=c(),
+       auxiliaries = ~ .lasttoggle,
+       duration=TRUE,
+       dependence=FALSE)
+}
+
+
+InitErgmTerm..previous.lt.net<-function(nw, arglist, ...) {
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c(),
+                      vartypes = c(),
+                      defaultvalues = list(),
+                      required = c())
+
+  list(name="_previous_lt_net_Network",
        coef.names=c(),
        auxiliaries = ~ .lasttoggle,
        duration=TRUE,
