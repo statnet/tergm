@@ -32,10 +32,10 @@ control.tergm(
   SAN.maxit = 4,
   SAN.nsteps.times = 8,
   SAN.control = control.san(term.options = term.options, SAN.maxit = SAN.maxit,
-    SAN.prop.weights = MCMC.prop.weights, SAN.prop.args = MCMC.prop.args, SAN.maxedges =
-    MCMC.maxedges, SAN.nsteps = round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max))
-    * SAN.nsteps.times, SAN.packagenames = MCMC.packagenames, parallel = parallel,
-    parallel.type = parallel.type, parallel.version.check = parallel.version.check),
+    SAN.prop.weights = MCMC.prop.weights, SAN.prop.args = MCMC.prop.args, SAN.nsteps =
+    round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max)) * SAN.nsteps.times,
+    SAN.packagenames = MCMC.packagenames, parallel = parallel, parallel.type =
+    parallel.type, parallel.version.check = parallel.version.check),
   SA.restarts = 10,
   SA.burnin = 1000,
   SA.plot.progress = FALSE,

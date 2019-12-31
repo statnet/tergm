@@ -15,39 +15,39 @@
 #include "tergm_model.h"
 
 X_CHANGESTAT_FN(x_edges_ageinterval_mon);
-D_CHANGESTAT_FN(d_edges_ageinterval_mon);
+C_CHANGESTAT_FN(c_edges_ageinterval_mon);
 S_CHANGESTAT_FN(s_edges_ageinterval_mon);
 
 X_CHANGESTAT_FN(x_edge_ages_mon);
-D_CHANGESTAT_FN(d_edge_ages_mon);
+C_CHANGESTAT_FN(c_edge_ages_mon);
 S_CHANGESTAT_FN(s_edge_ages_mon);
 
 X_CHANGESTAT_FN(x_edgecov_ages_mon);
-D_CHANGESTAT_FN(d_edgecov_ages_mon);
+C_CHANGESTAT_FN(c_edgecov_ages_mon);
 S_CHANGESTAT_FN(s_edgecov_ages_mon);
 
 X_CHANGESTAT_FN(x_mean_age_mon);
-D_CHANGESTAT_FN(d_mean_age_mon);
+C_CHANGESTAT_FN(c_mean_age_mon);
 S_CHANGESTAT_FN(s_mean_age_mon);
 
 X_CHANGESTAT_FN(x_edgecov_mean_age_mon);
-D_CHANGESTAT_FN(d_edgecov_mean_age_mon);
+C_CHANGESTAT_FN(c_edgecov_mean_age_mon);
 S_CHANGESTAT_FN(s_edgecov_mean_age_mon);
 
 X_CHANGESTAT_FN(x_degree_mean_age_mon);
-D_CHANGESTAT_FN(d_degree_mean_age_mon);
+C_CHANGESTAT_FN(c_degree_mean_age_mon);
 S_CHANGESTAT_FN(s_degree_mean_age_mon);
 
 X_CHANGESTAT_FN(x_degree_by_attr_mean_age_mon);
-D_CHANGESTAT_FN(d_degree_by_attr_mean_age_mon);
+C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon);
 S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon);
 
 X_CHANGESTAT_FN(x_degrange_mean_age_mon);
-D_CHANGESTAT_FN(d_degrange_mean_age_mon);
+C_CHANGESTAT_FN(c_degrange_mean_age_mon);
 S_CHANGESTAT_FN(s_degrange_mean_age_mon);
 
 X_CHANGESTAT_FN(x_degrange_by_attr_mean_age_mon);
-D_CHANGESTAT_FN(d_degrange_by_attr_mean_age_mon);
+C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon);
 S_CHANGESTAT_FN(s_degrange_by_attr_mean_age_mon);
 
 #endif
