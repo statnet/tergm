@@ -43,13 +43,13 @@ SEXP godfather_wrapper(SEXP stateR,
      the discord hashtable. */
   StoreTimeAndLasttoggle *dur_inf = (StoreTimeAndLasttoggle *)m->termarray->aux_storage[asInteger(getListElement(getListElement(m->R, "slots.extra.aux"), "system"))];
 
-  int *total_toggles = INTEGER(total_toggles_arg);
+  int total_toggles = asInteger(total_toggles_arg);
   int *toggletimes = INTEGER(toggletimes_arg); 
   int *toggletails = INTEGER(toggletails_arg);
   int *toggleheads = INTEGER(toggleheads_arg);
-  int *start_time = INTEGER(start_time_arg);
-  int *end_time = INTEGER(end_time_arg);
-  int *verbose = INTEGER(verbose_arg);
+  int start_time = asInteger(start_time_arg);
+  int end_time = asInteger(end_time_arg);
+  int verbose = asInteger(verbose_arg);
   
   /*********************
   changestats are modified in groups of m->n_stats, and they
@@ -59,7 +59,7 @@ SEXP godfather_wrapper(SEXP stateR,
   all be zero
   *********************/
   
-  SEXP changestatsRV = PROTECT(allocVector(REALSXP, (*end_time - *start_time + 1)*m->n_stats));
+  SEXP changestatsRV = PROTECT(allocVector(REALSXP, (end_time - start_time + 1)*m->n_stats));
   double *changestats = REAL(changestatsRV);
   memset(changestats, 0, m->n_stats*sizeof(double));
   
@@ -67,7 +67,7 @@ SEXP godfather_wrapper(SEXP stateR,
 
   unsigned int pos = 0;
   // The reason it's = start_time but < end_time is that by the time t_stat arrives at end_time, the toggles for end_time will have already been applied.
-  for(int t_stat = *start_time; t_stat < *end_time; t_stat++){
+  for(int t_stat = start_time; t_stat < end_time; t_stat++){
     changestats += m->n_stats;
     memcpy(changestats, changestats-m->n_stats, m->n_stats*sizeof(double));
     
@@ -77,19 +77,20 @@ SEXP godfather_wrapper(SEXP stateR,
     /* Record network statistics for posterity. */
     addonto(changestats, m->workspace, m->n_stats);
 
-    while(pos < *total_toggles && toggletimes[pos]==t_stat+1){
-      ChangeStats(1, (Vertex *)(toggletails+pos), (Vertex *)(toggleheads+pos), nwp, m);
-    
-      GET_EDGE_UPDATE_STORAGE_TOGGLE(toggletails[pos], toggleheads[pos], nwp, m, NULL);
-  
+    while(pos < total_toggles && toggletimes[pos]==t_stat+1){
+      Vertex tail = toggletails[pos], head = toggleheads[pos];
+      Rboolean edgeflag = IS_OUTEDGE(tail, head);
+      ChangeStats1(tail, head, nwp, m, edgeflag);  
       addonto(changestats, m->workspace, m->n_stats);
+    
+      UPDATE_STORAGE_TOGGLE(tail, head, nwp, m, NULL, edgeflag);
 
       pos++;
     }
     
     MCMCDyn1Step_advance(s, dur_inf, changestats,
                          0, NULL, NULL, NULL, NULL, NULL,
-                         *verbose);
+                         verbose);
   }
 
   SEXP status = PROTECT(ScalarInteger(MCMCDyn_OK));
@@ -100,7 +101,7 @@ SEXP godfather_wrapper(SEXP stateR,
   
   /* record new generated network to pass back to R */
   if(asInteger(status) == MCMCDyn_OK){
-    s->stats = REAL(changestatsRV) + (*end_time - *start_time)*m->n_stats;
+    s->stats = REAL(changestatsRV) + (end_time - start_time)*m->n_stats;
     SET_VECTOR_ELT(outl, 2, ErgmStateRSave(stateR, s));
   }
 
