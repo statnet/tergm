@@ -13,22 +13,18 @@
 #include "ergm_dyad_hashmap_utils.h"
 #include "tergm_model.h"
 
-// Initialize empty aux network. Then loop through the edges of y0 (ref_el).
-// If the edge also exists in y1, then keep it in auxnet->onwp.
-// The storage auxnet->onwp should be initialized as y0&y1 at the end.
+// Initialize aux network equal to y0. Then, loop through the changes
+// from last time step and toggle any changed edges off. The storage
+// auxnet->onwp should be initialized as y0&y1 at the end.
 I_CHANGESTAT_FN(i__intersect_lt_net_Network){
-  I_AUXNET(NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL));
+  I_AUXNET(NetworkCopy(nwp));
   GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
   TailHead dyad;
-  int lt;
-  const int t = dur_inf->time;
-  kh_foreach(dur_inf->lasttoggle, dyad, lt, {
-      // Time difference of 0 means that the edge was absent either in this time step or in the previous time step.
-      if(t-lt!=0 && IS_OUTEDGE(dyad.tail, dyad.head)){
-        ToggleKnownEdge(dyad.tail,dyad.head, auxnet->onwp, FALSE);
-      }
+  kh_foreach_key(dur_inf->discord, dyad, {
+      DeleteEdgeFromTrees(dyad.tail,dyad.head, auxnet->onwp);
     });
 }
+
 U_CHANGESTAT_FN(u__intersect_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
   GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
@@ -51,14 +47,25 @@ U_CHANGESTAT_FN(u__intersect_lt_net_Network){
 
 X_CHANGESTAT_FN(x__intersect_lt_net_Network){
   switch(type){
-  case TOCK:
+  case TICK:
     {
       GET_AUX_STORAGE(StoreAuxnet, auxnet);
+      // There are two ways to do this. One is to drop the old network
+      // and make a copy of the new one. The other is to make
+      // incremental changes. TODO: Benchmark.
+
+      /* NetworkDestroy(auxnet->onwp); */
+      /* auxnet->onwp = NetworkCopy(nwp); */
+
       GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
       TailHead dyad;
+      // Here, we need to add all edges that were added in the current
+      // (soon to be previous) time step. One way to discover them is
+      // to go through all the recently toggled edges and test if they
+      // are present in the current network.
       kh_foreach_key(dur_inf->discord, dyad, {
-          if(IS_OUTEDGE(dyad.tail, dyad.head))
-            ToggleKnownEdge(dyad.tail, dyad.head, auxnet->onwp, FALSE);
+        if(IS_OUTEDGE(dyad.tail, dyad.head))
+          AddEdgeToTrees(dyad.tail, dyad.head, auxnet->onwp);
         });
     }
     break;
@@ -71,20 +78,15 @@ F_CHANGESTAT_FN(f__intersect_lt_net_Network){
   NetworkDestroy(auxnet->onwp);
 }
 
-// Initialize aux network to y1. Then loop through the edges of y0 (ref_el).
-// If the edge does not exists in y1, then toggle it on in aux network.
-// The storage auxnet->onwp should be initialized as y0|y1 at the end.
+// Initialize aux network to y1. Then loop through the changed edges
+// and add any that are absent. The storage auxnet->onwp should be
+// initialized as y0|y1 at the end.
 I_CHANGESTAT_FN(i__union_lt_net_Network){
   I_AUXNET(NetworkCopy(nwp));
   GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
   TailHead dyad;
-  int lt;
-  const int t = dur_inf->time;
-  kh_foreach(dur_inf->lasttoggle, dyad, lt, {
-      // Time difference of 0 means that edge was present either in this time step or in the previous time step.
-      if(t-lt==0 && !IS_OUTEDGE(dyad.tail, dyad.head, auxnet->onwp)){
-        ToggleKnownEdge(dyad.tail,dyad.head, auxnet->onwp, FALSE);
-      }
+  kh_foreach_key(dur_inf->discord, dyad, {
+      AddEdgeToTrees(dyad.tail,dyad.head, auxnet->onwp);
     });
 }
 
@@ -110,14 +112,25 @@ U_CHANGESTAT_FN(u__union_lt_net_Network){
 
 X_CHANGESTAT_FN(x__union_lt_net_Network){
   switch(type){
-  case TOCK:
+  case TICK:
     {
       GET_AUX_STORAGE(StoreAuxnet, auxnet);
+      // There are two ways to do this. One is to drop the old network
+      // and make a copy of the new one. The other is to make
+      // incremental changes. TODO: Benchmark.
+
+      /* NetworkDestroy(auxnet->onwp); */
+      /* auxnet->onwp = NetworkCopy(nwp); */
+
       GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
       TailHead dyad;
+      // Here, we need to delete all edges that were toggled off in
+      // the current (soon to be previous) time step. One way to
+      // discover them is to go through all the recently toggled edges
+      // and test if they are absent in the current network.
       kh_foreach_key(dur_inf->discord, dyad, {
           if(!IS_OUTEDGE(dyad.tail, dyad.head))
-            ToggleKnownEdge(dyad.tail, dyad.head, auxnet->onwp, TRUE);
+            DeleteEdgeFromTrees(dyad.tail, dyad.head, auxnet->onwp);
         });
     }
     break;
@@ -137,14 +150,8 @@ I_CHANGESTAT_FN(i__previous_lt_net_Network){
   I_AUXNET(NetworkCopy(nwp));
   GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
   TailHead dyad;
-  int lt;
-  const int t = dur_inf->time;
-  kh_foreach(dur_inf->lasttoggle, dyad, lt, {
-      // Time difference of 0 means that the dyad just changed, so its
-      // state must have been opposite of what it is now.
-      if(t==lt){
-        ToggleEdge(dyad.tail,dyad.head, auxnet->onwp);
-      }
+  kh_foreach_key(dur_inf->discord, dyad, {
+      ToggleEdge(dyad.tail,dyad.head, auxnet->onwp);
     });
 }
 
@@ -163,13 +170,17 @@ X_CHANGESTAT_FN(x__previous_lt_net_Network){
   case TICK: // We are about to increment the clock. This means that the current network is about to become the previous network.
     {
       GET_AUX_STORAGE(StoreAuxnet, auxnet);
+      // There are two ways to do this. One is to drop the old network
+      // and make a copy of the new one. The other is to make
+      // incremental changes. TODO: Benchmark.
+
+      /* NetworkDestroy(auxnet->onwp); */
+      /* auxnet->onwp = NetworkCopy(nwp); */
+
       GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
       TailHead dyad;
-      int lt;
-      const int t = dur_inf->time;
       // I.e., we toggle what was just toggled.
-      kh_foreach(dur_inf->lasttoggle, dyad, lt, {
-          if(t==lt)
+      kh_foreach_key(dur_inf->discord, dyad, {
             ToggleEdge(dyad.tail, dyad.head, auxnet->onwp);
         });
     }
