@@ -16,12 +16,6 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
 
   if(!is.network(nw)) stop("Argument nw must be a network.")
 
-  if(is.null(nw %n% "lasttoggle")) {
-    nwel <- as.edgelist(nw)
-    nwel <- cbind(nwel, round(-.Machine$integer.max/2))
-    nw %n% "lasttoggle" <- nwel
-  }
-	
   if(is.null(nw %n% "time")) nw %n% "time" <- 0
 
   # EGMME requires targets, or there will be an error
@@ -52,10 +46,18 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
       if(is.null(control[[control.transfer[[arg]]]]))
           control[control.transfer[[arg]]] <- list(control[[arg]])
 
+  if (verbose) cat("Initializing Metropolis-Hastings proposal.\n")
+  proposal <- ergm_proposal(constraints, weights=control$MCMC.prop.weights, control$MCMC.prop.args, nw)
+  proposal.SAN <- ergm_proposal(constraints, weights=control$SAN.control$SAN.prop.weights, control$SAN.control$SAN.prop.args, nw)
+  
+  model <- ergm_model(formula, nw, term.options=control$term.options, extra.aux=list(proposal=proposal$auxiliaries, system=~.lasttoggle))
+  model.SAN <- ergm_model(SAN.formula, nw, term.options=control$SAN.control$term.options, extra.aux=list(proposal=proposal.SAN$auxiliaries))  
+  
+  proposal$aux.slots <- model$slots.extra.aux$proposal
+  proposal.SAN$aux.slots <- model.SAN$slots.extra.aux$proposal
+  
+  model.mon <- ergm_model(targets, nw, term.options=control$term.options)
 
-  model <- ergm_model(formula, nw, expanded=TRUE, term.options=control$term.options, extra.aux=list(system=~.lasttoggle))
-  model.mon <- ergm_model(targets, nw, expanded=TRUE, term.options=control$term.options)
-  model.SAN <- ergm_model(SAN.formula, nw, expanded=TRUE, term.options=control$term.options)
   if(any(model$etamap$canonical==0) || any(model.mon$etamap$canonical==0) || any(model.SAN$etamap$canonical==0)) stop("Equilibrium GMME for models based on curved ERGMs is not supported at this time.")
 
   p.free<-sum(!model$etamap$offsettheta)
@@ -74,7 +76,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
     
     nw <- TARGET_STATS <-
         san(model.SAN, basis=nw, target.stats=target.stats,
-            constraints=constraints,
+            constraints=proposal.SAN,
             control=control$SAN.control,
             only.last=TRUE,
             verbose=verbose,
@@ -96,9 +98,6 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
 
   model.mon$nw.stats <- nw.stats
   model.mon$target.stats <- if(!is.null(target.stats)) vector.namesmatch(target.stats, names(model.mon$nw.stats)) else model.mon$nw.stats
-
-  if (verbose) cat("Initializing Metropolis-Hastings proposal.\n")
-  proposal <- ergm_proposal(constraints, weights=control$MCMC.prop.weights, control$MCMC.prop.args, nw)
 
   # If some control$init is specified...
   

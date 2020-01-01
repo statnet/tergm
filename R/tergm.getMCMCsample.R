@@ -49,6 +49,8 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
   # this is where we combine models and pad out eta 
   # with 0s as necessary to accomodate the monitoring model
   model.comb <- c(model, model.mon)
+  proposal$aux.slots <- model.comb$slots.extra.aux$proposal
+  
   eta.comb <- c(eta, rep(0, NVL(model.mon$etamap$etalength, 0)))
 
   # always collect if monitoring model is passed
