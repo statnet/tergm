@@ -29,7 +29,7 @@ X_CHANGESTAT_FN(x_edges_ageinterval_mon){
   ZERO_ALL_CHANGESTATS();
 
   if(type == TICK) {
-    GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+    GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
     for(Edge k=1; k <= N_EDGES; k++){
       Vertex tail, head;
@@ -45,7 +45,7 @@ X_CHANGESTAT_FN(x_edges_ageinterval_mon){
 }
 
 C_CHANGESTAT_FN(c_edges_ageinterval_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
 
   int age = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
   // Only count if the age is in [from,to). ( to=0 ==> to=Inf )
@@ -61,7 +61,7 @@ C_CHANGESTAT_FN(c_edges_ageinterval_mon){
 }
 
 S_CHANGESTAT_FN(s_edges_ageinterval_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   ZERO_ALL_CHANGESTATS(i);
   for (Edge k=1; k <= N_EDGES; k++){
@@ -91,7 +91,7 @@ X_CHANGESTAT_FN(x_edge_ages_mon){
 
 
 C_CHANGESTAT_FN(c_edge_ages_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   int age = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
 
@@ -99,7 +99,7 @@ C_CHANGESTAT_FN(c_edge_ages_mon){
 }
 
 S_CHANGESTAT_FN(s_edge_ages_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   CHANGE_STAT[0] = 0;
   for (Edge k=1; k <= N_EDGES; k++){
@@ -138,7 +138,7 @@ X_CHANGESTAT_FN(x_edgecov_ages_mon){
 }
 
 C_CHANGESTAT_FN(c_edgecov_ages_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   int noffset = BIPARTITE, nrow;
   if(noffset > 0){
@@ -156,7 +156,7 @@ C_CHANGESTAT_FN(c_edgecov_ages_mon){
 }
 
 S_CHANGESTAT_FN(s_edgecov_ages_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   int noffset = BIPARTITE, nrow;
   if(noffset > 0){
@@ -187,7 +187,7 @@ S_CHANGESTAT_FN(s_edgecov_ages_mon){
 X_CHANGESTAT_FN(x_mean_age_mon){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
-    GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+    GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
         
     double s0 = 0, s1 = 0; // Sum of age values of initial and final network.
     double zeroval = INPUT_PARAM[0]; // Empty network value.
@@ -211,7 +211,7 @@ X_CHANGESTAT_FN(x_mean_age_mon){
 
 
 C_CHANGESTAT_FN(c_mean_age_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
   double s0 = 0, s1 = 0; // Sum of age values of initial and final network.
   double zeroval = INPUT_PARAM[0]; // Empty network value.
@@ -245,7 +245,7 @@ C_CHANGESTAT_FN(c_mean_age_mon){
 }
 
 S_CHANGESTAT_FN(s_mean_age_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   CHANGE_STAT[0] = 0;
   double zeroval = INPUT_PARAM[0];
@@ -277,7 +277,7 @@ S_CHANGESTAT_FN(s_mean_age_mon){
 X_CHANGESTAT_FN(x_edgecov_mean_age_mon){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
-    GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+    GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
     int noffset = BIPARTITE, nrow;
     if(noffset > 0){
@@ -311,7 +311,7 @@ X_CHANGESTAT_FN(x_edgecov_mean_age_mon){
 }
 
 C_CHANGESTAT_FN(c_edgecov_mean_age_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   int noffset = BIPARTITE, nrow;
   if(noffset > 0){
@@ -359,7 +359,7 @@ C_CHANGESTAT_FN(c_edgecov_mean_age_mon){
 }
 
 S_CHANGESTAT_FN(s_edgecov_mean_age_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   CHANGE_STAT[0] = 0;
   double zeroval = INPUT_PARAM[0], s=0, e=0;
@@ -401,7 +401,7 @@ S_CHANGESTAT_FN(s_edgecov_mean_age_mon){
 X_CHANGESTAT_FN(x_degree_mean_age_mon){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
-    GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+    GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
@@ -436,7 +436,7 @@ X_CHANGESTAT_FN(x_degree_mean_age_mon){
 
 
 C_CHANGESTAT_FN(c_degree_mean_age_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
@@ -571,7 +571,7 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
 
 
 S_CHANGESTAT_FN(s_degree_mean_age_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
@@ -613,7 +613,7 @@ S_CHANGESTAT_FN(s_degree_mean_age_mon){
 X_CHANGESTAT_FN(x_degree_by_attr_mean_age_mon){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
-    GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+    GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
@@ -653,7 +653,7 @@ X_CHANGESTAT_FN(x_degree_by_attr_mean_age_mon){
 }
 
 C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
@@ -801,7 +801,7 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
 }
 
 S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
@@ -854,7 +854,7 @@ S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon){
 X_CHANGESTAT_FN(x_degrange_mean_age_mon){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
-    GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+    GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
@@ -890,7 +890,7 @@ X_CHANGESTAT_FN(x_degrange_mean_age_mon){
 
 
 C_CHANGESTAT_FN(c_degrange_mean_age_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
@@ -1046,7 +1046,7 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
 
 
 S_CHANGESTAT_FN(s_degrange_mean_age_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
@@ -1089,7 +1089,7 @@ S_CHANGESTAT_FN(s_degrange_mean_age_mon){
 X_CHANGESTAT_FN(x_degrange_by_attr_mean_age_mon){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
-    GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+    GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
@@ -1130,7 +1130,7 @@ X_CHANGESTAT_FN(x_degrange_by_attr_mean_age_mon){
 
 
 C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
@@ -1303,7 +1303,7 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
 }
 
 S_CHANGESTAT_FN(s_degrange_by_attr_mean_age_mon){
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
