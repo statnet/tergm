@@ -8,10 +8,11 @@
 #  Copyright 2008-2019 Statnet Commons
 #######################################################################
 
-tergm.EGMME <- function(nw, formula, constraints, offset.coef,
+tergm.EGMME <- function(formula, constraints, offset.coef,
                    targets, target.stats, SAN.offsets, estimate,
                  control,
                  verbose) {
+  nw <- eval_lhs.formula(formula)
 
   if(!is.network(nw)) stop("Argument nw must be a network.")
 
