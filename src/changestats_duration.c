@@ -223,7 +223,7 @@ C_CHANGESTAT_FN(c_mean_age_mon){
   for(Edge k=1; k <= e0; k++){
     Vertex etail, ehead;
     FindithEdge(&etail, &ehead, k, nwp);
-    int et = ElapsedTimeToggle(etail,ehead,dur_inf,tail,head,edgeflag);
+    int et = ElapsedTime(etail,ehead,dur_inf);
     CSD_TRANSFORM_ET(et);
     s0 += ett1;
     s1 += ett1;
@@ -330,7 +330,7 @@ C_CHANGESTAT_FN(c_edgecov_mean_age_mon){
     FindithEdge(&etail, &ehead, k, nwp);
     double val = INPUT_ATTRIB[(ehead - 1 - noffset) * nrow + (etail - 1)];   
     if(val!=0){
-      int et = ElapsedTimeToggle(etail,ehead,dur_inf,tail,head,edgeflag);
+      int et = ElapsedTime(etail,ehead,dur_inf);
       CSD_TRANSFORM_ET(et);
       s0 += ett1*val;
       s1 += ett1*val;
@@ -455,7 +455,7 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
       unsigned int w = (od[etail]+id[etail]==deg) + (od[ehead]+id[ehead]==deg);
       
       if(w){
-        int et = ElapsedTimeToggle(etail,ehead,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTime(etail,ehead,dur_inf);
         CSD_TRANSFORM_ET(et);
         s0 += ett1*w;
         s1 += ett1*w;
@@ -678,7 +678,7 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
         ((headdeg==deg && headattr==testattr) ? 1 : 0);
       
       if(w){
-        int et = ElapsedTimeToggle(etail,ehead,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTime(etail,ehead,dur_inf);
         CSD_TRANSFORM_ET(et);
         s0 += ett1*w;
         s1 += ett1*w;
@@ -909,7 +909,7 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
       unsigned int w = FROM_TO(od[etail]+id[etail],from,to) + FROM_TO(od[ehead]+id[ehead],from,to);
       
       if(w){
-        int et = ElapsedTimeToggle(etail,ehead,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTime(etail,ehead,dur_inf);
         CSD_TRANSFORM_ET(et);
         s0 += ett1*w;
         s1 += ett1*w;
@@ -1155,7 +1155,7 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
         (FROM_TO(headdeg, from, to) && headattr==testattr);
       
       if(w){
-        int et = ElapsedTimeToggle(etail,ehead,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTime(etail,ehead,dur_inf);
         CSD_TRANSFORM_ET(et);
         s0 += ett1*w;
         s1 += ett1*w;

@@ -67,25 +67,27 @@ static inline int ElapsedTime(Vertex tail, Vertex head, StoreTimeAndLasttoggle *
 #define JUST_CHANGED(dur_inf, tail, head) (kh_get(DyadMapInt, (dur_inf)->discord, THKey((dur_inf)->discord,(tail),(head)))!=kh_none)
 
 static inline int ElapsedTimeToggle(Vertex tail, Vertex head, StoreTimeAndLasttoggle *dur_inf, Vertex toggletail, Vertex togglehead, int edgeflag){
-  if(tail != toggletail || head != togglehead) {
-    // if this *isn't* the dyad we're toggling then we can safely use ElapsedTime
+  if(edgeflag || tail != toggletail || head != togglehead) {
+    // if this *isn't* the dyad we're toggling, or if we're toggling this dyad *off*,
+    // then we can safely use ElapsedTime
     return ElapsedTime(tail, head, dur_inf);
   }
   
+  // otherwise this *is* the dyad we're toggling, and it's being toggled *on*
   TailHead dyad = THKey(dur_inf->discord,tail, head);
   khint_t i = kh_get(DyadMapInt,dur_inf->discord,dyad);
   if(i == kh_none){
-    // not in discord -> even number of toggles this timestep (including the current toggle)
-    if(edgeflag) return 0;
-    else return ElapsedTime(tail, head, dur_inf);
+    // not in discord -> odd number of toggles this timestep (including the current toggle)
+    // since it's being toggled on, it should have ElapsedTime 0
+    return 0;
   }else{
-    // in discord -> odd number of toggles this timestep (including the current toggle)
-    if(edgeflag) {
-      int ltt = kh_value(dur_inf->discord, i);
-      if(ltt == dur_inf->time) return INT_MAX;
-      else return dur_inf->time - ltt;
-    }
-    else return 0;
+    // in discord -> even number of toggles this timestep (including the current toggle)
+    // since it's being toggled on, it should be restored with whatever ElapsedTime
+    // it would have had if it hadn't been toggled at all this time step;
+    // that's currently in *discord* (not lasttoggle)
+    int ltt = kh_value(dur_inf->discord, i);
+    if(ltt == dur_inf->time) return INT_MAX;
+    else return dur_inf->time - ltt;
   }
 }
 
