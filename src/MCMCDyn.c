@@ -135,7 +135,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                     dur_inf,
                     eta,
                     stats,
-                    maxchanges, &nextdiffedge, difftime, difftail, diffhead, diffto,
+                    maxchanges, log_changes ? &nextdiffedge : NULL, difftime, difftail, diffhead, diffto,
                     min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, verbose);
     // Check that we didn't run out of log space.
     if(status==MCMCDyn_TOO_MANY_CHANGES)
@@ -168,7 +168,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                       dur_inf,
                       eta,
                       stats,
-                      maxchanges, &nextdiffedge, difftime, difftail, diffhead, diffto,
+                      maxchanges, log_changes ? &nextdiffedge : NULL, difftime, difftail, diffhead, diffto,
                       min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, verbose);
       
       // Check that we didn't run out of log space.
