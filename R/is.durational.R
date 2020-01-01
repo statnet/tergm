@@ -72,9 +72,7 @@ is.durational.formula<-function(object,response=NULL,basis=NULL,...){
          " the 'basis' argument must be given")
   }
   
-  # work around when durational dependent terms do not has role="target"
-  #	if(	deparse(substitute(object))=="monitor")
-  m<-ergm_model(object, nw, response=response, role=NULL, ...)
+  m<-ergm_model(object, nw, response=response, ...)
   is.durational(m)
 }
 

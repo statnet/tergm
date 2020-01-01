@@ -22,8 +22,8 @@ tergm.EGMME.initialfit<-function(init, nw, model, formula, model.mon, formula.mo
     form <- fd.formulae$form
     diss <- fd.formulae$diss
     
-    model.form <- ergm_model(form, nw=nw, role=NULL, term.options=control$term.options)
-    model.diss <- ergm_model(diss, nw=nw, role=NULL, term.options=control$term.options)
+    model.form <- ergm_model(form, nw=nw, term.options=control$term.options)
+    model.diss <- ergm_model(diss, nw=nw, term.options=control$term.options)
     
     wf <- which(grepl("Form\\(.+\\)", model$coef.names))
     wd <- which(grepl("Diss\\(.+\\)", model$coef.names))

@@ -442,13 +442,13 @@ simulate.network <- function(object, nsim=1, seed=NULL,
 
 
 
-  model.form <- ergm_model(formation, nw, role="formation", term.options=control$term.options)
+  model.form <- ergm_model(formation, nw, term.options=control$term.options)
   if(!missing(coef.form) && nparam(model.form)!=length(coef.form)) stop("coef.form has ", length(coef.form), " elements, while the model requires ",nparam(model.form)," parameters.")
 
-  model.diss <- ergm_model(dissolution, nw, role="dissolution", term.options=control$term.options)
+  model.diss <- ergm_model(dissolution, nw, term.options=control$term.options)
   if(!missing(coef.diss) && nparam(model.diss)!=length(coef.diss)) stop("coef.diss has ", length(coef.diss), " elements, while the model requires ",nparam(model.diss)," parameters.")
 
-  model.mon <- if(!is.null(monitor)) ergm_model(monitor, nw, role="target", term.options=control$term.options) else NULL
+  model.mon <- if(!is.null(monitor)) ergm_model(monitor, nw, term.options=control$term.options) else NULL
   
   if(missing(coef.form)) {
     coef.form <- rep(0,nparam(model.form, canonical=TRUE))

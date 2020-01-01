@@ -321,12 +321,12 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
   proposal <- ergm_proposal(constraints,control$MCMC.prop.args,nw,
                             weights=control$MCMC.prop.weights, class="c")
 
-  model <- ergm_model(formula, nw, role=NULL, term.options=control$term.options, extra.aux=list(proposal=proposal$auxiliaries, system=~.lasttoggle))
+  model <- ergm_model(formula, nw, term.options=control$term.options, extra.aux=list(proposal=proposal$auxiliaries, system=~.lasttoggle))
   proposal$aux.slots <- model$slots.extra.aux$proposal
 
   if(!missing(coef) && nparam(model)!=length(coef)) stop("coef has ", length(coef), " elements, while the model requires ",nparam(model)," parameters.")
 
-  model.mon <- if(!is.null(monitor)) ergm_model(monitor, nw, role="target", term.options=control$term.options) else NULL
+  model.mon <- if(!is.null(monitor)) ergm_model(monitor, nw, term.options=control$term.options) else NULL
   
   if(missing(coef)) {
     coef <- rep(0,nparam(model, canonical=TRUE))
