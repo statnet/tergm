@@ -34,7 +34,7 @@ X_CHANGESTAT_FN(x_edges_ageinterval_mon){
     for(Edge k=1; k <= N_EDGES; k++){
       Vertex tail, head;
       FindithEdge(&tail, &head, k, nwp);
-      int age = ElapsedTime(tail,head,dur_inf); // auxiliary has already been updated via TICK
+      int age = ElapsedTime(tail,head,dur_inf) + 1; // lasttoggle auxiliary has *not* yet been updated via TICK
       for(unsigned int j=0; j<N_CHANGE_STATS; j++){
         unsigned int from = INPUT_PARAM[j*2], to = INPUT_PARAM[j*2+1];
         if(age+1 == from) CHANGE_STAT[j]++; // The tie "ages" into the interval.
@@ -199,7 +199,7 @@ X_CHANGESTAT_FN(x_mean_age_mon){
     for(Edge k=1; k <= e0; k++){
       Vertex tail, head;
       FindithEdge(&tail, &head, k, nwp);
-      int et = ElapsedTime(tail,head,dur_inf);
+      int et = ElapsedTime(tail,head,dur_inf) + 1;
       CSD_TRANSFORM_ET(et);
       s0 += ett;
       s1 += ett1;
@@ -296,7 +296,7 @@ X_CHANGESTAT_FN(x_edgecov_mean_age_mon){
       FindithEdge(&tail, &head, k, nwp);
       double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];   
       if(val!=0){
-        int et = ElapsedTime(tail,head,dur_inf);
+        int et = ElapsedTime(tail,head,dur_inf) + 1;
         CSD_TRANSFORM_ET(et);
         s0 += ett*val;
         s1 += ett1*val;
@@ -420,7 +420,7 @@ X_CHANGESTAT_FN(x_degree_mean_age_mon){
         unsigned int w = (od[tail]+id[tail]==deg) + (od[head]+id[head]==deg);
         
         if(w){
-          int et = ElapsedTime(tail,head,dur_inf);
+          int et = ElapsedTime(tail,head,dur_inf) + 1;
           CSD_TRANSFORM_ET(et);
           s0 += ett*w;
           s1 += ett1*w;
@@ -638,7 +638,7 @@ X_CHANGESTAT_FN(x_degree_by_attr_mean_age_mon){
           ((headdeg==deg && headattr==testattr) ? 1 : 0);
         
         if(w){
-          int et = ElapsedTime(tail,head,dur_inf);
+          int et = ElapsedTime(tail,head,dur_inf) + 1;
           CSD_TRANSFORM_ET(et);
           s0 += ett*w;
           s1 += ett1*w;
@@ -873,7 +873,7 @@ X_CHANGESTAT_FN(x_degrange_mean_age_mon){
         unsigned int w = FROM_TO(od[tail]+id[tail],from,to) + FROM_TO(od[head]+id[head],from,to);
         
         if(w){
-          int et = ElapsedTime(tail,head,dur_inf);
+          int et = ElapsedTime(tail,head,dur_inf) + 1;
           CSD_TRANSFORM_ET(et);
           s0 += ett*w;
           s1 += ett1*w;
@@ -1114,7 +1114,7 @@ X_CHANGESTAT_FN(x_degrange_by_attr_mean_age_mon){
           (FROM_TO(headdeg, from, to) && headattr==testattr);
         
         if(w){
-          int et = ElapsedTime(tail,head,dur_inf);
+          int et = ElapsedTime(tail,head,dur_inf) + 1;
           CSD_TRANSFORM_ET(et);
           s0 += ett*w;
           s1 += ett1*w;
