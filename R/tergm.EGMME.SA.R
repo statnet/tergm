@@ -551,7 +551,7 @@ tergm.EGMME.SA.Phase2.C <- function(state, model, model.mon,
   
   eta.comb <- c(deInf(state$eta), rep(0,model.mon$etamap$etalength))
 
-  ergmstate <- ergm_state(nw=state$nw, model=model.comb, proposal=proposal)
+  ergmstate <- ergm_state(state$nw, model=model.comb, proposal=proposal)
 
   maxedges <- max(control$MCMC.init.maxedges, network.edgecount(ergmstate))
   maxchanges <- max(control$MCMC.init.maxchanges, network.edgecount(ergmstate))
