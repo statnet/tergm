@@ -553,12 +553,12 @@ tergm.EGMME.SA.Phase2.C <- function(state, model, model.mon,
 
   ergmstate <- ergm_state(state$nw, model=model.comb, proposal=proposal)
 
-  maxedges <- max(control$MCMC.init.maxedges, network.edgecount(ergmstate))
-  maxchanges <- max(control$MCMC.init.maxchanges, network.edgecount(ergmstate))
+  maxedges <- max(control$MCMC.maxedges, network.edgecount(ergmstate))
+  maxchanges <- max(control$MCMC.maxchanges, network.edgecount(ergmstate))
   
   z <- .Call("MCMCDynSArun_wrapper",
-             state,
-             as.integer(model.mon$nstats),
+             ergmstate,
+             as.integer(nparam(model.mon,canonical=TRUE)),
              # Parameter fitting.
              as.double(eta.comb),
              as.double(state$nw.diff),
