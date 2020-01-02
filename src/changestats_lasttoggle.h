@@ -66,14 +66,13 @@ static inline int ElapsedTime(Vertex tail, Vertex head, StoreTimeAndLasttoggle *
 
 #define JUST_CHANGED(dur_inf, tail, head) (kh_get(DyadMapInt, (dur_inf)->discord, THKey((dur_inf)->discord,(tail),(head)))!=kh_none)
 
-static inline int ElapsedTimeToggle(Vertex tail, Vertex head, StoreTimeAndLasttoggle *dur_inf, Vertex toggletail, Vertex togglehead, int edgeflag){
-  if(edgeflag || tail != toggletail || head != togglehead) {
-    // if this *isn't* the dyad we're toggling, or if we're toggling this dyad *off*,
-    // then we can safely use ElapsedTime
+static inline int ElapsedTimeToggle(Vertex tail, Vertex head, StoreTimeAndLasttoggle *dur_inf, int edgeflag){
+  if(edgeflag) {
+    // if we're toggling this dyad *off* then we can safely use ElapsedTime
     return ElapsedTime(tail, head, dur_inf);
   }
   
-  // otherwise this *is* the dyad we're toggling, and it's being toggled *on*
+  // otherwise we're toggling this dyad *on*
   TailHead dyad = THKey(dur_inf->discord,tail, head);
   khint_t i = kh_get(DyadMapInt,dur_inf->discord,dyad);
   if(i == kh_none){

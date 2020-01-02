@@ -47,7 +47,7 @@ X_CHANGESTAT_FN(x_edges_ageinterval_mon){
 C_CHANGESTAT_FN(c_edges_ageinterval_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
 
-  int age = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+  int age = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
   // Only count if the age is in [from,to). ( to=0 ==> to=Inf )
 
   for(unsigned int j=0; j<N_CHANGE_STATS; j++){
@@ -93,7 +93,7 @@ X_CHANGESTAT_FN(x_edge_ages_mon){
 C_CHANGESTAT_FN(c_edge_ages_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
-  int age = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+  int age = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
 
   CHANGE_STAT[0] += edgeflag ? - age - 1 : age + 1;
 }
@@ -149,7 +149,7 @@ C_CHANGESTAT_FN(c_edgecov_ages_mon){
 
   double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];
   if(val!=0){
-    int age = ElapsedTimeToggle(tail, head, dur_inf,tail,head,edgeflag);
+    int age = ElapsedTimeToggle(tail, head, dur_inf,edgeflag);
 
     CHANGE_STAT[0] += edgeflag ? - age*val - val : age*val + val;
   }
@@ -230,12 +230,12 @@ C_CHANGESTAT_FN(c_mean_age_mon){
   }
   
   if(edgeflag){
-    int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+    int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
     CSD_TRANSFORM_ET(et);
     s1 -= ett1;
     e1--;
   }else{
-    int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+    int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
     CSD_TRANSFORM_ET(et);
     s1 += ett1;
     e1++;
@@ -343,12 +343,12 @@ C_CHANGESTAT_FN(c_edgecov_mean_age_mon){
   double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];   
   if(val!=0){
     if(edgeflag){
-      int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+      int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
       CSD_TRANSFORM_ET(et);
       s1 -= ett1*val;
       e1 -= val;
     }else{
-      int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+      int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
       CSD_TRANSFORM_ET(et);
       s1 += ett1*val;
       e1 += val;
@@ -505,12 +505,12 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
         }
         // Here, we need to handle the focus dyad:
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -552,12 +552,12 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
         }
         // Here, we need to handle the focus dyad:
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -736,12 +736,12 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
         }
         // Here, we need to handle the focus dyad:
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -783,12 +783,12 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
         }
         // Here, we need to handle the focus dyad:
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -959,24 +959,24 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
       }
       // Here, we need to handle the focus dyad:
       if(change==+1){// if it's formed, add to s1
-        int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
         CSD_TRANSFORM_ET(et);
         s1 += ett1;
         e1++;
       }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-        int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
         CSD_TRANSFORM_ET(et);
         s1 -= ett1;
         e1--;
       }
     }else if(tailin0 && tailin1){ // tail was counted both times, but we need to handle the focus dyad
       if(change==+1){// if it's formed, add to s1
-        int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
         CSD_TRANSFORM_ET(et);
         s1 += ett1;
         e1++;
       }else{// if it's dissolved, it must be subtracted from s1
-        int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
         CSD_TRANSFORM_ET(et);
         s1 -= ett1;
         e1--;
@@ -1015,24 +1015,24 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
       }
       // Here, we need to handle the focus dyad:
       if(change==+1){// if it's formed, add to s1
-        int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
         CSD_TRANSFORM_ET(et);
         s1 += ett1;
         e1++;
       }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-        int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
         CSD_TRANSFORM_ET(et);
         s1 -= ett1;
         e1--;
       }
     }else if(headin0 && headin1){ // tail was counted both times, but we need to handle the focus dyad
       if(change==+1){// if it's formed, add to s1
-        int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
         CSD_TRANSFORM_ET(et);
         s1 += ett1;
         e1++;
       }else{// if it's dissolved, it must be subtracted from s1
-        int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
         CSD_TRANSFORM_ET(et);
         s1 -= ett1;
         e1--;
@@ -1214,24 +1214,24 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
         }
         // Here, we need to handle the focus dyad:
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
         }
       }else if(tailin0 && tailin1){ // tail was counted both times, but we need to handle the focus dyad
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it must be subtracted from s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -1272,24 +1272,24 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
         }
         // Here, we need to handle the focus dyad:
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
         }
       }else if(headin0 && headin1){ // tail was counted both times, but we need to handle the focus dyad
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it must be subtracted from s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
