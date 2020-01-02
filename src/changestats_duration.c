@@ -474,13 +474,13 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
     switch(taildiff){
       case -1: // tail was previously counted, but is no longer
         STEP_THROUGH_OUTEDGES(tail, e, head1){
-          int et = ElapsedTimeToggle(tail,head1,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(tail,head1,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
         }
         STEP_THROUGH_INEDGES(tail, e, head1){
-          int et = ElapsedTimeToggle(head1,tail,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(head1,tail,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -492,13 +492,13 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
       
       case +1: // tail was previously not counted, but is now
         STEP_THROUGH_OUTEDGES(tail, e, head1){
-          int et = ElapsedTimeToggle(tail,head1,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(tail,head1,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }
         STEP_THROUGH_INEDGES(tail, e, head1){
-          int et = ElapsedTimeToggle(head1,tail,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(head1,tail,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
@@ -521,13 +521,13 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
     switch(headdiff){
       case -1: // head was previously counted, but is no longer
         STEP_THROUGH_OUTEDGES(head, e, tail1){
-          int et = ElapsedTimeToggle(head,tail1,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(head,tail1,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
         }
         STEP_THROUGH_INEDGES(head, e, tail1){
-          int et = ElapsedTimeToggle(tail1,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(tail1,head,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -539,13 +539,13 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
 
       case +1: // head was previously not counted, but is now
         STEP_THROUGH_OUTEDGES(head, e, tail1){
-          int et = ElapsedTimeToggle(head,tail1,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(head,tail1,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }
         STEP_THROUGH_INEDGES(head, e, tail1){
-          int et = ElapsedTimeToggle(tail1,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(tail1,head,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
@@ -705,13 +705,13 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
     switch(taildiff * (tailattr==testattr)){ // If tailattr!=testattr, it'll look for case 0, i.e., do nothing.
       case -1: // tail was previously counted, but is no longer
         STEP_THROUGH_OUTEDGES(tail, e, head1){
-          int et = ElapsedTimeToggle(tail,head1,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(tail,head1,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
         }
         STEP_THROUGH_INEDGES(tail, e, head1){
-          int et = ElapsedTimeToggle(head1,tail,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(head1,tail,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -723,13 +723,13 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
 
       case +1: // tail was previously not counted, but is now
         STEP_THROUGH_OUTEDGES(tail, e, head1){
-          int et = ElapsedTimeToggle(tail,head1,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(tail,head1,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }
         STEP_THROUGH_INEDGES(tail, e, head1){
-          int et = ElapsedTimeToggle(head1,tail,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(head1,tail,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
@@ -752,13 +752,13 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
     switch(headdiff * (headattr==testattr)){ // If headattr!=testattr, it'll look for case 0, i.e., do nothing.
       case -1: // head was previously counted, but is no longer
         STEP_THROUGH_OUTEDGES(head, e, tail1){
-          int et = ElapsedTimeToggle(head,tail1,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(head,tail1,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
         }
         STEP_THROUGH_INEDGES(head, e, tail1){
-          int et = ElapsedTimeToggle(tail1,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(tail1,head,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -770,13 +770,13 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
 
       case +1: // head was previously not counted, but is now
         STEP_THROUGH_OUTEDGES(head, e, tail1){
-          int et = ElapsedTimeToggle(head,tail1,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(head,tail1,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }
         STEP_THROUGH_INEDGES(head, e, tail1){
-          int et = ElapsedTimeToggle(tail1,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(tail1,head,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
@@ -930,13 +930,13 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
 
     if(tailin0 && !tailin1){ // tail was previously counted, but is no longer
       STEP_THROUGH_OUTEDGES(tail, e, head1){
-        int et = ElapsedTimeToggle(tail,head1,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTime(tail,head1,dur_inf);
         CSD_TRANSFORM_ET(et);
         s1 -= ett1;
         e1--;
       }
       STEP_THROUGH_INEDGES(tail, e, head1){
-        int et = ElapsedTimeToggle(head1,tail,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTime(head1,tail,dur_inf);
         CSD_TRANSFORM_ET(et);
         s1 -= ett1;
         e1--;
@@ -946,13 +946,13 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
       // if it's dissolved, then it will have been subtracted off by the previous two loops.
     }else if(!tailin0 && tailin1){ // tail was previously not counted, but is now
       STEP_THROUGH_OUTEDGES(tail, e, head1){
-        int et = ElapsedTimeToggle(tail,head1,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTime(tail,head1,dur_inf);
         CSD_TRANSFORM_ET(et);
         s1 += ett1;
         e1++;
       }
       STEP_THROUGH_INEDGES(tail, e, head1){
-        int et = ElapsedTimeToggle(head1,tail,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTime(head1,tail,dur_inf);
         CSD_TRANSFORM_ET(et);
         s1 += ett1;
         e1++;
@@ -986,13 +986,13 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
     
     if(headin0 && !headin1){ // head was previously counted, but is no longer
       STEP_THROUGH_OUTEDGES(head, e, tail1){
-        int et = ElapsedTimeToggle(head,tail1,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTime(head,tail1,dur_inf);
         CSD_TRANSFORM_ET(et);
         s1 -= ett1;
         e1--;
       }
       STEP_THROUGH_INEDGES(head, e, tail1){
-        int et = ElapsedTimeToggle(tail1,head,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTime(tail1,head,dur_inf);
         CSD_TRANSFORM_ET(et);
         s1 -= ett1;
         e1--;
@@ -1002,13 +1002,13 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
       // if it's dissolved, then it will have been subtracted off by the previous two loops.
     }else if(!headin0 && headin1){ // head was previously not counted, but is now
       STEP_THROUGH_OUTEDGES(head, e, tail1){
-        int et = ElapsedTimeToggle(head,tail1,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTime(head,tail1,dur_inf);
         CSD_TRANSFORM_ET(et);
         s1 += ett1;
         e1++;
       }
       STEP_THROUGH_INEDGES(head, e, tail1){
-        int et = ElapsedTimeToggle(tail1,head,dur_inf,tail,head,edgeflag);
+        int et = ElapsedTime(tail1,head,dur_inf);
         CSD_TRANSFORM_ET(et);
         s1 += ett1;
         e1++;
@@ -1185,13 +1185,13 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
     if(tailattr==testattr){
       if(tailin0 && !tailin1){ // tail was previously counted, but is no longer
         STEP_THROUGH_OUTEDGES(tail, e, head1){
-          int et = ElapsedTimeToggle(tail,head1,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(tail,head1,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
         }
         STEP_THROUGH_INEDGES(tail, e, head1){
-          int et = ElapsedTimeToggle(head1,tail,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(head1,tail,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -1201,13 +1201,13 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
         // if it's dissolved, then it will have been subtracted off by the previous two loops.
       }else if(!tailin0 && tailin1){ // tail was previously not counted, but is now
         STEP_THROUGH_OUTEDGES(tail, e, head1){
-          int et = ElapsedTimeToggle(tail,head1,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(tail,head1,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }
         STEP_THROUGH_INEDGES(tail, e, head1){
-          int et = ElapsedTimeToggle(head1,tail,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(head1,tail,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
@@ -1243,13 +1243,13 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
     if(headattr==testattr){
       if(headin0 && !headin1){ // head was previously counted, but is no longer
         STEP_THROUGH_OUTEDGES(head, e, tail1){
-          int et = ElapsedTimeToggle(head,tail1,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(head,tail1,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
         }
         STEP_THROUGH_INEDGES(head, e, tail1){
-          int et = ElapsedTimeToggle(tail1,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(tail1,head,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -1259,13 +1259,13 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
         // if it's dissolved, then it will have been subtracted off by the previous two loops.
       }else if(!headin0 && headin1){ // head was previously not counted, but is now
         STEP_THROUGH_OUTEDGES(head, e, tail1){
-          int et = ElapsedTimeToggle(head,tail1,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(head,tail1,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }
         STEP_THROUGH_INEDGES(head, e, tail1){
-          int et = ElapsedTimeToggle(tail1,head,dur_inf,tail,head,edgeflag);
+          int et = ElapsedTime(tail1,head,dur_inf);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
