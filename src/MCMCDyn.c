@@ -235,7 +235,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
 
   /* If the term has an extension, send it a "TICK" signal. */
   memset(m->workspace, 0, m->n_stats*sizeof(double)); /* Zero all change stats. */
-  SIGNAL_TERMS_INTO(m, m->workspace, TICK, NULL);
+  SIGNAL_TERMS_INTO(nwp, m, m->workspace, TICK, NULL);
   /* Record network statistics for posterity. */
   if(stats) {
     for (unsigned int i = 0; i < m->n_stats; i++)
@@ -376,7 +376,7 @@ MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
   /* If the term has an extension, send it a "TOCK" signal and the set
      of dyads that changed. */
   memset(m->workspace, 0, m->n_stats*sizeof(double)); /* Zero all change stats. */
-  SIGNAL_TERMS_INTO(m, m->workspace, TOCK, NULL);
+  SIGNAL_TERMS_INTO(nwp, m, m->workspace, TOCK, NULL);
   /* Record network statistics for posterity. */
   if(stats) {
     addonto(stats, m->workspace, m->n_stats);

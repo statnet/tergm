@@ -73,7 +73,7 @@ SEXP godfather_wrapper(SEXP stateR,
     
     /* If the term has an extension, send it a "TICK" signal. */
     memset(m->workspace, 0, m->n_stats*sizeof(double)); /* Zero all change stats. */
-    SIGNAL_TERMS_INTO(m, m->workspace, TICK, NULL);
+    SIGNAL_TERMS_INTO(nwp, m, m->workspace, TICK, NULL);
     /* Record network statistics for posterity. */
     addonto(changestats, m->workspace, m->n_stats);
 
