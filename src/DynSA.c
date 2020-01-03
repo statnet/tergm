@@ -50,7 +50,7 @@ SEXP MCMCDynSArun_wrapper(SEXP stateR,
   memset(REAL(opt_history), 0, (2*m->n_stats - asInteger(nstatsmonitor))*asInteger(runlength)*asInteger(SA_interval));
   
   SEXP eta = PROTECT(allocVector(REALSXP, m->n_stats));
-  memcpy(REAL(eta), eta0, m->n_stats*sizeof(double));
+  memcpy(REAL(eta), REAL(eta0), m->n_stats*sizeof(double));
   
   SEXP status;
   if(MHp) status = PROTECT(ScalarInteger(MCMCDynSArun(s,
