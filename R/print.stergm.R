@@ -21,3 +21,14 @@ print.stergm <- function (x, digits = max(3, getOption("digits") - 3), ...) {
   cat("Dissolution Coefficients:\n")
   print.default(format(x$dissolution.fit$coef, digits = digits), print.gap = 2, quote = FALSE)
 }
+
+#' @describeIn tergm Print the parameter estimates.
+#' 
+#' @param x A \code{\link{tergm}} object.
+#' @param digits Significant digits for coefficients
+#' @export
+print.tergm <- function (x, digits = max(3, getOption("digits") - 3), ...) {
+  cat("Coefficients:\n")
+  print.default(format(x$fit$coef, digits = digits), print.gap = 2, quote = FALSE)
+}
+
