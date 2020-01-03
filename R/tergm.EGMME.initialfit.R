@@ -30,7 +30,10 @@ tergm.EGMME.initialfit<-function(init, nw, model, formula, model.mon, formula.mo
     
     init.form <- init[wf]
     init.diss <- init[wd]
-        
+    
+    names(init.form) <- model.form$coef.names
+    names(init.diss) <- model.diss$coef.names
+    
     form <- nonsimp_update.formula(form, nw ~ ., from.new = "nw")
     model.form$formula <- form
   
