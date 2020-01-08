@@ -183,65 +183,72 @@ S_CHANGESTAT_FN(s_edgecov_ages_mon){
  The mean_ages of an empty network is defined to be emptyval.
 
  *****************/
- 
-X_CHANGESTAT_FN(x_mean_age_mon){
-  ZERO_ALL_CHANGESTATS();
-  if(type == TICK) {
-    GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
-        
-    double s0 = 0, s1 = 0; // Sum of age values of initial and final network.
-    double zeroval = INPUT_PARAM[0]; // Empty network value.
-    int transform = INPUT_PARAM[1]; // Transformation code.
-    Edge e0, e1; // Number of edges in initial and final network.
-    
-    e0 = e1 = N_EDGES;
-    
-    for(Edge k=1; k <= e0; k++){
-      Vertex tail, head;
-      FindithEdge(&tail, &head, k, nwp);
-      int et = ElapsedTime(tail,head,dur_inf) + 1;
-      CSD_TRANSFORM_ET(et);
-      s0 += ett;
-      s1 += ett1;
-    }
-        
-    CHANGE_STAT[0]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+
+I_CHANGESTAT_FN(i_mean_age_mon){
+  ALLOC_STORAGE(2, double, sto);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
+  int transform = INPUT_PARAM[1];
+  
+  for(Edge k=1; k <= N_EDGES; k++){
+    Vertex tail, head;
+    FindithEdge(&tail, &head, k, nwp);
+    int et = ElapsedTime(tail,head,dur_inf);
+    CSD_TRANSFORM_ET(et);
+    sto[0] += ett1;
   }
 }
 
+X_CHANGESTAT_FN(x_mean_age_mon){
+  ZERO_ALL_CHANGESTATS();
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
+  
+  int transform = INPUT_PARAM[1];
+  
+  if(type == TICK) {
+    GET_STORAGE(double, sto);
+    
+    if(transform == 0) {
+      sto[0] += N_EDGES;
+      CHANGE_STAT[0] = N_EDGES ? 1 : 0;
+    } else {
+      double oldval = sto[0];
+      sto[0] = 0;
+      for(Edge k=1; k <= N_EDGES; k++){
+        Vertex tail, head;
+        FindithEdge(&tail, &head, k, nwp);
+        int et = ElapsedTime(tail,head,dur_inf) + 1;
+        CSD_TRANSFORM_ET(et);
+        sto[0] += ett1;
+      }
+      CHANGE_STAT[0] = N_EDGES ? (sto[0] - oldval)/N_EDGES : 0;
+    }
+  }
+}
 
 C_CHANGESTAT_FN(c_mean_age_mon){
+  GET_STORAGE(double, sto);
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
-  double s0 = 0, s1 = 0; // Sum of age values of initial and final network.
+  double s0 = sto[0], s1 = sto[0]; // Sum of age values of initial and final network.
   double zeroval = INPUT_PARAM[0]; // Empty network value.
   int transform = INPUT_PARAM[1]; // Transformation code.
   Edge e0, e1; // Number of edges in initial and final network.
   
   e0 = e1 = N_EDGES;
   
-  for(Edge k=1; k <= e0; k++){
-    Vertex etail, ehead;
-    FindithEdge(&etail, &ehead, k, nwp);
-    int et = ElapsedTime(etail,ehead,dur_inf);
-    CSD_TRANSFORM_ET(et);
-    s0 += ett1;
-    s1 += ett1;
-  }
-  
-  if(edgeflag){
-    int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
-    CSD_TRANSFORM_ET(et);
-    s1 -= ett1;
-    e1--;
-  }else{
-    int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
-    CSD_TRANSFORM_ET(et);
-    s1 += ett1;
-    e1++;
-  }
+  int change = edgeflag ? -1 : 1;
+  int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);  
+  CSD_TRANSFORM_ET(et);
+  s1 += change*ett1;
+  e1 += change;
+  sto[1] = s1;
 
   CHANGE_STAT[0]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+}
+
+U_CHANGESTAT_FN(u_mean_age_mon){
+  GET_STORAGE(double, sto);
+  sto[0] = sto[1];
 }
 
 S_CHANGESTAT_FN(s_mean_age_mon){
