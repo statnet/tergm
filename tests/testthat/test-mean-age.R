@@ -27,6 +27,7 @@ test_that("mean.age behaves correctly with summary and godfather", {
   
   nw %n% "lasttoggle" <- cbind(el, init.lasttoggle.times)
   
+  expect_equal(unname(summary(network.initialize(10,dir=FALSE) ~ mean.age(emptyval=4321.4))), 4321.4)  
   expect_equal(unname(summary(nw ~ mean.age)), mean(5 - init.lasttoggle.times + 1))
   
   toggles <- matrix(c(6, 2, 3,
@@ -46,9 +47,13 @@ test_that("mean.age behaves correctly with summary and godfather", {
                       12, 5, 8,
                       13, 1, 3,
                       13, 1, 3,
-                      13, 1, 3), ncol = 3, byrow = TRUE)
+                      13, 1, 3,
+                      15, 1, 2,
+                      15, 1, 5,
+                      15, 5, 8,
+                      15, 9, 10), ncol = 3, byrow = TRUE)
   
-  rv <- tergm.godfather(nw ~ edges + mean.age, toggles=toggles)
+  rv <- tergm.godfather(nw ~ edges + mean.age(emptyval=3425.432), toggles=toggles)
   rv <- as.matrix(rv)
   
   lt.times.6 <- init.lasttoggle.times[-3]
@@ -59,7 +64,7 @@ test_that("mean.age behaves correctly with summary and godfather", {
   lt.times.11 <- lt.times.10
   lt.times.12 <- c(lt.times.11, 12)
   lt.times.13 <- lt.times.12[-2]
-  
+  lt.times.14 <- lt.times.13
   
   expect_equal(mean(6 - lt.times.6 + 1), unname(rv[1,2]))
   expect_equal(mean(7 - lt.times.7 + 1), unname(rv[2,2]))
@@ -69,6 +74,8 @@ test_that("mean.age behaves correctly with summary and godfather", {
   expect_equal(mean(11 - lt.times.11 + 1), unname(rv[6,2]))
   expect_equal(mean(12 - lt.times.12 + 1), unname(rv[7,2]))
   expect_equal(mean(13 - lt.times.13 + 1), unname(rv[8,2]))
+  expect_equal(mean(14 - lt.times.14 + 1), unname(rv[9,2]))
+  expect_equal(3425.432, unname(rv[10,2]))
   
 })
 
@@ -89,7 +96,8 @@ test_that("mean.(log)age behaves correctly with summary and godfather", {
   nw %n% "time" <- 5
   
   nw %n% "lasttoggle" <- cbind(el, init.lasttoggle.times)
-  
+
+  expect_equal(unname(summary(network.initialize(10,dir=FALSE) ~ mean.age(emptyval=pi^3/83, log=TRUE))), pi^3/83)    
   expect_equal(unname(summary(nw ~ mean.age(log=TRUE))), mean(log(5 - init.lasttoggle.times + 1)))
   
   toggles <- matrix(c(6, 2, 3,
@@ -109,9 +117,13 @@ test_that("mean.(log)age behaves correctly with summary and godfather", {
                       12, 5, 8,
                       13, 1, 3,
                       13, 1, 3,
-                      13, 1, 3), ncol = 3, byrow = TRUE)
+                      13, 1, 3,
+                      15, 1, 2,
+                      15, 1, 5,
+                      15, 5, 8,
+                      15, 9, 10), ncol = 3, byrow = TRUE)
   
-  rv <- tergm.godfather(nw ~ edges + mean.age(log=TRUE), toggles=toggles)
+  rv <- tergm.godfather(nw ~ edges + mean.age(emptyval=pi^2/13, log=TRUE), toggles=toggles)
   rv <- as.matrix(rv)
   
   lt.times.6 <- init.lasttoggle.times[-3]
@@ -122,7 +134,7 @@ test_that("mean.(log)age behaves correctly with summary and godfather", {
   lt.times.11 <- lt.times.10
   lt.times.12 <- c(lt.times.11, 12)
   lt.times.13 <- lt.times.12[-2]
-  
+  lt.times.14 <- lt.times.13
   
   expect_equal(mean(log(6 - lt.times.6 + 1)), unname(rv[1,2]))
   expect_equal(mean(log(7 - lt.times.7 + 1)), unname(rv[2,2]))
@@ -132,6 +144,8 @@ test_that("mean.(log)age behaves correctly with summary and godfather", {
   expect_equal(mean(log(11 - lt.times.11 + 1)), unname(rv[6,2]))
   expect_equal(mean(log(12 - lt.times.12 + 1)), unname(rv[7,2]))
   expect_equal(mean(log(13 - lt.times.13 + 1)), unname(rv[8,2]))
-  
+  expect_equal(mean(log(14 - lt.times.14 + 1)), unname(rv[9,2]))
+  expect_equal(pi^2/13, unname(rv[10,2]))
+ 
 })
 
