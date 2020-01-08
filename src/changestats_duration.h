@@ -26,8 +26,10 @@ X_CHANGESTAT_FN(x_edgecov_ages_mon);
 C_CHANGESTAT_FN(c_edgecov_ages_mon);
 S_CHANGESTAT_FN(s_edgecov_ages_mon);
 
+I_CHANGESTAT_FN(i_mean_age_mon);
 X_CHANGESTAT_FN(x_mean_age_mon);
 C_CHANGESTAT_FN(c_mean_age_mon);
+U_CHANGESTAT_FN(u_mean_age_mon);
 S_CHANGESTAT_FN(s_mean_age_mon);
 
 X_CHANGESTAT_FN(x_edgecov_mean_age_mon);
