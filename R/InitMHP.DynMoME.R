@@ -15,6 +15,10 @@
 #      <dissolution>
 #===================================================================
 
+InitErgmProposal.discordTNT <- function(arguments, nw, model) {
+  proposal <- list(name = "discordTNT", inputs=NULL, auxiliaries = ~.lasttoggle)
+}
+
 InitErgmProposal.formation <- function(arguments, nw, model) {
   proposal <- list(name = "Formation", inputs=NULL)
   proposal
