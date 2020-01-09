@@ -24,20 +24,20 @@ coef.form <- c(-6.57, 1.01)
 coef.diss <- c(2.944439)
 
 # Fit the model with very poor starting values.
-set.seed(1)
-dynfit<-stergm(g1,formation=~edges+degree(1),dissolution=~offset(edges), targets="formation", estimate="EGMME", offset.coef.diss=coef.diss,target.stats=target.stats[-3],verbose=TRUE,control=control.stergm(SA.plot.progress=do.plot,SA.restart.on.err=FALSE,init.form=c(-log(.95/.05),0)))
+set.seed(3)
+dynfit<-tergm(g1 ~ FormE(~edges + degree(1)) + offset(DissE(~edges)), targets=~edges + degree(1), estimate="EGMME", constraints="discordTNT"~., offset.coef=coef.diss,target.stats=target.stats[-3],verbose=TRUE,control=control.tergm(SA.plot.progress=do.plot,SA.restart.on.err=FALSE,init=c(-log(.95/.05),0, coef.diss)))
 
-print(summary(dynfit))
-mcmc.diagnostics(dynfit)
+#print(summary(dynfit))
+#mcmc.diagnostics(dynfit)
 
-stopifnot(all.equal(c(coef.form,coef.diss),unlist(coef(dynfit)),tol=0.01,check.attributes=FALSE))
+stopifnot(all.equal(c(coef.form,coef.diss),dynfit$fit$coef,tol=0.01,check.attributes=FALSE))
 
 # All parameters free, edges, degree(1), and edge.ages as target.
-set.seed(1)
-dynfit2<-stergm(g1,formation=~edges+degree(1),dissolution=~edges, targets=~edges+degree(1)+mean.age, estimate="EGMME", target.stats=target.stats,control=control.stergm(SA.plot.progress=do.plot,SA.plot.stats=TRUE))
+set.seed(5)
+dynfit2<-tergm(g1 ~ FormE(~edges + degree(1)) + DissE(~edges), targets=~edges+degree(1)+mean.age, estimate="EGMME", constraints="discordTNT"~., target.stats=target.stats,control=control.tergm(SA.plot.progress=do.plot,SA.plot.stats=TRUE))
 
-print(summary(dynfit2))
-mcmc.diagnostics(dynfit2)
+#print(summary(dynfit2))
+#mcmc.diagnostics(dynfit2)
 
-stopifnot(all.equal(c(coef.form,coef.diss),unlist(coef(dynfit2)),tol=0.01,check.attributes=FALSE))
+stopifnot(all.equal(c(coef.form,coef.diss),dynfit2$fit$coef,tol=0.01,check.attributes=FALSE))
 }, "EGMME")
