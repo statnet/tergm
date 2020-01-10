@@ -61,7 +61,6 @@ Collate:
     'print.stergm.R'
     'simulate.stergm.R'
     'simulate.tergm.R'
-    'stergm.CMLE.R'
     'stergm.R'
     'tergm-deprecated.R'
     'stergm.utils.R'
