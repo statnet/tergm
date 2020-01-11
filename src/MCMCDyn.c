@@ -235,7 +235,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
 
   /* If the term has an extension, send it a "TICK" signal. */
   memset(m->workspace, 0, m->n_stats*sizeof(double)); /* Zero all change stats. */
-  SIGNAL_TERMS_INTO(nwp, m, m->workspace, TICK, NULL);
+  SEND_X_SIGNAL_INTO(nwp, m, MHp, m->workspace, TICK, NULL);
   /* Record network statistics for posterity. */
   if(stats) {
     for (unsigned int i = 0; i < m->n_stats; i++)
@@ -355,7 +355,7 @@ MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
   
   Network *nwp = s->nwp;
   Model *m = s->m;
-
+  MHProposal *MHp = s->MHp;
 
   if(nextdiffedge) {
     TailHead dyad;
@@ -376,7 +376,7 @@ MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
   /* If the term has an extension, send it a "TOCK" signal and the set
      of dyads that changed. */
   memset(m->workspace, 0, m->n_stats*sizeof(double)); /* Zero all change stats. */
-  SIGNAL_TERMS_INTO(nwp, m, m->workspace, TOCK, NULL);
+  SEND_X_SIGNAL_INTO(nwp, m, MHp, m->workspace, TOCK, NULL);
   /* Record network statistics for posterity. */
   if(stats) {
     addonto(stats, m->workspace, m->n_stats);
