@@ -138,7 +138,9 @@ InitErgmTerm.Form1 <- function(nw, arglist, response=NULL,  ...){
   c(list(name="on_union_net_Network", pkgname="ergm",
          auxiliaries = ~.union.net((nw%n%".PrevNets")[[1]], implementation="Network"),
          submodel = m),
-    wrap.ergm_model(m, nw, response, function(x) paste0('Form(',x,')')))
+    modifyList(wrap.ergm_model(m, nw, response, function(x) paste0('Form(',x,')')),
+               list(emptynwstats=summary(m, (nw%n%".PrevNets")[[1]], response=response)))
+    )
 }
 
 InitErgmTerm.Diss <- function(nw, arglist, response=NULL,  ...) {
