@@ -535,7 +535,7 @@ simulate_formula.networkDynamic <- function(object, nsim=1, seed=NULL,
                           output=switch(output, networkDynamic = "changes", output),
                           stats = stats,
                           duration.dependent=duration.dependent,
-                          verbose=verbose, ...)
+                          verbose=verbose, dynamic=dynamic, ...)
   
   ## Map the vertex IDs back to the original dynamic network from the static sim:
   #  using the pid methods to be safe for when pids are non-numeric
