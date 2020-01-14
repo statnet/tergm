@@ -201,7 +201,7 @@ tergm <- function(formula, constraints = ~., estimate, times=NULL, offset.coef=N
                   targets, target.stats, SAN.offsets, estimate, control, verbose)
                 )
   
-  
+  out$estimate <- estimate
   out$control <- control
   
   class(out)<-c("tergm","ergm")
