@@ -40,7 +40,7 @@ diss.mle<-function(y0,y1){
 do.run <- function(dir, prop.weights="default"){
 y0<-network.initialize(n,dir=dir)
 y0 %v% "a" <- rep(seq_along(ns), ns)
-set.seed(321)
+set.seed(3213)
 y0<-simulate(y0~edges, constraints=~blockdiag("a"), coef=theta, control=control.simulate(MCMC.burnin=n^2*2), dynamic=FALSE)
 
 cat("Complete data:\n")
