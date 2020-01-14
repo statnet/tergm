@@ -28,10 +28,7 @@ simtest <- function(S, edges, dur, n, dir=FALSE, bip=0){
   g0<-network.initialize(n, dir=dir, bipartite=bip)
   g0 %n% "dc" <- dc
   g0 %n% "time" <- 0
-  g0 %n% "lasttoggle" <- -1-rgeom(network.dyadcount(g0),1/4)
 
-
-  
   dyads <- network.dyadcount(g0)
   density<-edges/dyads
   
@@ -39,18 +36,20 @@ simtest <- function(S, edges, dur, n, dir=FALSE, bip=0){
   
   # Get a reasonably close starting network.
   g1<-san(g0~edges,target.stats=target.stats,verbose=TRUE)
+
+  g1 %n% "lasttoggle" <- cbind(as.edgelist(g1), -rgeom(network.edgecount(g1),1/4))
   
   print(coef.form)
   print(coef.diss)
   
   # Simulate. Starting from an ordinary network:
-  dynsim<-simulate(g1,formation=~edges,dissolution=~edges,coef.form=coef.form,coef.diss=coef.diss,time.slices=S,verbose=TRUE,monitor=~edgecov("dc")+edgecov.ages("dc"))
+  dynsim<-simulate(g1 ~ FormE(~edges) + DissE(~edges),coef=c(coef.form,coef.diss),time.slices=S,verbose=TRUE,monitor=~edgecov("dc")+edgecov.ages("dc"), dynamic=TRUE)
   
   # Resuming from a networkDynamic:
-  dynsim2<-simulate(dynsim,formation=~edges,dissolution=~edges,coef.form=coef.form,coef.diss=coef.diss,time.slices=S,verbose=TRUE,monitor=~edgecov("dc")+edgecov.ages("dc"))
+  dynsim2<-simulate(dynsim ~ FormE(~edges) + DissE(~edges),coef=c(coef.form,coef.diss),time.slices=S,verbose=TRUE,monitor=~edgecov("dc")+edgecov.ages("dc"), dynamic=TRUE)
   
   # Resuming from a resumed networkDynamic:
-  dynsim3<-simulate(dynsim2,formation=~edges,dissolution=~edges,coef.form=coef.form,coef.diss=coef.diss,time.slices=S,verbose=TRUE,monitor=~edgecov("dc")+edgecov.ages("dc"))
+  dynsim3<-simulate(dynsim2 ~ FormE(~edges) + DissE(~edges),coef=c(coef.form,coef.diss),time.slices=S,verbose=TRUE,monitor=~edgecov("dc")+edgecov.ages("dc"), dynamic=TRUE)
 
   sim.stats <- attr(dynsim3,"stats")
   
