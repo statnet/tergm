@@ -67,7 +67,12 @@ network.extract.with.lasttoggle <- function(nwd, at, duration.dependent){
     ltlts <- unlist(lapply(lapply(lapply(nw$mel, "[[", "atl"), "[[", 
                     "active"), function(x) suppressWarnings(max(x[x <= at]))))
 
-    ltlts[ltlts == -Inf] <- round(-.Machine$integer.max/2)
+    wp <- which(ltlts != -Inf)
+    
+    lttails <- lttails[wp]
+    ltheads <- ltheads[wp]
+    ltlts <- ltlts[wp]
+
     ltlts <- as.integer(ltlts)
 
     w <- lttails & ltheads

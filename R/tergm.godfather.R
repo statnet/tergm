@@ -128,7 +128,6 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
     # need to apply the toggles that take effect then.
     toggles <- toggles[toggles[,1]>start & toggles[,1]<=end,,drop=FALSE]
 
-    if(is.null(nw %n% "lasttoggle")) nw %n% "lasttoggle" <- cbind(as.edgelist(nw), round(-.Machine$integer.max/2))
     nw %n% "time" <- start
   }
 
