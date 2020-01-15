@@ -47,7 +47,7 @@ is.durational.character <- function(object,...) FALSE # for mon="all"
 #' @export
 is.durational.ergm_model <- function(object, ...){
 #' @import purrr
-  map(object$terms, "duration") %>% NVL(FALSE) %>% unlist %>% max
+  map(object$terms, "duration") %>% unlist %>% NVL(FALSE) %>% max
 }
 
 #' @describeIn is.durational Test if the ergm_state has duration-dependent terms, which call for [lasttoggle] data structures.
