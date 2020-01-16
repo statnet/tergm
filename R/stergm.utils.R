@@ -59,7 +59,7 @@ get.dev <- local({
 #
 # updates: lasttoggle is NULL when duration.dependent is FALSE
 network.extract.with.lasttoggle <- function(nwd, at, duration.dependent){
-  nw <- network.extract(nwd, onset=at-1, terminus=at+1)
+  nw <- network.extract(nwd, at=at)
 
   if(duration.dependent) {
     lttails <- unlist(lapply(nw$mel, "[[", "outl"))
