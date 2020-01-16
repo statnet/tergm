@@ -276,47 +276,75 @@ S_CHANGESTAT_FN(s_mean_age_mon){
 /*****************
  edgecov_mean_age
 
- Weigted mean of ages of all extant ties.
+ Weighted mean of ages of all extant ties.
 
  The edgecov_mean_ages of an empty network is defined to be emptyval.
 
  *****************/
-X_CHANGESTAT_FN(x_edgecov_mean_age_mon){
+I_CHANGESTAT_FN(i_edgecov_mean_age_mon) {
+  ALLOC_STORAGE(4, double, sto);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
+  int transform = INPUT_PARAM[1];
+  
+  int noffset = BIPARTITE, nrow;
+  if(noffset > 0){
+    nrow = noffset;
+  }else{
+    nrow = INPUT_PARAM[2];
+  }
+  
+  for(Edge k=1; k <= N_EDGES; k++){
+    Vertex tail, head;
+    FindithEdge(&tail, &head, k, nwp);
+    double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];   
+    if(val!=0){   
+      int et = ElapsedTime(tail,head,dur_inf);
+      CSD_TRANSFORM_ET(et);
+      sto[0] += ett1*val;
+      sto[1] += val;
+    }
+  }
+}
+
+X_CHANGESTAT_FN(x_edgecov_mean_age_mon) {
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
-    GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
-    
+    GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
+
     int noffset = BIPARTITE, nrow;
     if(noffset > 0){
       nrow = noffset;
     }else{
       nrow = INPUT_PARAM[2];
     }
-    
-    double s0 = 0, s1 = 0; // Sum of age values of initial and final network.
-    double zeroval = INPUT_PARAM[0]; // Empty network value.
-    int transform = INPUT_PARAM[1]; // Transformation code.
-    double e0 = 0, e1 = 0; // Sum of edge weights in initial and final network.
   
-    for(Edge k=1; k <= N_EDGES; k++){
-      Vertex tail, head;
-      FindithEdge(&tail, &head, k, nwp);
-      double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];   
-      if(val!=0){
-        int et = ElapsedTime(tail,head,dur_inf) + 1;
-        CSD_TRANSFORM_ET(et);
-        s0 += ett*val;
-        s1 += ett1*val;
-        e0 += val;
+    int transform = INPUT_PARAM[1];
+    
+    GET_STORAGE(double, sto);
+    
+    if(sto[1] != 0) {
+      if(transform == 0) {
+        sto[0] += sto[1];
+        CHANGE_STAT[0] = 1;
+      } else {
+        double oldval = sto[0];
+        sto[0] = 0;
+        for(Edge k=1; k <= N_EDGES; k++) {
+          Vertex tail, head;
+          FindithEdge(&tail, &head, k, nwp);
+          double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];   
+          if(val!=0) {
+            int et = ElapsedTime(tail,head,dur_inf) + 1;
+            CSD_TRANSFORM_ET(et);
+            sto[0] += ett1*val;
+          }
+        }
+        CHANGE_STAT[0] = (sto[0] - oldval)/sto[1];
       }
     }
-    
-    e1 = e0;
-    
-    CHANGE_STAT[0]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
   }
 }
-
+  
 C_CHANGESTAT_FN(c_edgecov_mean_age_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
@@ -327,25 +355,12 @@ C_CHANGESTAT_FN(c_edgecov_mean_age_mon){
     nrow = INPUT_PARAM[2];
   }
 
-  double s0 = 0, s1 = 0; // Sum of age values of initial and final network.
+  GET_STORAGE(double, sto);
+
+  double s0 = sto[0], s1 = sto[0]; // Sum of age values of initial and final network.
   double zeroval = INPUT_PARAM[0]; // Empty network value.
   int transform = INPUT_PARAM[1]; // Transformation code.
-  double e0 = 0, e1 = 0; // Sum of edge weights in initial and final network.
-
-  for(Edge k=1; k <= N_EDGES; k++){
-    Vertex etail, ehead;
-    FindithEdge(&etail, &ehead, k, nwp);
-    double val = INPUT_ATTRIB[(ehead - 1 - noffset) * nrow + (etail - 1)];   
-    if(val!=0){
-      int et = ElapsedTime(etail,ehead,dur_inf);
-      CSD_TRANSFORM_ET(et);
-      s0 += ett1*val;
-      s1 += ett1*val;
-      e0 += val;
-    }
-  }
-  
-  e1 = e0;
+  double e0 = sto[1], e1 = sto[1]; // Sum of edge weights in initial and final network.
   
   double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];   
   if(val!=0){
@@ -363,6 +378,15 @@ C_CHANGESTAT_FN(c_edgecov_mean_age_mon){
   }
   
   CHANGE_STAT[0]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+  
+  sto[2] = s1;
+  sto[3] = e1;
+}
+
+U_CHANGESTAT_FN(u_edgecov_mean_age_mon){
+  GET_STORAGE(double, sto);
+  sto[0] = sto[2];
+  sto[1] = sto[3];
 }
 
 S_CHANGESTAT_FN(s_edgecov_mean_age_mon){
