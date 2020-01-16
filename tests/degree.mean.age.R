@@ -47,10 +47,11 @@ print(coef.form)
 print(coef.diss)
 
 # Simulate from the fit.
-dynsim<-simulate(g0,formation=~edges,dissolution=~edges,coef.form=coef.form,coef.diss=coef.diss,time.burnin=S, time.slices=S,verbose=TRUE,output="stats",
+dynsim<-simulate(g0 ~ FormE(~edges) + DissE(~edges),coef=c(coef.form,coef.diss),time.burnin=S, time.slices=S,verbose=TRUE,output="stats",
                  monitor=~edges+mean.age
                  +degree.mean.age(1:3)+degrange.mean.age(1:2,3:4)+degrange.mean.age(1:2)
-                 +degree.mean.age(1:3,"a")+degrange.mean.age(1:2,3:4,"a")+degrange.mean.age(1:2,by="a")
+                 +degree.mean.age(1:3,"a")+degrange.mean.age(1:2,3:4,"a")+degrange.mean.age(1:2,by="a"), dynamic=TRUE,
+                 constraint="discordTNT"~.
                  )
 
 dynsim.dup <- duplicated(as.data.frame(t(dynsim)))
