@@ -405,38 +405,95 @@ S_CHANGESTAT_FN(s_edgecov_mean_age_mon){
  The degree_mean_age of a network with no actors with degree of interest is defined to be emptyval.
 
  *****************/
+I_CHANGESTAT_FN(i_degree_mean_age_mon){
+  ALLOC_STORAGE(4, void *, sto);
+  
+  sto[0] = Calloc(N_CHANGE_STATS, double);
+  sto[1] = Calloc(N_CHANGE_STATS, int);
+  
+  sto[2] = Calloc(N_CHANGE_STATS, double);
+  sto[3] = Calloc(N_CHANGE_STATS, int);
+  
+  double *age = (double *)sto[0];
+  int *count = (int *)sto[1];
+
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+    
+  Vertex *id=IN_DEG, *od=OUT_DEG;
+  int transform = INPUT_PARAM[1]; // Transformation code.
+    
+  for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
+    double s0 = 0;
+    Edge e0 = 0;
+  
+    Vertex deg = INPUT_PARAM[j+2];
+      
+    for (Edge k=1; k <= N_EDGES; k++){
+      Vertex tail, head;
+      FindithEdge(&tail, &head, k, nwp);
+        
+      unsigned int w = (od[tail]+id[tail]==deg) + (od[head]+id[head]==deg);
+        
+      if(w){
+        int et = ElapsedTime(tail,head,dur_inf);
+        CSD_TRANSFORM_ET(et);
+        s0 += ett1*w;
+        e0+=w;
+      }
+    }
+    
+    age[j] = s0;
+    count[j] = e0;
+  }
+}
+ 
 X_CHANGESTAT_FN(x_degree_mean_age_mon){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+    GET_STORAGE(void *, sto);
     
+    double *age = (double *)sto[0];
+    int *count = (int *)sto[1];
+   
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
     int transform = INPUT_PARAM[1]; // Transformation code.
-    
-    for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
-      double s0 = 0, s1 = 0;
-      Edge e0 = 0, e1 = 0;
-  
-      Vertex deg = INPUT_PARAM[j+2];
+
+    for(unsigned int j = 0; j < N_CHANGE_STATS; j++) {
+      double s0, s1;
+      int e0;
+      if(transform == 0) { // do it the fast way
+        s0 = age[j];
+        e0 = count[j];
+        
+        s1 = s0 + e0;
+      } else { // transform == 1 and we need to do it the old way
+        s0 = 0;
+        s1 = 0;
+        e0 = 0;
       
-      for (Edge k=1; k <= N_EDGES; k++){
-        Vertex tail, head;
-        FindithEdge(&tail, &head, k, nwp);
+        Vertex deg = INPUT_PARAM[j+2];
         
-        unsigned int w = (od[tail]+id[tail]==deg) + (od[head]+id[head]==deg);
-        
-        if(w){
-          int et = ElapsedTime(tail,head,dur_inf) + 1;
-          CSD_TRANSFORM_ET(et);
-          s0 += ett*w;
-          s1 += ett1*w;
-          e0+=w;
-          e1+=w;
-        }
+        for (Edge k=1; k <= N_EDGES; k++){
+          Vertex tail, head;
+          FindithEdge(&tail, &head, k, nwp);
+          
+          unsigned int w = (od[tail]+id[tail]==deg) + (od[head]+id[head]==deg);
+          
+          if(w){
+            int et = ElapsedTime(tail,head,dur_inf) + 1;
+            CSD_TRANSFORM_ET(et);
+            s0 += ett*w;
+            s1 += ett1*w;
+            e0+=w;
+          }
+        }      
       }
-    
-      CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+      
+      CHANGE_STAT[j]=(e0==0?zeroval:s1/e0)-(e0==0?zeroval:s0/e0);
+      
+      age[j] = s1;      
     }
   }
 }
@@ -449,28 +506,21 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
   double zeroval = INPUT_PARAM[0];
   int transform = INPUT_PARAM[1]; // Transformation code.
   
+  GET_STORAGE(void *, sto);
+    
+  double *age = (double *)sto[0];
+  int *count = (int *)sto[1];
+  double *newage = (double *)sto[2];
+  int *newcount = (int *)sto[3];
+
+  
+  
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
-    double s0 = 0, s1 = 0;
-    Edge e0 = 0, e1 = 0;
+    double s0 = age[j], s1 = age[j];
+    Edge e0 = count[j], e1 = count[j];
 
     Vertex deg = INPUT_PARAM[j+2];
     
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex etail, ehead;
-      FindithEdge(&etail, &ehead, k, nwp);
-      
-      unsigned int w = (od[etail]+id[etail]==deg) + (od[ehead]+id[ehead]==deg);
-      
-      if(w){
-        int et = ElapsedTime(etail,ehead,dur_inf);
-        CSD_TRANSFORM_ET(et);
-        s0 += ett1*w;
-        s1 += ett1*w;
-        e0+=w;
-        e1+=w;
-      }
-    }
-
     int change = edgeflag ? -1 : +1;
     int taildiff = (od[tail]+id[tail] + change == deg)-(od[tail]+id[tail] == deg);
     int headdiff = (od[head]+id[head] + change == deg)-(od[head]+id[head] == deg);
@@ -572,10 +622,33 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
         break;
     }
   
+    newage[j] = s1;
+    newcount[j] = e1;
+  
     CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
   }
 }
 
+U_CHANGESTAT_FN(u_degree_mean_age_mon){
+  GET_STORAGE(void *, sto);
+    
+  double *age = (double *)sto[0];
+  int *count = (int *)sto[1];
+  double *newage = (double *)sto[2];
+  int *newcount = (int *)sto[3];
+
+  memcpy(age, newage, N_CHANGE_STATS*sizeof(double));
+  memcpy(count, newcount, N_CHANGE_STATS*sizeof(double));
+}
+
+F_CHANGESTAT_FN(f_degree_mean_age_mon){
+  GET_STORAGE(void *, sto);
+
+  Free(sto[3]);
+  Free(sto[2]);
+  Free(sto[1]);
+  Free(sto[0]);  
+}
 
 S_CHANGESTAT_FN(s_degree_mean_age_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
@@ -617,88 +690,139 @@ S_CHANGESTAT_FN(s_degree_mean_age_mon){
  The degree_by_attr_mean_age of a network with no actors with degree of interest is defined to be emptyval.
 
  *****************/
+I_CHANGESTAT_FN(i_degree_by_attr_mean_age_mon){
+  ALLOC_STORAGE(4, void *, sto);
+  
+  sto[0] = Calloc(N_CHANGE_STATS, double);
+  sto[1] = Calloc(N_CHANGE_STATS, int);
+  
+  sto[2] = Calloc(N_CHANGE_STATS, double);
+  sto[3] = Calloc(N_CHANGE_STATS, int);
+  
+  double *age = (double *)sto[0];
+  int *count = (int *)sto[1];
+
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+    
+  Vertex *id=IN_DEG, *od=OUT_DEG;
+  int transform = INPUT_PARAM[1]; // Transformation code.
+    
+  for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
+    double s0 = 0;
+    Edge e0 = 0;
+  
+    Vertex deg = INPUT_PARAM[2*j+2];
+    int testattr = INPUT_PARAM[2*j+3];
+      
+    for (Edge k=1; k <= N_EDGES; k++){
+      Vertex tail, head;
+      FindithEdge(&tail, &head, k, nwp);
+        
+      Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
+      int tailattr = INPUT_PARAM[2*N_CHANGE_STATS + tail + 1]; 
+      int headattr = INPUT_PARAM[2*N_CHANGE_STATS + head + 1]; 
+  
+      unsigned int w = ((taildeg==deg && tailattr==testattr) ? 1 : 0) +
+        ((headdeg==deg && headattr==testattr) ? 1 : 0);
+        
+      if(w){
+        int et = ElapsedTime(tail,head,dur_inf);
+        CSD_TRANSFORM_ET(et);
+        s0 += ett1*w;
+        e0+=w;
+      }
+    }
+    
+    age[j] = s0;
+    count[j] = e0;
+  }
+}
+
 X_CHANGESTAT_FN(x_degree_by_attr_mean_age_mon){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+    GET_STORAGE(void *, sto);
     
+    double *age = (double *)sto[0];
+    int *count = (int *)sto[1];
+   
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
     int transform = INPUT_PARAM[1]; // Transformation code.
-    
-    for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
-      double s0 = 0, s1 = 0;
-      Edge e0 = 0, e1 = 0;
-  
-      Vertex deg = INPUT_PARAM[2*j+2];
-      int testattr = INPUT_PARAM[2*j+3];
+
+    for(unsigned int j = 0; j < N_CHANGE_STATS; j++) {
+      double s0, s1;
+      int e0;
+      if(transform == 0) { // do it the fast way
+        s0 = age[j];
+        e0 = count[j];
+        
+        s1 = s0 + e0;
+      } else { // transform == 1 and we need to do it the old way
+        s0 = 0;
+        s1 = 0;
+        e0 = 0;
       
-      for (Edge k=1; k <= N_EDGES; k++){
-        Vertex tail, head;
-        FindithEdge(&tail, &head, k, nwp);
+        Vertex deg = INPUT_PARAM[2*j+2];
+        int testattr = INPUT_PARAM[2*j+3];
         
-        Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
-        int tailattr = INPUT_PARAM[2*N_CHANGE_STATS + tail + 1]; 
-        int headattr = INPUT_PARAM[2*N_CHANGE_STATS + head + 1]; 
+        for (Edge k=1; k <= N_EDGES; k++){
+          Vertex tail, head;
+          FindithEdge(&tail, &head, k, nwp);
+          
+          Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
+          int tailattr = INPUT_PARAM[2*N_CHANGE_STATS + tail + 1]; 
+          int headattr = INPUT_PARAM[2*N_CHANGE_STATS + head + 1]; 
   
-        unsigned int w = ((taildeg==deg && tailattr==testattr) ? 1 : 0) +
-          ((headdeg==deg && headattr==testattr) ? 1 : 0);
-        
-        if(w){
-          int et = ElapsedTime(tail,head,dur_inf) + 1;
-          CSD_TRANSFORM_ET(et);
-          s0 += ett*w;
-          s1 += ett1*w;
-          e0+=w;
-          e1+=w;
-        }
+          unsigned int w = ((taildeg==deg && tailattr==testattr) ? 1 : 0) +
+            ((headdeg==deg && headattr==testattr) ? 1 : 0);
+          
+          if(w){
+            int et = ElapsedTime(tail,head,dur_inf) + 1;
+            CSD_TRANSFORM_ET(et);
+            s0 += ett*w;
+            s1 += ett1*w;
+            e0+=w;
+          }
+        }      
       }
-    
-      CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+      
+      CHANGE_STAT[j]=(e0==0?zeroval:s1/e0)-(e0==0?zeroval:s0/e0);
+      
+      age[j] = s1;      
     }
   }
 }
 
 C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
-  
+
+  GET_STORAGE(void *, sto);
+    
+  double *age = (double *)sto[0];
+  int *count = (int *)sto[1];
+  double *newage = (double *)sto[2];
+  int *newcount = (int *)sto[3];
+    
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
   int transform = INPUT_PARAM[1]; // Transformation code.
   
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
-    double s0 = 0, s1 = 0;
-    Edge e0 = 0, e1 = 0;
+    double s0 = age[j], s1 = age[j];
+    Edge e0 = count[j], e1 = count[j];
 
     Vertex deg = INPUT_PARAM[2*j+2];
     int testattr = INPUT_PARAM[2*j+3];
-    
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex etail, ehead;
-      FindithEdge(&etail, &ehead, k, nwp);
-      
-      Vertex taildeg = od[etail]+id[etail], headdeg = od[ehead]+id[ehead];
-      int tailattr = INPUT_PARAM[2*N_CHANGE_STATS + etail + 1]; 
-      int headattr = INPUT_PARAM[2*N_CHANGE_STATS + ehead + 1]; 
-
-      unsigned int w = ((taildeg==deg && tailattr==testattr) ? 1 : 0) +
-        ((headdeg==deg && headattr==testattr) ? 1 : 0);
-      
-      if(w){
-        int et = ElapsedTime(etail,ehead,dur_inf);
-        CSD_TRANSFORM_ET(et);
-        s0 += ett1*w;
-        s1 += ett1*w;
-        e0+=w;
-        e1+=w;
-      }
-    }
 
     int tailattr = INPUT_PARAM[2*N_CHANGE_STATS + tail + 1]; 
     int headattr = INPUT_PARAM[2*N_CHANGE_STATS + head + 1]; 
 
     // If neither attribute matches, this toggle has no effect on the statistic.
     if(tailattr!=testattr && headattr!=testattr){
+      newage[j] = age[j];
+      newcount[j] = count[j];
       continue; 
     }
 
@@ -804,8 +928,33 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
     }
   
     CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+    
+    newcount[j] = e1;
+    newage[j] = s1;
   }
 }
+
+U_CHANGESTAT_FN(u_degree_by_attr_mean_age_mon){
+  GET_STORAGE(void *, sto);
+    
+  double *age = (double *)sto[0];
+  int *count = (int *)sto[1];
+  double *newage = (double *)sto[2];
+  int *newcount = (int *)sto[3];
+
+  memcpy(age, newage, N_CHANGE_STATS*sizeof(double));
+  memcpy(count, newcount, N_CHANGE_STATS*sizeof(double));
+}
+
+F_CHANGESTAT_FN(f_degree_by_attr_mean_age_mon){
+  GET_STORAGE(void *, sto);
+
+  Free(sto[3]);
+  Free(sto[2]);
+  Free(sto[1]);
+  Free(sto[0]);  
+}
+
 
 S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
@@ -858,43 +1007,98 @@ S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon){
 // A macro indicating whether x is in [from,to)
 #define FROM_TO(x, from, to) ((x)>=(from) && (x)<(to))
 
+I_CHANGESTAT_FN(i_degrange_mean_age_mon){
+  ALLOC_STORAGE(4, void *, sto);
+  
+  sto[0] = Calloc(N_CHANGE_STATS, double);
+  sto[1] = Calloc(N_CHANGE_STATS, int);
+  
+  sto[2] = Calloc(N_CHANGE_STATS, double);
+  sto[3] = Calloc(N_CHANGE_STATS, int);
+  
+  double *age = (double *)sto[0];
+  int *count = (int *)sto[1];
+
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+    
+  Vertex *id=IN_DEG, *od=OUT_DEG;
+  int transform = INPUT_PARAM[1]; // Transformation code.
+    
+  for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
+    double s0 = 0;
+    Edge e0 = 0;
+  
+    Vertex from = INPUT_PARAM[j*2+2], to = INPUT_PARAM[j*2+3];
+      
+    for (Edge k=1; k <= N_EDGES; k++){
+      Vertex tail, head;
+      FindithEdge(&tail, &head, k, nwp);
+        
+      unsigned int w = FROM_TO(od[tail]+id[tail],from,to) + FROM_TO(od[head]+id[head],from,to);
+        
+      if(w){
+        int et = ElapsedTime(tail,head,dur_inf);
+        CSD_TRANSFORM_ET(et);
+        s0 += ett1*w;
+        e0+=w;
+      }
+    }
+    
+    age[j] = s0;
+    count[j] = e0;
+  }
+}
+
 X_CHANGESTAT_FN(x_degrange_mean_age_mon){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+    GET_STORAGE(void *, sto);
     
+    double *age = (double *)sto[0];
+    int *count = (int *)sto[1];
+   
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
     int transform = INPUT_PARAM[1]; // Transformation code.
-    
-    for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
-      double s0 = 0, s1 = 0;
-      Edge e0 = 0, e1 = 0;
-  
-      Vertex from = INPUT_PARAM[j*2+2], to = INPUT_PARAM[j*2+3];
+
+    for(unsigned int j = 0; j < N_CHANGE_STATS; j++) {
+      double s0, s1;
+      int e0;
+      if(transform == 0) { // do it the fast way
+        s0 = age[j];
+        e0 = count[j];
+        
+        s1 = s0 + e0;
+      } else { // transform == 1 and we need to do it the old way
+        s0 = 0;
+        s1 = 0;
+        e0 = 0;
       
-      for (Edge k=1; k <= N_EDGES; k++){
-        Vertex tail, head;
-        FindithEdge(&tail, &head, k, nwp);
+        Vertex from = INPUT_PARAM[j*2+2], to = INPUT_PARAM[j*2+3];        
         
-        unsigned int w = FROM_TO(od[tail]+id[tail],from,to) + FROM_TO(od[head]+id[head],from,to);
-        
-        if(w){
-          int et = ElapsedTime(tail,head,dur_inf) + 1;
-          CSD_TRANSFORM_ET(et);
-          s0 += ett*w;
-          s1 += ett1*w;
-          e0+=w;
-          e1+=w;
-        }
+        for (Edge k=1; k <= N_EDGES; k++){
+          Vertex tail, head;
+          FindithEdge(&tail, &head, k, nwp);
+  
+          unsigned int w = FROM_TO(od[tail]+id[tail],from,to) + FROM_TO(od[head]+id[head],from,to);
+          
+          if(w){
+            int et = ElapsedTime(tail,head,dur_inf) + 1;
+            CSD_TRANSFORM_ET(et);
+            s0 += ett*w;
+            s1 += ett1*w;
+            e0+=w;
+          }
+        }      
       }
-    
-      CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+      
+      CHANGE_STAT[j]=(e0==0?zeroval:s1/e0)-(e0==0?zeroval:s0/e0);
+      
+      age[j] = s1;      
     }
   }
 }
-
-
 
 C_CHANGESTAT_FN(c_degrange_mean_age_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
@@ -903,27 +1107,19 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
   double zeroval = INPUT_PARAM[0];
   int transform = INPUT_PARAM[1]; // Transformation code.
   
+  GET_STORAGE(void *, sto);
+    
+  double *age = (double *)sto[0];
+  int *count = (int *)sto[1];
+  double *newage = (double *)sto[2];
+  int *newcount = (int *)sto[3];
+  
+  
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
-    double s0 = 0, s1 = 0;
-    Edge e0 = 0, e1 = 0;
+    double s0 = age[j], s1 = age[j];
+    Edge e0 = count[j], e1 = count[j];
 
     Vertex from = INPUT_PARAM[j*2+2], to = INPUT_PARAM[j*2+3];
-    
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex etail, ehead;
-      FindithEdge(&etail, &ehead, k, nwp);
-      
-      unsigned int w = FROM_TO(od[etail]+id[etail],from,to) + FROM_TO(od[ehead]+id[ehead],from,to);
-      
-      if(w){
-        int et = ElapsedTime(etail,ehead,dur_inf);
-        CSD_TRANSFORM_ET(et);
-        s0 += ett1*w;
-        s1 += ett1*w;
-        e0+=w;
-        e1+=w;
-      }
-    }
 
     int change = edgeflag ? -1 : +1;
     // In the degree range case, it's possible to gain or lose a tie without entering or exiting a given degree range.
@@ -1048,7 +1244,31 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
     // If !headin0 && !headin1, then it made no difference.
   
     CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+    
+    newage[j] = s1;
+    newcount[j] = e1;
   }
+}
+
+U_CHANGESTAT_FN(u_degrange_mean_age_mon){
+  GET_STORAGE(void *, sto);
+    
+  double *age = (double *)sto[0];
+  int *count = (int *)sto[1];
+  double *newage = (double *)sto[2];
+  int *newcount = (int *)sto[3];
+
+  memcpy(age, newage, N_CHANGE_STATS*sizeof(double));
+  memcpy(count, newcount, N_CHANGE_STATS*sizeof(double));
+}
+
+F_CHANGESTAT_FN(f_degrange_mean_age_mon){
+  GET_STORAGE(void *, sto);
+
+  Free(sto[3]);
+  Free(sto[2]);
+  Free(sto[1]);
+  Free(sto[0]);  
 }
 
 
@@ -1093,48 +1313,111 @@ S_CHANGESTAT_FN(s_degrange_mean_age_mon){
 
  *****************/
 
+I_CHANGESTAT_FN(i_degrange_by_attr_mean_age_mon){
+  ALLOC_STORAGE(4, void *, sto);
+  
+  sto[0] = Calloc(N_CHANGE_STATS, double);
+  sto[1] = Calloc(N_CHANGE_STATS, int);
+  
+  sto[2] = Calloc(N_CHANGE_STATS, double);
+  sto[3] = Calloc(N_CHANGE_STATS, int);
+  
+  double *age = (double *)sto[0];
+  int *count = (int *)sto[1];
+
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+    
+  Vertex *id=IN_DEG, *od=OUT_DEG;
+  int transform = INPUT_PARAM[1]; // Transformation code.
+    
+  for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
+    double s0 = 0;
+    Edge e0 = 0;
+  
+    Vertex from = INPUT_PARAM[3*j+2], to = INPUT_PARAM[3*j+3];
+    int testattr = INPUT_PARAM[3*j+4];
+
+      
+    for (Edge k=1; k <= N_EDGES; k++){
+      Vertex tail, head;
+      FindithEdge(&tail, &head, k, nwp);
+        
+      Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
+      int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail + 1]; 
+      int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head + 1]; 
+   
+      unsigned int w = (FROM_TO(taildeg, from, to) && tailattr==testattr) +
+        (FROM_TO(headdeg, from, to) && headattr==testattr);
+        
+      if(w){
+        int et = ElapsedTime(tail,head,dur_inf);
+        CSD_TRANSFORM_ET(et);
+        s0 += ett1*w;
+        e0+=w;
+      }
+    }
+    
+    age[j] = s0;
+    count[j] = e0;
+  }
+}
+
 X_CHANGESTAT_FN(x_degrange_by_attr_mean_age_mon){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+    GET_STORAGE(void *, sto);
     
+    double *age = (double *)sto[0];
+    int *count = (int *)sto[1];
+   
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
     int transform = INPUT_PARAM[1]; // Transformation code.
-    
-    for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
-      double s0 = 0, s1 = 0;
-      Edge e0 = 0, e1 = 0;
-   
-      Vertex from = INPUT_PARAM[3*j+2], to = INPUT_PARAM[3*j+3];
-      int testattr = INPUT_PARAM[3*j+4];
+
+    for(unsigned int j = 0; j < N_CHANGE_STATS; j++) {
+      double s0, s1;
+      int e0;
+      if(transform == 0) { // do it the fast way
+        s0 = age[j];
+        e0 = count[j];
+        
+        s1 = s0 + e0;
+      } else { // transform == 1 and we need to do it the old way
+        s0 = 0;
+        s1 = 0;
+        e0 = 0;
       
-      for (Edge k=1; k <= N_EDGES; k++){
-        Vertex tail, head;
-        FindithEdge(&tail, &head, k, nwp);
+        Vertex from = INPUT_PARAM[3*j+2], to = INPUT_PARAM[3*j+3];
+        int testattr = INPUT_PARAM[3*j+4];
         
-        Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
-        int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail + 1]; 
-        int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head + 1]; 
+        for (Edge k=1; k <= N_EDGES; k++){
+          Vertex tail, head;
+          FindithEdge(&tail, &head, k, nwp);
+  
+          Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
+          int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail + 1]; 
+          int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head + 1]; 
    
-        unsigned int w = (FROM_TO(taildeg, from, to) && tailattr==testattr) +
-          (FROM_TO(headdeg, from, to) && headattr==testattr);
-        
-        if(w){
-          int et = ElapsedTime(tail,head,dur_inf) + 1;
-          CSD_TRANSFORM_ET(et);
-          s0 += ett*w;
-          s1 += ett1*w;
-          e0+=w;
-          e1+=w;
-        }
+          unsigned int w = (FROM_TO(taildeg, from, to) && tailattr==testattr) +
+            (FROM_TO(headdeg, from, to) && headattr==testattr);
+          
+          if(w){
+            int et = ElapsedTime(tail,head,dur_inf) + 1;
+            CSD_TRANSFORM_ET(et);
+            s0 += ett*w;
+            s1 += ett1*w;
+            e0+=w;
+          }
+        }      
       }
-    
-      CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+      
+      CHANGE_STAT[j]=(e0==0?zeroval:s1/e0)-(e0==0?zeroval:s0/e0);
+      
+      age[j] = s1;      
     }
   }
 }
-
 
 C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
@@ -1143,39 +1426,27 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
   double zeroval = INPUT_PARAM[0];
   int transform = INPUT_PARAM[1]; // Transformation code.
   
+  GET_STORAGE(void *, sto);
+    
+  double *age = (double *)sto[0];
+  int *count = (int *)sto[1];
+  double *newage = (double *)sto[2];
+  int *newcount = (int *)sto[3];
+  
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
-    double s0 = 0, s1 = 0;
-    Edge e0 = 0, e1 = 0;
+    double s0 = age[j], s1 = age[j];
+    Edge e0 = count[j], e1 = count[j];
 
     Vertex from = INPUT_PARAM[3*j+2], to = INPUT_PARAM[3*j+3];
     int testattr = INPUT_PARAM[3*j+4];
     
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex etail, ehead;
-      FindithEdge(&etail, &ehead, k, nwp);
-      
-      Vertex taildeg = od[etail]+id[etail], headdeg = od[ehead]+id[ehead];
-      int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + etail + 1]; 
-      int headattr = INPUT_PARAM[3*N_CHANGE_STATS + ehead + 1]; 
-
-      unsigned int w = (FROM_TO(taildeg, from, to) && tailattr==testattr) +
-        (FROM_TO(headdeg, from, to) && headattr==testattr);
-      
-      if(w){
-        int et = ElapsedTime(etail,ehead,dur_inf);
-        CSD_TRANSFORM_ET(et);
-        s0 += ett1*w;
-        s1 += ett1*w;
-        e0+=w;
-        e1+=w;
-      }
-    }
-
     int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail + 1]; 
     int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head + 1]; 
 
     // If neither attribute matches, this toggle has no effect on the statistic.
     if(tailattr!=testattr && headattr!=testattr){
+      newage[j] = age[j];
+      newcount[j] = count[j];
       continue; 
     }
 
@@ -1306,8 +1577,33 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
     }
   
     CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+    
+    newage[j] = s1;
+    newcount[j] = e1;
   }
 }
+
+U_CHANGESTAT_FN(u_degrange_by_attr_mean_age_mon){
+  GET_STORAGE(void *, sto);
+    
+  double *age = (double *)sto[0];
+  int *count = (int *)sto[1];
+  double *newage = (double *)sto[2];
+  int *newcount = (int *)sto[3];
+
+  memcpy(age, newage, N_CHANGE_STATS*sizeof(double));
+  memcpy(count, newcount, N_CHANGE_STATS*sizeof(double));
+}
+
+F_CHANGESTAT_FN(f_degrange_by_attr_mean_age_mon){
+  GET_STORAGE(void *, sto);
+
+  Free(sto[3]);
+  Free(sto[2]);
+  Free(sto[1]);
+  Free(sto[0]);  
+}
+
 
 S_CHANGESTAT_FN(s_degrange_by_attr_mean_age_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
