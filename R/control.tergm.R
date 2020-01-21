@@ -288,6 +288,8 @@
 #' @param parallel.version.check Logical: If TRUE, check that the
 #'   version of \code{\link[=ergm-package]{ergm}} running on the slave
 #'   nodes is the same as that running on the master node.
+#' @param parallel.inherit.MT Logical: If TRUE, slave nodes and
+#' processes inherit the [set.MT_terms()] setting.
 #' @param MCMC.burnin,MCMC.burnin.mul No longer used. See
 #'   \code{EGMME.MCMC.burnin.min}, \code{EGMME.MCMC.burnin.max},
 #'   \code{EGMME.MCMC.burnin.pval}, \code{EGMME.MCMC.burnin.pval},
@@ -351,7 +353,8 @@ control.tergm<-function(init=NULL,
                            
                            parallel=parallel,
                            parallel.type=parallel.type,
-                           parallel.version.check=parallel.version.check),
+                           parallel.version.check=parallel.version.check,
+                           parallel.inherit.MT=parallel.inherit.MT),
 
                          SA.restarts=10,
                          
@@ -413,7 +416,8 @@ control.tergm<-function(init=NULL,
                          seed=NULL,
                          parallel=0,
                          parallel.type=NULL,
-                         parallel.version.check=TRUE){
+                         parallel.version.check=TRUE,
+                         parallel.inherit.MT=FALSE){
 
   if(!is.null(MCMC.burnin) || !is.null(MCMC.burnin.mul)) stop("Control parameters MCMC.burnin and MCMC.burnin.mul are no longer used. See help for EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max, EGMME.MCMC.burnin.pval, EGMME.MCMC.burnin.pval, and CMLE.MCMC.burnin and CMLE.MCMC.interval for their replacements.")
 

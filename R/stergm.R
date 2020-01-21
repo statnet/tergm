@@ -220,16 +220,16 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
     nw %n% "lasttoggle" <- NVL(nw %n% "lasttoggle",rep(round(-.Machine$integer.max/2), network.dyadcount(nw)))  else nw %n% "lasttoggle" <- NULL
   }
   
-  out <- switch(estimate,
-                CMLE=,
-                CMPLE=stergm.CMLE(nw, formation, dissolution, constraints,
-                  times, offset.coef.form, offset.coef.diss, eval.loglik,
-                  estimate, control, verbose),
-                EGMME=stergm.EGMME(nw, formation, dissolution, constraints,
-                  offset.coef.form, offset.coef.diss,
-                  targets, target.stats, estimate, control, verbose)
-                  )
-  
+#  out <- switch(estimate,
+#                CMLE=,
+#                CMPLE=stergm.CMLE(nw, formation, dissolution, constraints,
+#                  times, offset.coef.form, offset.coef.diss, eval.loglik,
+#                  estimate, control, verbose),
+#                EGMME=stergm.EGMME(nw, formation, dissolution, constraints,
+#                  offset.coef.form, offset.coef.diss,
+#                  targets, target.stats, estimate, control, verbose)
+#                  )
+#  
   
   out$formation <- formation
   out$dissolution <- dissolution

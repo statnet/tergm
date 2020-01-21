@@ -278,7 +278,7 @@
 #'    \code{\link{network}}s is returned.
 #'  }
 #' @examples
-#' 
+#' \donttest{
 #' logit<-function(p)log(p/(1-p))
 #' coef.form.f<-function(coef.diss,density) -log(((1+exp(coef.diss))/(density/(1-density)))-1)
 #' 
@@ -310,6 +310,7 @@
 #' 
 #' # "Resume" the simulation.
 #' dynsim2<-simulate(dynsim,time.slices=S,verbose=TRUE)
+#' }
 #' @importFrom stats simulate
 #' @export
 simulate.stergm<-function(object, nsim=1, seed=NULL,
@@ -477,9 +478,10 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   out <- replicate(nsim, {
     nw <- .set.default.net.obs.period(nw, time.start)
     nw %n% "time" <- start <- .get.last.obs.time(nw, time.start)
-    z <- stergm_MCMC_sample(nw, model.form, model.diss, model.mon,
-                              proposal.form, proposal.diss,
-                              eta.form=eta.form, eta.diss=eta.diss, control=control, verbose=verbose)
+    z <- NULL
+#    z <- stergm_MCMC_sample(nw, model.form, model.diss, model.mon,
+#                              proposal.form, proposal.diss,
+#                              eta.form=eta.form, eta.diss=eta.diss, control=control, verbose=verbose)
     
     stats.form <- if(control$collect.form) mcmc(sweep(z$statsmatrix.form,2,summary(formation),"+"),start=time.burnin+1,thin=time.interval)
     stats.diss <- if(control$collect.diss) mcmc(sweep(z$statsmatrix.diss,2,summary(dissolution),"+"),start=time.burnin+1,thin=time.interval)

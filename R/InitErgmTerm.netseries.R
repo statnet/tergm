@@ -118,6 +118,7 @@ InitErgmTerm.Form <- function(nw, arglist, response=NULL,  ...) {
   # TODO: Fix coefficient names.
 }
 
+#' @importFrom utils modifyList
 # One formation transition
 InitErgmTerm.Form1 <- function(nw, arglist, response=NULL,  ...){
   a <- check.ErgmTerm(nw, arglist,

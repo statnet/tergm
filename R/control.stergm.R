@@ -356,8 +356,6 @@ control.stergm<-function(init.form=NULL,
                            SAN.maxit=SAN.maxit,
                            SAN.prop.weights=MCMC.prop.weights.form,
                            SAN.prop.args=MCMC.prop.args.form,
-                           SAN.init.maxedges=MCMC.init.maxedges,
-                           SAN.max.maxedges=Inf,
 
                            SAN.nsteps=round(sqrt(EGMME.MCMC.burnin.min*EGMME.MCMC.burnin.max))*SAN.nsteps.times,
 
