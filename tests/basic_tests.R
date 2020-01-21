@@ -1,6 +1,7 @@
 # These are tests of basic functionality. They will eventually be merged into others.
 
 # Construct a random network
+
 library(tergm)
 library(tibble)
 

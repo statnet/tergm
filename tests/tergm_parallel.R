@@ -14,12 +14,11 @@ opttest({
   net <- flobusiness
   set.seed(1)
   
-  mod1 <- stergm(flobusiness, formation= ~edges + degree(3), 
-                 dissolution= ~offset(edges),
-                 offset.coef.diss=log(9), 
-                 targets="formation",
+  mod1 <- tergm(flobusiness ~ FormE(~edges + degree(3)) + offset(DissE(~edges)),
+                 offset.coef=log(9),
+                 targets=~edges + degree(3),
                  estimate="EGMME",
-                 control=control.stergm(parallel=2, parallel.type="PSOCK")
+                 control=control.tergm(parallel=2, parallel.type="PSOCK")
   )
 
 }, testname='tergm_parallel')
@@ -29,12 +28,11 @@ opttest({
   net <- flobusiness
   set.seed(1)
   
-  mod1 <- stergm(flobusiness, formation= ~edges + degree(3), 
-                 dissolution= ~offset(edges),
-                 offset.coef.diss=log(9), 
-                 targets="formation",
+  mod1 <- tergm(flobusiness ~ FormE(~edges + degree(3)) + offset(DissE(~edges)),
+                 offset.coef=log(9),
+                 targets=~edges + degree(3),
                  estimate="EGMME",
-                 control=control.stergm(parallel=2, parallel.type="MPI")
+                 control=control.tergm(parallel=2, parallel.type="MPI")
   )
   
 }, testname='tergm_parallel_MPI', testvar="ENABLE_MPI_TESTS")

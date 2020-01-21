@@ -7,6 +7,7 @@
 #
 #  Copyright 2003-2020 Statnet Commons
 #######################################################################
+
 require(testthat)
 require(tergm)
 
