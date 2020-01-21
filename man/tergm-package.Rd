@@ -9,7 +9,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \name{tergm-package}
 \alias{tergm-package}
-\alias{tergm}
+% \alias{tergm} commented out as conflicts with new function named tergm
 \docType{package}
 \title{
 Fit, Simulate and Diagnose Dynamic Network Models derived from

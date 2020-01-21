@@ -35,7 +35,8 @@ control.tergm(
     SAN.prop.weights = MCMC.prop.weights, SAN.prop.args = MCMC.prop.args, SAN.nsteps =
     round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max)) * SAN.nsteps.times,
     SAN.packagenames = MCMC.packagenames, parallel = parallel, parallel.type =
-    parallel.type, parallel.version.check = parallel.version.check),
+    parallel.type, parallel.version.check = parallel.version.check, parallel.inherit.MT =
+    parallel.inherit.MT),
   SA.restarts = 10,
   SA.burnin = 1000,
   SA.plot.progress = FALSE,
@@ -79,7 +80,8 @@ control.tergm(
   seed = NULL,
   parallel = 0,
   parallel.type = NULL,
-  parallel.version.check = TRUE
+  parallel.version.check = TRUE,
+  parallel.inherit.MT = FALSE
 )
 }
 \arguments{
@@ -410,6 +412,9 @@ values are \code{"MPI"} and \code{"PSOCK"}. Defaults to using the
 \item{parallel.version.check}{Logical: If TRUE, check that the
 version of \code{\link[=ergm-package]{ergm}} running on the slave
 nodes is the same as that running on the master node.}
+
+\item{parallel.inherit.MT}{Logical: If TRUE, slave nodes and
+processes inherit the \code{\link[=set.MT_terms]{set.MT_terms()}} setting.}
 }
 \value{
 A list with arguments as components.

@@ -298,7 +298,7 @@ specified, \code{time.start} will override it with a warning.)
 }
 }
 \examples{
-
+\donttest{
 logit<-function(p)log(p/(1-p))
 coef.form.f<-function(coef.diss,density) -log(((1+exp(coef.diss))/(density/(1-density)))-1)
 
@@ -330,4 +330,5 @@ dynsim<-simulate(g1,formation=~edges,dissolution=~edges,
 
 # "Resume" the simulation.
 dynsim2<-simulate(dynsim,time.slices=S,verbose=TRUE)
+}
 }

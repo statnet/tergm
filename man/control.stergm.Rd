@@ -44,10 +44,9 @@ control.stergm(
   SAN.nsteps.times = 8,
   SAN.control = control.san(term.options = term.options, SAN.maxit = SAN.maxit,
     SAN.prop.weights = MCMC.prop.weights.form, SAN.prop.args = MCMC.prop.args.form,
-    SAN.init.maxedges = MCMC.init.maxedges, SAN.max.maxedges = Inf, SAN.nsteps =
-    round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max)) * SAN.nsteps.times,
-    SAN.packagenames = MCMC.packagenames, parallel = parallel, parallel.type =
-    parallel.type, parallel.version.check = parallel.version.check),
+    SAN.nsteps = round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max)) *
+    SAN.nsteps.times, SAN.packagenames = MCMC.packagenames, parallel = parallel,
+    parallel.type = parallel.type, parallel.version.check = parallel.version.check),
   SA.restarts = 10,
   SA.burnin = 1000,
   SA.plot.progress = FALSE,
