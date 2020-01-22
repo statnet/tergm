@@ -64,7 +64,7 @@ stopifnot(z.error(diss.mle(y0,y1), fit$coef[2], vcov(fit)[2,2]) <= tolerance)
 for(prop.weight in prop.weights){
 cat("====",prop.weight,"====\n")
 set.seed(543)
-fit<-tergm(list(y0,y1) ~ Form(~edges) + Diss(~edges), estimate="CMLE", control=control.tergm(CMLE.control=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 5e3, MCMC.interval = 3e3, MCMC.burnin = 3e3, force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2), eval.loglik=FALSE)
+fit<-tergm(list(y0,y1) ~ Form(~edges) + Diss(~edges), estimate="CMLE", control=control.tergm(CMLE.control=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 2.5e3, force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2), eval.loglik=FALSE)
 
 stopifnot(fit$estimate=="CMLE")
 stopifnot(z.error(form.mle(y0,y1), fit$coef[1], vcov(fit)[1,1]) <= tolerance)
@@ -99,7 +99,7 @@ stopifnot(z.error(diss.mle(y0,y1m), fit$coef[2], vcov(fit)[2,2]) <= tolerance)
 for(prop.weight in prop.weights){
 cat("====",prop.weight,"====\n")
 set.seed(234)
-fit<-tergm(list(y0,y1m) ~ Form(~edges) + Diss(~edges), estimate="CMLE", control=control.tergm(CMLE.control=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 5e3, MCMC.interval = 3e3, MCMC.burnin = 3e3, force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2), eval.loglik=FALSE)
+fit<-tergm(list(y0,y1m) ~ Form(~edges) + Diss(~edges), estimate="CMLE", control=control.tergm(CMLE.control=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 2.5e3, force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2), eval.loglik=FALSE)
 
 stopifnot(fit$estimate=="CMLE")
 stopifnot(z.error(form.mle(y0,y1m), fit$coef[1], vcov(fit)[1,1]) <= tolerance)
