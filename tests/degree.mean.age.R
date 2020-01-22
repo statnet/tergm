@@ -8,7 +8,7 @@
 #  Copyright 2008-2019 Statnet Commons
 #######################################################################
 library(statnet.common)
-#opttest({
+opttest({
 library(tergm)
 set.seed(0)
 logit<-function(p)log(p/(1-p))
@@ -70,4 +70,4 @@ if(test$p.value < 0.001){
 
 #print.sim.stats(dynsim,target.stats,duration)
 #dynsim<-simulate(g0,formation=~edges,dissolution=~edges,coef.form=coef.form,coef.diss=coef.diss,time.slices=S,verbose=TRUE,statsonly=TRUE,monitor=~degrange(0:2,2:4,"a"))
-#}, "degree mean age terms simulation")
+}, "degree mean age terms simulation")
