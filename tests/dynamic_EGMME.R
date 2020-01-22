@@ -8,7 +8,7 @@
 #  Copyright 2008-2019 Statnet Commons
 #######################################################################
 library(statnet.common)
-opttest({
+#opttest({
 library(tergm)
 n<-40
 do.plot <- TRUE
@@ -40,4 +40,4 @@ dynfit2<-tergm(g1 ~ FormE(~edges + degree(1)) + DissE(~edges), targets=~edges+de
 #mcmc.diagnostics(dynfit2)
 
 stopifnot(all.equal(c(coef.form,coef.diss),dynfit2$fit$coef,tol=0.01,check.attributes=FALSE))
-}, "EGMME")
+#}, "EGMME")

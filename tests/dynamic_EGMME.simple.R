@@ -8,7 +8,7 @@
 #  Copyright 2008-2019 Statnet Commons
 #######################################################################
 library(statnet.common)
-opttest({
+#opttest({
 library(tergm)
 n<-40
 do.plot <- TRUE
@@ -36,4 +36,4 @@ dynfit<-tergm(g1 ~ FormE(~edges) + DissE(~edges), targets=~edges+mean.age, estim
 #mcmc.diagnostics(dynfit)
 
 stopifnot(all.equal(unlist(truth),dynfit$fit$coef,tol=0.01,check.attributes=FALSE))
-},"simple EGMME")
+#},"simple EGMME")

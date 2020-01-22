@@ -8,7 +8,7 @@
 #  Copyright 2008-2019 Statnet Commons
 #######################################################################
 library(statnet.common)
-opttest({
+#opttest({
 library(tergm)
 options(tergm.eval.loglik=FALSE)
 
@@ -68,7 +68,7 @@ stopifnot(z.error(diss.mle(y0,y1), fit$coef[2], vcov(fit)[2,2]) <= tolerance)
 for(prop.weight in prop.weights){
 cat("====",prop.weight,"====\n")
 set.seed(543)
-fit<-tergm(list(y0,y1) ~ Form(~edges) + Diss(~edges), constraints=~blockdiag("a"), estimate="CMLE", control=control.tergm(CMLE.control=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 1e4, MCMC.interval = 1e4, MCMC.burnin = 1e4, force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2))
+fit<-tergm(list(y0,y1) ~ Form(~edges) + Diss(~edges), constraints=~blockdiag("a"), estimate="CMLE", control=control.tergm(CMLE.control=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 2.5e3, force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2))
 
 stopifnot(fit$estimate=="CMLE")
 stopifnot(z.error(form.mle(y0,y1), fit$coef[1], vcov(fit)[1,1]) <= tolerance)
@@ -103,7 +103,7 @@ stopifnot(z.error(diss.mle(y0,y1m), fit$coef[2], vcov(fit)[2,2]) <= tolerance)
 for(prop.weight in prop.weights){
 cat("====",prop.weight,"====\n")
 set.seed(234)
-fit<-tergm(list(y0,y1m) ~ Form(~edges) + Diss(~edges), constraints=~blockdiag("a"), estimate="CMLE", control=control.tergm(CMLE.control=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 1e4, MCMC.interval = 1e4, MCMC.burnin = 1e4, force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2))
+fit<-tergm(list(y0,y1m) ~ Form(~edges) + Diss(~edges), constraints=~blockdiag("a"), estimate="CMLE", control=control.tergm(CMLE.control=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 4e3, force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2))
 
 stopifnot(fit$estimate=="CMLE")
 stopifnot(z.error(form.mle(y0,y1m), fit$coef[1], vcov(fit)[1,1]) <= tolerance)
@@ -115,4 +115,5 @@ cat("=========== Directed test ===========\n")
 do.run(TRUE, prop.weights=c("default","random"))
 cat("=========== Undirected test ===========\n")
 do.run(FALSE, prop.weights=c("default","random"))
-}, "dynamic MLE with block-diagonal constraints")
+
+#}, "dynamic MLE with block-diagonal constraints")
