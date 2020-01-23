@@ -398,6 +398,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                # assume that simulate.stergm has added +1 to all the time values, so subtract 1 for an offset of 0
                changes[,1]<-changes[,1]-1+time.offset
                newnw <- as.network(z$newnetwork)
+               newnw <- .add.net.obs.period.spell(newnw, start-1+time.offset, time.slices)
                attributes(newnw) <- c(attributes(newnw), # Don't clobber existing attributes!
                                       list(formula = formula,
                                            stats.fd = stats.fd,
