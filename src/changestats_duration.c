@@ -654,6 +654,7 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
 }
 
 U_CHANGESTAT_FN(u_degree_mean_age_mon){
+  // FIXME: Do not assume that the dyad in this u_ call is the same as that in the last c_ call.
   GET_STORAGE(void *, sto);
     
   double *age = (double *)sto[0];
@@ -662,7 +663,7 @@ U_CHANGESTAT_FN(u_degree_mean_age_mon){
   int *newcount = (int *)sto[3];
 
   memcpy(age, newage, N_CHANGE_STATS*sizeof(double));
-  memcpy(count, newcount, N_CHANGE_STATS*sizeof(double));
+  memcpy(count, newcount, N_CHANGE_STATS*sizeof(int));
 }
 
 F_CHANGESTAT_FN(f_degree_mean_age_mon){
@@ -959,6 +960,7 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
 }
 
 U_CHANGESTAT_FN(u_degree_by_attr_mean_age_mon){
+  // FIXME: Do not assume that the dyad in this u_ call is the same as that in the last c_ call.
   GET_STORAGE(void *, sto);
     
   double *age = (double *)sto[0];
@@ -967,7 +969,7 @@ U_CHANGESTAT_FN(u_degree_by_attr_mean_age_mon){
   int *newcount = (int *)sto[3];
 
   memcpy(age, newage, N_CHANGE_STATS*sizeof(double));
-  memcpy(count, newcount, N_CHANGE_STATS*sizeof(double));
+  memcpy(count, newcount, N_CHANGE_STATS*sizeof(int));
 }
 
 F_CHANGESTAT_FN(f_degree_by_attr_mean_age_mon){
@@ -1275,6 +1277,7 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
 }
 
 U_CHANGESTAT_FN(u_degrange_mean_age_mon){
+  // FIXME: Do not assume that the dyad in this u_ call is the same as that in the last c_ call.
   GET_STORAGE(void *, sto);
     
   double *age = (double *)sto[0];
@@ -1283,7 +1286,7 @@ U_CHANGESTAT_FN(u_degrange_mean_age_mon){
   int *newcount = (int *)sto[3];
 
   memcpy(age, newage, N_CHANGE_STATS*sizeof(double));
-  memcpy(count, newcount, N_CHANGE_STATS*sizeof(double));
+  memcpy(count, newcount, N_CHANGE_STATS*sizeof(int));
 }
 
 F_CHANGESTAT_FN(f_degrange_mean_age_mon){
@@ -1608,6 +1611,7 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
 }
 
 U_CHANGESTAT_FN(u_degrange_by_attr_mean_age_mon){
+  // FIXME: Do not assume that the dyad in this u_ call is the same as that in the last c_ call.
   GET_STORAGE(void *, sto);
     
   double *age = (double *)sto[0];
@@ -1616,7 +1620,7 @@ U_CHANGESTAT_FN(u_degrange_by_attr_mean_age_mon){
   int *newcount = (int *)sto[3];
 
   memcpy(age, newage, N_CHANGE_STATS*sizeof(double));
-  memcpy(count, newcount, N_CHANGE_STATS*sizeof(double));
+  memcpy(count, newcount, N_CHANGE_STATS*sizeof(int));
 }
 
 F_CHANGESTAT_FN(f_degrange_by_attr_mean_age_mon){
