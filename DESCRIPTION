@@ -70,3 +70,7 @@ Collate:
     'summary.statistics.networkDynamic.R'
     'summary.stergm.R'
     'zzz.R'
+Remotes: github::statnet/statnet.common@master,
+    github::statnet/network@master,
+    github::statnet/networkDynamic@master,
+    github::statnet/ergm@master
