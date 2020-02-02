@@ -80,3 +80,8 @@ Collate:
     'tergm.getMCMCsample.R'
     'tergm.godfather.R'
     'zzz.R'
+Remotes: github::statnet/statnet.common@master,
+    github::statnet/network@master,
+    github::statnet/networkDynamic@master,
+    github::statnet/ergm-private@dev,
+    github::statnet/ergm.multi-private@dev
