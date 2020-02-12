@@ -175,6 +175,9 @@ and monitoring formulas	used in the simulation,	respectively.}
 \item{\code{coef}:}{Coefficients used in the simulation.}
 \item{\code{changes}:}{A four-column matrix summarizing the changes in the
 \code{"changes"} output. (This may be removed in the future.)}
+\item{\code{formation}, \code{dissolution}:}{Formation and dissolution
+formula arguments.}
+\item{\code{coef.form}, \code{coef.diss}:}{Coefficient arguments.}
 }
 When \code{nsim>1}, a \code{\link{network.list}} of these
 \code{\link{networkDynamic}}s is returned.
@@ -209,6 +212,9 @@ and monitoring formulas	used in the simulation,	respectively.}
 \item{coef:}{Coefficients used in the simulation.}
 \item{changes}{A four-column matrix summarizing the changes in the
 \code{"changes"} output. (This may be removed in the future.)}
+\item{\code{formation}, \code{dissolution}:}{Formation and dissolution
+formula arguments.}
+\item{\code{coef.form}, \code{coef.diss}:}{Coefficient arguments.}
 }
 When \code{nsim>1}, a \code{\link{network.list}} of these
 \code{\link{network}}s is returned.
@@ -219,7 +225,7 @@ The \code{simulate.network} and \code{simulate.networkDynamic} wrappers
 are provided for backwards compatibility.  It is recommended that new
 code make use of the \code{simulate_formula.network} and
 \code{simulate_formula.networkDynamic} functions instead.  See
-\code{\link[simulate.tergm]} for details on these new functions.
+\code{\link{simulate.tergm}} for details on these new functions.
 }
 \details{
 Note that return values may be structured differently than in past versions.
