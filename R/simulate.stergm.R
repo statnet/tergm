@@ -88,7 +88,7 @@
 #' are provided for backwards compatibility.  It is recommended that new
 #' code make use of the \code{simulate_formula.network} and
 #' \code{simulate_formula.networkDynamic} functions instead.  See
-#' \code{\link[simulate.tergm]} for details on these new functions.
+#' \code{\link{simulate.tergm}} for details on these new functions.
 #'
 #' Note that return values may be structured differently than in past versions.
 #' 
@@ -194,6 +194,9 @@
 #'      \item{\code{coef}:}{Coefficients used in the simulation.}
 #'      \item{\code{changes}:}{A four-column matrix summarizing the changes in the
 #'	\code{"changes"} output. (This may be removed in the future.)}
+#'      \item{\code{formation}, \code{dissolution}:}{Formation and dissolution
+#'	formula arguments.}
+#'      \item{\code{coef.form}, \code{coef.diss}:}{Coefficient arguments.}
 #'    } 
 #'    When \code{nsim>1}, a \code{\link{network.list}} of these
 #'    \code{\link{networkDynamic}}s is returned.
@@ -228,6 +231,9 @@
 #'      \item{coef:}{Coefficients used in the simulation.}
 #'      \item{changes}{A four-column matrix summarizing the changes in the
 #'	\code{"changes"} output. (This may be removed in the future.)}
+#'      \item{\code{formation}, \code{dissolution}:}{Formation and dissolution
+#'	formula arguments.}
+#'      \item{\code{coef.form}, \code{coef.diss}:}{Coefficient arguments.}
 #'    }
 #'    When \code{nsim>1}, a \code{\link{network.list}} of these
 #'    \code{\link{network}}s is returned.
@@ -259,8 +265,14 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   
   control <- set.control.class("control.simulate.network.tergm")
 
-  simulate(object ~ FormE(formation) + DissE(dissolution), nsim=nsim, seed=seed, coef = c(coef.form, coef.diss), constraints=constraints,
+  rv <- simulate(object ~ FormE(formation) + DissE(dissolution), nsim=nsim, seed=seed, coef = c(coef.form, coef.diss), constraints=constraints,
            monitor=monitor, time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval, time.offset=time.offset, control=control, output=match.arg(output), stats = stats.form || stats.diss, duration.dependent=duration.dependent, verbose=verbose, dynamic=TRUE, ...)
+           
+  if(is(rv, "network")) {
+    attributes(rv) <- c(attributes(rv), list(formation = formation, dissolution = dissolution, coef.form = coef.form, coef.diss = coef.diss))
+  }
+  
+  rv
 }
 #' @rdname simulate.stergm
 #' @export
@@ -286,8 +298,16 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   
   control <- set.control.class("control.simulate.network.tergm")
 
-  simulate(object ~ FormE(formation) + DissE(dissolution), nsim=nsim, seed=seed, coef = c(coef.form, coef.diss), constraints=constraints,
+
+
+  rv <- simulate(object ~ FormE(formation) + DissE(dissolution), nsim=nsim, seed=seed, coef = c(coef.form, coef.diss), constraints=constraints,
            monitor=monitor, time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval, time.offset=time.offset, control=control, output=match.arg(output), stats = stats.form || stats.diss, duration.dependent=duration.dependent, verbose=verbose, dynamic=TRUE, ...)
+
+  if(is(rv, "networkDynamic")) {
+    attributes(rv) <- c(attributes(rv), list(formation = formation, dissolution = dissolution, coef.form = coef.form, coef.diss = coef.diss))
+  }
+  
+  rv
 }
 
 .set.default.net.obs.period <- function(nw, time.start=NULL){
