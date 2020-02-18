@@ -216,8 +216,8 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
   control.transfer <- list(MCMC.prop.weights="MCMC.prop.weights",
                            MCMC.prop.args="MCMC.prop.args",
                            MCMC.packagenames="MCMC.packagenames",
-                           MCMC.init.maxedges="MCMC.init.maxedges",
-                           MCMC.init.maxchanges="MCMC.init.maxchanges",
+                           MCMC.maxedges="MCMC.maxedges",
+                           MCMC.maxchanges="MCMC.maxchanges",
                            EGMME.MCMC.burnin.min="MCMC.burnin.min",
                            EGMME.MCMC.burnin.max="MCMC.burnin.max",
                            EGMME.MCMC.burnin.pval="MCMC.burnin.pval",
@@ -246,7 +246,7 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
     duration.dependent <-   is.lasttoggle(nw.start,object$formula,monitor=object$monitor)
   }
   
-  simulate_formula.network(object=object$formula, basis=nw.start,nsim=nsim,coef=coef, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, output=output, stats=stats, duration.dependent=duration.dependent, verbose=verbose, ...)
+  simulate_formula.network(object=object$formula, basis=nw.start,nsim=nsim,coef=coef, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, output=match.arg(output), stats=stats, duration.dependent=duration.dependent, verbose=verbose, dynamic=TRUE, ...)
 }
 
 

@@ -130,7 +130,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
                 )
 
   out <- list(network = nw, formula = formula, targets = targets, target.stats=model.mon$target.stats, estimate=estimate, covar = Cout$covar, opt.history=Cout$opt.history, sample=Cout$sample, sample.obs=NULL, control=control, reference = ~Bernoulli, mc.se = Cout$mc.se, constraints = constraints,
-              fit = with(Cout, list(network=nw, formula=formula, coef = eta, covar=covar, etamap = model$etamap, offset = model$etamap$offsettheta, constraints=constraints, estimate=estimate, control=control, reference = ~Bernoulli, mc.se = mc.se)))
+              fit = with(Cout, list(network=nw, formula=formula, coef = eta, covar=covar, etamap = model$etamap, offset = model$etamap$offsettheta, constraints=constraints, estimate=estimate, control=control, reference = ~Bernoulli, mc.se = mc.se, ergm_version = packageVersion("ergm"))))
   class(out$fit)<-"ergm"
   
   out

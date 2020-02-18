@@ -86,3 +86,25 @@ mcmc.diagnostics.stergm <- function(object,
     getS3method("mcmc.diagnostics","ergm")(object, center=center, esteq=esteq, vars.per.page=vars.per.page, ...)
   }
 }
+
+#' @export
+mcmc.diagnostics.tergm <- function(object, 
+                                    center=TRUE,
+                                    esteq=TRUE,
+                                    vars.per.page=3, ...){
+  if(!is.null(object$fit$sample)){
+    cat("\n==========================\n")
+    cat("Model fit diagnostics\n")
+    cat("==========================\n\n")
+    object$fit$control$MCMLE.termination <- NVL(object$fit$control$MCMLE.termination,"NA")
+    mcmc.diagnostics(object$fit, center=center, esteq=esteq, vars.per.page=vars.per.page, ...)
+  }
+  if(!is.null(object$sample)){
+    cat("\n==========================\n")
+    cat("EGMME diagnostics\n")
+    cat("==========================\n\n")
+    object$control$MCMLE.termination <- NVL(object$control$MCMLE.termination,"NA")    
+    getS3method("mcmc.diagnostics","ergm")(object, center=center, esteq=esteq, vars.per.page=vars.per.page, ...)
+  }
+}
+
