@@ -33,3 +33,16 @@ stopifnot(lt[lt[,1]==2 & lt[,2]==9,3] == 0)
 stopifnot(lt[lt[,1]==1 & lt[,2]==4,3] == 8)
 stopifnot(lt[lt[,1]==2 & lt[,2]==2,3] == 5)
 stopifnot(sum(lt[,3]==1)==15)
+
+# Test that auxiliary networks are being tracked properly.
+el <- matrix(c(1, 2,
+               1, 3,
+               1, 4,
+               2, 3), ncol=2, nrow=4, byrow=TRUE)
+
+nw2 <- network(el, type="edgelist", dir=FALSE)
+nw2 %n% "lasttoggle" <- cbind(el, c(1,1,1,2))
+nw2 %n% "time" <- 2
+stopifnot(all(summary(nw2 ~ FormE(~edges + triangle) + DissE(~edges + triangle))==c(4,1,3,0)))
+nw2 %n% "time" <- 3
+stopifnot(all(summary(nw2 ~ FormE(~edges + triangle) + DissE(~edges + triangle))==c(4,1,4,1)))

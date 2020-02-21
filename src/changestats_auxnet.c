@@ -105,7 +105,7 @@ U_CHANGESTAT_FN(u__union_lt_net_Network){
     // If we are in the "fiat" mode, then if the dyad just changed,
     // then it can only flip between (0,1) and (1,0) and so stays at
     // 1, but if not, then it flips between (0,0) and (1,1).
-    if(JUST_CHANGED(dur_inf,tail,head))
+    if(!JUST_CHANGED(dur_inf,tail,head))
       ToggleKnownEdge(tail, head, auxnet->onwp, edgeflag);
   }
 }
