@@ -61,9 +61,9 @@
 #' @param MCMC.prop.args.form,MCMC.prop.args.diss An alternative,
 #'   direct way of specifying additional arguments to the proposal in
 #'   the formation/dissolution phase.
-#' @param MCMC.init.maxedges Maximum number of edges for which to
+#' @param MCMC.maxedges Maximum number of edges for which to
 #'   allocate space.
-#' @param MCMC.init.maxchanges Maximum number of changes in dynamic
+#' @param MCMC.maxchanges Maximum number of changes in dynamic
 #'   network simulation for which to allocate space.
 #' @param MCMC.packagenames Names of packages in which to look for
 #'   change statistic functions in addition to those
@@ -327,15 +327,15 @@ control.stergm<-function(init.form=NULL,
 
                          MCMC.prop.weights.form="default",MCMC.prop.args.form=NULL,
                          MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,
-                         MCMC.init.maxedges=20000,
-                         MCMC.init.maxchanges=20000,
+                         MCMC.maxedges=20000,
+                         MCMC.maxchanges=20000,
                          MCMC.packagenames=c(),
                          
                          CMLE.MCMC.burnin = 1024*16,
                          CMLE.MCMC.interval = 1024,
                          CMLE.control=NULL,
-                         CMLE.control.form=control.ergm(init=init.form, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
-                         CMLE.control.diss=control.ergm(init=init.diss, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.init.maxedges=MCMC.init.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.control.form=control.ergm(init=init.form, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.control.diss=control.ergm(init=init.diss, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
 
                          CMLE.NA.impute=c(),
                          CMLE.term.check.override=FALSE,

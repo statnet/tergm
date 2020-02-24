@@ -98,7 +98,8 @@
 #'   set globally via `option(tergm.eval.loglik=...)`, falling back to
 #'   `getOption("ergm.eval.loglik")` if not set.
 #' @param control A list of control parameters for algorithm tuning.
-#' Constructed using \code{\link{control.stergm}}.
+#' Constructed using \code{\link{control.stergm}}.  Remapped to 
+#' \code{\link{control.tergm}}.
 #' @param verbose logical or integer; if TRUE or positive, the program will
 #' print out progress information. Higher values result in more output.
 #' @param \dots Additional arguments, to be passed to lower-level functions.
@@ -212,29 +213,17 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
     dissolution <- dissolution[c(1,3)] # in a formula f<-y~x, f[1]=~, f[2]=y, and f[3]=x
   }
   
-  # lasttoggle
-  if(estimate=="EGMME"){
-  duration.dependent <- is.lasttoggle(nw,formation,dissolution,targets)
+  control$init <- c(control$init.form, control$init.diss) # may be problem if one specified and the other isn't
+
+  control$MCMC.prop.weights <- control$MCMC.prop.weights.form
+  control$MCMC.prop.args <- control$MCMC.prop.args.form
+
+  control$CMLE.control <- control$CMLE.control.form
+  control$CMLE.control$init <- control$init
   
-  if(duration.dependent)
-    nw %n% "lasttoggle" <- NVL(nw %n% "lasttoggle",rep(round(-.Machine$integer.max/2), network.dyadcount(nw)))  else nw %n% "lasttoggle" <- NULL
-  }
+  control <- set.control.class("control.tergm")
   
-#  out <- switch(estimate,
-#                CMLE=,
-#                CMPLE=stergm.CMLE(nw, formation, dissolution, constraints,
-#                  times, offset.coef.form, offset.coef.diss, eval.loglik,
-#                  estimate, control, verbose),
-#                EGMME=stergm.EGMME(nw, formation, dissolution, constraints,
-#                  offset.coef.form, offset.coef.diss,
-#                  targets, target.stats, estimate, control, verbose)
-#                  )
-#  
+  formula <- if(estimate == "EGMME") nw ~ FormE(formation) + DissE(dissolution) else nw ~ Form(formation) + Diss(dissolution)
   
-  out$formation <- formation
-  out$dissolution <- dissolution
-  out$control <- control
-  
-  class(out)<-"stergm"
-  out
+  tergm(formula=formula, constraints=constraints, estimate=estimate, times=times, offset.coef=c(offset.coef.form, offset.coef.diss), targets=targets, target.stats=target.stats, eval.loglik=eval.loglik, control=control, verbose=verbose, ...)
 }
