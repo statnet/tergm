@@ -13,24 +13,22 @@ control.stergm(
   MCMC.prop.args.form = NULL,
   MCMC.prop.weights.diss = "default",
   MCMC.prop.args.diss = NULL,
-  MCMC.init.maxedges = 20000,
-  MCMC.init.maxchanges = 20000,
+  MCMC.maxedges = 20000,
+  MCMC.maxchanges = 20000,
   MCMC.packagenames = c(),
   CMLE.MCMC.burnin = 1024 * 16,
   CMLE.MCMC.interval = 1024,
   CMLE.control = NULL,
   CMLE.control.form = control.ergm(init = init.form, MCMC.burnin = CMLE.MCMC.burnin,
     MCMC.interval = CMLE.MCMC.interval, MCMC.prop.weights = MCMC.prop.weights.form,
-    MCMC.prop.args = MCMC.prop.args.form, MCMC.init.maxedges = MCMC.init.maxedges,
-    MCMC.packagenames = MCMC.packagenames, parallel = parallel, parallel.type =
-    parallel.type, parallel.version.check = parallel.version.check, force.main =
-    force.main),
+    MCMC.prop.args = MCMC.prop.args.form, MCMC.maxedges = MCMC.maxedges, MCMC.packagenames
+    = MCMC.packagenames, parallel = parallel, parallel.type = parallel.type,
+    parallel.version.check = parallel.version.check, force.main = force.main),
   CMLE.control.diss = control.ergm(init = init.diss, MCMC.burnin = CMLE.MCMC.burnin,
     MCMC.interval = CMLE.MCMC.interval, MCMC.prop.weights = MCMC.prop.weights.diss,
-    MCMC.prop.args = MCMC.prop.args.diss, MCMC.init.maxedges = MCMC.init.maxedges,
-    MCMC.packagenames = MCMC.packagenames, parallel = parallel, parallel.type =
-    parallel.type, parallel.version.check = parallel.version.check, force.main =
-    force.main),
+    MCMC.prop.args = MCMC.prop.args.diss, MCMC.maxedges = MCMC.maxedges, MCMC.packagenames
+    = MCMC.packagenames, parallel = parallel, parallel.type = parallel.type,
+    parallel.version.check = parallel.version.check, force.main = force.main),
   CMLE.NA.impute = c(),
   CMLE.term.check.override = FALSE,
   EGMME.main.method = c("Gradient-Descent"),
@@ -139,10 +137,10 @@ possible constraints.}
 direct way of specifying additional arguments to the proposal in
 the formation/dissolution phase.}
 
-\item{MCMC.init.maxedges}{Maximum number of edges for which to
+\item{MCMC.maxedges}{Maximum number of edges for which to
 allocate space.}
 
-\item{MCMC.init.maxchanges}{Maximum number of changes in dynamic
+\item{MCMC.maxchanges}{Maximum number of changes in dynamic
 network simulation for which to allocate space.}
 
 \item{MCMC.packagenames}{Names of packages in which to look for

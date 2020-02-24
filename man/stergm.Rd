@@ -122,7 +122,8 @@ set globally via \code{option(tergm.eval.loglik=...)}, falling back to
 \code{getOption("ergm.eval.loglik")} if not set.}
 
 \item{control}{A list of control parameters for algorithm tuning.
-Constructed using \code{\link{control.stergm}}.}
+Constructed using \code{\link{control.stergm}}.  Remapped to
+\code{\link{control.tergm}}.}
 
 \item{verbose}{logical or integer; if TRUE or positive, the program will
 print out progress information. Higher values result in more output.}
