@@ -17,7 +17,15 @@
 
 InitErgmProposal.discordTNT <- function(arguments, nw, model) {
   proposal <- list(name = "discordTNT", inputs=NULL, auxiliaries = ~.lasttoggle)
+  proposal
 }
+
+InitErgmProposal.discordStratTNT <- function(arguments, nw, model) {
+  stp <- ergm:::InitErgmProposal.StratTNT(arguments, nw)
+  proposal <- list(name = "discordStratTNT", inputs=stp$inputs, auxiliaries = ~.lasttoggle)
+  proposal
+}
+
 
 InitErgmProposal.formation <- function(arguments, nw, model) {
   proposal <- list(name = "Formation", inputs=NULL)
