@@ -46,6 +46,6 @@ library(statnet.common)
   sapply(list(mod1, mod2, mod3, mod4), function(x) x$fit$coef)
   
   for (mod in list(mod1, mod2, mod3, mod4)) {
-    print(apply(simulate(mod, monitor=~edges+degree(3), output="stats", time.slices=200, dynamic=TRUE), 2, mean))
+    print(apply(simulate(mod, monitor=~edges+degree(3), output="stats", time.slices=200), 2, mean))
   }
 #}, testname='target_offset')
