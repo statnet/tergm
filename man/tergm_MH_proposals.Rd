@@ -30,6 +30,8 @@
 \alias{InitErgmProposal.dissolutionNonObservedMLEblockdiagTNT}
 \alias{InitErgmProposal.formationNonObservedMLETNT}
 \alias{InitErgmProposal.formationNonObservedMLEblockdiagTNT}
+\alias{InitErgmProposal.discordTNT}
+\alias{InitErgmProposal.discordStratTNT}
 
 
 
@@ -66,6 +68,9 @@
     \item{InitErgmProposal.dissolutionNonObservedMLEblockdiagTNT}{}
     \item{InitErgmProposal.formationNonObservedMLETNT}{}
     \item{InitErgmProposal.formationNonObservedMLEblockdiagTNT}{}
+    \item{InitErgmProposal.discordTNT}{}
+    \item{InitErgmProposal.discordStratTNT}{}
+    
    }
     
 }
