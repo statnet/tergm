@@ -112,7 +112,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
   if (any(offset.info.formula(targets)$term)) {
     message("Targets formula should not contain offset terms;
                 they have been been removed.")
-    targets <- remove.offset.formula(targets)
+    targets <- filter_rhs.formula(targets, function(x) (if(is.call(x)) x[[1]] else x)!="offset")
   }
 
   control.transfer <- list(EGMME.MCMC.burnin.min="MCMC.burnin.min",
@@ -201,7 +201,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
   if(!is.null(offset.coef.diss)) control$init.diss[model.diss$etamap$offsettheta]<-offset.coef.diss
   names(control$init.diss) <- model.diss$coef.names
 
-  initialfit <- stergm.EGMME.initialfit(control$init.form, control$init.diss, nw, model.form, model.diss, model.mon, control, verbose)
+  initialfit <- stergm.EGMME.initialfit(formation, dissolution, targets, control$init.form, control$init.diss, nw, model.form, model.diss, model.mon, control, verbose)
   
   if(verbose) cat("Fitting STERGM Equilibrium GMME.\n")
 

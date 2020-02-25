@@ -4,8 +4,7 @@
 \alias{mcmc.diagnostics.stergm}
 \title{Conduct MCMC diagnostics on an ergm or stergm fit}
 \usage{
-\method{mcmc.diagnostics}{stergm}(object, center = TRUE, esteq = TRUE,
-  vars.per.page = 3, ...)
+\method{mcmc.diagnostics}{stergm}(object, center = TRUE, esteq = TRUE, vars.per.page = 3, ...)
 }
 \arguments{
 \item{object}{A stergm object.  See documentation for

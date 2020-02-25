@@ -5,21 +5,39 @@
 \alias{control.simulate.stergm}
 \title{Auxiliary for Controlling Separable Temporal ERGM Simulation}
 \usage{
-control.simulate.network(MCMC.burnin.min = 1000,
-  MCMC.burnin.max = 1e+05, MCMC.burnin.pval = 0.5,
-  MCMC.burnin.add = 1, MCMC.burnin = NULL, MCMC.burnin.mul = NULL,
-  MCMC.prop.weights.form = "default", MCMC.prop.args.form = NULL,
-  MCMC.prop.weights.diss = "default", MCMC.prop.args.diss = NULL,
-  MCMC.init.maxedges = 20000, MCMC.packagenames = c(),
-  term.options = NULL, MCMC.init.maxchanges = 1e+06)
+control.simulate.network(
+  MCMC.burnin.min = 1000,
+  MCMC.burnin.max = 1e+05,
+  MCMC.burnin.pval = 0.5,
+  MCMC.burnin.add = 1,
+  MCMC.burnin = NULL,
+  MCMC.burnin.mul = NULL,
+  MCMC.prop.weights.form = "default",
+  MCMC.prop.args.form = NULL,
+  MCMC.prop.weights.diss = "default",
+  MCMC.prop.args.diss = NULL,
+  MCMC.init.maxedges = 20000,
+  MCMC.packagenames = c(),
+  term.options = NULL,
+  MCMC.init.maxchanges = 1e+06
+)
 
-control.simulate.stergm(MCMC.burnin.min = NULL, MCMC.burnin.max = NULL,
-  MCMC.burnin.pval = NULL, MCMC.burnin.add = NULL,
-  MCMC.burnin = NULL, MCMC.burnin.mul = NULL,
-  MCMC.prop.weights.form = NULL, MCMC.prop.args.form = NULL,
-  MCMC.prop.weights.diss = NULL, MCMC.prop.args.diss = NULL,
-  MCMC.init.maxedges = NULL, MCMC.packagenames = NULL,
-  term.options = NULL, MCMC.init.maxchanges = NULL)
+control.simulate.stergm(
+  MCMC.burnin.min = NULL,
+  MCMC.burnin.max = NULL,
+  MCMC.burnin.pval = NULL,
+  MCMC.burnin.add = NULL,
+  MCMC.burnin = NULL,
+  MCMC.burnin.mul = NULL,
+  MCMC.prop.weights.form = NULL,
+  MCMC.prop.args.form = NULL,
+  MCMC.prop.weights.diss = NULL,
+  MCMC.prop.args.diss = NULL,
+  MCMC.init.maxedges = NULL,
+  MCMC.packagenames = NULL,
+  term.options = NULL,
+  MCMC.init.maxchanges = NULL
+)
 }
 \arguments{
 \item{MCMC.burnin.min, MCMC.burnin.max, MCMC.burnin.pval, MCMC.burnin.add}{Number of Metropolis-Hastings steps per phase (formation and

@@ -6,13 +6,33 @@
 \title{Collects a sample of networks and returns the formation and dissolution
 statistics of each sample}
 \usage{
-stergm_MCMC_sample(nw, model.form, model.diss, model.mon, proposal.form,
-  proposal.diss, control, theta.form = NULL, theta.diss = NULL,
-  verbose = FALSE, ..., eta.form = ergm.eta(theta.form,
-  model.form$etamap), eta.diss = ergm.eta(theta.diss, model.diss$etamap))
+stergm_MCMC_sample(
+  nw,
+  model.form,
+  model.diss,
+  model.mon,
+  proposal.form,
+  proposal.diss,
+  control,
+  theta.form = NULL,
+  theta.diss = NULL,
+  verbose = FALSE,
+  ...,
+  eta.form = ergm.eta(theta.form, model.form$etamap),
+  eta.diss = ergm.eta(theta.diss, model.diss$etamap)
+)
 
-stergm_MCMC_slave(Clist.form, Clist.diss, Clist.mon, proposal.form,
-  proposal.diss, eta.form, eta.diss, control, verbose)
+stergm_MCMC_slave(
+  Clist.form,
+  Clist.diss,
+  Clist.mon,
+  proposal.form,
+  proposal.diss,
+  eta.form,
+  eta.diss,
+  control,
+  verbose
+)
 }
 \arguments{
 \item{nw}{a \code{\link{network}} object}
