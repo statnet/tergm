@@ -106,7 +106,7 @@ to.networkDynamic.lasttoggle <- function(nw){
     
     lt.edges <- edgelist_with_lasttoggle(nw)
     
-    lt.edges <- lt.edges[lt.edges[,3]>round(-.Machine$integer.max/2),,drop=FALSE] 
+    lt.edges <- lt.edges[lt.edges[,3]>as.integer(-.Machine$integer.max/2),,drop=FALSE] 
 
     # removed the +1 after lt.edges[,3]
     if(nrow(lt.edges)) nwd <- deactivate.edges(nwd, onset=-Inf, terminus=lt.edges[,3], e=apply(lt.edges[,1:2,drop=FALSE],1,function(e) get.edgeIDs(nw, e[1], e[2])))
@@ -206,7 +206,7 @@ edgelist_with_lasttoggle <- function(nw) {
   # handle no edges this way to avoid warning from cbind
   if(NROW(rv) == 0) return(matrix(0L,0,3))
   
-  rv <- cbind(rv, round(-.Machine$integer.max/2)) # default time
+  rv <- cbind(rv, as.integer(-.Machine$integer.max/2)) # default time
   
   lt <- if(is(nw, "ergm_state")) nw$nw0 %n% "lasttoggle" else nw %n% "lasttoggle"
   
