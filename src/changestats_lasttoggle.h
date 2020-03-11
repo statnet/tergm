@@ -60,7 +60,7 @@ void ExpireTimestamps(StoreTimeAndLasttoggle *dur_inf, unsigned int edges, unsig
 
 static inline int ElapsedTime(Vertex tail, Vertex head, StoreTimeAndLasttoggle *dur_inf){
   khint_t i = kh_get(DyadMapInt, dur_inf->lasttoggle, THKey(dur_inf->lasttoggle,tail,head));
-  if(i==kh_none) return dur_inf->time + INT_MAX/10;
+  if(i==kh_none) return dur_inf->time + INT_MAX/2;
   return dur_inf->time - kh_value(dur_inf->lasttoggle, i); // Possible int overflow here.
 }
 
@@ -85,7 +85,7 @@ static inline int ElapsedTimeToggle(Vertex tail, Vertex head, StoreTimeAndLastto
     // it would have had if it hadn't been toggled at all this time step;
     // that's currently in *discord* (not lasttoggle)
     int ltt = kh_value(dur_inf->discord, i);
-    if(ltt == dur_inf->time) return dur_inf->time + INT_MAX/10;
+    if(ltt == dur_inf->time) return dur_inf->time + INT_MAX/2;
     else return dur_inf->time - ltt;
   }
 }
