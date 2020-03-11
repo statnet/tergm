@@ -32,8 +32,8 @@ g1<-san(g0~meandeg,target.stats=target.stats[1],verbose=TRUE)
 set.seed(1)
 dynfit<-tergm(g1 ~ FormE(~edges) + DissE(~edges), targets=~edges+mean.age, estimate="EGMME",target.stats=target.stats[-3], constraints="discordTNT"~., verbose=TRUE,control=control.tergm(SA.plot.progress=do.plot,SA.restart.on.err=FALSE,init=c(-log(.95/.05), 1)))
 
-#print(summary(dynfit))
-#mcmc.diagnostics(dynfit)
+print(summary(dynfit))
+mcmc.diagnostics(dynfit)
 
 stopifnot(all.equal(unlist(truth),dynfit$fit$coef,tol=0.01,check.attributes=FALSE))
 #},"simple EGMME")
