@@ -812,7 +812,7 @@ MH_U_FN(Mu_discordBDTNT) {
         } while((e = EdgetreePreSuccessor(sto->nonBDTDNE->outedges, e)) != 0);
       }                
 
-      for(int i = 0; i < sto->transferEL->nedges; i++) {
+      for(int i = 1; i <= sto->transferEL->nedges; i++) {
         ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->nonBDTDNE, TRUE);            
         ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->BDTDNE, FALSE);
       }        
@@ -846,7 +846,7 @@ MH_U_FN(Mu_discordBDTNT) {
         } while((e = EdgetreePreSuccessor(sto->nonBDTDNE->outedges, e)) != 0);
       }                
 
-      for(int i = 0; i < sto->transferEL->nedges; i++) {
+      for(int i = 1; i <= sto->transferEL->nedges; i++) {
         ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->nonBDTDNE, TRUE);            
         ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->BDTDNE, FALSE);
       }
@@ -877,7 +877,7 @@ MH_U_FN(Mu_discordBDTNT) {
         } while((e = EdgetreePreSuccessor(sto->BDTDNE->outedges, e)) != 0);
       }                
 
-      for(int i = 0; i < sto->transferEL->nedges; i++) {
+      for(int i = 1; i <= sto->transferEL->nedges; i++) {
         ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->BDTDNE, TRUE);
         ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->nonBDTDNE, FALSE);            
       }
@@ -908,7 +908,7 @@ MH_U_FN(Mu_discordBDTNT) {
         } while((e = EdgetreePreSuccessor(sto->BDTDNE->outedges, e)) != 0);
       }                
 
-      for(int i = 0; i < sto->transferEL->nedges; i++) {
+      for(int i = 1; i <= sto->transferEL->nedges; i++) {
         ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->BDTDNE, TRUE);
         ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->nonBDTDNE, FALSE);            
       }
@@ -1540,7 +1540,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
           } while((e = EdgetreePreSuccessor(sto->nonBDTDNE[i]->outedges, e)) != 0);
         }                
   
-        for(int j = 0; j < sto->transferEL->nedges; j++) {
+        for(int j = 1; j <= sto->transferEL->nedges; j++) {
           ToggleKnownEdge(sto->transferEL->tails[j], sto->transferEL->heads[j], sto->nonBDTDNE[i], TRUE);            
           ToggleKnownEdge(sto->transferEL->tails[j], sto->transferEL->heads[j], sto->BDTDNE[i], FALSE);
         }
@@ -1576,7 +1576,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
           } while((e = EdgetreePreSuccessor(sto->nonBDTDNE[i]->outedges, e)) != 0);
         }                
   
-        for(int j = 0; j < sto->transferEL->nedges; j++) {
+        for(int j = 1; j <= sto->transferEL->nedges; j++) {
           ToggleKnownEdge(sto->transferEL->tails[j], sto->transferEL->heads[j], sto->nonBDTDNE[i], TRUE);            
           ToggleKnownEdge(sto->transferEL->tails[j], sto->transferEL->heads[j], sto->BDTDNE[i], FALSE);
         }
@@ -1607,7 +1607,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
           } while((e = EdgetreePreSuccessor(sto->BDTDNE[i]->outedges, e)) != 0);
         }                
   
-        for(int j = 0; j < sto->transferEL->nedges; j++) {
+        for(int j = 1; j <= sto->transferEL->nedges; j++) {
           ToggleKnownEdge(sto->transferEL->tails[j], sto->transferEL->heads[j], sto->BDTDNE[i], TRUE);
           ToggleKnownEdge(sto->transferEL->tails[j], sto->transferEL->heads[j], sto->nonBDTDNE[i], FALSE);            
         }
@@ -1638,7 +1638,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
           } while((e = EdgetreePreSuccessor(sto->BDTDNE[i]->outedges, e)) != 0);
         }                
   
-        for(int j = 0; j < sto->transferEL->nedges; j++) {
+        for(int j = 1; j <= sto->transferEL->nedges; j++) {
           ToggleKnownEdge(sto->transferEL->tails[j], sto->transferEL->heads[j], sto->BDTDNE[i], TRUE);
           ToggleKnownEdge(sto->transferEL->tails[j], sto->transferEL->heads[j], sto->nonBDTDNE[i], FALSE);            
         }
