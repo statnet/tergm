@@ -231,7 +231,7 @@ MH_X_FN(Mx_discordStratTNT) {
       int nedges = sto->discordantELs[i]->nedges;
       
       for(int j = 0; j < nedges; j++) {
-        UnsrtELInsert(tails[j], heads[j], sto->nonDiscordantELs[i]);
+        UnsrtELInsert(tails[j + 1], heads[j + 1], sto->nonDiscordantELs[i]);
       }
       
       sto->discordantELs[i]->nedges = 0;
