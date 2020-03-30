@@ -230,8 +230,9 @@ MH_X_FN(Mx_discordStratTNT) {
       Vertex *heads = sto->discordantELs[i]->heads;
       int nedges = sto->discordantELs[i]->nedges;
       
-      for(int j = 0; j < nedges; j++) {
-        UnsrtELInsert(tails[j + 1], heads[j + 1], sto->nonDiscordantELs[i]);
+      // UnsrtELs start at index 1 here
+      for(int j = 1; j <= nedges; j++) {
+        UnsrtELInsert(tails[j], heads[j], sto->nonDiscordantELs[i]);
       }
       
       sto->discordantELs[i]->nedges = 0;
@@ -329,10 +330,10 @@ MH_P_FN(MH_discordStratTNT) {
     // propose from discord
     if(unif_rand() < sto->discordantELs[i]->nedges/((double) nddyadstype)) {
       UnsrtELGetRand(Mtail, Mhead, sto->discordantELs[i]);
-      in_network = FALSE;
+      in_network = TRUE;
     } else {
       UnsrtELGetRand(Mtail, Mhead, sto->discordantNonELs[i]);
-      in_network = TRUE;
+      in_network = FALSE;
     }
     in_discord = TRUE;
   }
