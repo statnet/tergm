@@ -1586,7 +1586,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
     if(sto->tailmaxl) {
       // tail will be newly maxl after toggle, so remove it from the appropriate node list
       sto->nodesvec[sto->strattailtype][sto->bdtailtype][sto->nodepos[tail - 1]] = sto->nodesvec[sto->strattailtype][sto->bdtailtype][sto->attrcounts[sto->strattailtype][sto->bdtailtype] - 1];
-      sto->nodepos[sto->nodesvec[sto->strattailtype][sto->bdtailtype][sto->nodepos[tail - 1]]] = sto->nodepos[tail - 1];
+      sto->nodepos[sto->nodesvec[sto->strattailtype][sto->bdtailtype][sto->nodepos[tail - 1]] - 1] = sto->nodepos[tail - 1];
       sto->attrcounts[sto->strattailtype][sto->bdtailtype]--;
 
       for(int i = 0; i < sto->nmixtypes; i++) {
@@ -1617,7 +1617,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
     if(sto->headmaxl) {
       // head will be newly maxl after toggle, so remove it from the appropriate node list
       sto->nodesvec[sto->stratheadtype][sto->bdheadtype][sto->nodepos[head - 1]] = sto->nodesvec[sto->stratheadtype][sto->bdheadtype][sto->attrcounts[sto->stratheadtype][sto->bdheadtype] - 1];
-      sto->nodepos[sto->nodesvec[sto->stratheadtype][sto->bdheadtype][sto->nodepos[head - 1]]] = sto->nodepos[head - 1];
+      sto->nodepos[sto->nodesvec[sto->stratheadtype][sto->bdheadtype][sto->nodepos[head - 1]] - 1] = sto->nodepos[head - 1];
       sto->attrcounts[sto->stratheadtype][sto->bdheadtype]--;
 
       for(int i = 0; i < sto->nmixtypes; i++) {
