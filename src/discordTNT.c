@@ -1184,6 +1184,11 @@ MH_X_FN(Mx_discordBDStratTNT) {
         ToggleKnownEdge(tail, head, sto->nonBDTDNE[i], TRUE);
       }
       
+      Vertex *tails = sto->discordantEdges[i]->tails;
+      Vertex *heads = sto->discordantEdges[i]->heads;
+      for(int j = 1; j <= sto->discordantEdges[i]->nedges; j++) {
+        UnsrtELInsert(tails[j], heads[j], sto->nonDiscordantEdges[i]);
+      }
       sto->discordantEdges[i]->nedges = 0;
     }
   }
