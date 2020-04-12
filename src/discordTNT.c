@@ -411,30 +411,32 @@ typedef struct {
   int *attrcounts;
   Vertex **nodesvec;
   int *nodepos;
-  
+    
   int tailtype;
   int tailmaxl;
   
   int headtype;
   int headmaxl;
   
-  int currentdyads;
-  int proposeddyads;
+  Dyad currentdyads;
+  Dyad proposeddyads;
   
   int bound;
   int nmixtypes;
   double *vattr;
   double *tailtypes;
   double *headtypes;
-  
-  Network *BDTDNE;
-  Network *nonBDTDNE;
-  
+
+  UnsrtEL *BDTDNE;
+  UnsrtEL *nonBDTDNE;
+
+  UnsrtEL *nonDiscordantEdges;
   UnsrtEL *discordantEdges;
   
-  int in_discord;
+  int *BDTDNE_deg;
+  int *nonBDTDNE_deg;
   
-  UnsrtEL *transferEL; // for moving edges between BDTDNE and nonBDTDNE
+  int in_discord;  
 } discordBDTNTStorage;
 
 MH_I_FN(Mi_discordBDTNT) {
@@ -462,8 +464,6 @@ MH_I_FN(Mi_discordBDTNT) {
     nodesvec[i] = (Vertex *)Calloc((int)nodecountsbycode[i], Vertex);
   }
 
-  // nodepos[i - 1] is node i's position within nodesvec[(int)vattr[i - 1]] if node i is 
-  // present within that list, and is undefined otherwise
   int *nodepos = Calloc(N_NODES, int);
 
   for(Vertex vertex = 1; vertex <= N_NODES; vertex++) {
@@ -476,12 +476,12 @@ MH_I_FN(Mi_discordBDTNT) {
   }
   
   // count number of "BD-toggleable" dyads in current network
-  int currentdyads = 0;    
+  Dyad currentdyads = 0;    
   for(int i = 0; i < nmixtypes; i++) {
     if(tailtypes[i] == headtypes[i]) {
-      currentdyads += attrcounts[(int)tailtypes[i]]*(attrcounts[(int)headtypes[i]] - 1)/2;
+      currentdyads += (Dyad)attrcounts[(int)tailtypes[i]]*(attrcounts[(int)headtypes[i]] - 1)/2;
     } else {
-      currentdyads += attrcounts[(int)tailtypes[i]]*attrcounts[(int)headtypes[i]];
+      currentdyads += (Dyad)attrcounts[(int)tailtypes[i]]*attrcounts[(int)headtypes[i]];
     }
   }
 
@@ -501,14 +501,24 @@ MH_I_FN(Mi_discordBDTNT) {
   sto->vattr = vattr;
   sto->tailtypes = tailtypes;
   sto->headtypes = headtypes;
+
+  sto->nonDiscordantEdges = UnsrtELInitialize(0, NULL, NULL, FALSE);
+  Vertex head;
+  Edge e;
+  for(Vertex tail = 1; tail <= N_NODES; tail++) {
+    STEP_THROUGH_OUTEDGES(tail, e, head) {
+      UnsrtELInsert(tail, head, sto->nonDiscordantEdges);
+    }
+  }
   
   sto->nodepos = nodepos;
   
-  sto->BDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL);
-  sto->nonBDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL);
-  
   sto->discordantEdges = UnsrtELInitialize(0, NULL, NULL, FALSE);
-  sto->transferEL = UnsrtELInitialize(0, NULL, NULL, FALSE);
+  
+  sto->BDTDNE = UnsrtELInitialize(0, NULL, NULL, FALSE);
+  sto->nonBDTDNE = UnsrtELInitialize(0, NULL, NULL, FALSE);
+  sto->BDTDNE_deg = Calloc(N_NODES + 1, int);
+  sto->nonBDTDNE_deg = Calloc(N_NODES + 1, int);
 }
 
 MH_X_FN(Mx_discordBDTNT) {
@@ -516,20 +526,16 @@ MH_X_FN(Mx_discordBDTNT) {
     // clear all the discordance information
     
     GET_STORAGE(discordBDTNTStorage, sto);
+        
+    sto->BDTDNE->nedges = 0;
+    sto->nonBDTDNE->nedges = 0;
     
-    Vertex tail;
-    Vertex head;
+    memset(sto->BDTDNE_deg, 0, (N_NODES + 1)*sizeof(int));
+    memset(sto->nonBDTDNE_deg, 0, (N_NODES + 1)*sizeof(int));
     
-    for(Edge i = EDGECOUNT(sto->BDTDNE); i > 0; i--) {
-      FindithEdge(&tail, &head, i, sto->BDTDNE);
-      ToggleKnownEdge(tail, head, sto->BDTDNE, TRUE);
+    for(int i = 1; i <= sto->discordantEdges->nedges; i++) {
+      UnsrtELInsert(sto->discordantEdges->tails[i], sto->discordantEdges->heads[i], sto->nonDiscordantEdges);
     }
-    
-    for(Edge i = EDGECOUNT(sto->nonBDTDNE); i > 0; i--) {
-      FindithEdge(&tail, &head, i, sto->nonBDTDNE);
-      ToggleKnownEdge(tail, head, sto->nonBDTDNE, TRUE);
-    }
-    
     sto->discordantEdges->nedges = 0;
   }
 }
@@ -542,41 +548,46 @@ MH_P_FN(MH_discordBDTNT) {
   
   int in_network;
   int in_discord;
-
-  // number of *BD-toggleable* discordant dyads
-  int nddyads = sto->discordantEdges->nedges + EDGECOUNT(sto->BDTDNE);
-
+  
+  int nddyads = sto->discordantEdges->nedges + sto->BDTDNE->nedges;
+  
   if(nddyads == 0 || unif_rand() < 0.5) {
     // propose from network
-
+    
     // if currentdyads == 0, we *must* propose toggling off an existing edge;
     // the case nedges == 0 && currentdyads == 0 was excluded during initialization,
     // and we cannot end up in that case if we don't start in that case
     // (assuming the initial network is valid)  
     if((unif_rand() < 0.5 && nedges > 0) || (sto->currentdyads == 0)) {
       // select an existing edge at random, and propose toggling it off
-      GetRandEdge(Mtail, Mhead, nwp);
-            
+      if(unif_rand() < ((double) sto->nonDiscordantEdges->nedges)/nedges) {
+        UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantEdges);
+        in_discord = FALSE;
+      } else {
+        UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges);
+        in_discord = TRUE;
+      }
+          
       in_network = TRUE;
     } else {
       // select a BD-toggleable dyad and propose toggling it
       // doubling here allows more efficient calculation in 
       // the case tailtypes[i] == headtypes[i]
       
-      int dyadindex = 2*sto->currentdyads*unif_rand();
+      Dyad dyadindex = 2*sto->currentdyads*unif_rand();
               
-      Vertex tail;
       Vertex head;
+      Vertex tail;
       
       // this rather ugly block of code is just finding the dyad that corresponds
       // to the dyadindex we drew above, and then setting the info for
       // tail and head appropriately
       for(int i = 0; i < sto->nmixtypes; i++) {
-        int dyadstype;
+        Dyad dyadstype;
         if(sto->tailtypes[i] == sto->headtypes[i]) {
-          dyadstype = sto->attrcounts[(int)sto->tailtypes[i]]*(sto->attrcounts[(int)sto->headtypes[i]] - 1)/2;
+          dyadstype = (Dyad)sto->attrcounts[(int)sto->tailtypes[i]]*(sto->attrcounts[(int)sto->headtypes[i]] - 1)/2;
         } else {
-          dyadstype = sto->attrcounts[(int)sto->tailtypes[i]]*sto->attrcounts[(int)sto->headtypes[i]];
+          dyadstype = (Dyad)sto->attrcounts[(int)sto->tailtypes[i]]*sto->attrcounts[(int)sto->headtypes[i]];
         }
         
         if(dyadindex < 2*dyadstype) {
@@ -617,31 +628,35 @@ MH_P_FN(MH_discordBDTNT) {
       }
           
       in_network = IS_OUTEDGE(Mtail[0],Mhead[0]);
-    }
-    
-    in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;
+      in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;
 
-    if(in_network && in_discord) {
-      // need to resample
-      UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges);
+      if(in_discord) {
+        // need to resample
+        if(in_network) {
+          UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges);
+        } else {
+          UnsrtELGetRand(Mtail, Mhead, sto->BDTDNE);
+        }
+      } else if(in_network) {
+        UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantEdges);
+      }
     }
   } else {
-    // propose from (the BD-toggleable subset of) discord
+    // propose from discord      
     if(unif_rand() < ((double) sto->discordantEdges->nedges)/nddyads) {
       UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges);
       in_network = TRUE;
     } else {
-      GetRandEdge(Mtail, Mhead, sto->BDTDNE);
-      in_network = FALSE;
+      UnsrtELGetRand(Mtail, Mhead, sto->BDTDNE);
+      in_network = FALSE;      
     }
-    
     in_discord = TRUE;
   }
   
   sto->in_discord = in_discord;
   
   sto->tailtype = sto->vattr[Mtail[0] - 1];
-  sto->headtype = sto->vattr[Mhead[0] - 1];      
+  sto->headtype = sto->vattr[Mhead[0] - 1];    
   
   if(in_network) {
     sto->tailmaxl = IN_DEG[Mtail[0]] + OUT_DEG[Mtail[0]] == sto->bound;
@@ -653,21 +668,45 @@ MH_P_FN(MH_discordBDTNT) {
         
   // the count of dyads that can be toggled in the "GetRandBDDyad" branch,
   // in the proposed network
-  sto->proposeddyads = 0;
+  sto->proposeddyads = sto->currentdyads;
+  
+  int delta = in_network ? +1 : -1;
   
   for(int i = 0; i < sto->nmixtypes; i++) {
-    int proposedtailadjustment = (sto->vattr[Mtail[0] - 1] == sto->tailtypes[i] && sto->tailmaxl) + (sto->vattr[Mhead[0] - 1] == sto->tailtypes[i] && sto->headmaxl);
-    int proposedheadadjustment = (sto->vattr[Mtail[0] - 1] == sto->headtypes[i] && sto->tailmaxl) + (sto->vattr[Mhead[0] - 1] == sto->headtypes[i] && sto->headmaxl);
-    
-    if(!in_network) {
-      proposedtailadjustment = -proposedtailadjustment;
-      proposedheadadjustment = -proposedheadadjustment;
+    int corr = 0;
+    int ha = 0;
+
+    if(sto->tailtype == sto->headtypes[i] && sto->tailmaxl) {
+      ha += delta;
+      corr += sto->attrcounts[(int)sto->tailtypes[i]];
+    }
+      
+    if(sto->headtype == sto->headtypes[i] && sto->headmaxl) {
+      ha += delta;
+      corr += sto->attrcounts[(int)sto->tailtypes[i]];        
+    }
+      
+    if(sto->tailtype == sto->tailtypes[i] && sto->tailmaxl) {
+      corr += sto->attrcounts[(int)sto->headtypes[i]] + ha;
+    }
+      
+    if(sto->headtype == sto->tailtypes[i] && sto->headmaxl) {
+      corr += sto->attrcounts[(int)sto->headtypes[i]] + ha;
+    }
+      
+    if(sto->tailtypes[i] == sto->headtypes[i]) {
+      if(in_network) {
+        corr -= ha;
+      } else {
+        corr += ha;
+      }
+      corr /= 2;
     }
     
-    if(sto->tailtypes[i] == sto->headtypes[i]) {
-      sto->proposeddyads += (sto->attrcounts[(int)sto->tailtypes[i]] + proposedtailadjustment)*(sto->attrcounts[(int)sto->headtypes[i]] + proposedheadadjustment - 1)/2;
+    if(in_network) {
+      sto->proposeddyads += corr;
     } else {
-      sto->proposeddyads += (sto->attrcounts[(int)sto->tailtypes[i]] + proposedtailadjustment)*(sto->attrcounts[(int)sto->headtypes[i]] + proposedheadadjustment);
+      sto->proposeddyads -= corr;
     }
   }
 
@@ -690,51 +729,33 @@ MH_P_FN(MH_discordBDTNT) {
   if(!in_network) {
     // may reduce propnddyads; subtract in_discord to avoid repeatedly counting the Mtail[0] -> Mhead[0] edge
     if(sto->tailmaxl) {
-      propnddyads -= sto->BDTDNE->indegree[Mtail[0]] + sto->BDTDNE->outdegree[Mtail[0]] - in_discord;
+      propnddyads -= sto->BDTDNE_deg[Mtail[0]] - in_discord;
     }
     
     if(sto->headmaxl) {
-      propnddyads -= sto->BDTDNE->indegree[Mhead[0]] + sto->BDTDNE->outdegree[Mhead[0]] - in_discord;
+      propnddyads -= sto->BDTDNE_deg[Mhead[0]] - in_discord;
     }
   } else {
     // may increase propnddyads, but only if other endpoint is also submaximal
     if(sto->tailmaxl) {
-      if(sto->nonBDTDNE->indegree[Mtail[0]] > 0) {
-        Edge e = Mtail[0];
-        do { // NB the neighbor cannot be head
-          if(IN_DEG[sto->nonBDTDNE->inedges[e].value] + OUT_DEG[sto->nonBDTDNE->inedges[e].value] < sto->bound) {
+      if(sto->nonBDTDNE_deg[Mtail[0]] > 0) {
+        for(int i = 1; i <= sto->nonBDTDNE->nedges; i++) {
+          if((sto->nonBDTDNE->tails[i] == Mtail[0] && IN_DEG[sto->nonBDTDNE->heads[i]] + OUT_DEG[sto->nonBDTDNE->heads[i]] < sto->bound) ||
+             (sto->nonBDTDNE->heads[i] == Mtail[0] && IN_DEG[sto->nonBDTDNE->tails[i]] + OUT_DEG[sto->nonBDTDNE->tails[i]] < sto->bound)) {
             propnddyads++;
           }
-        } while((e = EdgetreePreSuccessor(sto->nonBDTDNE->inedges, e)) != 0);       
-      }
-      
-      if(sto->nonBDTDNE->outdegree[Mtail[0]] > 0) {
-        Edge e = Mtail[0];
-        do { // NB the neighbor cannot be head
-          if(IN_DEG[sto->nonBDTDNE->outedges[e].value] + OUT_DEG[sto->nonBDTDNE->outedges[e].value] < sto->bound) {
-            propnddyads++;
-          }
-        } while((e = EdgetreePreSuccessor(sto->nonBDTDNE->outedges, e)) != 0);               
+        }
       }
     }
     
     if(sto->headmaxl) {
-      if(sto->nonBDTDNE->indegree[Mhead[0]] > 0) {
-        Edge e = Mhead[0];
-        do { // NB the neighbor cannot be head
-          if(IN_DEG[sto->nonBDTDNE->inedges[e].value] + OUT_DEG[sto->nonBDTDNE->inedges[e].value] < sto->bound) {
+      if(sto->nonBDTDNE_deg[Mhead[0]] > 0) {
+        for(int i = 1; i <= sto->nonBDTDNE->nedges; i++) {
+          if((sto->nonBDTDNE->tails[i] == Mhead[0] && IN_DEG[sto->nonBDTDNE->heads[i]] + OUT_DEG[sto->nonBDTDNE->heads[i]] < sto->bound) ||
+             (sto->nonBDTDNE->heads[i] == Mhead[0] && IN_DEG[sto->nonBDTDNE->tails[i]] + OUT_DEG[sto->nonBDTDNE->tails[i]] < sto->bound)) {
             propnddyads++;
           }
-        } while((e = EdgetreePreSuccessor(sto->nonBDTDNE->inedges, e)) != 0);       
-      }
-      
-      if(sto->nonBDTDNE->outdegree[Mhead[0]] > 0) {
-        Edge e = Mhead[0];
-        do { // NB the neighbor cannot be head
-          if(IN_DEG[sto->nonBDTDNE->outedges[e].value] + OUT_DEG[sto->nonBDTDNE->outedges[e].value] < sto->bound) {
-            propnddyads++;
-          }
-        } while((e = EdgetreePreSuccessor(sto->nonBDTDNE->outedges, e)) != 0);               
+        }
       }
     }
   }
@@ -767,12 +788,20 @@ MH_U_FN(Mu_discordBDTNT) {
       UnsrtELDelete(tail, head, sto->discordantEdges);
     } else {
       // nondiscordant edge; will become BDTDNE
-      ToggleKnownEdge(tail, head, sto->BDTDNE, FALSE);
+      UnsrtELDelete(tail, head, sto->nonDiscordantEdges);
+      UnsrtELInsert(tail, head, sto->BDTDNE);
+
+      sto->BDTDNE_deg[tail]++;
+      sto->BDTDNE_deg[head]++;
     }
   } else {
     if(sto->in_discord) {
       // discordant non-edge; evidently BD toggleable
-      ToggleKnownEdge(tail, head, sto->BDTDNE, TRUE); // it's an edge in the (BDT) discordant non-edge network :)        
+      UnsrtELDelete(tail, head, sto->BDTDNE);
+      UnsrtELInsert(tail, head, sto->nonDiscordantEdges);
+
+      sto->BDTDNE_deg[tail]--;
+      sto->BDTDNE_deg[head]--;      
     } else {
       // nondiscordant nonedge; will become discordantEdge
       UnsrtELInsert(tail, head, sto->discordantEdges);        
@@ -789,33 +818,26 @@ MH_U_FN(Mu_discordBDTNT) {
       sto->nodesvec[sto->tailtype][sto->attrcounts[sto->tailtype]] = tail;
       sto->nodepos[tail - 1] = sto->attrcounts[sto->tailtype];
       sto->attrcounts[sto->tailtype]++;
-
-      sto->transferEL->nedges = 0;
       
       // iterate over all nonBDTDNEs with tail as an endpoint; if other endpoint is also
       // submaxl, move this edge from nonBDTDNE to BDTDNE
-      if(sto->nonBDTDNE->indegree[tail] > 0) {
-        Edge e = tail;
-        do { // NB the neighbor cannot be head
-          if(IN_DEG[sto->nonBDTDNE->inedges[e].value] + OUT_DEG[sto->nonBDTDNE->inedges[e].value] < sto->bound) {
-            UnsrtELInsert(sto->nonBDTDNE->inedges[e].value, tail, sto->transferEL);
+      if(sto->nonBDTDNE_deg[tail] > 0) {
+        for(int j = sto->nonBDTDNE->nedges; j >= 1; j--) {
+          Vertex ttail = sto->nonBDTDNE->tails[j];
+          Vertex thead = sto->nonBDTDNE->heads[j];
+          if((tail == ttail && IN_DEG[thead] + OUT_DEG[thead] < sto->bound) || (tail == thead && IN_DEG[ttail] + OUT_DEG[ttail] < sto->bound)) {
+            sto->nonBDTDNE->lindex = j;
+            sto->nonBDTDNE->ltail = ttail;
+            sto->nonBDTDNE->lhead = thead;
+            UnsrtELDelete(ttail, thead, sto->nonBDTDNE);
+            UnsrtELInsert(ttail, thead, sto->BDTDNE);
+            sto->nonBDTDNE_deg[ttail]--;
+            sto->nonBDTDNE_deg[thead]--;
+            sto->BDTDNE_deg[ttail]++;
+            sto->BDTDNE_deg[thead]++;            
           }
-        } while((e = EdgetreePreSuccessor(sto->nonBDTDNE->inedges, e)) != 0);
+        }
       }
-      
-      if(sto->nonBDTDNE->outdegree[tail] > 0) {
-        Edge e = tail;
-        do {
-          if(IN_DEG[sto->nonBDTDNE->outedges[e].value] + OUT_DEG[sto->nonBDTDNE->outedges[e].value] < sto->bound) {
-            UnsrtELInsert(tail, sto->nonBDTDNE->outedges[e].value, sto->transferEL);
-          }
-        } while((e = EdgetreePreSuccessor(sto->nonBDTDNE->outedges, e)) != 0);
-      }                
-
-      for(int i = 1; i <= sto->transferEL->nedges; i++) {
-        ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->nonBDTDNE, TRUE);            
-        ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->BDTDNE, FALSE);
-      }        
     }
     
     if(sto->headmaxl) {
@@ -824,31 +846,24 @@ MH_U_FN(Mu_discordBDTNT) {
       sto->nodepos[head - 1] = sto->attrcounts[sto->headtype];
       sto->attrcounts[sto->headtype]++;
 
-      sto->transferEL->nedges = 0;
-
       // iterate over all nonBDTDNEs with head as an endpoint; if other endpoint is also
       // submaxl, move this edge from nonBDTDNE to BDTDNE
-      if(sto->nonBDTDNE->indegree[head] > 0) {
-        Edge e = head;
-        do { // NB the neighbor cannot be tail
-          if(IN_DEG[sto->nonBDTDNE->inedges[e].value] + OUT_DEG[sto->nonBDTDNE->inedges[e].value] < sto->bound) {
-            UnsrtELInsert(sto->nonBDTDNE->inedges[e].value, head, sto->transferEL);
+      if(sto->nonBDTDNE_deg[head] > 0) {
+        for(int j = sto->nonBDTDNE->nedges; j >= 1; j--) {
+          Vertex ttail = sto->nonBDTDNE->tails[j];
+          Vertex thead = sto->nonBDTDNE->heads[j];
+          if((head == ttail && IN_DEG[thead] + OUT_DEG[thead] < sto->bound) || (head == thead && IN_DEG[ttail] + OUT_DEG[ttail] < sto->bound)) {
+            sto->nonBDTDNE->lindex = j;
+            sto->nonBDTDNE->ltail = ttail;
+            sto->nonBDTDNE->lhead = thead;
+            UnsrtELDelete(ttail, thead, sto->nonBDTDNE);
+            UnsrtELInsert(ttail, thead, sto->BDTDNE);
+            sto->nonBDTDNE_deg[ttail]--;
+            sto->nonBDTDNE_deg[thead]--;
+            sto->BDTDNE_deg[ttail]++;
+            sto->BDTDNE_deg[thead]++;            
           }
-        } while((e = EdgetreePreSuccessor(sto->nonBDTDNE->inedges, e)) != 0);
-      }
-      
-      if(sto->nonBDTDNE->outdegree[head] > 0) {
-        Edge e = head;
-        do {
-          if(IN_DEG[sto->nonBDTDNE->outedges[e].value] + OUT_DEG[sto->nonBDTDNE->outedges[e].value] < sto->bound) {
-            UnsrtELInsert(head, sto->nonBDTDNE->outedges[e].value, sto->transferEL);
-          }
-        } while((e = EdgetreePreSuccessor(sto->nonBDTDNE->outedges, e)) != 0);
-      }                
-
-      for(int i = 1; i <= sto->transferEL->nedges; i++) {
-        ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->nonBDTDNE, TRUE);            
-        ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->BDTDNE, FALSE);
+        }
       }
     }
   } else {
@@ -860,27 +875,24 @@ MH_U_FN(Mu_discordBDTNT) {
       sto->nodesvec[sto->tailtype][sto->nodepos[tail - 1]] = sto->nodesvec[sto->tailtype][sto->attrcounts[sto->tailtype] - 1];
       sto->attrcounts[sto->tailtype]--;
 
-      sto->transferEL->nedges = 0;
-      
       // transfer all BDTDNEs with tail as an endpoint to nonBDTDNE
-      if(sto->BDTDNE->indegree[tail] > 0) {
-        Edge e = tail;
-        do {
-          UnsrtELInsert(sto->BDTDNE->inedges[e].value, tail, sto->transferEL);
-        } while((e = EdgetreePreSuccessor(sto->BDTDNE->inedges, e)) != 0);
-      }
-      
-      if(sto->BDTDNE->outdegree[tail] > 0) {
-        Edge e = tail;
-        do {
-          UnsrtELInsert(sto->BDTDNE->outedges[e].value, tail, sto->transferEL);
-        } while((e = EdgetreePreSuccessor(sto->BDTDNE->outedges, e)) != 0);
-      }                
-
-      for(int i = 1; i <= sto->transferEL->nedges; i++) {
-        ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->BDTDNE, TRUE);
-        ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->nonBDTDNE, FALSE);            
-      }
+      if(sto->BDTDNE_deg[tail] > 0) {
+        for(int j = sto->BDTDNE->nedges; j >= 1; j--) {
+          Vertex ttail = sto->BDTDNE->tails[j];
+          Vertex thead = sto->BDTDNE->heads[j];
+          if(tail == ttail || tail == thead) {
+            sto->BDTDNE->lindex = j;
+            sto->BDTDNE->ltail = ttail;
+            sto->BDTDNE->lhead = thead;
+            UnsrtELDelete(ttail, thead, sto->BDTDNE);
+            UnsrtELInsert(ttail, thead, sto->nonBDTDNE);
+            sto->nonBDTDNE_deg[ttail]++;
+            sto->nonBDTDNE_deg[thead]++;
+            sto->BDTDNE_deg[ttail]--;
+            sto->BDTDNE_deg[thead]--;            
+          }
+        }        
+      }          
     }
     
     if(sto->headmaxl) {
@@ -891,26 +903,22 @@ MH_U_FN(Mu_discordBDTNT) {
       sto->nodesvec[sto->headtype][sto->nodepos[head - 1]] = sto->nodesvec[sto->headtype][sto->attrcounts[sto->headtype] - 1];
       sto->attrcounts[sto->headtype]--;
 
-      sto->transferEL->nedges = 0;
-      
-      // transfer all BDTDNEs with head as an endpoint to nonBDTDNE
-      if(sto->BDTDNE->indegree[head] > 0) {
-        Edge e = head;
-        do {
-          UnsrtELInsert(sto->BDTDNE->inedges[e].value, head, sto->transferEL);
-        } while((e = EdgetreePreSuccessor(sto->BDTDNE->inedges, e)) != 0);
-      }
-      
-      if(sto->BDTDNE->outdegree[head] > 0) {
-        Edge e = head;
-        do {
-          UnsrtELInsert(sto->BDTDNE->outedges[e].value, head, sto->transferEL);
-        } while((e = EdgetreePreSuccessor(sto->BDTDNE->outedges, e)) != 0);
-      }                
-
-      for(int i = 1; i <= sto->transferEL->nedges; i++) {
-        ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->BDTDNE, TRUE);
-        ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->nonBDTDNE, FALSE);            
+      if(sto->BDTDNE_deg[head] > 0) {
+        for(int j = sto->BDTDNE->nedges; j >= 1; j--) {
+          Vertex ttail = sto->BDTDNE->tails[j];
+          Vertex thead = sto->BDTDNE->heads[j];
+          if(head == ttail || head == thead) {
+            sto->BDTDNE->lindex = j;
+            sto->BDTDNE->ltail = ttail;
+            sto->BDTDNE->lhead = thead;
+            UnsrtELDelete(ttail, thead, sto->BDTDNE);
+            UnsrtELInsert(ttail, thead, sto->nonBDTDNE);
+            sto->nonBDTDNE_deg[ttail]++;
+            sto->nonBDTDNE_deg[thead]++;
+            sto->BDTDNE_deg[ttail]--;
+            sto->BDTDNE_deg[thead]--;                        
+          }
+        }        
       }
     }      
   }
@@ -930,9 +938,13 @@ MH_F_FN(Mf_discordBDTNT) {
   Free(sto->attrcounts);
   Free(sto->nodepos);
 
-  NetworkDestroy(sto->BDTDNE);
-  NetworkDestroy(sto->nonBDTDNE);
+  UnsrtELDestroy(sto->BDTDNE);
+  UnsrtELDestroy(sto->nonBDTDNE);
   UnsrtELDestroy(sto->discordantEdges);
+  UnsrtELDestroy(sto->nonDiscordantEdges);
+  
+  Free(sto->BDTDNE_deg);
+  Free(sto->nonBDTDNE_deg);
   
   // MHp->storage itself should be Freed by MHProposalDestroy
 }
