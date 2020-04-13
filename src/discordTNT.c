@@ -1540,13 +1540,6 @@ MH_P_FN(MH_discordBDStratTNT) {
   
 }
 
-//// need to update U_FN and F_FN still
-// note nodepos must be in U_FN in this implementation 
-// must also write sto->proposedcumprob to sto->currentcumprob
-// and remove dyad count stuff
-// do also add overall BDTDNE and nonBDTDNE degree vecs so we don't have to loop most times
-// in the event looping is done, contiguity would probably make lookups faster
-
 MH_U_FN(Mu_discordBDStratTNT) {   
   GET_STORAGE(discordBDStratTNTStorage, sto);
 
