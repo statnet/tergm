@@ -145,7 +145,7 @@ typedef struct {
   
   double *pmat;
   double *nodecountsbycode;
-  double *dyadcounts;
+  Dyad *dyadcounts;
   
   double *tailtypes;
   double *headtypes;
@@ -180,7 +180,7 @@ MH_I_FN(Mi_discordStratTNT) {
     sto->discordantNonELs[i] = UnsrtELInitialize(0, NULL, NULL, FALSE);
   }
     
-  double *inputindmat = MHp->inputs + 1 + 3*nmixtypes + 1 + nattrcodes + N_NODES + N_NODES + nmixtypes;  
+  double *inputindmat = MHp->inputs + 1 + 3*nmixtypes + 1 + nattrcodes + N_NODES + N_NODES;  
   
   double **indmat = (double **)Calloc(nattrcodes, double *);
   indmat[0] = inputindmat;
@@ -210,13 +210,51 @@ MH_I_FN(Mi_discordStratTNT) {
     sto->nodesbycode[i] = sto->nodesbycode[i - 1] + (int)sto->nodecountsbycode[i - 1];
   }
   
-  sto->nmixtypes = nmixtypes;
-  sto->pmat = MHp->inputs + 1 + 2*nmixtypes;
+  sto->nmixtypes = nmixtypes;  
+  sto->pmat = Calloc(nmixtypes, double);
+
+  int empirical_flag = MHp->inputs[1 + 3*nmixtypes + 1 + nattrcodes + N_NODES + N_NODES + nattrcodes*nattrcodes];
+  if(empirical_flag) {
+    sto->pmat[0] = sto->nonDiscordantELs[0]->nedges;
+    for(int i = 1; i < nmixtypes; i++) {
+      sto->pmat[i] = sto->pmat[i - 1] + sto->nonDiscordantELs[i]->nedges;
+    }
+
+    // empirical_flag with no edges is an error
+    if(sto->pmat[nmixtypes - 1] == 0) {
+      MHp->ntoggles = MH_FAILED;
+      return;
+    }
+
+    for(int i = 0; i < nmixtypes; i++) {
+      sto->pmat[i] /= sto->pmat[nmixtypes - 1];
+    }
+  } else {
+    memcpy(sto->pmat, MHp->inputs + 1 + 2*nmixtypes, nmixtypes*sizeof(double));
+  }
   
-  sto->dyadcounts = MHp->inputs + 1 + 3*nmixtypes + 1 + nattrcodes + N_NODES + N_NODES;
   
   sto->tailtypes = MHp->inputs + 1;
   sto->headtypes = MHp->inputs + 1 + nmixtypes;
+  
+  sto->dyadcounts = Calloc(nmixtypes, Dyad);
+  for(int i = 0; i < nmixtypes; i++) {
+    int tailtype = sto->tailtypes[i];
+    int headtype = sto->headtypes[i];
+    
+    int tailcounts = sto->nodecountsbycode[tailtype];
+    int headcounts = sto->nodecountsbycode[headtype];
+    
+    if(tailtype == headtype) {
+      if(DIRECTED) {
+        sto->dyadcounts[i] = (Dyad)tailcounts*(headcounts - 1);
+      } else {
+        sto->dyadcounts[i] = (Dyad)tailcounts*(headcounts - 1)/2;
+      }
+    } else {
+      sto->dyadcounts[i] = (Dyad)tailcounts*headcounts;
+    }
+  }  
 } 
 
 MH_X_FN(Mx_discordStratTNT) {
@@ -263,7 +301,7 @@ MH_P_FN(MH_discordStratTNT) {
   int nedgestype = sto->nonDiscordantELs[i]->nedges + sto->discordantELs[i]->nedges;
 
   // number of dyads of this mixing type
-  int ndyadstype = sto->dyadcounts[i];
+  Dyad ndyadstype = sto->dyadcounts[i];
   
   // number of discordant dyads of this mixing type
   int nddyadstype = sto->discordantNonELs[i]->nedges + sto->discordantELs[i]->nedges;
@@ -397,6 +435,9 @@ MH_F_FN(Mf_discordStratTNT) {
   Free(sto->discordantNonELs);
 
   Free(sto->nodesbycode);
+
+  Free(sto->pmat);
+  Free(sto->dyadcounts);
 
   // MHp->storage itself should be Freed by MHProposalDestroy
 }
