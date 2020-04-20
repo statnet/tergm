@@ -10,26 +10,6 @@
 \name{tergm_proposals}
 \alias{tergm_proposals}
 \alias{InitErgmProposal}
-\alias{InitErgmProposal.dissolution}
-\alias{InitErgmProposal.dissolutionTNT}
-\alias{InitErgmProposal.dissolutionMLE}
-\alias{InitErgmProposal.dissolutionNonObservedMLE}
-\alias{InitErgmProposal.formation}
-\alias{InitErgmProposal.formationMLE}
-\alias{InitErgmProposal.formationMLETNT}
-\alias{InitErgmProposal.formationNonObservedMLE}
-\alias{InitErgmProposal.formationTNT}
-\alias{InitErgmProposal.dissolutionMLEblockdiag}
-\alias{InitErgmProposal.dissolutionNonObservedMLEblockdiag}
-\alias{InitErgmProposal.formationMLEblockdiag}
-\alias{InitErgmProposal.formationMLEblockdiagTNT}
-\alias{InitErgmProposal.formationNonObservedMLEblockdiag}
-\alias{InitErgmProposal.dissolutionMLETNT}
-\alias{InitErgmProposal.dissolutionMLEblockdiagTNT}
-\alias{InitErgmProposal.dissolutionNonObservedMLETNT}
-\alias{InitErgmProposal.dissolutionNonObservedMLEblockdiagTNT}
-\alias{InitErgmProposal.formationNonObservedMLETNT}
-\alias{InitErgmProposal.formationNonObservedMLEblockdiagTNT}
 \alias{InitErgmProposal.discordTNT}
 \alias{InitErgmProposal.discordStratTNT}
 \alias{InitErgmProposal.discordBDTNT}
@@ -50,26 +30,6 @@
 
   TODO: EXPLAIN TERGM PROPOSAL TYPES HERE
   \itemize{
-    \item{InitErgmProposal.dissolution}{}
-    \item{InitErgmProposal.dissolutionTNT}{}
-    \item{InitErgmProposal.dissolutionMLE}{}
-    \item{InitErgmProposal.dissolutionNonObservedMLE}{}
-    \item{InitErgmProposal.formation}{}
-    \item{InitErgmProposal.formationMLE}{}
-    \item{InitErgmProposal.formationMLETNT}{}
-    \item{InitErgmProposal.formationNonObservedMLE}{}
-    \item{InitErgmProposal.formationTNT}{}
-    \item{InitErgmProposal.dissolutionMLEblockdiag}{}
-    \item{InitErgmProposal.dissolutionNonObservedMLEblockdiag}{}
-    \item{InitErgmProposal.formationMLEblockdiag}{}
-    \item{InitErgmProposal.formationMLEblockdiagTNT}{}
-    \item{InitErgmProposal.formationNonObservedMLEblockdiag}{}
-    \item{InitErgmProposal.dissolutionMLETNT}{}
-    \item{InitErgmProposal.dissolutionMLEblockdiagTNT}{}
-    \item{InitErgmProposal.dissolutionNonObservedMLETNT}{}
-    \item{InitErgmProposal.dissolutionNonObservedMLEblockdiagTNT}{}
-    \item{InitErgmProposal.formationNonObservedMLETNT}{}
-    \item{InitErgmProposal.formationNonObservedMLEblockdiagTNT}{}
     \item{InitErgmProposal.discordTNT}{}
     \item{InitErgmProposal.discordStratTNT}{}
     \item{InitErgmProposal.discordBDTNT}{}    
