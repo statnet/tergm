@@ -18,6 +18,7 @@ g0<-network.initialize(n,dir=FALSE)
 target.stats<-c(      n*1/2,    n*0.6,       20)
 
 # Get a deliberately bad starting network.
+set.seed(1)
 g1<-san(g0~meandeg+degree(1),target.stats=target.stats[-3],verbose=TRUE)
 
 coef.form <- c(-6.57, 1.01)
