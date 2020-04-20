@@ -321,7 +321,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
   if(!is.null(monitor)) monitor<-nonsimp_update.formula(monitor,nw~., from.new="nw")
   
   proposal <- ergm_proposal(constraints,control$MCMC.prop.args,nw,
-                            weights=control$MCMC.prop.weights, class="c")
+                            weights=control$MCMC.prop.weights, class="t")
 
   model <- ergm_model(formula, nw, term.options=control$term.options, extra.aux=list(proposal=proposal$auxiliaries, system=~.lasttoggle))
   proposal$aux.slots <- model$slots.extra.aux$proposal

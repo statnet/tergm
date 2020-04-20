@@ -47,8 +47,8 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
           control[control.transfer[[arg]]] <- list(control[[arg]])
 
   if (verbose) cat("Initializing Metropolis-Hastings proposal.\n")
-  proposal <- ergm_proposal(constraints, weights=control$MCMC.prop.weights, control$MCMC.prop.args, nw)
-  proposal.SAN <- ergm_proposal(constraints, weights=control$SAN.control$SAN.prop.weights, control$SAN.control$SAN.prop.args, nw)
+  proposal <- ergm_proposal(constraints, weights=control$MCMC.prop.weights, control$MCMC.prop.args, nw, class="t")
+  proposal.SAN <- ergm_proposal(constraints, weights=control$SAN.control$SAN.prop.weights, control$SAN.control$SAN.prop.args, nw, class="c")
   
   model <- ergm_model(formula, nw, term.options=control$term.options, extra.aux=list(proposal=proposal$auxiliaries, system=~.lasttoggle))
   model.SAN <- ergm_model(SAN.formula, nw, term.options=control$SAN.control$term.options, extra.aux=list(proposal=proposal.SAN$auxiliaries))  
