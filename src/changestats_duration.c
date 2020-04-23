@@ -399,7 +399,7 @@ S_CHANGESTAT_FN(s_edgecov_mean_age_mon){
   if(noffset > 0){
     nrow = noffset;
   }else{
-    nrow = INPUT_PARAM[1];
+    nrow = INPUT_PARAM[2];
   }
 
   for (Edge k=1; k <= N_EDGES; k++){
