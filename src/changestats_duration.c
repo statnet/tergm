@@ -70,7 +70,7 @@ S_CHANGESTAT_FN(s_edges_ageinterval_mon){
     int age = ElapsedTime(tail,head,dur_inf) + 1;
     for(unsigned int j=0; j<N_CHANGE_STATS; j++){
       unsigned int from = INPUT_PARAM[j*2], to = INPUT_PARAM[j*2+1];
-      if(from<=age && (to==0 || age<to)) CHANGE_STAT[0]++;
+      if(from<=age && (to==0 || age<to)) CHANGE_STAT[j]++;
     }
   }
 }
