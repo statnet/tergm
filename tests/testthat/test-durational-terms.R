@@ -10,7 +10,8 @@
 
 context("test-durational-terms.R")
 
-test_that("mean.age, edge.ages, edgecov.ages, and edgecov.mean.age behave correctly with summary and godfather", {
+test_that("mean.age, edge.ages, edgecov.ages, edgecov.mean.age, and edges.ageinterval behave correctly with summary and godfather", {
+  
   el <- matrix(c(1, 2,
                  1, 3,
                  2, 3,
@@ -35,6 +36,16 @@ test_that("mean.age, edge.ages, edgecov.ages, and edgecov.mean.age behave correc
   
   nw0 <- network.initialize(10,dir=FALSE)
   
+  ages_from = c(1, 1, 4, 2, 5, 10, 1, 5)
+  ages_to = c(2, 3, 15, 5, 7, 12, Inf, Inf) 
+  
+  init_ages <- 5 - init.lasttoggle.times + 1
+  
+  init_age_counts <- integer(length(ages_from))
+  for(i in seq_len(length(ages_from))) {
+    init_age_counts[i] <- sum(init_ages >= ages_from[i] & init_ages < ages_to[i])
+  }
+  
   expect_equal(unname(summary(nw0 ~ mean.age(emptyval=4321.4))), 4321.4)  
   expect_equal(unname(summary(nw ~ mean.age)), mean(5 - init.lasttoggle.times + 1))
   
@@ -53,6 +64,9 @@ test_that("mean.age, edge.ages, edgecov.ages, and edgecov.mean.age behave correc
   expect_equal(unname(summary(nw0 ~ edgecov.mean.age("edgewts", emptyval=pi^4/25, log=TRUE))), pi^4/25)  
   expect_equal(unname(summary(nw ~ edgecov.mean.age("edgewts", log=TRUE))), sum(wts[el]*log(5 - init.lasttoggle.times + 1))/sum(wts[el]))
     
+  expect_equal(unname(summary(nw0 ~ edges.ageinterval(from=ages_from, to=ages_to))), integer(length(ages_from)))  
+  expect_equal(unname(summary(nw ~ edges.ageinterval(from=ages_from, to=ages_to))), init_age_counts)  
+        
   toggles <- matrix(c(6, 2, 3,
                       7, 1, 4,
                       7, 1, 5,
@@ -76,7 +90,7 @@ test_that("mean.age, edge.ages, edgecov.ages, and edgecov.mean.age behave correc
                       15, 5, 8,
                       15, 9, 10), ncol = 3, byrow = TRUE)
   
-  rv <- tergm.godfather(nw ~ edges + mean.age(emptyval=3425.432) + edge.ages + edgecov.ages("edgewts") + edgecov.mean.age("edgewts", emptyval=exp(pi/5)/3.14) + mean.age(emptyval=13.1, log=TRUE) + edgecov.mean.age("edgewts", emptyval=0.874, log=TRUE), toggles=toggles)
+  rv <- tergm.godfather(nw ~ edges + mean.age(emptyval=3425.432) + edge.ages + edgecov.ages("edgewts") + edgecov.mean.age("edgewts", emptyval=exp(pi/5)/3.14) + mean.age(emptyval=13.1, log=TRUE) + edgecov.mean.age("edgewts", emptyval=0.874, log=TRUE) + edges.ageinterval(from=ages_from, to=ages_to), toggles=toggles)
   rv <- as.matrix(rv)
   
   # takes initial edgelist with lasttoggle times and the set of toggles and
@@ -139,6 +153,11 @@ test_that("mean.age, edge.ages, edgecov.ages, and edgecov.mean.age behave correc
     expect_equal(sum(wts[el_lts[[j]][,1:2]]*(j - el_lts[[j]][,3] + 1))/sum(wts[el_lts[[j]][,1:2]]), unname(rv[j - 5, 5]))
     expect_equal(mean(log(j - el_lts[[j]][,3] + 1)), unname(rv[j - 5,6]))
     expect_equal(sum(wts[el_lts[[j]][,1:2]]*log(j - el_lts[[j]][,3] + 1))/sum(wts[el_lts[[j]][,1:2]]), unname(rv[j - 5, 7]))
+    
+    for(k in seq_len(length(ages_from))) {
+      expect_equal(sum(j - el_lts[[j]][,3] + 1 >= ages_from[k] & j - el_lts[[j]][,3] + 1 < ages_to[k]), unname(rv[j - 5, 7 + k]))
+    }
+  
   }
 
   expect_equal(3425.432, unname(rv[10,2]))  
@@ -147,4 +166,7 @@ test_that("mean.age, edge.ages, edgecov.ages, and edgecov.mean.age behave correc
   expect_equal(exp(pi/5)/3.14, unname(rv[10,5]))
   expect_equal(13.1, unname(rv[10,6]))
   expect_equal(0.874, unname(rv[10,7]))
+  expect_equal(integer(length(ages_from)), unname(rv[10, 8:(8 + length(ages_from) - 1)]))
+  
 })
+
