@@ -307,18 +307,17 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
 
   formula<-nonsimp_update.formula(formula,nw~., from.new="nw")
 
-  unset.offset.call <- function(object){
-    if(inherits(object,"call") && object[[1]]=="offset")
-      object[[2]]
-    else
-      object
+  if(is.character(monitor)) {
+    formula_pieces <- .extract.fd.formulae(formula)
+    
+    monitor <- switch(monitor,
+                      formation = formula_pieces$form,
+                      dissolution = formula_pieces$diss,
+                      all = append_rhs.formula(~nw, unique(lapply(list_rhs.formula(formula_pieces$all), unset.offset.call)))
+                      )
   }
-  
-  if(is.character(monitor)){
-    stop("TERGM simulate() does not support ", sQuote("monitor"), " arguments of class character.")
-  }
-  
-  if(!is.null(monitor)) monitor<-nonsimp_update.formula(monitor,nw~., from.new="nw")
+    
+  if(!is.null(monitor)) monitor <- nonsimp_update.formula(monitor, nw~., from.new="nw")
   
   proposal <- ergm_proposal(constraints,control$MCMC.prop.args,nw,
                             weights=control$MCMC.prop.weights, class="t")

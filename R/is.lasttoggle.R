@@ -18,42 +18,18 @@
 #' @descrption This needs to be written (or links to it removed) before the 4.0 release.
 NULL
 
-is.lasttoggle <- function(nw,formation=NULL,dissolution=NULL,monitor=NULL,target=NULL){
-  
+is.lasttoggle <- function(nw, formation=NULL, dissolution=NULL, monitor=NULL, targets=NULL) {  
   if(!is.null(formation))
     formation<-nonsimp_update.formula(formation,nw~., from.new="nw")
   
   if(!is.null(dissolution))  
     dissolution<-nonsimp_update.formula(dissolution,nw~., from.new="nw")
+
+  if(is(monitor, "formula"))
+    monitor <- nonsimp_update.formula(monitor, nw~., from.new="nw")
+     
+  if(is(targets, "formula"))
+    targets <- nonsimp_update.formula(targets, nw~., from.new="nw")
   
-  if(!is.null(monitor)){    
-    if(is.character(monitor)){
-      monitor <- switch(monitor,
-          formation = formation,
-          dissolution = dissolution,
-          all = append_rhs.formula(~nw, unique(lapply(c(list_rhs.formula(formation),list_rhs.formula(dissolution)), unset.offset.call)))
-      )
-    }
-    
-    if(!is.null(monitor)) 
-      monitor <- nonsimp_update.formula(monitor,nw~., from.new="nw")
-  }
-  
-  
-  if(!is.null(target)){
-    if(is.character(targets)){
-      targets <- switch(targets,
-          formation = formation,
-          dissolution = dissolution)}
-      
-      targets <- nonsimp_update.formula(targets,nw~., from.new="nw")
-    }
-  
-  
-  
-    duration.dependent <- if(is.durational(formation) || is.durational(dissolution)|| is.durational(monitor))
-        {1} else {0}
-    
-    duration.dependent
-    
-  }
+  as.integer(is.durational(formation) || is.durational(dissolution) || is.durational(monitor) || is.durational(targets))
+}

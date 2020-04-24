@@ -351,9 +351,24 @@ unset.offset.call <- function(object){
   all <- ~.
   attributes(all)$.Environment <- attributes(formula)$.Environment
 
-  if(list_rhs.formula(form)[[1]] != ".") all <- append_rhs.formula(all, list_rhs.formula(form))
-  if(list_rhs.formula(diss)[[1]] != ".") all <- append_rhs.formula(all, list_rhs.formula(diss))
-  if(list_rhs.formula(nonsep)[[1]] != ".") all <- append_rhs.formula(all, list_rhs.formula(nonsep))  
+  if(length(form) == 3) {
+    all <- append_rhs.formula(all, list_rhs.formula(form))
+    form <- form[c(1,3)]
+  }
+
+  if(length(diss) == 3) {
+    all <- append_rhs.formula(all, list_rhs.formula(diss))
+    diss <- diss[c(1,3)]
+  }
+
+  if(length(nonsep) == 3) {
+    all <- append_rhs.formula(all, list_rhs.formula(nonsep))
+    nonsep <- nonsep[c(1,3)]
+  }
+
+  if(length(all) == 3) {
+    all <- all[c(1,3)]
+  }
   
   list(form=form, diss=diss, nonsep=nonsep, all=all)
 }

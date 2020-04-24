@@ -21,9 +21,13 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
   # EGMME requires targets, or there will be an error
   if (is.null(targets)) stop('tergm.EGMME requires targets parameter be specified')
   
-  if(!is(targets,"formula")) stop("tergm.EGMME requires targets parameter to be a formula.")
+  if(is.character(targets)) {    
+    targets <- switch(targets,
+                      formation = .extract.fd.formulae(formula)$form,
+                      dissolution = .extract.fd.formulae(formula)$diss)
+  }
   
-  if(length(targets)==3){
+  if(length(targets)==3) {
     warning("Targets formula has an LHS, which will be ignored in favor of nw.")
     targets <- targets[c(1,3)] # in a formula f<-y~x, f[1]=~, f[2]=y, and f[3]=x
   }
