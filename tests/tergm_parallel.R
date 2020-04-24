@@ -16,7 +16,7 @@ opttest({
   
   mod1 <- tergm(flobusiness ~ FormE(~edges + degree(3)) + offset(DissE(~edges)),
                  offset.coef=log(9),
-                 targets=~edges + degree(3),
+                 targets="formation",
                  estimate="EGMME",
                  control=control.tergm(parallel=2, parallel.type="PSOCK")
   )
@@ -30,7 +30,7 @@ opttest({
   
   mod1 <- tergm(flobusiness ~ FormE(~edges + degree(3)) + offset(DissE(~edges)),
                  offset.coef=log(9),
-                 targets=~edges + degree(3),
+                 targets="formation",
                  estimate="EGMME",
                  control=control.tergm(parallel=2, parallel.type="MPI")
   )

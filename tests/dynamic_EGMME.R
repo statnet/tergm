@@ -26,7 +26,7 @@ coef.diss <- c(2.944439)
 
 # Fit the model with very poor starting values.
 set.seed(3)
-dynfit<-tergm(g1 ~ FormE(~edges + degree(1)) + offset(DissE(~edges)), targets=~edges + degree(1), estimate="EGMME", constraints="discordTNT"~., offset.coef=coef.diss,target.stats=target.stats[-3],verbose=TRUE,control=control.tergm(SA.plot.progress=do.plot,SA.restart.on.err=FALSE,init=c(-log(.95/.05),0, coef.diss)))
+dynfit<-tergm(g1 ~ FormE(~edges + degree(1)) + offset(DissE(~edges)), targets="formation", estimate="EGMME", constraints="discordTNT"~., offset.coef=coef.diss,target.stats=target.stats[-3],verbose=TRUE,control=control.tergm(SA.plot.progress=do.plot,SA.restart.on.err=FALSE,init=c(-log(.95/.05),0, coef.diss)))
 
 print(summary(dynfit))
 mcmc.diagnostics(dynfit)

@@ -73,7 +73,7 @@ activate.edges(msm.sim, -Inf, Inf)
 msm.sim <- simulate(msm.sim ~ FormE(~edges) + DissE(~edges),
                     coef=c(coef.form,coef.diss),
                     time.slices = 1,
-                    monitor=~edges,
+                    monitor="all",
                     verbose=TRUE,
                     dynamic=TRUE
 )
@@ -81,7 +81,7 @@ msm.sim <- simulate(msm.sim ~ FormE(~edges) + DissE(~edges),
 msm.sim <- simulate(msm.sim ~ FormE(~edges) + DissE(~edges),
                     coef=c(coef.form,coef.diss),
                     time.slices = 1,
-                    monitor=~edges,
+                    monitor="all",
                     verbose=TRUE,
                     dynamic=TRUE
 )
@@ -115,7 +115,7 @@ activate.edges(msm.sim, -Inf, Inf)
 msm.sim <- simulate(msm.sim ~ FormE(~edges) + DissE(~edges),
                     coef=c(coef.form,coef.diss),
                     time.slices = 1,
-                    monitor=~edges,
+                    monitor="formation",
                     verbose=TRUE,
                     dynamic=TRUE
 )
@@ -129,7 +129,7 @@ add.vertices.active(msm.sim,nv=5,onset=0,terminus=Inf)
 msm.sim <- simulate(msm.sim ~ FormE(~edges) + DissE(~edges),
                     coef=c(coef.form,coef.diss),
                     time.slices = 1,
-                    monitor=~edges,
+                    monitor="all",
                     verbose=TRUE,
                     dynamic=TRUE
 )
@@ -150,7 +150,7 @@ if(!all(network.dynamic.check(msm.sim,complete=FALSE)$dyad.checks)){
 msm.sim <- simulate(msm.sim ~ FormE(~edges) + DissE(~edges),
                     coef=c(coef.form,coef.diss),
                     time.slices = 1, time.start=2,time.offset=0,
-                    monitor=~edges,
+                    monitor="formation",
                     verbose=TRUE,
                     dynamic=TRUE
 )
@@ -166,7 +166,7 @@ if (!all(get.change.times(msm.sim)==0:2)){
 msm.sim <- simulate(msm.sim ~ FormE(~edges) + DissE(~edges),
                     coef=c(coef.form,coef.diss),
                     time.slices = 1, time.start=3,time.offset=0,
-                    monitor=~edges,
+                    monitor="all",
                     verbose=TRUE,
                     dynamic=TRUE
 )
@@ -209,7 +209,7 @@ add.edges(msm.sim,msm.edgelist[,1],msm.edgelist[,2])
 msm.sim <- simulate(msm.sim ~ FormE(~edges) + DissE(~edges),
                     coef=c(coef.form,coef.diss),
                     time.slices = 1, time.start=0,time.offset=0,
-                    monitor=~edges,
+                    monitor="all",
                     verbose=TRUE,
                     dynamic=TRUE
 )
@@ -304,5 +304,5 @@ fit.sim <- simulate(fit, dynamic=FALSE)
 diag.sim <- simulate(fit.sim ~ FormE(~ edges + offset(nodemix("loc", levels2=-c(1, 3)))) + offset(DissE(~edges)),
                      coef=c(coef.form,log(40-1)),
                      time.slices = 10,
-                     monitor = ~ edges + offset(nodemix("loc", levels2=-c(1, 3))),
+                     monitor = "formation",
                      nsim = 1,dynamic=TRUE)
