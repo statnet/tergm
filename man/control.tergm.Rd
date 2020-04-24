@@ -15,14 +15,15 @@ control.tergm(
   MCMC.packagenames = c(),
   CMLE.MCMC.burnin = 1024 * 16,
   CMLE.MCMC.interval = 1024,
-  CMLE.control = control.ergm(init = init, MCMC.burnin = CMLE.MCMC.burnin, MCMC.interval
-    = CMLE.MCMC.interval, MCMC.prop.weights = MCMC.prop.weights, MCMC.prop.args =
-    MCMC.prop.args, MCMC.maxedges = MCMC.maxedges, MCMC.packagenames = MCMC.packagenames,
-    parallel = parallel, parallel.type = parallel.type, parallel.version.check =
-    parallel.version.check, force.main = force.main),
+  CMLE.control = control.ergm(init = init, MCMC.burnin = CMLE.MCMC.burnin,
+    MCMC.interval = CMLE.MCMC.interval, MCMC.prop.weights = MCMC.prop.weights,
+    MCMC.prop.args = MCMC.prop.args, MCMC.maxedges = MCMC.maxedges, MCMC.packagenames =
+    MCMC.packagenames, parallel = parallel, parallel.type = parallel.type,
+    parallel.version.check = parallel.version.check, force.main = force.main),
   CMLE.NA.impute = c(),
   CMLE.term.check.override = FALSE,
   EGMME.main.method = c("Gradient-Descent"),
+  EGMME.initialfit.control = control.ergm(),
   EGMME.MCMC.burnin.min = 1000,
   EGMME.MCMC.burnin.max = 1e+05,
   EGMME.MCMC.burnin.pval = 0.5,
@@ -171,6 +172,9 @@ overrides the tests.}
 \item{EGMME.main.method}{Estimation method used to find the
 Equilibrium Generalized Method of Moments estimator.  Currently
 only "Gradient-Descent" is implemented.}
+
+\item{EGMME.initialfit.control}{Control object for the ergm fit
+in tergm.EGMME.initialfit}
 
 \item{EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max, }{Number of
 Metropolis-Hastings steps
