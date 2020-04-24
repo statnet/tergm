@@ -61,7 +61,11 @@ tergm.EGMME.initialfit<-function(init, nw, model, formula, model.mon, formula.mo
       # Fit an ERGM to the formation terms:
       form.targets <- model.mon$target.stats[match(model.form$coef.names,.do(model.mon$coef.names))]
       form.targets <- form.targets[!model.form$etamap$offsettheta]
-      init.form<-coef(ergm(model.form$formula,control=control.ergm(init=init.form), target.stats=form.targets, offset.coef = form.offset.coef, eval.loglik=FALSE))
+      
+      ergm_control <- NVL(control$EGMME.initialfit.control, control.ergm())
+      ergm_control$init <- init.form
+      
+      init.form<-coef(ergm(model.form$formula,control=ergm_control, target.stats=form.targets, offset.coef = form.offset.coef, eval.loglik=FALSE))
       # Now, match up non-offset formation terms with dissolution terms.
       # In case it's not obvious (it's not to me) what the following
       # does, it takes non-offset elements of init.form, then, from
