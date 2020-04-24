@@ -26,15 +26,7 @@ is.lasttoggle <- function(nw,formation=NULL,dissolution=NULL,monitor=NULL,target
   if(!is.null(dissolution))  
     dissolution<-nonsimp_update.formula(dissolution,nw~., from.new="nw")
   
-  if(!is.null(monitor)){
-    
-    unset.offset.call <- function(object){
-      if(inherits(object,"call") && object[[1]]=="offset")
-        object[[2]]
-      else
-        object
-    }
-    
+  if(!is.null(monitor)){    
     if(is.character(monitor)){
       monitor <- switch(monitor,
           formation = formation,

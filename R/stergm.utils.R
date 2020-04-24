@@ -284,3 +284,76 @@ edgelist_with_lasttoggle <- function(nw) {
   rv
 }
 
+unset.offset.call <- function(object){
+  if(inherits(object,"call") && object[[1]]=="offset")
+    object[[2]]
+  else
+    object
+}
+
+.extract.fd.formulae <- function(formula) {
+  x <- list_rhs.formula(formula)
+  
+  form <- ~.
+  attributes(form)$.Environment <- attributes(formula)$.Environment
+  diss <- ~.
+  attributes(diss)$.Environment <- attributes(formula)$.Environment
+  nonsep <- ~.
+  attributes(nonsep)$.Environment <- attributes(formula)$.Environment
+  
+  for(i in seq_along(x)) {
+    term <- x[[i]]
+    sign <- attr(x, "sign")[i]
+
+    if(!is.call(term)) {
+      nonsep <- append_rhs.formula(nonsep, structure(list(term), sign=sign))
+      next
+    }
+    
+    formbit <- FALSE
+    dissbit <- FALSE
+    
+    offset <- FALSE
+    
+    subterm <- term
+    
+    if(grepl("^offset", deparse(term[[1]]))) {
+      subterm <- term[[2]]
+      if(!is.call(subterm)) {
+        nonsep <- append_rhs.formula(nonsep, structure(list(term), sign=sign))
+        next
+      }
+      offset <- TRUE
+    }
+    
+    if(grepl("^FormE", deparse(subterm[[1]]))) formbit <- TRUE
+    else if(grepl("^DissE", deparse(subterm[[1]]))) dissbit <- TRUE
+    else {
+      nonsep <- append_rhs.formula(nonsep, structure(list(term), sign=sign))
+      next      
+    }
+    
+    formula_arg_list <- list_rhs.formula(as.formula(subterm[[2]]))
+    attr(formula_arg_list, "sign") <- attr(formula_arg_list, "sign")*sign # propagate overall sign
+    
+    if(offset) { # stick `offset()` on each term that doesn't already have it
+      for(j in seq_along(formula_arg_list)) {
+        if(!grepl("^offset", deparse(formula_arg_list[[j]]))) {
+          formula_arg_list[[j]] <- str2lang(paste0("offset(", deparse(formula_arg_list[[j]]), ")"))
+        }
+      }
+    }
+    
+    if(formbit) form <- append_rhs.formula(form, formula_arg_list)
+    else diss <- append_rhs.formula(diss, formula_arg_list)
+  }
+  
+  all <- ~.
+  attributes(all)$.Environment <- attributes(formula)$.Environment
+
+  if(list_rhs.formula(form)[[1]] != ".") all <- append_rhs.formula(all, list_rhs.formula(form))
+  if(list_rhs.formula(diss)[[1]] != ".") all <- append_rhs.formula(all, list_rhs.formula(diss))
+  if(list_rhs.formula(nonsep)[[1]] != ".") all <- append_rhs.formula(all, list_rhs.formula(nonsep))  
+  
+  list(form=form, diss=diss, nonsep=nonsep, all=all)
+}
