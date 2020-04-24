@@ -333,7 +333,7 @@ unset.offset.call <- function(object){
       next      
     }
     
-    formula_arg_list <- list_rhs.formula(as.formula(subterm[[2]]))
+    formula_arg_list <- list_rhs.formula(eval(subterm[[2]], envir=attributes(formula)$.Environment))
     attr(formula_arg_list, "sign") <- attr(formula_arg_list, "sign")*sign # propagate overall sign
     
     if(offset) { # stick `offset()` on each term that doesn't already have it
