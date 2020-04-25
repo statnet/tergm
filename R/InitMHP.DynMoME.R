@@ -37,23 +37,3 @@ InitErgmProposal.discordBDStratTNT <- function(arguments, nw, model) {
   proposal <- list(name = "discordBDStratTNT", inputs=stp$inputs, auxiliaries = ~.lasttoggle)
   proposal
 }
-
-InitErgmProposal.formation <- function(arguments, nw, model) {
-  proposal <- list(name = "Formation", inputs=NULL)
-  proposal
-}
-
-InitErgmProposal.formationTNT <- function(arguments, nw, model) {
-  proposal <- list(name = "FormationTNT", inputs=NULL)
-  proposal
-}
-
-InitErgmProposal.dissolution <- function(arguments, nw, model) {
-  proposal <- list(name = "Dissolution", inputs=NULL)
-  proposal
-}
-
-InitErgmProposal.dissolutionTNT <- function(arguments, nw, model) {
-  proposal <- list(name = "DissolutionTNT", inputs=NULL)
-  proposal
-}
