@@ -93,6 +93,7 @@ Fitting an ERGM usually begins with obtaining data:
 
 <<>>=
 library(ergm)
+options(ergm.term=list(cache.sp=FALSE))
 data("florentine")
 ls()
 @
@@ -751,7 +752,7 @@ summary(msm.fit)
 Now, we simulate a dynamic network:
 
 <<>>=
-msm.sim <- simulate(msm.fit,time.slices=1000)
+msm.sim <- simulate(msm.fit,time.slices=1000, control=control.simulate.tergm(MCMC.maxchanges=1e8))
 @
 
 and compare the outputs to what we expect, in terms of cross-sectional structure:
