@@ -63,7 +63,7 @@ test_that("network.extract.with.lasttoggle behaves reasonably", {
   lt_list <- list(lt_0, lt_1, lt_2, lt_3, lt_4)
   
   for(timeslice in 0:4) {
-    nwe <- tergm:::network.extract.with.lasttoggle(nwd, timeslice, TRUE)
+    nwe <- network.extract.with.lasttoggle(nwd, timeslice, TRUE)
     expect_identical(nwe %n% "time", timeslice)
     
     extracted_lt <- nwe %n% "lasttoggle"
@@ -91,7 +91,7 @@ test_that("network.extract.with.lasttoggle behaves reasonably", {
   lt_list_mod[[5]] <- lt_4_mod
   
   for(timeslice in 0:4) {
-    nwe <- tergm:::network.extract.with.lasttoggle(nwd2, timeslice, TRUE)
+    nwe <- network.extract.with.lasttoggle(nwd2, timeslice, TRUE)
     expect_identical(nwe %n% "time", timeslice)
     
     extracted_lt <- nwe %n% "lasttoggle"
@@ -112,7 +112,7 @@ test_that("network.extract.with.lasttoggle behaves reasonably", {
                          3L, 5L, 2L, 
                          4L, 5L, 2L), ncol = 3, byrow = TRUE)
                          
-  nwe <- tergm:::network.extract.with.lasttoggle(nwd3, at=10, TRUE)
+  nwe <- network.extract.with.lasttoggle(nwd3, at=10, TRUE)
   
   expect_identical(nwe %n% "time", 10)
   expect_identical(nwe %n% "lasttoggle", lt_10_mod_3)
@@ -126,7 +126,7 @@ test_that("network.extract.with.lasttoggle behaves reasonably", {
   
   nwd4 <- deactivate.vertices(nwd, onset=4,terminus=7,v=c(1), deactivate.edges=FALSE)
   
-  nwe <- tergm:::network.extract.with.lasttoggle(nwd4, at=10, TRUE)
+  nwe <- network.extract.with.lasttoggle(nwd4, at=10, TRUE)
   
   expect_identical(nwe %n% "time", 10)
   expect_identical(nwe %n% "lasttoggle", lt_4)
@@ -138,7 +138,7 @@ test_that("network.extract.with.lasttoggle behaves reasonably", {
   nwd5 <- deactivate.vertices(nwd, onset=4,terminus=Inf,v=c(1), deactivate.edges=FALSE)
   nwd6 <- activate.vertices(nwd, onset=7,terminus=Inf,v=c(1))
   
-  nwe <- tergm:::network.extract.with.lasttoggle(nwd6, at=10, TRUE)
+  nwe <- network.extract.with.lasttoggle(nwd6, at=10, TRUE)
   
   expect_identical(nwe %n% "time", 10)
   expect_identical(nwe %n% "lasttoggle", lt_4)
