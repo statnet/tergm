@@ -43,7 +43,7 @@ Description: An integrated set of extensions to the 'ergm' package to analyze an
 License: GPL-3 + file LICENSE
 URL: http://www.statnet.org
 VignetteBuilder: rmarkdown, knitr
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
 Collate: 
@@ -52,7 +52,6 @@ Collate:
     'InitErgmTerm.duration.R'
     'InitErgmTerm.netseries.R'
     'InitMHP.DynMoME.R'
-    'coef.stergm.R'
     'control.simulate.stergm.R'
     'control.simulate.tergm.R'
     'control.stergm.R'
@@ -61,15 +60,14 @@ Collate:
     'impute.network.list.R'
     'is.durational.R'
     'is.lasttoggle.R'
-    'mcmc.diagnostics.stergm.R'
-    'print.stergm.R'
+    'mcmc.diagnostics.tergm.R'
+    'print.tergm.R'
     'simulate.stergm.R'
     'simulate.tergm.R'
     'stergm.R'
     'tergm-deprecated.R'
     'stergm.utils.R'
     'summary.statistics.networkDynamic.R'
-    'summary.stergm.R'
     'summary.tergm.R'
     'tergm.CMLE.R'
     'tergm.EGMME.GD.R'
