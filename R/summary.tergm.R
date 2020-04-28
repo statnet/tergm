@@ -10,6 +10,7 @@ summary.tergm <- function(object, ...) {
 
 
 #' @noRd
+#' @importFrom utils getS3method
 #' @export
 print.summary.tergm <- function(x, ...){
   cat("\n==============================\n")

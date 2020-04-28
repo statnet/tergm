@@ -130,9 +130,9 @@
 #' \item{control}{The control
 #' parameters used to fit the model.} 
 #' 
-#' See the method \code{\link{print.stergm}} for details on how an
+#' See the method \code{\link{print.tergm}} for details on how an
 #' \code{\link{stergm}} object is printed.  Note that the method
-#' \code{\link{summary.stergm}} returns a summary of the relevant parts of the
+#' \code{\link{summary.tergm}} returns a summary of the relevant parts of the
 #' \code{\link{stergm}} object in concise summary format.
 #' @seealso ergm, network, \%v\%, \%n\%, \code{\link{ergm-terms}}
 #' @references \itemize{

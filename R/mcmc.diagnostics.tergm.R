@@ -62,30 +62,6 @@
 #' is available from the Statlib archive.
 #' @keywords models
 #' @importFrom ergm mcmc.diagnostics
-#' @export
-mcmc.diagnostics.stergm <- function(object, 
-                                    center=TRUE,
-                                    esteq=TRUE,
-                                    vars.per.page=3, ...){
-  if(!is.null(object$formation.fit$sample)){
-    cat("\n==========================\n")
-    cat("Formation fit diagnostics\n")
-    cat("==========================\n\n")
-    mcmc.diagnostics(object$formation.fit, center=center, esteq=esteq, vars.per.page=vars.per.page, ...)
-  }
-  if(!is.null(object$dissolution.fit$sample)){
-    cat("\n==========================\n")
-    cat("Dissolution fit diagnostics\n")
-    cat("==========================\n\n")
-    mcmc.diagnostics(object$dissolution.fit, center=center, esteq=esteq, vars.per.page=vars.per.page, ...)
-  }
-  if(!is.null(object$sample)){
-    cat("\n==========================\n")
-    cat("EGMME diagnostics\n")
-    cat("==========================\n\n")
-    getS3method("mcmc.diagnostics","ergm")(object, center=center, esteq=esteq, vars.per.page=vars.per.page, ...)
-  }
-}
 
 #' @export
 mcmc.diagnostics.tergm <- function(object, 

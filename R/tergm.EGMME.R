@@ -126,7 +126,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
   }
   
   Cout <- switch(control$EGMME.main.method,
-                 "Gradient-Descent" = tergm.EGMME.GD(initialfit$fit$coef,
+                 "Gradient-Descent" = tergm.EGMME.GD(initialfit$coef,
                    nw, model, model.mon,
                    control=control, proposal=proposal,
                   verbose),

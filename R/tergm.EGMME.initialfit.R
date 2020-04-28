@@ -83,7 +83,7 @@ tergm.EGMME.initialfit<-function(init, nw, model, formula, model.mon, formula.mo
       stop("No initial parameter method for specified model and targets combination is implemented. Specify via control$init.")
     }
   }
-  out <- list(formula=formula, targets = formula.mon, target.stats=model.mon$target.stats, nw = nw, control = control, fit = list(coef=init, etamap = model$etamap))
+  out <- list(formula=formula, coef = init, targets = formula.mon, target.stats=model.mon$target.stats, nw = nw, control = control, fit = list(coef=init, etamap = model$etamap))
   class(out)<-"tergm"
   out
 }
