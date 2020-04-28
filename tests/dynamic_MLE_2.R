@@ -58,16 +58,16 @@ set.seed(543)
 fit<-tergm(list(y0,y1,y2) ~ Form(~edges) + Diss(~edges), estimate="CMPLE", times=c(1,2,3))
 
 stopifnot(fit$estimate=="CMPLE")
-stopifnot(z.error(form.mle(y0,y1,y2), fit$fit$coef[1], vcov(fit$fit)[1,1]) <= tolerance)
-stopifnot(z.error(diss.mle(y0,y1,y2), fit$fit$coef[2], vcov(fit$fit)[2,2]) <= tolerance)
+stopifnot(z.error(form.mle(y0,y1,y2), fit$coef[1], vcov(fit$fit)[1,1]) <= tolerance)
+stopifnot(z.error(diss.mle(y0,y1,y2), fit$coef[2], vcov(fit$fit)[2,2]) <= tolerance)
 
 # Autodetected CMPLE
 set.seed(543)
 fit<-tergm(list(y0,y1,y2) ~ Form(~edges) + Diss(~edges), estimate="CMLE", times=c(1,2,3))
 
 stopifnot(fit$estimate=="CMLE")
-stopifnot(z.error(form.mle(y0,y1,y2), fit$fit$coef[1], vcov(fit$fit)[1,1]) <= tolerance)
-stopifnot(z.error(diss.mle(y0,y1,y2), fit$fit$coef[2], vcov(fit$fit)[2,2]) <= tolerance)
+stopifnot(z.error(form.mle(y0,y1,y2), fit$coef[1], vcov(fit$fit)[1,1]) <= tolerance)
+stopifnot(z.error(diss.mle(y0,y1,y2), fit$coef[2], vcov(fit$fit)[2,2]) <= tolerance)
 
 # Force CMLE
 for(prop.weight in prop.weights){
@@ -76,8 +76,8 @@ set.seed(543)
 fit<-tergm(list(y0,y1,y2) ~ Form(~edges) + Diss(~edges), estimate="CMLE", control=control.tergm(CMLE.control=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 2*1024, MCMC.burnin=10000, MCMC.interval = 1024,force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2,3))
 
 stopifnot(fit$estimate=="CMLE")
-stopifnot(z.error(form.mle(y0,y1,y2), fit$fit$coef[1], vcov(fit$fit)[1,1]) <= tolerance)
-stopifnot(z.error(diss.mle(y0,y1,y2), fit$fit$coef[2], vcov(fit$fit)[2,2]) <= tolerance)
+stopifnot(z.error(form.mle(y0,y1,y2), fit$coef[1], vcov(fit$fit)[1,1]) <= tolerance)
+stopifnot(z.error(diss.mle(y0,y1,y2), fit$coef[2], vcov(fit$fit)[2,2]) <= tolerance)
 }
 
 cat("Missing data:\n")
@@ -93,16 +93,16 @@ set.seed(765)
 fit<-tergm(list(y0,y1,y2m) ~ Form(~edges) + Diss(~edges), estimate="CMPLE", times=c(1,2,3))
 
 stopifnot(fit$estimate=="CMPLE")
-stopifnot(z.error(form.mle(y0,y1,y2m), fit$fit$coef[1], vcov(fit$fit)[1,1]) <= tolerance)
-stopifnot(z.error(diss.mle(y0,y1,y2m), fit$fit$coef[2], vcov(fit$fit)[2,2]) <= tolerance)
+stopifnot(z.error(form.mle(y0,y1,y2m), fit$coef[1], vcov(fit$fit)[1,1]) <= tolerance)
+stopifnot(z.error(diss.mle(y0,y1,y2m), fit$coef[2], vcov(fit$fit)[2,2]) <= tolerance)
 
 # Autodetected CMPLE
 set.seed(765)
 fit<-tergm(list(y0,y1,y2m) ~ Form(~edges) + Diss(~edges), estimate="CMLE", times=c(1,2,3))
 
 stopifnot(fit$estimate=="CMLE")
-stopifnot(z.error(form.mle(y0,y1,y2m), fit$fit$coef[1], vcov(fit$fit)[1,1]) <= tolerance)
-stopifnot(z.error(diss.mle(y0,y1,y2m), fit$fit$coef[2], vcov(fit$fit)[2,2]) <= tolerance)
+stopifnot(z.error(form.mle(y0,y1,y2m), fit$coef[1], vcov(fit$fit)[1,1]) <= tolerance)
+stopifnot(z.error(diss.mle(y0,y1,y2m), fit$coef[2], vcov(fit$fit)[2,2]) <= tolerance)
 
 # Force CMLE
 for(prop.weight in prop.weights){
@@ -111,8 +111,8 @@ set.seed(234)
 fit<-tergm(list(y0,y1,y2m) ~ Form(~edges) + Diss(~edges), estimate="CMLE", control=control.tergm(CMLE.control=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 2*1024, MCMC.burnin=10000, MCMC.interval = 1024,force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2,3))
 
 stopifnot(fit$estimate=="CMLE")
-stopifnot(z.error(form.mle(y0,y1,y2m), fit$fit$coef[1], vcov(fit$fit)[1,1]) <= tolerance)
-stopifnot(z.error(diss.mle(y0,y1,y2m), fit$fit$coef[2], vcov(fit$fit)[2,2]) <= tolerance)
+stopifnot(z.error(form.mle(y0,y1,y2m), fit$coef[1], vcov(fit$fit)[1,1]) <= tolerance)
+stopifnot(z.error(diss.mle(y0,y1,y2m), fit$coef[2], vcov(fit$fit)[2,2]) <= tolerance)
 }
 }
 

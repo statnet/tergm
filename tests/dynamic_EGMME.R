@@ -31,7 +31,7 @@ dynfit<-tergm(g1 ~ FormE(~edges + degree(1)) + offset(DissE(~edges)), targets="f
 print(summary(dynfit))
 mcmc.diagnostics(dynfit)
 
-stopifnot(all.equal(c(coef.form,coef.diss),dynfit$fit$coef,tol=0.01,check.attributes=FALSE))
+stopifnot(all.equal(c(coef.form,coef.diss),dynfit$coef,tol=0.01,check.attributes=FALSE))
 
 # All parameters free, edges, degree(1), and edge.ages as target.
 set.seed(5)
@@ -40,5 +40,5 @@ dynfit2<-tergm(g1 ~ FormE(~edges + degree(1)) + DissE(~edges), targets=~edges+de
 print(summary(dynfit2))
 mcmc.diagnostics(dynfit2)
 
-stopifnot(all.equal(c(coef.form,coef.diss),dynfit2$fit$coef,tol=0.01,check.attributes=FALSE))
+stopifnot(all.equal(c(coef.form,coef.diss),dynfit2$coef,tol=0.01,check.attributes=FALSE))
 #}, "EGMME")

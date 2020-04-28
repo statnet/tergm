@@ -35,5 +35,5 @@ dynfit<-tergm(g1 ~ FormE(~edges) + DissE(~edges), targets=~edges+mean.age, estim
 print(summary(dynfit))
 mcmc.diagnostics(dynfit)
 
-stopifnot(all.equal(unlist(truth),dynfit$fit$coef,tol=0.01,check.attributes=FALSE))
+stopifnot(all.equal(unlist(truth),dynfit$coef,tol=0.01,check.attributes=FALSE))
 #},"simple EGMME")
