@@ -203,6 +203,7 @@ tergm <- function(formula, constraints = ~., estimate, times=NULL, offset.coef=N
   
   out$estimate <- estimate
   out$control <- control
+  out$constraints <- constraints
   
   class(out)<-c("tergm","ergm")
   out

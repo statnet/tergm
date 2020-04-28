@@ -26,5 +26,7 @@ tergm.CMLE <- function(formula, times, ...,
   fit <- ergm(formula, ..., control=control$CMLE.control)
 
   # TODO: Figure out what additional information to attach.
-  list(fit=fit)
+  list(formula = formula,
+       coef = fit$coef,
+       fit=fit)
 }
