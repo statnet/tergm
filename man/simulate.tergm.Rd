@@ -11,7 +11,7 @@ Random Graph Model}
   object,
   nsim = 1,
   seed = NULL,
-  coef = object$fit$coef,
+  coef = object$coef,
   constraints = object$constraints,
   monitor = object$targets,
   time.slices = 1,
