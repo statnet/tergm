@@ -50,14 +50,6 @@ See the \link[=ergm-constraints]{ERGM constraints} documentation for the
 constraints implemented in the \strong{\link[=ergm-package]{ergm}} package.
 Other packages may add their own constraints.
 
-For STERGMs in particular, the constraints apply to the post-formation and
-the post-dissolution network, rather than the final network. This means, for
-example, that if the degree of all vertices is constrained to be less than
-or equal to three, and a vertex begins a time step with three edges, then,
-even if one of its edges is dissolved during its time step, it won't be able
-to form another edge until the next time step. This behavior may change in
-the future.
-
 Note that not all possible combinations of constraints are supported.}
 
 \item{estimate}{One of "EGMME" for Equilibrium Generalized Method of Moments
@@ -109,37 +101,13 @@ print out progress information. Higher values result in more output.}
 \item{\dots}{Additional arguments, to be passed to lower-level functions.}
 }
 \value{
-\code{\link{stergm}} returns an object of class \code{\link{stergm}}
-that is a list consisting of the following elements:
-\item{formation, dissolution}{Formation and dissolution formulas,
-respectively.}
-\item{targets}{The targets formula.}
-\item{target.stats}{The target statistics.}
-\item{estimate}{The type of estimate.}
-\item{opt.history}{A
-matrix containing the full trace of the EGMME optimization process:
-coefficients tried and target statistics simulated.}
-\item{sample}{An \code{\link{mcmc}} object containing target
-statistics sampled at the estimate.}
-\item{covar}{The full estimated
-variance-covariance matrix of the parameter estimates for EGMME. (Note that
-although the CMLE formation parameter estimates are independent of the
-dissolution parameter estimates due to the separability assumption, this is
-not necessarily the case for EGMME.) }
-\item{formation.fit, dissolution.fit}{For CMLE and CMPLE, \code{\link{ergm}} objects from
-fitting formation and dissolution, respectively. For EGMME, stripped down
-\code{\link{ergm}}-like lists.}
-\item{network}{For
-\code{estimate=="EGMME"}, the original network; for \code{estimate=="CMLE"}
-or \code{estimate=="CMPLE"}, a \code{\link{network.list}} (a discrete series
-of networks) to which the model was fit.}
-\item{control}{The control
-parameters used to fit the model.}
+\code{\link{stergm}} returns an object of class \code{\link{tergm}};
+see \code{\link{tergm}} for details.
 
 See the method \code{\link{print.tergm}} for details on how an
-\code{\link{stergm}} object is printed.  Note that the method
+\code{\link{tergm}} object is printed.  Note that the method
 \code{\link{summary.tergm}} returns a summary of the relevant parts of the
-\code{\link{stergm}} object in concise summary format.
+\code{\link{tergm}} object in concise summary format.
 }
 \description{
 \code{\link{stergm}} is used for finding Separable Temporal ERGMs' (STERGMs)
@@ -158,7 +126,6 @@ avalible on the statnet wiki:
 }
 \examples{
 
-\donttest{
 # EGMME Example
 par(ask=FALSE)
 n<-30
@@ -196,7 +163,7 @@ samplk123 <- stergm(list(samplk1, samplk2, samplk3),
 
 mcmc.diagnostics(samplk123)
 summary(samplk123)
-}
+
 }
 \references{
 \itemize{

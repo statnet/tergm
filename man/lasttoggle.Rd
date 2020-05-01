@@ -2,7 +2,11 @@
 % Please edit documentation in R/is.lasttoggle.R
 \name{lasttoggle}
 \alias{lasttoggle}
-\title{Lasttoggle placeholder RD}
+\title{Lasttoggle placeholder RD
+
+This needs to be written (or links to it removed) before the 4.0 release.}
 \description{
 Lasttoggle placeholder RD
+
+This needs to be written (or links to it removed) before the 4.0 release.
 }
