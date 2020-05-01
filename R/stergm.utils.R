@@ -272,6 +272,8 @@ edgelist_with_lasttoggle <- function(nw) {
   lt <- if(is(nw, "ergm_state")) nw$nw0 %n% "lasttoggle" else nw %n% "lasttoggle"
   
   # if a non-default time exists, use it instead
+  # TODO: it would probably be faster to sort the lasttoggle and do
+  #       sorted lookups of the edges, rather than this linear search
   for(i in seq_len(NROW(rv))) {
     for(j in seq_len(NROW(lt))) {
       if(rv[i,1] == lt[j,1] && rv[i,2] == lt[j,2]) {
