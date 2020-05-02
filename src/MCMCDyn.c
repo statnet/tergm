@@ -296,7 +296,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
       /* Hold off updating timesteamps until the changes are committed,
          which doesn't happen until later. */
       for (unsigned int i=0; i < MHp->ntoggles; i++){
-                             GET_EDGE_UPDATE_STORAGE_TOGGLE(MHp->toggletail[i], MHp->togglehead[i], nwp, m, MHp);
+        ToggleEdge(MHp->toggletail[i], MHp->togglehead[i], nwp);
       }
       /* Record network statistics for posterity. */
       if(stats) {

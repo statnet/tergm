@@ -83,8 +83,6 @@ SEXP godfather_wrapper(SEXP stateR,
       ChangeStats1(tail, head, nwp, m, edgeflag);  
       addonto(changestats, m->workspace, m->n_stats);
     
-      UPDATE_STORAGE_TOGGLE(tail, head, nwp, m, NULL, edgeflag);
-
       pos++;
     }
     
