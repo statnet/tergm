@@ -19,7 +19,7 @@ Random Graph Model}
   time.burnin = 0,
   time.interval = 1,
   control = control.simulate.tergm(),
-  output = c("networkDynamic", "stats", "changes", "final"),
+  output = c("networkDynamic", "stats", "changes", "final", "ergm_state"),
   nw.start = NULL,
   stats = FALSE,
   duration.dependent = NULL,
@@ -62,7 +62,7 @@ Random Graph Model}
   time.interval = 1,
   time.offset = 1,
   control = control.simulate.network.tergm(),
-  output = c("networkDynamic", "stats", "changes"),
+  output = c("networkDynamic", "stats", "changes", "final", "ergm_state"),
   stats = FALSE,
   duration.dependent = NULL,
   verbose = FALSE,
@@ -182,7 +182,7 @@ Depends on the \code{output} argument:
 \item{"stats"}{If \code{stats == FALSE}, an \code{\link{mcmc}} matrix with
 monitored statistics, and if \code{stats == TRUE}, a
 list containing elements \code{stats} for statistics specified in the
-\code{monitor} argument, and \code{stats.fd} for the model statistics.
+\code{monitor} argument, and \code{stats.gen} for the model statistics.
 If \code{stats == FALSE} and no monitored statistics are specified,
 an empty list is returned, with a warning.
 When \code{nsim>1}, an \code{\link{mcmc.list}} (or list of them) of
@@ -203,8 +203,8 @@ Additionally, attributes (\code{\link{attr}}, not network
 attributes) are attached as follows:
 \describe{
 \item{\code{formula}, \code{monitor}:}{Model
-and monitoring formulas	used in the simulation,	respectively.}
-\item{\code{stats}, \code{stats.fd}:}{Network statistics as above.}
+and monitoring formulas used in the simulation, respectively.}
+\item{\code{stats}, \code{stats.gen}:}{Network statistics as above.}
 \item{\code{coef}:}{Coefficients used in the simulation.}
 \item{\code{changes}:}{A four-column matrix summarizing the changes in the
 \code{"changes"} output. (This may be removed in the future.)}
@@ -236,9 +236,8 @@ is not implemented in the method for
 Additionally, attributes (\code{\link{attr}}, not network
 attributes) are attached as follows:
 \describe{
-\item{formula, monitor:}{Model
-and monitoring formulas	used in the simulation,	respectively.}
-\item{stats, stats.fd:}{Network statistics as above.}
+\item{formula, monitor:}{Model and monitoring formulas used in the simulation, respectively.}
+\item{stats, stats.gen:}{Network statistics as above.}
 \item{coef:}{Coefficients used in the simulation.}
 \item{changes}{A four-column matrix summarizing the changes in the
 \code{"changes"} output. (This may be removed in the future.)}
@@ -246,6 +245,12 @@ and monitoring formulas	used in the simulation,	respectively.}
 When \code{nsim>1}, a \code{\link{network.list}} of these
 \code{\link{network}}s is returned.
 }
+\item{"ergm_state"}{The \code{\link[ergm]{ergm_state}} object resulting
+from the simulation.}
+Note that when using \code{simulate_formula.networkDynamic} with either
+\code{"final"} or \code{"ergm_state"} for \code{output}, the nodes
+included in these objects are those produced by \code{network.collapse}
+at the start time.
 }
 \description{
 \code{\link[stats]{simulate}} is used to draw from temporal
@@ -279,6 +284,29 @@ specified, \code{time.start} will override it with a warning.)
 }
 }
 \examples{
-# need to add examples
+data(samplk)
+
+# Fit a transition from Time 1 to Time 2
+samplk12 <- tergm(list(samplk1, samplk2)~
+                  Form(~edges+mutual+transitiveties+cyclicalties)+
+                  Diss(~edges+mutual+transitiveties+cyclicalties),
+                  estimate="CMLE")
+
+# direct simulation from tergm object
+sim1 <- simulate(samplk12, nw.start="last")
+
+# equivalent simulation from formula with network LHS;
+# must pass dynamic=TRUE for tergm simulation
+sim2 <- simulate(samplk2 ~ FormE(~edges+mutual+transitiveties+cyclicalties) +
+                           DissE(~edges+mutual+transitiveties+cyclicalties),
+                           coef = samplk12$coef,
+                           dynamic=TRUE)
+
+# the default simulate output is a networkDynamic, and we can simulate
+# with a networkDynamic LHS as well
+sim3 <- simulate(sim2 ~ FormE(~edges+mutual+transitiveties+cyclicalties) +
+                        DissE(~edges+mutual+transitiveties+cyclicalties),
+                        coef = samplk12$coef,
+                        dynamic=TRUE)
 
 }

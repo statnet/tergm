@@ -31,7 +31,8 @@
 #'   are be imputed when using conditional estimation. See argument
 #'   \code{imputers} of \code{\link{impute.network.list}} for details.
 #'
-#' @return A network object with temporal metadata.
+#' @return A list containing a network object with temporal metadata 
+#'         (\code{$Networks}) and a list of networks (\code{$nwl}).
 #'
 #' @seealso [Help on model specification][ergm-terms] for specific terms.
 #' 
@@ -40,11 +41,11 @@
 #' data(samplk)
 #'
 #' # Method 1: list of networks
-#' monks <- NetSeries(list(samplk1,samplk2,samplk3))
+#' monks <- NetSeries(list(samplk1,samplk2,samplk3))$Networks
 #' ergm(monks ~ Form(~edges)+Diss(~edges))
 #'
 #' # Method 2: networks as arguments
-#' monks <- NetSeries(samplk1,samplk2,samplk3)
+#' monks <- NetSeries(samplk1,samplk2,samplk3)$Networks
 #' ergm(monks ~ Form(~edges)+Diss(~edges))
 #'
 #' # Method 3: networkDynamic and time points:
@@ -76,7 +77,9 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
     times <- seq_along(nwl)
   }else stop("Unrecognized format for network series specification. See help for information.")
 
-  nwl0 <- impute.network.list(nwl[-length(nwl)], NA.impute, nwl.append=nwl[length(nwl)])
+  nwl0_out <- impute.network.list(nwl, NA.impute)
+
+  nwl0 <- nwl0_out[-length(nwl0_out)]
 
   nwl0.NA <- sapply(nwl0, network.naedgecount)>0 # Update which networks have missing dyads.
   
@@ -95,7 +98,7 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
   
   # Now, just combine them using the Networks() constructor.
   #' @importFrom ergm.multi Networks
-  Networks(nwl)
+  list(Networks = Networks(nwl), nwl = nwl0_out)
 }
 
 

@@ -39,7 +39,7 @@
     \itemize{
       \item{\code{InitErgmProposal.discordTNT}} {
       
-        A temporal version of \code{\link[ergm:InitErgmProposal.TNT]{TNT}}, with approximately
+        A temporal version of \code{\link[ergm:ergm-proposals]{TNT}}, with approximately
         50\% of proposed toggles being made on the set of discordant dyads,
         and approximately 50\% of proposed toggles being TNT proposals from
         the network.
@@ -47,33 +47,33 @@
       
       \item{\code{InitErgmProposal.discordStratTNT}} {
       
-        A temporal version of \code{\link[ergm:InitErgmProposal.StratTNT]{StratTNT}}.  Within each strat
+        A temporal version of \code{\link[ergm:ergm-proposals]{StratTNT}}.  Within each strat
         mixing type, approximately 50\% of proposed toggles are made on
         discordant dyads, and approximately 50\% of proposed toggles are
         TNT proposals from the network.
 
-        Proposal arguments are the same as for \code{\link[ergm:InitErgmProposal.StratTNT]{StratTNT}}.
+        Proposal arguments are the same as for \code{\link[ergm:ergm-proposals]{StratTNT}}.
       }
       
       \item{\code{InitErgmProposal.discordBDTNT}} {
 
-        A temporal version of \code{\link[ergm:InitErgmProposal.BDTNT]{BDTNT}}, with approximately
+        A temporal version of \code{\link[ergm:ergm-proposals]{BDTNT}}, with approximately
         50\% of proposed toggles being made on the set of discordant dyads,
         and approximately 50\% of proposed toggles being TNT proposals from
         the network, all subject to the bounded degree constraints.
 
-        Proposal arguments are the same as for \code{\link[ergm:InitErgmProposal.BDTNT]{BDTNT}}.      
+        Proposal arguments are the same as for \code{\link[ergm:ergm-proposals]{BDTNT}}.      
       }    
       
       \item{\code{InitErgmProposal.discordBDStratTNT}} {
 
-        A temporal version of \code{\link[ergm:InitErgmProposal.BDStratTNT]{BDStratTNT}}.  Within each 
+        A temporal version of \code{\link[ergm:ergm-proposals]{BDStratTNT}}.  Within each 
         strat mixing type, approximately 50\% of proposed toggles are made on
         discordant dyads, and approximately 50\% of proposed toggles are
         TNT proposals from the network, all subject to the bounded degree
         constraints.
 
-        Proposal arguments are the same as for \code{\link[ergm:InitErgmProposal.BDStratTNT]{BDStratTNT}}.
+        Proposal arguments are the same as for \code{\link[ergm:ergm-proposals]{BDStratTNT}}.
       }    
     }  
   }

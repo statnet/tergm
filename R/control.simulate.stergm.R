@@ -73,15 +73,23 @@ control.simulate.network<-function(MCMC.burnin.min=1000,
 #' This function is only used within a call to the \code{\link{simulate}}
 #' function.  See the \code{usage} section in \code{\link{simulate.stergm}} for
 #' details.
+#'
+#' These functions are included for backwards compatibility, and users are  
+#' encouraged to use \code{control.simulate.tergm} or
+#' \code{control.simulate.network.tergm} with the \code{\link{simulate.tergm}}
+#' family of functions instead.  When a
+#' \code{control.simulate.stergm} or \code{control.simulate.network} object 
+#' is passed to one of the \code{\link{simulate.stergm}} functions, 
+#' the corresponding \code{\link{simulate.tergm}} function is invoked,
+#' and uses the formation proposal arguments and weights, ignoring the 
+#' dissolution proposal arguments and weights.
 #' 
 #' @param
 #'   MCMC.burnin.min,MCMC.burnin.max,MCMC.burnin.pval,MCMC.burnin.add
-#'   Number of Metropolis-Hastings steps per phase (formation and
-#'   dissolution) per time step used in simulation. By default, this
+#'   Number of Metropolis-Hastings steps per time step used in simulation. By default, this
 #'   is determined adaptively by keeping track of increments in the
 #'   Hamming distance between the transitioned-from network and the
-#'   network being sampled (formation network or dissolution
-#'   network). Once \code{MCMC.burnin.min} steps have elapsed, the
+#'   network being sampled. Once \code{MCMC.burnin.min} steps have elapsed, the
 #'   increments are tested against 0, and when their average number
 #'   becomes statistically indistinguishable from 0 (with the p-value
 #'   being greater than \code{MCMC.burnin.pval}), or
@@ -92,10 +100,9 @@ control.simulate.network<-function(MCMC.burnin.min=1000,
 #' 
 #'   To use a fixed number of steps, set both \code{MCMC.burnin.min}
 #'   and \code{MCMC.burnin.max} to the desired number of steps.
-#' @param MCMC.prop.weights.form,MCMC.prop.weights.diss Specifies the
+#' @param MCMC.prop.weights.form Specifies the
 #'   proposal distribution used in the MCMC Metropolis-Hastings
-#'   algorithm for formation and dissolution, respectively. Possible
-#'   choices are \code{"TNT"} or \code{"random"}; the
+#'   algorithm.  Possible choices are \code{"TNT"} or \code{"random"}; the
 #'   \code{"default"}.  The \code{TNT} (tie / no tie) option puts
 #'   roughly equal weight on selecting a dyad with or without a tie as
 #'   a candidate for toggling, whereas the \code{random} option puts
@@ -105,8 +112,11 @@ control.simulate.network<-function(MCMC.burnin.min=1000,
 #'   appears to improve Markov chain mixing particularly for networks
 #'   with a low edge density, as is typical of many realistic social
 #'   networks.
-#' @param MCMC.prop.args.form,MCMC.prop.args.diss An alternative,
+#' @param MCMC.prop.args.form An alternative,
 #'   direct way of specifying additional arguments to proposals.
+#' @param MCMC.prop.weights.diss,MCMC.prop.args.diss Ignored. These are included
+#'        for backwards compatibility of calls to \code{control}
+#'        functions only; they have no effect on \code{simulate} behavior.
 #' @param MCMC.init.maxchanges Maximum number of toggles changes for
 #'   which to allocate space.
 #' @param MCMC.packagenames Names of packages in which to look for

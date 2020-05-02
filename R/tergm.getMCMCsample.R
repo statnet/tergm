@@ -86,16 +86,16 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
   
   if(!is.null(statsmatrix)) colnames(statsmatrix) <- model.comb$coef.names
 
-  # this is where we separate monitored stats from fd stats if model.mon is passed
+  # this is where we separate monitored stats from generative stats if model.mon is passed
   if(is.null(model.mon)) {
-    statsmatrix.fd <- statsmatrix
+    statsmatrix.gen <- statsmatrix
     statsmatrix.mon <- NULL
   } else {
-    statsmatrix.fd <- statsmatrix[,1:(NCOL(statsmatrix) - model.mon$etamap$etalength),drop=FALSE]
+    statsmatrix.gen <- statsmatrix[,1:(NCOL(statsmatrix) - model.mon$etamap$etalength),drop=FALSE]
     statsmatrix.mon <- statsmatrix[,(NCOL(statsmatrix) - model.mon$etamap$etalength + 1):NCOL(statsmatrix),drop=FALSE]
   }
 
-  list(statsmatrix.fd=statsmatrix.fd,
+  list(statsmatrix.gen=statsmatrix.gen,
        statsmatrix.mon=statsmatrix.mon,
        newnetwork=state,
        changed=diffedgelist,

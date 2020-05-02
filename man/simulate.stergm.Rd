@@ -22,7 +22,7 @@
   time.interval = 1,
   time.offset = 1,
   control = control.simulate.network(),
-  output = c("networkDynamic", "stats", "changes", "final"),
+  output = c("networkDynamic", "stats", "changes", "final", "ergm_state"),
   stats.form = FALSE,
   stats.diss = FALSE,
   duration.dependent = NULL,
@@ -46,7 +46,7 @@
   time.interval = 1,
   time.offset = 1,
   control = control.simulate.network(),
-  output = c("networkDynamic", "stats", "changes"),
+  output = c("networkDynamic", "stats", "changes", "final", "ergm_state"),
   stats.form = FALSE,
   stats.diss = FALSE,
   duration.dependent = NULL,
@@ -79,8 +79,8 @@ of networks being modeled.
 
 It is also possible to specify a proposal function directly by passing a
 string with the function's name. In that case, arguments to the proposal
-should be specified through the \code{prop.args} argument to
-\code{\link{control.ergm}}.
+should be specified through the \code{MCMC.prop.args.form} argument to
+\code{\link{control.simulate.network}}.
 
 The default is \code{~.}, for an unconstrained model.
 
@@ -122,14 +122,14 @@ to \code{\link{control.simulate.network.tergm}} controls by assigning
 and \code{MCMC.maxchanges} respectively.}
 
 \item{output}{A character vector specifying output type: one of
-"networkDynamic" (the default), "stats", and "changes", with partial
-matching allowed. See Value section for details.}
+"networkDynamic" (the default), "stats", "changes", "final", and
+"ergm_state", with partial matching allowed.}
 
 \item{stats.form, stats.diss}{Logical: Whether to return
 formation/dissolution model statistics. This is not the recommended method:
 use \code{monitor} argument instead.  Note that if either \code{stats.form}
 or \code{stats.diss} is \code{TRUE}, all generative model statistics will be
-returned as a single matrix.}
+returned.}
 
 \item{duration.dependent}{Logical: Whether the model terms in formula or
 model are duration dependent. E.g., if a duration-dependent term is used in
@@ -142,83 +142,11 @@ chain progresses.}
 \item{\dots}{Further arguments passed to or used by methods.}
 }
 \value{
-Depends on the \code{output} argument:
-\item{"stats"}{If \code{stats.form==FALSE} and
-\code{stats.diss==FALSE}, an \code{\link{mcmc}} matrix with
-monitored statistics, and if either of them is \code{TRUE}, a
-list containing elements \code{stats} for statistics specified in the
-\code{monitor} argument, and \code{stats.fd}
-for the combined formation and dissolution statistics.
-If \code{stats.form==FALSE} and
-\code{stats.diss==FALSE} and no monitored statistics are specified,
-an empty list is returned, with a warning.
-When \code{nsim>1}, an \code{\link{mcmc.list}} (or list of them) of
-the statistics is returned instead.}
-\item{"networkDynamic"}{A \code{\link[networkDynamic]{networkDynamic}}
-object representing the simulated process, with ties present in the
-initial network having onset \code{-Inf} and ties present at the end
-of the simulation having terminus \code{+Inf}. The method for
-\code{\link[networkDynamic]{networkDynamic}} returns the initial
-\code{\link[networkDynamic]{networkDynamic}} with simulated changes
-applied to it. The \code{\link{net.obs.period}} network attribute is
-updated (or added if not existing) to reflect the time period that was
-simulated. If the network does not have any \code{\link[networkDynamic]{persistent.ids}}
-defined for vertices, a vertex.pid will be attached in a vertex attribute
-named \code{'tergm_pid'} to facilitate 'bookkeeping' between the networkDynamic
-argument and the simulated network time step.
-Additionally, attributes (\code{\link{attr}}, not network
-attributes) are attached as follows:
-\describe{
-\item{\code{formula}, \code{monitor}:}{Model
-and monitoring formulas	used in the simulation,	respectively.}
-\item{\code{stats}, \code{stats.fd}:}{Network statistics as above.}
-\item{\code{coef}:}{Coefficients used in the simulation.}
-\item{\code{changes}:}{A four-column matrix summarizing the changes in the
-\code{"changes"} output. (This may be removed in the future.)}
-\item{\code{formation}, \code{dissolution}:}{Formation and dissolution
-formula arguments.}
-\item{\code{coef.form}, \code{coef.diss}:}{Coefficient arguments.}
-}
-When \code{nsim>1}, a \code{\link{network.list}} of these
-\code{\link{networkDynamic}}s is returned.
-}
-
-\item{"changes"}{An integer matrix with four columns (\code{time},
-\code{tail}, \code{head}, and \code{to}), giving the time-stamped
-changes relative to the current network. \code{to} is \code{1} if
-a tie was formed and \code{0} if a tie was dissolved. The
-convention for \code{time} is that it gives the time point during
-which the change is effective. For example, a row
-\code{c(5,2,3,1)} indicates that between time \eqn{4} and \eqn{5},
-a tie from node \eqn{2} to node \eqn{3} was formed, so that it was
-absent at time point \eqn{4} and present at time point \eqn{5};
-while a row \code{c(5,2,3,0)} indicates that in that time, that
-tie was dissolved, so that it is was present at time point \eqn{4}
-and absent at time point \eqn{5}.
-Additionally, same attributes (\code{\link{attr}}, not network
-attributes) as with \code{output=="networkDynamic"} are attached.
-When \code{nsim>1}, a list of these change matrices is returned.}
-\item{"final"}{A \code{\link[network]{network}}
-object representing the last network in the series generated. This
-is not implemented in the method for
-\code{\link[networkDynamic]{networkDynamic}}.
-\code{\link{lasttoggle}} attributes are also included.
-Additionally, attributes (\code{\link{attr}}, not network
-attributes) are attached as follows:
-\describe{
-\item{formula, monitor:}{Model
-and monitoring formulas	used in the simulation,	respectively.}
-\item{stats, stats.fd:}{Network statistics as above.}
-\item{coef:}{Coefficients used in the simulation.}
-\item{changes}{A four-column matrix summarizing the changes in the
-\code{"changes"} output. (This may be removed in the future.)}
-\item{\code{formation}, \code{dissolution}:}{Formation and dissolution
-formula arguments.}
-\item{\code{coef.form}, \code{coef.diss}:}{Coefficient arguments.}
-}
-When \code{nsim>1}, a \code{\link{network.list}} of these
-\code{\link{network}}s is returned.
-}
+Depends on the \code{output} argument.  See \link{simulate.tergm}
+for details.  Note that some formation/dissolution separated
+information is also attached to the return value for calls made through
+\code{simulate.network} and \code{simulate.networkDynamic} in
+an attempt to increase backwards compatibility.
 }
 \description{
 The \code{simulate.network} and \code{simulate.networkDynamic} wrappers

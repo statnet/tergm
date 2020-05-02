@@ -56,7 +56,7 @@ Collate:
     'control.simulate.tergm.R'
     'control.stergm.R'
     'control.tergm.R'
-    'gof.stergm.R'
+    'gof.tergm.R'
     'impute.network.list.R'
     'is.durational.R'
     'is.lasttoggle.R'

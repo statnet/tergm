@@ -12,10 +12,11 @@
 # info requires duration information. 
 ###############################################################################
 
-#' @describeIn lasttoggle
+#' @rdname lasttoggle
 #' @name lasttoggle
 #' @title Lasttoggle placeholder RD
-#' @descrption This needs to be written (or links to it removed) before the 4.0 release.
+#' 
+#' This needs to be written (or links to it removed) before the 4.0 release.
 NULL
 
 is.lasttoggle <- function(nw, formation=NULL, dissolution=NULL, monitor=NULL, targets=NULL) {  
