@@ -83,6 +83,8 @@ SEXP godfather_wrapper(SEXP stateR,
       ChangeStats1(tail, head, nwp, m, edgeflag);  
       addonto(changestats, m->workspace, m->n_stats);
     
+      ToggleKnownEdge(tail, head, nwp, edgeflag);
+
       pos++;
     }
     
