@@ -1263,12 +1263,16 @@ MH_X_FN(Mx_discordBDStratTNT) {
     for(int i = 0; i < sto->nmixtypes; i++) {
       // clear all the discordance information
 
-      memset(sto->BDTDNE_deg[i], 0, (N_NODES + 1)*sizeof(int));
-      sto->BDTDNE[i]->nedges = 0;
+      if(sto->BDTDNE[i]->nedges > 0) {
+        memset(sto->BDTDNE_deg[i], 0, (N_NODES + 1)*sizeof(int));
+        sto->BDTDNE[i]->nedges = 0;
+      }
       
-      memset(sto->nonBDTDNE_deg[i], 0, (N_NODES + 1)*sizeof(int));
-      sto->nonBDTDNE[i]->nedges = 0;
-
+      if(sto->nonBDTDNE[i]->nedges > 0) {
+        memset(sto->nonBDTDNE_deg[i], 0, (N_NODES + 1)*sizeof(int));
+        sto->nonBDTDNE[i]->nedges = 0;
+      }
+      
       // transfer discordantEdges to nonDiscordantEdges
       Vertex *tails = sto->discordantEdges[i]->tails;
       Vertex *heads = sto->discordantEdges[i]->heads;
