@@ -21,7 +21,7 @@
 
  Wrapper for a call from R.
 *****************/
-SEXP MCMCDyn_wrapper(ARGS_STATE, // ergm_state
+SEXP MCMCDyn_wrapper(SEXP stateR, // ergm_state
                 SEXP eta,      // double
                 SEXP nsteps,   // integer
                 SEXP min_MH_interval, // integer
@@ -36,7 +36,7 @@ SEXP MCMCDyn_wrapper(ARGS_STATE, // ergm_state
                 SEXP log_changes, // integer (logical)
                 SEXP verbose){  // integer
   GetRNGstate();  /* R function enabling uniform RNG */
-  ErgmState *s = ErgmStateInit(YES_STATE);
+  ErgmState *s = ErgmStateInit(stateR, 0);
 
   Model *m = s->m;
   MHProposal *MHp = s->MHp;

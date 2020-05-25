@@ -31,7 +31,7 @@ SEXP godfather_wrapper(SEXP stateR,
                SEXP end_time_arg,
                SEXP verbose_arg){
   GetRNGstate();  /* R function enabling uniform RNG */
-  ErgmState *s = ErgmStateInit(YES_STATE);
+  ErgmState *s = ErgmStateInit(stateR, ERGM_STATE_NO_INIT_PROP);
   
   Network *nwp = s->nwp;
   Model *m = s->m;  

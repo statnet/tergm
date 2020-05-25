@@ -31,7 +31,7 @@ SEXP MCMCDynSArun_wrapper(SEXP stateR,
                  SEXP maxchanges,
                  SEXP verbose){    
   GetRNGstate();  /* R function enabling uniform RNG */
-  ErgmState *s = ErgmStateInit(YES_STATE);
+  ErgmState *s = ErgmStateInit(stateR, ERGM_STATE_NO_INIT_PROP);
 
   Model *m = s->m;
   MHProposal *MHp = s->MHp;
