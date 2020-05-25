@@ -224,9 +224,11 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   
   control <- set.control.class("control.simulate.network.tergm")
 
+  output <- match.arg(output)
+
   rv <- simulate(object ~ FormE(formation) + DissE(dissolution), nsim=nsim, seed=seed, coef = c(coef.form, coef.diss), constraints=constraints,
-           monitor=monitor, time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval, time.offset=time.offset, control=control, output=match.arg(output), stats = stats.form || stats.diss, duration.dependent=duration.dependent, verbose=verbose, dynamic=TRUE, ...)
-           
+                 monitor=monitor, time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval, time.offset=time.offset, control=control, output=output, stats = stats.form || stats.diss, duration.dependent=duration.dependent, verbose=verbose, dynamic=TRUE, ...)
+         
   if(output != "stats") {
     attributes(rv) <- c(attributes(rv), list(formation = formation, dissolution = dissolution, coef.form = coef.form, coef.diss = coef.diss))
     stats.gen <- attr(rv, "stats.gen")
@@ -268,8 +270,10 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   
   control <- set.control.class("control.simulate.network.tergm")
 
+  output <- match.arg(output)
+
   rv <- simulate(object ~ FormE(formation) + DissE(dissolution), nsim=nsim, seed=seed, coef = c(coef.form, coef.diss), constraints=constraints,
-           monitor=monitor, time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval, time.offset=time.offset, control=control, output=match.arg(output), stats = stats.form || stats.diss, duration.dependent=duration.dependent, verbose=verbose, dynamic=TRUE, ...)
+                 monitor=monitor, time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval, time.offset=time.offset, control=control, output=output, stats = stats.form || stats.diss, duration.dependent=duration.dependent, verbose=verbose, dynamic=TRUE, ...)
 
   if(output != "stats") {
     attributes(rv) <- c(attributes(rv), list(formation = formation, dissolution = dissolution, coef.form = coef.form, coef.diss = coef.diss))

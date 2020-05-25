@@ -151,7 +151,7 @@ avalible on the statnet wiki:
 }}
 
 \examples{
-
+\dontrun{
 # EGMME Example
 par(ask=FALSE)
 n<-30
@@ -189,7 +189,7 @@ samplk123 <- tergm(list(samplk1, samplk2, samplk3)~
 
 mcmc.diagnostics(samplk123)
 summary(samplk123)
-
+}
 }
 \references{
 \itemize{

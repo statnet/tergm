@@ -123,7 +123,7 @@
 #' 
 #' }
 #' @examples
-#' 
+#' \dontrun{
 #' # EGMME Example
 #' par(ask=FALSE)
 #' n<-30
@@ -161,7 +161,7 @@
 #' 
 #' mcmc.diagnostics(samplk123)
 #' summary(samplk123)
-#' 
+#' }
 #' @import network
 #' @import networkDynamic
 #' @export
