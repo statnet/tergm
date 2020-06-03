@@ -1,6 +1,6 @@
 Package: tergm
-Version: 4.0.0-1944
-Date: 2020-05-08
+Version: 4.0.0-1956
+Date: 2020-06-03
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
 	person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="pavel@uow.edu.au", comment=c(ORCID="0000-0002-9101-3362")),
@@ -46,38 +46,6 @@ VignetteBuilder: rmarkdown, knitr
 RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
-Collate: 
-    'InitConstraint.R'
-    'InitErgmTerm.EGMME.R'
-    'InitErgmTerm.duration.R'
-    'InitErgmTerm.netseries.R'
-    'InitMHP.DynMoME.R'
-    'control.simulate.stergm.R'
-    'control.simulate.tergm.R'
-    'control.stergm.R'
-    'control.tergm.R'
-    'gof.tergm.R'
-    'impute.network.list.R'
-    'is.durational.R'
-    'is.lasttoggle.R'
-    'mcmc.diagnostics.tergm.R'
-    'print.tergm.R'
-    'simulate.stergm.R'
-    'simulate.tergm.R'
-    'stergm.R'
-    'tergm-deprecated.R'
-    'stergm.utils.R'
-    'summary.statistics.networkDynamic.R'
-    'summary.tergm.R'
-    'tergm.CMLE.R'
-    'tergm.EGMME.GD.R'
-    'tergm.EGMME.R'
-    'tergm.EGMME.SA.R'
-    'tergm.EGMME.initialfit.R'
-    'tergm.R'
-    'tergm.getMCMCsample.R'
-    'tergm.godfather.R'
-    'zzz.R'
 Remotes: github::statnet/statnet.common@master,
     github::statnet/network@master,
     github::statnet/networkDynamic@master,
