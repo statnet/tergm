@@ -8,6 +8,7 @@ control.tergm(
   init = NULL,
   init.method = NULL,
   force.main = FALSE,
+  MCMC.prop = ~TNT,
   MCMC.prop.weights = "default",
   MCMC.prop.args = NULL,
   MCMC.maxedges = 20000,

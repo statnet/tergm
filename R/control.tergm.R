@@ -320,11 +320,12 @@ control.tergm<-function(init=NULL,
                          init.method=NULL,
                          force.main = FALSE,                         
 
+                        MCMC.prop=~TNT,
                          MCMC.prop.weights="default",MCMC.prop.args=NULL,
                          MCMC.maxedges=20000,
                          MCMC.maxchanges=20000,
                          MCMC.packagenames=c(),
-                         
+
                          CMLE.MCMC.burnin = 1024*16,
                          CMLE.MCMC.interval = 1024,
                          CMLE.control=control.ergm(init=init, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights, MCMC.prop.args=MCMC.prop.args, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),

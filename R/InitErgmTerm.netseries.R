@@ -97,7 +97,12 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
   
   # Now, just combine them using the Networks() constructor.
   #' @importFrom ergm.multi Networks
-  Networks(nwl)
+  nw <- Networks(nwl)
+  # Add previous networks combined.
+  .PrevNet <- Networks(nwl0)
+  nw %ergmlhs% "constraints" <- nonsimp_update.formula(nw%ergmlhs%"constraints", .~discordTNT(.PrevNet), from.new=".PrevNet")
+
+  nw
 }
 
 
