@@ -31,8 +31,7 @@
 #'   are be imputed when using conditional estimation. See argument
 #'   \code{imputers} of \code{\link{impute.network.list}} for details.
 #'
-#' @return A list containing a network object with temporal metadata 
-#'         (\code{$Networks}) and a list of networks (\code{$nwl}).
+#' @return A combined network object.
 #'
 #' @seealso [Help on model specification][ergm-terms] for specific terms.
 #' 
@@ -41,11 +40,11 @@
 #' data(samplk)
 #'
 #' # Method 1: list of networks
-#' monks <- NetSeries(list(samplk1,samplk2,samplk3))$Networks
+#' monks <- NetSeries(list(samplk1,samplk2,samplk3))
 #' ergm(monks ~ Form(~edges)+Diss(~edges))
 #'
 #' # Method 2: networks as arguments
-#' monks <- NetSeries(samplk1,samplk2,samplk3)$Networks
+#' monks <- NetSeries(samplk1,samplk2,samplk3)
 #' ergm(monks ~ Form(~edges)+Diss(~edges))
 #'
 #' # Method 3: networkDynamic and time points:
@@ -98,7 +97,7 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
   
   # Now, just combine them using the Networks() constructor.
   #' @importFrom ergm.multi Networks
-  list(Networks = Networks(nwl), nwl = nwl0_out)
+  Networks(nwl)
 }
 
 
