@@ -227,6 +227,7 @@
 #'                         dynamic=TRUE)
 #' 
 #' @importFrom stats simulate
+#' @importFrom ergm.multi uncombine_network
 #' @export
 simulate.tergm<-function(object, nsim=1, seed=NULL,
                           coef=object$coef,
@@ -274,12 +275,15 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
     if(is.network(object$network)) nw.start <- object$network
     else stop('Simulating from TERGM CMLE fit requires the starting network to be specified in the nw.start argument: "first", "last", a numeric index of the network in the series (with "first"==1), or a network (NOT networkDynamic at this time).')
   }else if(is.numeric(nw.start)){
-    nw.start <- object$network[[nw.start]]
+    nwl <- uncombine_network(eval_lhs.formula(object$formula))
+    if(nw.start == 1) nw.start <- (nwl[[1]] %n% ".PrevNets")[[1]]
+    else nw.start <- nwl[[nw.start - 1]]
     if(!is.network(nw.start)) stop("Invalid starting network specification.")
   }else if(is.character(nw.start)){
+    nwl <- uncombine_network(eval_lhs.formula(object$formula))
     nw.start <- switch(nw.start,
-                       first = object$network[[1]],
-                       last = object$network[[length(object$network)]],
+                       first = (nwl[[1]] %n% ".PrevNets")[[1]],
+                       last = nwl[[length(nwl)]],
                        stop("Invalid starting network specification."))
     if(!is.network(nw.start)) stop("Invalid starting network specification.")                   
   }else if(is.networkDynamic(nw.start)){

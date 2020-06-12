@@ -31,7 +31,7 @@
 #'   are be imputed when using conditional estimation. See argument
 #'   \code{imputers} of \code{\link{impute.network.list}} for details.
 #'
-#' @return A combined network object.
+#' @return A network object with temporal metadata.
 #'
 #' @seealso [Help on model specification][ergm-terms] for specific terms.
 #' 
@@ -76,9 +76,7 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
     times <- seq_along(nwl)
   }else stop("Unrecognized format for network series specification. See help for information.")
 
-  nwl0_out <- impute.network.list(nwl, NA.impute)
-
-  nwl0 <- nwl0_out[-length(nwl0_out)]
+  nwl0 <- impute.network.list(nwl[-length(nwl)], NA.impute, nwl.append=nwl[length(nwl)])
 
   nwl0.NA <- sapply(nwl0, network.naedgecount)>0 # Update which networks have missing dyads.
   

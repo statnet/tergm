@@ -20,8 +20,6 @@ tergm.CMLE <- function(formula, times, ...,
     stop("Unsupported specification for the network series. See help for ",sQuote("NetSeries")," for arguments.")
   }
 
-  nwl <- NetSeries$nwl
-  NetSeries <- NetSeries$Networks
   
   formula <- nonsimp_update.formula(formula, NetSeries~., from.new="NetSeries")
   
@@ -30,6 +28,5 @@ tergm.CMLE <- function(formula, times, ...,
   # TODO: Figure out what additional information to attach.
   list(formula = formula,
        coef = fit$coef,
-       network = nwl,       
        fit=fit)
 }
