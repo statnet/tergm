@@ -868,8 +868,6 @@ MH_U_FN(Mu_discordBDTNT) {
           Vertex thead = sto->nonBDTDNE->heads[j];
           if((tail == ttail && IN_DEG[thead] + OUT_DEG[thead] < sto->bound) || (tail == thead && IN_DEG[ttail] + OUT_DEG[ttail] < sto->bound)) {
             sto->nonBDTDNE->lindex = j;
-            sto->nonBDTDNE->ltail = ttail;
-            sto->nonBDTDNE->lhead = thead;
             UnsrtELDelete(ttail, thead, sto->nonBDTDNE);
             UnsrtELInsert(ttail, thead, sto->BDTDNE);
             sto->nonBDTDNE_deg[ttail]--;
@@ -895,8 +893,6 @@ MH_U_FN(Mu_discordBDTNT) {
           Vertex thead = sto->nonBDTDNE->heads[j];
           if((head == ttail && IN_DEG[thead] + OUT_DEG[thead] < sto->bound) || (head == thead && IN_DEG[ttail] + OUT_DEG[ttail] < sto->bound)) {
             sto->nonBDTDNE->lindex = j;
-            sto->nonBDTDNE->ltail = ttail;
-            sto->nonBDTDNE->lhead = thead;
             UnsrtELDelete(ttail, thead, sto->nonBDTDNE);
             UnsrtELInsert(ttail, thead, sto->BDTDNE);
             sto->nonBDTDNE_deg[ttail]--;
@@ -923,8 +919,6 @@ MH_U_FN(Mu_discordBDTNT) {
           Vertex thead = sto->BDTDNE->heads[j];
           if(tail == ttail || tail == thead) {
             sto->BDTDNE->lindex = j;
-            sto->BDTDNE->ltail = ttail;
-            sto->BDTDNE->lhead = thead;
             UnsrtELDelete(ttail, thead, sto->BDTDNE);
             UnsrtELInsert(ttail, thead, sto->nonBDTDNE);
             sto->nonBDTDNE_deg[ttail]++;
@@ -950,8 +944,6 @@ MH_U_FN(Mu_discordBDTNT) {
           Vertex thead = sto->BDTDNE->heads[j];
           if(head == ttail || head == thead) {
             sto->BDTDNE->lindex = j;
-            sto->BDTDNE->ltail = ttail;
-            sto->BDTDNE->lhead = thead;
             UnsrtELDelete(ttail, thead, sto->BDTDNE);
             UnsrtELInsert(ttail, thead, sto->nonBDTDNE);
             sto->nonBDTDNE_deg[ttail]++;
@@ -1753,8 +1745,6 @@ MH_U_FN(Mu_discordBDStratTNT) {
               Vertex thead = sto->nonBDTDNE[i]->heads[j];
               if((tail == ttail && IN_DEG[thead] + OUT_DEG[thead] < sto->bound) || (tail == thead && IN_DEG[ttail] + OUT_DEG[ttail] < sto->bound)) {
                 sto->nonBDTDNE[i]->lindex = j;
-                sto->nonBDTDNE[i]->ltail = ttail;
-                sto->nonBDTDNE[i]->lhead = thead;
                 UnsrtELDelete(ttail, thead, sto->nonBDTDNE[i]);
                 UnsrtELInsert(ttail, thead, sto->BDTDNE[i]);
                 sto->nonBDTDNE_deg[i][ttail]--;
@@ -1789,8 +1779,6 @@ MH_U_FN(Mu_discordBDStratTNT) {
               Vertex thead = sto->nonBDTDNE[i]->heads[j];
               if((head == ttail && IN_DEG[thead] + OUT_DEG[thead] < sto->bound) || (head == thead && IN_DEG[ttail] + OUT_DEG[ttail] < sto->bound)) {
                 sto->nonBDTDNE[i]->lindex = j;
-                sto->nonBDTDNE[i]->ltail = ttail;
-                sto->nonBDTDNE[i]->lhead = thead;
                 UnsrtELDelete(ttail, thead, sto->nonBDTDNE[i]);
                 UnsrtELInsert(ttail, thead, sto->BDTDNE[i]);
                 sto->nonBDTDNE_deg[i][ttail]--;
@@ -1824,8 +1812,6 @@ MH_U_FN(Mu_discordBDStratTNT) {
               Vertex thead = sto->BDTDNE[i]->heads[j];
               if(tail == ttail || tail == thead) {
                 sto->BDTDNE[i]->lindex = j;
-                sto->BDTDNE[i]->ltail = ttail;
-                sto->BDTDNE[i]->lhead = thead;
                 UnsrtELDelete(ttail, thead, sto->BDTDNE[i]);
                 UnsrtELInsert(ttail, thead, sto->nonBDTDNE[i]);
                 sto->nonBDTDNE_deg[i][ttail]++;
@@ -1858,8 +1844,6 @@ MH_U_FN(Mu_discordBDStratTNT) {
               Vertex thead = sto->BDTDNE[i]->heads[j];
               if(head == ttail || head == thead) {
                 sto->BDTDNE[i]->lindex = j;
-                sto->BDTDNE[i]->ltail = ttail;
-                sto->BDTDNE[i]->lhead = thead;
                 UnsrtELDelete(ttail, thead, sto->BDTDNE[i]);
                 UnsrtELInsert(ttail, thead, sto->nonBDTDNE[i]);
                 sto->nonBDTDNE_deg[i][ttail]++;
