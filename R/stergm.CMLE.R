@@ -118,7 +118,7 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   if(!is.null(control$CMLE.control.form$init)){
     # Check length of control$CMLE.control.form$init.
     if(length(control$CMLE.control.form$init)!=length(model.form$etamap$offsettheta)) {
-      if(verbose) cat("control$CMLE.control.form$init is", control$CMLE.control.form$init, "\n", "number of statistics is",length(model.form$coef.names), "\n")
+      if(verbose) message("control$CMLE.control.form$init is ", paste(control$CMLE.control.form$init, collapse = " "), "\n", " number of statistics is ", length(model.form$coef.names))
       stop(paste("Invalid starting formation parameter vector control$CMLE.control.form$init:",
                  "wrong number of parameters."))
     }
@@ -129,7 +129,7 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   if(!is.null(control$CMLE.control.diss$init)){
     # Check length of control$CMLE.control.diss$init.
     if(length(control$CMLE.control.diss$init)!=length(model.diss$etamap$offsettheta)) {
-      if(verbose) cat("control$CMLE.control.diss$init is", control$CMLE.control.diss$init, "\n", "number of statistics is",length(model.diss$coef.names), "\n")
+      if(verbose) message("control$CMLE.control.diss$init is ", paste(control$CMLE.control.diss$init, collapse = " "), "\n", " number of statistics is ", length(model.diss$coef.names))
       stop(paste("Invalid starting dissolution parameter vector control$CMLE.control.diss$init:",
                  "wrong number of parameters."))
     }
@@ -144,9 +144,9 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
                      CMPLE = "MPLE")
   
   # Now, call the ergm()s:
-  cat("Fitting formation...\n")
+  message("Fitting formation...")
   fit.form <- ergm(formation, constraints=constraints.form, offset.coef=offset.coef.form, eval.loglik=eval.loglik, estimate=ergm.estimate, control=control$CMLE.control.form, verbose=verbose)
-  cat("Fitting dissolution...\n")
+  message("Fitting dissolution...")
   fit.diss <- ergm(dissolution, constraints=constraints.diss, offset.coef=offset.coef.diss, eval.loglik=eval.loglik, estimate=ergm.estimate, control=control$CMLE.control.diss, verbose=verbose)
 
   # Construct the output list. Conveniently, this is mainly a list consisting of two ergms.

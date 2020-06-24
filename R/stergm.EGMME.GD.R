@@ -44,7 +44,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     h.fits <-
       if(!is.null(ergm.getCluster(control))){
         requireNamespace('parallel')
-        if(verbose) {cat("Calling lm/lmrob:\n"); print(gc())}
+        if(verbose) {message("Calling lm/lmrob:"); message_print(gc())}
         out <- parallel::clusterApplyLB(ergm.getCluster(control), 1:q,
                        function(i){
                          y<-ys[,i]
@@ -56,7 +56,7 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
                                               silent=TRUE))
                          
                        })
-        if(verbose) print(gc())
+        if(verbose) message_print(gc())
         out
       }else{
         lapply(1:q,
@@ -132,18 +132,18 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     
     
     if(verbose>1){
-      cat("New interval:",control$SA.interval ,"\n")
+      message("New interval: ", control$SA.interval)
     }
     
     ## Detect parameters whose effect we aren't able to reliably detect.
     ineffectual.pars <- !apply(G.signif,2,any)
 
     if(all(ineffectual.pars)){
-      if(test.G || verbose>0) cat("None of the parameters have a detectable effect. Increasing jitter.\n" )
+      if(test.G || verbose>0) message("None of the parameters have a detectable effect. Increasing jitter.")
       control$jitter[!offsets] <- control$jitter[!offsets]*2
     }
     else if(any(ineffectual.pars)){
-      if(test.G) cat("Parameters",paste.and(p.names[!offsets][ineffectual.pars]),"do not have a detectable effect. Shifting jitter to them.\n" )
+      if(test.G) message("Parameters ", paste.and(p.names[!offsets][ineffectual.pars]), " do not have a detectable effect. Shifting jitter to them." )
       control$jitter[!offsets] <- control$jitter[!offsets] * (ineffectual.pars+1/2) / mean(control$jitter[!offsets] * (ineffectual.pars+1/2))
     }
 
@@ -166,27 +166,27 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     names(par.eff)<-colnames(G.pvals)<-colnames(G)<-p.names[!offsets]
     rownames(G.pvals)<-rownames(G)<-q.names
     if(verbose>1){
-      cat("Most recent parameters:\n")
-      cat("Formation:\n")
-      for(state in states) print(state$eta.form)
-      cat("Dissolution:\n")
-      for(state in states) print(state$eta.diss)
-      cat("Target differences (most recent):\n")
-      for(state in states) print(state$nw.diff)
-      cat("Target differences (last run):\n")
-      print(colMeans(oh.last[,-(1:p),drop=FALSE]))
-      cat("Approximate objective function (most recent):\n")
-      print(mahalanobis(oh[nrow(oh),-(1:p),drop=FALSE],0,cov=w,inverted=TRUE))
-      cat("Approximate objective function (last run):\n")
-      print(mahalanobis(colMeans(oh.last[,-(1:p),drop=FALSE]),0,cov=w,inverted=TRUE))
-      cat("Estimaged gradient p-values:\n")
-      print(G.pvals)
-      cat("Estimated gradient:\n")
-      print(G)
-      cat("Normalized parameter effects:\n")
-      print(par.eff)
-      cat("Estimated covariance of statistics:\n")
-      print(v)
+      message("Most recent parameters:")
+      message("Formation:")
+      for(state in states) message_print(state$eta.form)
+      message("Dissolution:")
+      for(state in states) message_print(state$eta.diss)
+      message("Target differences (most recent):")
+      for(state in states) message_print(state$nw.diff)
+      message("Target differences (last run):")
+      message_print(colMeans(oh.last[,-(1:p),drop=FALSE]))
+      message("Approximate objective function (most recent):")
+      message_print(mahalanobis(oh[nrow(oh),-(1:p),drop=FALSE],0,cov=w,inverted=TRUE))
+      message("Approximate objective function (last run):")
+      message_print(mahalanobis(colMeans(oh.last[,-(1:p),drop=FALSE]),0,cov=w,inverted=TRUE))
+      message("Estimaged gradient p-values:")
+      message_print(G.pvals)
+      message("Estimated gradient:")
+      message_print(G)
+      message("Normalized parameter effects:")
+      message_print(par.eff)
+      message("Estimated covariance of statistics:")
+      message_print(v)
     }
 
     # Plot if requested.
@@ -219,10 +219,10 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     colnames(control$GainM) <- q.names
     
     if(verbose>1){
-      cat("New deviation -> coefficient map:\n")
-      print(control$GainM)
-      cat("New jitter cancelation matrix:\n")
-      print(control$dejitter)
+      message("New deviation -> coefficient map:")
+      message_print(control$GainM)
+      message("New jitter cancelation matrix:")
+      message_print(control$dejitter)
     }
 
     if(update.jitter){
@@ -231,20 +231,20 @@ stergm.EGMME.GD <- function(theta.form0, theta.diss0, nw, model.form, model.diss
     }
     
     if(verbose>1){
-      cat("New jitter values:\n")
-      print(control$jitter)
+      message("New jitter values:")
+      message_print(control$jitter)
     }
 
     control$dev.guard <- apply(oh[,-(1:p),drop=FALSE],2,function(x) quantile(abs(x),.9)) * control$SA.guard.mul
     if(verbose>1){
-      cat("New deviation guard values:\n")
-      print(control$dev.guard)
+      message("New deviation guard values:")
+      message_print(control$dev.guard)
     }
 
     control$par.guard <- apply(abs(diff(oh[,1:p,drop=FALSE],lag=control$SA.runlength*control$SA.interval-1)),2,median) * control$SA.guard.mul
     if(verbose>1){
-      cat("New parameter guard values:\n")
-      print(control$par.guard)
+      message("New parameter guard values:")
+      message_print(control$par.guard)
     }
     
     list(control=control,
