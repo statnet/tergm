@@ -630,7 +630,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
     object%n%'vertex.pid'<-'tergm_pid'
   }
   
-  if(verbose) cat("extracting state of networkDynamic at time ",start,"\n")
+  if(verbose) message("extracting state of networkDynamic at time  ",start)
   
   # extract nwd to nw
   
@@ -665,7 +665,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   ## If all the user wants is statistics or a list of toggles, we are done.
   if(output!="networkDynamic") return(sim)
 
-  if(verbose) cat("Updating networkDynamic ")
+  if(verbose) message("Updating networkDynamic ", appendLF = FALSE)
   
   object  <- networkDynamic.apply.changes(object, sim)
   # set up net.obs.period list to describe time period simulated
@@ -673,7 +673,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   
   if(verbose){
     obs<-(object%n%'net.obs.period')$observations
-    cat("with simulated time: (",obs[[length(obs)]],").\n")
+    message("with simulated time: ( ",obs[[length(obs)]]," ).")
   }
   
   attributes(object) <- c(attributes(object), # Don't clobber existing attributes!

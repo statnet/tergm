@@ -266,7 +266,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
     maxedges <- Clist$nedges + maxedges.sd*control$GF.init.maxedges.mul
   }
 
-  if(verbose) cat("Applying changes...\n")
+  if(verbose) message("Applying changes...")
   repeat{
     z <- .C("godfather_wrapper",
             as.integer(Clist$tails), as.integer(Clist$heads),
@@ -304,7 +304,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
   stats <- mcmc(stats, start=if(stats.start) start else start+1)
   
   if(end.network){ 
-    if(verbose) cat("Creating new network...\n")
+    if(verbose) message("Creating new network...")
     newnetwork <- as.network(pending_update_network(nw,z))
     newnetwork %n% "time" <- z$time
     newnetwork %n% "lasttoggle" <- z$lasttoggle

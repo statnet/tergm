@@ -140,7 +140,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
     if(length(nw.stats)!=length(target.stats))
       stop("Incorrect length of the target.stats vector: should be ", length(nw.stats), " but is ",length(target.stats),".")
         
-    if(verbose) cat("Constructing an approximate response network.\n")
+    if(verbose) message("Constructing an approximate response network.")
     ## If target.stats are given, overwrite the given network and targets
     ## with SAN-ed network and targets.
     
@@ -157,19 +157,19 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
     nw.stats <- summary(model.mon, nw)
 
     if(verbose){
-      cat("SAN summary statistics:\n")
-      print(nw.stats)
-      cat("Meanstats Goal:\n")
-      print(target.stats)
-      cat("Difference: SAN target.stats - Goal target.stats =\n")
-      print(round(nw.stats-target.stats,0))
+      message("SAN summary statistics:")
+      message_print(nw.stats)
+      message("Meanstats Goal:")
+      message_print(target.stats)
+      message("Difference: SAN target.stats - Goal target.stats =")
+      message_print(round(nw.stats-target.stats,0))
     }
   }
 
   model.mon$nw.stats <- nw.stats
   model.mon$target.stats <- if(!is.null(target.stats)) vector.namesmatch(target.stats, names(model.mon$nw.stats)) else model.mon$nw.stats
 
-  if (verbose) cat("Initializing Metropolis-Hastings proposals.\n")
+  if (verbose) message("Initializing Metropolis-Hastings proposals.")
   proposal.form <- ergm_proposal(constraints, weights=control$MCMC.prop.weights.form, control$MCMC.prop.args.form, nw, class="f")
   proposal.diss <- ergm_proposal(constraints, weights=control$MCMC.prop.weights.diss, control$MCMC.prop.args.diss, nw, class="d")
 
@@ -182,7 +182,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
   if(!is.null(control$init.form)){
     # Check length of control$init.form.
     if(length(control$init.form)!=length(model.form$etamap$offsettheta)) {
-      if(verbose) cat("control$init.form is", control$init.form, "\n", "number of statistics is",length(model.form$coef.names), "\n")
+      if(verbose) message("control$init.form is ", paste(control$init.form, collapse = " "), "\n", " number of statistics is ", length(model.form$coef.names))
       stop(paste("Invalid starting formation parameter vector control$init.form:",
                  "wrong number of parameters."))
     }
@@ -193,7 +193,7 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
   if(!is.null(control$init.diss)){
     # Check length of control$init.diss.
     if(length(control$init.diss)!=length(model.diss$etamap$offsettheta)) {
-      if(verbose) cat("control$init.diss is", control$init.diss, "\n", "number of statistics is",length(model.diss$coef.names), "\n")
+      if(verbose) message("control$init.diss is ", paste(control$init.diss, collapse = " "), "\n", " number of statistics is ", length(model.diss$coef.names))
       stop(paste("Invalid starting dissolution parameter vector control$init.diss:",
                  "wrong number of parameters."))
     }
@@ -203,11 +203,11 @@ stergm.EGMME <- function(nw, formation, dissolution, constraints, offset.coef.fo
 
   initialfit <- stergm.EGMME.initialfit(formation, dissolution, targets, control$init.form, control$init.diss, nw, model.form, model.diss, model.mon, control, verbose)
   
-  if(verbose) cat("Fitting STERGM Equilibrium GMME.\n")
+  if(verbose) message("Fitting STERGM Equilibrium GMME.")
 
   if(control$parallel){
     ergm.getCluster(control, verbose=verbose)
-    if(verbose && !is.null(ergm.getCluster(control))) cat("Using parallel cluster.\n")
+    if(verbose && !is.null(ergm.getCluster(control))) message("Using parallel cluster.")
   }
   
   Cout <- switch(control$EGMME.main.method,
