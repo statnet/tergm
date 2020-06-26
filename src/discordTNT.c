@@ -462,6 +462,9 @@ typedef struct {
   Dyad currentdyads;
   Dyad proposeddyads;
   
+  int currentsubmaxledges;
+  int proposedsubmaxledges;  
+  
   int bound;
   int nmixtypes;
   double *vattr;
@@ -549,6 +552,9 @@ MH_I_FN(Mi_discordBDTNT) {
   for(Vertex tail = 1; tail <= N_NODES; tail++) {
     STEP_THROUGH_OUTEDGES(tail, e, head) {
       UnsrtELInsert(tail, head, sto->nonDiscordantEdges);
+      if(IN_DEG[tail] + OUT_DEG[tail] < bound && IN_DEG[head] + OUT_DEG[head] < bound) {
+        sto->currentsubmaxledges++;
+      }
     }
   }
   
@@ -671,15 +677,16 @@ MH_P_FN(MH_discordBDTNT) {
       in_network = IS_OUTEDGE(Mtail[0],Mhead[0]);
       in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;
 
-      if(in_discord) {
-        // need to resample
-        if(in_network) {
-          UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges);
+      if(in_network) {
+        if(unif_rand() < ((double) sto->nonDiscordantEdges->nedges)/nedges) {
+          UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantEdges);
+          in_discord = FALSE;
         } else {
-          UnsrtELGetRand(Mtail, Mhead, sto->BDTDNE);
+          UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges);
+          in_discord = TRUE;
         }
-      } else if(in_network) {
-        UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantEdges);
+      } else if(in_discord) {
+        UnsrtELGetRand(Mtail, Mhead, sto->BDTDNE);
       }
     }
   } else {
@@ -751,6 +758,55 @@ MH_P_FN(MH_discordBDTNT) {
     }
   }
 
+  sto->proposedsubmaxledges = sto->currentsubmaxledges;
+  
+  // if we are adding an edge that will be submaximal in the post-toggle 
+  // network, then increment proposedsubmaxledges for this particular edge
+  if(!in_network && !sto->tailmaxl && !sto->headmaxl) {
+    sto->proposedsubmaxledges++;
+  }
+  
+  // if we are removing an edge that is submaximal in the current
+  // network, decrement proposedsubmaxledges for this particular edge
+  if(in_network && !sto->tailmaxl && !sto->headmaxl) {
+    sto->proposedsubmaxledges--;
+  }
+
+  Edge e;
+  Vertex v;
+
+  // if tail will change maximality on toggle, then adjust
+  // proposedsubmaxledges for all edges between tail and
+  // a submaximal neighbor v, taking care not to count head,
+  // since that was handled separately above
+  if(sto->tailmaxl) {
+    STEP_THROUGH_OUTEDGES(Mtail[0], e, v) {
+      if(v != Mhead[0] && IN_DEG[v] + OUT_DEG[v] < sto->bound) {
+        sto->proposedsubmaxledges += delta;
+      }
+    }
+    STEP_THROUGH_INEDGES(Mtail[0], e, v) {
+      if(IN_DEG[v] + OUT_DEG[v] < sto->bound) {
+        sto->proposedsubmaxledges += delta;
+      }
+    }
+  }
+  
+  // ditto head
+  if(sto->headmaxl) {
+    STEP_THROUGH_OUTEDGES(Mhead[0], e, v) {
+      if(IN_DEG[v] + OUT_DEG[v] < sto->bound) {
+        sto->proposedsubmaxledges += delta;
+      }
+    }
+    STEP_THROUGH_INEDGES(Mhead[0], e, v) {
+      if(v != Mtail[0] && IN_DEG[v] + OUT_DEG[v] < sto->bound) {
+        sto->proposedsubmaxledges += delta;
+      }
+    }
+  }
+
+
   // how nddyads can change:
   // the dyad we toggle can add/remove one discordant dyad
   // discordant nonedges can change toggleability status based on the toggle we make,
@@ -801,11 +857,11 @@ MH_P_FN(MH_discordBDTNT) {
     }
   }
   
-  double forward_network = in_network ? ((sto->currentdyads == 0 ? 1.0 : 0.5)/nedges + (sto->tailmaxl || sto->headmaxl ? 0 : 0.5/sto->currentdyads)) : ((nedges == 0 ? 1.0 : 0.5)/sto->currentdyads);
+  double forward_network = in_network ? (sto->currentdyads == 0 ? 1.0/nedges : 0.5/nedges + (0.5/sto->currentdyads)*((double)sto->currentsubmaxledges/nedges)) : (nedges == 0 ? 1.0/sto->currentdyads : 0.5/sto->currentdyads);
   
   double forward_discord = in_discord ? 1.0/nddyads : 0;
   
-  double backward_network = in_network ? ((nedges == 1 ? 1.0 : 0.5)/sto->proposeddyads) : ((sto->proposeddyads == 0 ? 1.0 : 0.5)/(nedges + 1) + (sto->tailmaxl || sto->headmaxl ? 0 : 0.5/sto->proposeddyads));
+  double backward_network = in_network ? (nedges == 1 ? 1.0/sto->proposeddyads : 0.5/sto->proposeddyads) : (sto->proposeddyads == 0 ? 1.0/(nedges + 1) : 0.5/(nedges + 1) + (0.5/sto->proposeddyads)*((double) sto->proposedsubmaxledges/(nedges + 1)));
   
   double backward_discord = in_discord ? 0 : 1.0/propnddyads;
   
@@ -851,6 +907,9 @@ MH_U_FN(Mu_discordBDTNT) {
   
   // update current dyad count
   sto->currentdyads = sto->proposeddyads;  
+  
+  // update the current submaximal edge count
+  sto->currentsubmaxledges = sto->proposedsubmaxledges;  
   
   // if (sub)maximality/BD toggleability has changed for any nodes/dyads, update storage accordingly
   if(edgeflag) {
@@ -1039,6 +1098,9 @@ typedef struct {
   
   int *influenced_counts;
   int **influenced;
+  
+  int *currentsubmaxledgestype;
+  double **indmat;  
 } discordBDStratTNTStorage;
 
 MH_I_FN(Mi_discordBDStratTNT) {
@@ -1072,6 +1134,12 @@ MH_I_FN(Mi_discordBDStratTNT) {
     indmat[i] = indmat[i - 1] + nattrcodes;
   }
   
+  sto->currentsubmaxledgestype = Calloc(nmixtypes, int);
+  
+  int npairings = MHp->inputs[1 + 3*nmixtypes + 1 + N_NODES + nattrcodes*nattrcodes];
+  
+  int bound = MHp->inputs[1 + 3*nmixtypes + 1 + N_NODES + nattrcodes*nattrcodes + 1 + npairings];  
+  
   Vertex head;
   Edge e;
   for(Vertex tail = 1; tail <= N_NODES; tail++) {
@@ -1079,17 +1147,16 @@ MH_I_FN(Mi_discordBDStratTNT) {
       int index = indmat[(int)strat_vattr[tail - 1]][(int)strat_vattr[head - 1]];
       if(index >= 0) {
         UnsrtELInsert(tail, head, els[index]);
+        if(IN_DEG[tail] + OUT_DEG[tail] < bound && IN_DEG[head] + OUT_DEG[head] < bound) {
+          sto->currentsubmaxledgestype[index]++;
+        }        
       }
     }
   }
-  Free(indmat);
+  sto->indmat = indmat;
   
   // above handles initialization of edgelists according to the "strat" part of BDStratTNT
-  
-  int npairings = MHp->inputs[1 + 3*nmixtypes + 1 + N_NODES + nattrcodes*nattrcodes];
-  
-  int bound = MHp->inputs[1 + 3*nmixtypes + 1 + N_NODES + nattrcodes*nattrcodes + 1 + npairings];
-  
+    
   int bdlevels = MHp->inputs[1 + 3*nmixtypes + 1 + N_NODES + nattrcodes*nattrcodes + 1 + npairings + 1];
   
   int bdmixtypes = MHp->inputs[1 + 3*nmixtypes + 1 + N_NODES + nattrcodes*nattrcodes + 1 + npairings + 1 + 1];
@@ -1407,15 +1474,16 @@ MH_P_FN(MH_discordBDStratTNT) {
       in_network = IS_OUTEDGE(Mtail[0],Mhead[0]);
       in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;
 
-      if(in_discord) {
-        // need to resample
-        if(in_network) {
-          UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges[strat_i]);
+      if(in_network) {
+        if(unif_rand() < ((double) sto->nonDiscordantEdges[strat_i]->nedges/nedgestype)) {
+          UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantEdges[strat_i]);          
+          in_discord = FALSE;          
         } else {
-          UnsrtELGetRand(Mtail, Mhead, sto->BDTDNE[strat_i]);
+          UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges[strat_i]);
+          in_discord = TRUE;
         }
-      } else if(in_network) {
-        UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantEdges[strat_i]);
+      } else if(in_discord) {
+        UnsrtELGetRand(Mtail, Mhead, sto->BDTDNE[strat_i]);          
       }
     }
   } else {
@@ -1609,14 +1677,63 @@ MH_P_FN(MH_discordBDStratTNT) {
       }
     }
   }
+
+  int proposedsubmaxledgestype = sto->currentsubmaxledgestype[strat_i];
+
+  // if we are adding an edge that will be submaximal in the post-toggle 
+  // network, then increment proposedsubmaxledgestype for this particular edge
+  if(!in_network && !sto->tailmaxl && !sto->headmaxl) {
+    proposedsubmaxledgestype++;
+  }
+
+  // if we are removing an edge that is submaximal in the current
+  // network, decrement proposedsubmaxledgestype for this particular edge
+  if(in_network && !sto->tailmaxl && !sto->headmaxl) {
+    proposedsubmaxledgestype--;
+  }
+
+  Edge e;
+  Vertex v;
+
+  // if tail will change maximality on toggle, then adjust
+  // proposedsubmaxledgestype for all edges between tail and
+  // a submaximal neighbor v with the edge between tail and v
+  // having the mixing type strat_i, taking care not to count head,
+  // since that was handled separately above
+  if(sto->tailmaxl) {
+    STEP_THROUGH_OUTEDGES(Mtail[0], e, v) {
+      if(v != Mhead[0] && IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]] == strat_i) {
+        proposedsubmaxledgestype += delta;
+      }
+    }
+    STEP_THROUGH_INEDGES(Mtail[0], e, v) {
+      if(IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]] == strat_i) {
+        proposedsubmaxledgestype += delta;
+      }
+    }
+  }
+
+  // ditto head
+  if(sto->headmaxl) {
+    STEP_THROUGH_OUTEDGES(Mhead[0], e, v) {
+      if(IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]] == strat_i) {
+        proposedsubmaxledgestype += delta;
+      }
+    }
+    STEP_THROUGH_INEDGES(Mhead[0], e, v) {
+      if(v != Mtail[0] && IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]] == strat_i) {
+        proposedsubmaxledgestype += delta;
+      }
+    }
+  }
     
   double prob_weight = sto->currentcumprob/sto->proposedcumprob;
   
-  double forward_network = in_network ? ((ndyadstype == 0 ? 1.0 : 0.5)/nedgestype + (sto->tailmaxl || sto->headmaxl ? 0 : 0.5/ndyadstype)) : ((nedgestype == 0 ? 1.0 : 0.5)/ndyadstype);
+  double forward_network = in_network ? (ndyadstype == 0 ? 1.0/nedgestype : 0.5/nedgestype + (0.5/ndyadstype)*((double)sto->currentsubmaxledgestype[strat_i]/nedgestype)) : (nedgestype == 0 ? 1.0/ndyadstype : 0.5/ndyadstype);
   
   double forward_discord = in_discord ? 1.0/nddyadstype : 0;
   
-  double backward_network = in_network ? ((nedgestype == 1 ? 1.0 : 0.5)/proposeddyadstype) : ((proposeddyadstype == 0 ? 1.0 : 0.5)/(nedgestype + 1) + (sto->tailmaxl || sto->headmaxl ? 0 : 0.5/proposeddyadstype));
+  double backward_network = in_network ? (nedgestype == 1 ? 1.0/proposeddyadstype : 0.5/proposeddyadstype) : (proposeddyadstype == 0 ? 1.0/(nedgestype + 1) : 0.5/(nedgestype + 1) + (0.5/proposeddyadstype)*((double) proposedsubmaxledgestype/(nedgestype + 1)));
   
   double backward_discord = in_discord ? 0 : 1.0/propnddyadstype;
   
@@ -1632,6 +1749,54 @@ MH_P_FN(MH_discordBDStratTNT) {
 
 MH_U_FN(Mu_discordBDStratTNT) {   
   GET_STORAGE(discordBDStratTNTStorage, sto);
+
+  // if we are adding an edge that will be submaximal in the post-toggle 
+  // network, then increment currentsubmaxledgestype for this particular edge
+  if(!edgeflag && !sto->tailmaxl && !sto->headmaxl) {
+    sto->currentsubmaxledgestype[sto->stratmixingtype]++;
+  }
+
+  // if we are removing an edge that is submaximal in the current
+  // network, decrement currentsubmaxledgestype for this particular edge
+  if(edgeflag && !sto->tailmaxl && !sto->headmaxl) {
+    sto->currentsubmaxledgestype[sto->stratmixingtype]--;
+  }
+
+  int delta = edgeflag ? +1 : -1;
+
+  Edge e;
+  Vertex v;
+
+  // if tail will change maximality on toggle, then adjust
+  // currentsubmaxledgestype for all edges between tail and
+  // a submaximal neighbor v, taking care not to count head,
+  // since that was handled separately above
+  if(sto->tailmaxl) {
+    STEP_THROUGH_OUTEDGES(tail, e, v) {
+      if(v != head && IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]] >= 0) {
+        sto->currentsubmaxledgestype[(int)sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]]] += delta;
+      }
+    }
+    STEP_THROUGH_INEDGES(tail, e, v) {
+      if(IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]] >= 0) {
+        sto->currentsubmaxledgestype[(int)sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]]] += delta;
+      }
+    }
+  }
+
+  // ditto head
+  if(sto->headmaxl) {
+    STEP_THROUGH_OUTEDGES(head, e, v) {
+      if(IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]] >= 0) {
+        sto->currentsubmaxledgestype[(int)sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]]] += delta;
+      }
+    }
+    STEP_THROUGH_INEDGES(head, e, v) {
+      if(v != tail && IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]] >= 0) {
+        sto->currentsubmaxledgestype[(int)sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]]] += delta;
+      }
+    }
+  }  
 
   // avoid copying in the common case where all strat types are toggleable in both the current and proposed networks
   if(sto->currentcumprob != 1 || sto->proposedcumprob != 1) {
@@ -1860,7 +2025,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
           }
         }
       }
-    }      
+    }
   }
 }
 
@@ -1905,6 +2070,9 @@ MH_F_FN(Mf_discordBDStratTNT) {
   }
   Free(sto->influenced);
   Free(sto->influenced_counts);
+  
+  Free(sto->indmat);
+  Free(sto->currentsubmaxledgestype);
   
   Free(sto->BDTDNE);
   Free(sto->nonBDTDNE);
