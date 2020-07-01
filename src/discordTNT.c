@@ -81,7 +81,7 @@ MH_P_FN(MH_discordTNT) {
   
   // compute logratio
   
-  int ndyads = DYADCOUNT(nwp);
+  Dyad ndyads = DYADCOUNT(nwp);
   
   // these ignore overall factor of 1/2 which cancels out in ratio
   double forward_discord = in_discord ? 1.0/nddyads : 0;
