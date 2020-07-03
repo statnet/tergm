@@ -200,6 +200,7 @@ stergm_MCMC_slave <- function(Clist.form, Clist.diss, Clist.mon, proposal.form, 
             # Observed network.
             as.integer(Clist.form$tails), as.integer(Clist.form$heads),
             time = if(is.null(Clist.form$time)) as.integer(0) else as.integer(Clist.form$time),
+            lasttoggle_flag = as.integer(!is.null(NVL(Clist.form$lasttoggle,Clist.diss$lasttoggle,Clist.mon$lasttoggle))),
             lasttoggle = as.integer(NVL(Clist.form$lasttoggle,Clist.diss$lasttoggle,Clist.mon$lasttoggle,0)),  
             as.integer(Clist.form$nedges),
             as.integer(Clist.form$n),

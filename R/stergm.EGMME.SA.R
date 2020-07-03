@@ -584,6 +584,7 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
             # Observed/starting network. 
             as.integer(Clist.form$tails), as.integer(Clist.form$heads),
             time = as.integer(min(Clist.form$time,Clist.diss$time,Clist.diss$time)),
+            lasttoggle_flag = as.integer(!is.null(NVL(Clist.form$lasttoggle,Clist.diss$lasttoggle,Clist.mon$lasttoggle))),
             lasttoggle = as.integer(NVL(Clist.form$lasttoggle,Clist.diss$lasttoggle,Clist.mon$lasttoggle,0)),  
             as.integer(Clist.form$nedges),
             as.integer(Clist.form$n),

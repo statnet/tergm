@@ -271,6 +271,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
     z <- .C("godfather_wrapper",
             as.integer(Clist$tails), as.integer(Clist$heads),
             time = if(is.null(Clist$time)) as.integer(0) else as.integer(Clist$time),
+            lasttoggle_flag = as.integer(!is.null(Clist$lasttoggle)),
             lasttoggle = as.integer(NVL(Clist$lasttoggle,0)),             
             as.integer(Clist$nedges),
             as.integer(Clist$n),
