@@ -166,7 +166,7 @@ S_CHANGESTAT_FN(s_edges_ageinterval_mon){
     int age = ElapsedTime(tail,head,nwp);
     for(unsigned int j=0; j<N_CHANGE_STATS; j++){
       unsigned int from = INPUT_PARAM[j*2], to = INPUT_PARAM[j*2+1];
-      if(from<=age && (to==0 || age<to)) CHANGE_STAT[0]++;
+      if(from<=age && (to==0 || age<to)) CHANGE_STAT[j]++;
     }
   }
 }
@@ -383,7 +383,7 @@ D_CHANGESTAT_FN(d_edgecov_mean_age_mon){
       }else{
 	int et = 0;	
 	CSD_TRANSFORM_ET(et);
-	s1 += ett1;
+	s1 += ett1*val;
 	e1 += val;
       }
     }
@@ -400,7 +400,7 @@ S_CHANGESTAT_FN(s_edgecov_mean_age_mon){
   if(noffset > 0){
     nrow = noffset;
   }else{
-    nrow = INPUT_PARAM[1];
+    nrow = INPUT_PARAM[2];
   }
 
   for (Edge k=1; k <= N_EDGES; k++){
