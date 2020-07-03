@@ -14,7 +14,7 @@
 #include "MHproposal.h"
 
 void MCMCDynSArun_wrapper(// Observed network.
-			     int *tails, int *heads, int *time, int *lasttoggle, int *n_edges,
+			     int *tails, int *heads, int *time, int *lasttoggle_flag, int *lasttoggle, int *n_edges,
 			     int *n_nodes, int *dflag, int *bipartite, 
 			     // Formation terms and proposals.
 			     int *F_nterms, char **F_funnames, char **F_sonames,

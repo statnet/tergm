@@ -10,7 +10,7 @@
 #include "DynSA.h"
 
 void MCMCDynSArun_wrapper(// Observed network.
-			     int *tails, int *heads, int *time, int *lasttoggle, int *n_edges,
+			     int *tails, int *heads, int *time, int *lasttoggle_flag, int *lasttoggle, int *n_edges,
 			     int *n_nodes, int *dflag, int *bipartite, 
 			     // Formation terms and proposals.
 			     int *F_nterms, char **F_funnames, char **F_sonames,
@@ -46,7 +46,7 @@ void MCMCDynSArun_wrapper(// Observed network.
   Model *F_m, *D_m, *M_m;
   MHProposal *F_MH, *D_MH;
   
-  if(*lasttoggle == 0) lasttoggle = NULL;
+  if(!*lasttoggle_flag) lasttoggle = NULL;
 
   Vertex *difftime, *difftail, *diffhead;
   difftime = (Vertex *) Calloc(*maxchanges,Vertex);
