@@ -193,6 +193,9 @@ stergm_MCMC_slave <- function(Clist.form, Clist.diss, Clist.mon, proposal.form, 
   collect.diss<-if(!is.null(control$collect.diss)) control$collect.diss else TRUE
   maxedges <- control$MCMC.init.maxedges
   maxchanges <- control$MCMC.init.maxchanges
+  
+  lasttoggle_flag <- as.integer(!is.null(NVL(Clist.form$lasttoggle,Clist.diss$lasttoggle,Clist.mon$lasttoggle)))
+  
   repeat{
     #FIXME: Separate MCMC control parameters and properly attach them.
     
@@ -200,8 +203,8 @@ stergm_MCMC_slave <- function(Clist.form, Clist.diss, Clist.mon, proposal.form, 
             # Observed network.
             as.integer(Clist.form$tails), as.integer(Clist.form$heads),
             time = if(is.null(Clist.form$time)) as.integer(0) else as.integer(Clist.form$time),
-            lasttoggle_flag = as.integer(!is.null(NVL(Clist.form$lasttoggle,Clist.diss$lasttoggle,Clist.mon$lasttoggle))),
-            lasttoggle = as.integer(NVL(Clist.form$lasttoggle,Clist.diss$lasttoggle,Clist.mon$lasttoggle,0)),  
+            lasttoggle_flag,
+            lasttoggle = as.integer(NVL(Clist.form$lasttoggle,Clist.diss$lasttoggle,Clist.mon$lasttoggle)),  
             as.integer(Clist.form$nedges),
             as.integer(Clist.form$n),
             as.integer(Clist.form$dir), as.integer(Clist.form$bipartite),
@@ -280,9 +283,10 @@ stergm_MCMC_slave <- function(Clist.form, Clist.diss, Clist.mon, proposal.form, 
       NULL
 
   # Blank all elements of z that we don't want to bother returning.
+  # note that we want z$lasttoggle to be NULL if lasttoggle_flag is FALSE
   zn <- names(z)
   for(i in rev(seq_along(zn))){ # Do in reverse, to preserve indexing.
-    if(! zn[i] %in% c("time", "lasttoggle", "newnwtails", "newnwheads", "diffnwtime", "diffnwtails", "diffnwheads", "diffnwdirs", "status"))
+    if(! zn[i] %in% c("time", if(lasttoggle_flag) "lasttoggle", "newnwtails", "newnwheads", "diffnwtime", "diffnwtails", "diffnwheads", "diffnwdirs", "status"))
       z[[i]] <- NULL
   }  
   c(z,
