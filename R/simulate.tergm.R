@@ -214,15 +214,15 @@
 #'
 #' # equivalent simulation from formula with network LHS;
 #' # must pass dynamic=TRUE for tergm simulation
-#' sim2 <- simulate(samplk2 ~ FormE(~edges+mutual+transitiveties+cyclicalties) +
-#'                            DissE(~edges+mutual+transitiveties+cyclicalties),
+#' sim2 <- simulate(samplk2 ~ Form(~edges+mutual+transitiveties+cyclicalties) +
+#'                            Diss(~edges+mutual+transitiveties+cyclicalties),
 #'                            coef = samplk12$coef,
 #'                            dynamic=TRUE)
 #'
 #' # the default simulate output is a networkDynamic, and we can simulate
 #' # with a networkDynamic LHS as well
-#' sim3 <- simulate(sim2 ~ FormE(~edges+mutual+transitiveties+cyclicalties) +
-#'                         DissE(~edges+mutual+transitiveties+cyclicalties),
+#' sim3 <- simulate(sim2 ~ Form(~edges+mutual+transitiveties+cyclicalties) +
+#'                         Diss(~edges+mutual+transitiveties+cyclicalties),
 #'                         coef = samplk12$coef,
 #'                         dynamic=TRUE)
 #' 
@@ -265,12 +265,6 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
 
   control <- set.control.class("control.simulate.network.tergm")
 
-  # the following hack replaces Form and Diss with FormE and DissE for dynamic simulaton of CMLE fits;
-  # it should be obviated by making Form and Diss aware of how they're being used, so they can behave
-  # like FormE and DissE when appropriate, but that behavior isn't available yet
-  formula <- if(object$estimate == "EGMME") object$formula else do.call("substitute", list(object$formula, list(Form=quote(FormE), Diss=quote(DissE))))
-  attributes(formula)$.Environment <- attributes(object$formula)$.Environment
-
   if(is.null(nw.start)){
     if(is.network(object$network)) nw.start <- object$network
     else stop('Simulating from TERGM CMLE fit requires the starting network to be specified in the nw.start argument: "first", "last", a numeric index of the network in the series (with "first"==1), or a network (NOT networkDynamic at this time).')
@@ -290,9 +284,9 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
     stop("Using a networkDynamic to start a simulation from a TERGM is not supported at this time.")
   }
   
-  duration.dependent <- NVL(duration.dependent, is.lasttoggle(nw.start,formula,monitor=object$monitor))
+  duration.dependent <- NVL(duration.dependent, is.lasttoggle(nw.start,object$formula,monitor=object$monitor))
   
-  simulate_formula.network(object=formula, basis=nw.start,nsim=nsim,coef=coef, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, output=match.arg(output), stats=stats, duration.dependent=duration.dependent, verbose=verbose, dynamic=TRUE, ...)
+  simulate_formula.network(object=object$formula, basis=nw.start,nsim=nsim,coef=coef, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, output=match.arg(output), stats=stats, duration.dependent=duration.dependent, verbose=verbose, dynamic=TRUE, ...)
 }
 
 

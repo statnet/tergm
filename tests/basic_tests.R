@@ -13,15 +13,15 @@ colnames(lt) <- c(".tail", ".head", "lt")
 merge(el, lt, all=TRUE) # I.e., lasttoggle without an edge, and 1 edge with an old lasttoggle.
 
 nw %n% "time" <- 1
-# Here, there are 16 edges in the network, all but 1 added "today" (so DissE(~edges) is 1), and 1 removed "today" (so FormE(~edges) is 17):
-stopifnot(all(summary(nw~edges+FormE(~edges)+DissE(~edges))==c(16,17,1))) 
+# Here, there are 16 edges in the network, all but 1 added "today" (so Diss(~edges) is 1), and 1 removed "today" (so Form(~edges) is 17):
+stopifnot(all(summary(nw~edges+Form(~edges)+Diss(~edges))==c(16,17,1))) 
 
 nw %n% "time" <- 2
 # No changes at time 2, so all should be 16.
-stopifnot(all(summary(nw~edges+FormE(~edges)+DissE(~edges))==c(16,16,16))) 
+stopifnot(all(summary(nw~edges+Form(~edges)+Diss(~edges))==c(16,16,16))) 
 
 # Now, let's start at Time 2, add edge (1,2) at time 4, remove it at time 5, and then delete edge (1,4) at time 7 and re-add it at time 8.
-o <- tergm.godfather(nw~edges+FormE(~edges)+DissE(~edges), toggles=rbind(c(4,1,2),c(5,1,2),c(7,1,4),c(8,1,4)),start=2, end=10, end.network=TRUE)
+o <- tergm.godfather(nw~edges+Form(~edges)+Diss(~edges), toggles=rbind(c(4,1,2),c(5,1,2),c(7,1,4),c(8,1,4)),start=2, end=10, end.network=TRUE)
 attr(o, "stats") # Statistics are appropriate: note how both formation and dissolution "lag":
 stopifnot(all(attr(o,"stats")==structure(c(16,17,16,16,15,16,16,16,
                                            16,17,17,16,16,16,16,16,
@@ -43,6 +43,6 @@ el <- matrix(c(1, 2,
 nw2 <- network(el, type="edgelist", dir=FALSE)
 nw2 %n% "lasttoggle" <- cbind(el, c(1,1,1,2))
 nw2 %n% "time" <- 2
-stopifnot(all(summary(nw2 ~ FormE(~edges + triangle) + DissE(~edges + triangle))==c(4,1,3,0)))
+stopifnot(all(summary(nw2 ~ Form(~edges + triangle) + Diss(~edges + triangle))==c(4,1,3,0)))
 nw2 %n% "time" <- 3
-stopifnot(all(summary(nw2 ~ FormE(~edges + triangle) + DissE(~edges + triangle))==c(4,1,4,1)))
+stopifnot(all(summary(nw2 ~ Form(~edges + triangle) + Diss(~edges + triangle))==c(4,1,4,1)))

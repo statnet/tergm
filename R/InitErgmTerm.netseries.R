@@ -106,6 +106,10 @@ InitErgmTerm.Form <- function(nw, arglist, response=NULL,  ...) {
                       defaultvalues = list(NULL,~1,TRUE,1,NULL,NULL,NULL),
                       required = c(TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE))
 
+  if(!is(nw, "combined_networks")) {
+    return(InitErgmTerm.FormE(nw = nw, arglist = a["formula"], response = response, ...))
+  }
+
   f <- a$formula
   ult(f) <- call("Form1",call("~",ult(f))) # e.g., a~b -> a~Form1(~b)
   environment(f) <- environment(a$formula)
@@ -150,6 +154,10 @@ InitErgmTerm.Diss <- function(nw, arglist, response=NULL,  ...) {
                       vartypes = c("formula","formula","formula,logical,numeric,expression,call","formula,logical,numeric,expression,call","list","formula,logical,numeric,expression,call","character"),
                       defaultvalues = list(NULL,~1,TRUE,1,NULL,NULL,NULL),
                       required = c(TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE))
+
+  if(!is(nw, "combined_networks")) {
+    return(InitErgmTerm.DissE(nw = nw, arglist = a["formula"], response = response, ...))
+  }
 
   f <- a$formula
   ult(f) <- call("Diss1",call("~",ult(f))) # e.g., a~b -> a~Form1(~b)

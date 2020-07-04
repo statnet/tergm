@@ -328,8 +328,8 @@ unset.offset.call <- function(object){
       offset <- TRUE
     }
     
-    if(grepl("^FormE", deparse(subterm[[1]]))) formbit <- TRUE
-    else if(grepl("^DissE", deparse(subterm[[1]]))) dissbit <- TRUE
+    if(grepl("^Form", deparse(subterm[[1]]))) formbit <- TRUE
+    else if(grepl("^Diss", deparse(subterm[[1]]))) dissbit <- TRUE
     else {
       nonsep <- append_rhs.formula(nonsep, structure(list(term), sign=sign))
       next      
