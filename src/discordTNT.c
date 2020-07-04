@@ -61,7 +61,7 @@ MH_P_FN(MH_discordTNT) {
   int nedges = EDGECOUNT(nwp);
   int nddyads = kh_size(dur_inf->discord);
   
-  if(nddyads == 0 || unif_rand() > sto->discordance_fraction) {
+  if(nddyads == 0 || unif_rand() < 1 - sto->discordance_fraction) {
     // propose from network
     if(nedges == 0 || unif_rand() < 0.5) {
       // propose toggling a random dyad
