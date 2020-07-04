@@ -6,6 +6,7 @@
 #include "ergm_unsorted_edgelist.h"
 #include "changestats_lasttoggle.h"
 #include "tergm_model.h"
+#include "ergm_Rutil.h"
 
 
 #define OUTVAL_NET(e,n) ((n)->outedges[(e)].value)
@@ -22,6 +23,8 @@ typedef struct {
   UnsrtEL *discordantEdges;
   UnsrtEL *discordantNonEdges;
   
+  double discordance_fraction;
+  
   int in_discord;
   
 } discordTNTStorage; 
@@ -32,6 +35,8 @@ MH_I_FN(Mi_discordTNT) {
   ALLOC_STORAGE(1, discordTNTStorage, sto);
   sto->discordantEdges = UnsrtELInitialize(0, NULL, NULL, FALSE);
   sto->discordantNonEdges = UnsrtELInitialize(0, NULL, NULL, FALSE);
+
+  sto->discordance_fraction = asReal(getListElement(MHp->R, "discordance_fraction"));  
   // we ignore discord for this initialization (assuming a TICK will precede any proposals)
 }
 
@@ -56,7 +61,7 @@ MH_P_FN(MH_discordTNT) {
   int nedges = EDGECOUNT(nwp);
   int nddyads = kh_size(dur_inf->discord);
   
-  if(nddyads == 0 || unif_rand() < 0.5) {
+  if(nddyads == 0 || unif_rand() > sto->discordance_fraction) {
     // propose from network
     if(nedges == 0 || unif_rand() < 0.5) {
       // propose toggling a random dyad
@@ -101,11 +106,11 @@ MH_P_FN(MH_discordTNT) {
   double forward_network = in_network ? (0.5/nedges + 0.5/ndyads) : (nedges == 0 ? 1.0/ndyads : 0.5/ndyads);
   double backward_network = in_network ? (nedges == 1 ? 1.0/ndyads : 0.5/ndyads) : (0.5/(nedges + 1) + 0.5/ndyads);
   
-  if(nddyads == 0) forward_network *= 2;
-  if(nddyads == 1 && in_discord) backward_network *= 2;
+  if(nddyads == 0) forward_network /= (1 - sto->discordance_fraction);
+  if(nddyads == 1 && in_discord) backward_network /= (1 - sto->discordance_fraction);
   
-  double forward = forward_discord + forward_network;
-  double backward = backward_discord + backward_network;
+  double forward = sto->discordance_fraction*forward_discord + (1 - sto->discordance_fraction)*forward_network;
+  double backward = sto->discordance_fraction*backward_discord + (1 - sto->discordance_fraction)*backward_network;
 
   MHp->logratio = log(backward/forward);
 
@@ -2109,3 +2114,13 @@ MH_F_FN(Mf_discordBDStratTNT) {
   UnsrtELDestroy(sto->transferEL);
   // MHp->storage itself should be Freed by MHProposalDestroy
 }
+
+
+#undef OUTVAL_NET
+#undef INVAL_NET
+#undef MIN_OUTEDGE_NET
+#undef MIN_INEDGE_NET
+#undef NEXT_OUTEDGE_NET
+#undef NEXT_INEDGE_NET
+#undef STEP_THROUGH_OUTEDGES_NET
+#undef STEP_THROUGH_INEDGES_NET
