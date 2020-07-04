@@ -112,7 +112,7 @@ void MCMCDyn_finish_common(Network *nwp,
  Wrapper for a call from R.
 *****************/
 void MCMCDyn_wrapper(// Starting network.
-		     int *tails, int *heads, int *time, int *lasttoggle, int *n_edges,
+		     int *tails, int *heads, int *time, int *lasttoggle_flag, int *lasttoggle, int *n_edges,
 		     int *n_nodes, int *dflag, int *bipartite,
 		     // Formation terms and proposals.
 		     int *F_nterms, char **F_funnames, char **F_sonames, 
@@ -146,7 +146,7 @@ void MCMCDyn_wrapper(// Starting network.
   Model *F_m, *D_m, *M_m;
   MHProposal *F_MH, *D_MH;
 
-  if(*lasttoggle == 0) lasttoggle = NULL;
+  if(!*lasttoggle_flag) lasttoggle = NULL;
 
   Vertex *difftime, *difftail, *diffhead;
   int *diffto;

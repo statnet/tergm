@@ -579,12 +579,15 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
   eta.form <- deInf(state$eta.form)
   eta.diss <- deInf(state$eta.diss)
   
+  lasttoggle_flag <- as.integer(!is.null(NVL(Clist.form$lasttoggle,Clist.diss$lasttoggle,Clist.mon$lasttoggle)))
+  
   repeat{
     z <- .C("MCMCDynSArun_wrapper",
             # Observed/starting network. 
             as.integer(Clist.form$tails), as.integer(Clist.form$heads),
             time = as.integer(min(Clist.form$time,Clist.diss$time,Clist.diss$time)),
-            lasttoggle = as.integer(NVL(Clist.form$lasttoggle,Clist.diss$lasttoggle,Clist.mon$lasttoggle,0)),  
+            lasttoggle_flag,
+            lasttoggle = as.integer(NVL(Clist.form$lasttoggle,Clist.diss$lasttoggle,Clist.mon$lasttoggle)),  
             as.integer(Clist.form$nedges),
             as.integer(Clist.form$n),
             as.integer(Clist.form$dir), as.integer(Clist.form$bipartite),
@@ -642,7 +645,7 @@ stergm.EGMME.SA.Phase2.C <- function(state, model.form, model.diss, model.mon,
 
   newnetwork<-as.network(pending_update_network(state$nw,z))
   newnetwork %n% "time" <- z$time
-  newnetwork %n% "lasttoggle" <- z$lasttoggle
+  newnetwork %n% "lasttoggle" <- if(lasttoggle_flag) z$lasttoggle else NULL
   
   list(nw.diff=z$nw.diff,
        newnetwork=newnetwork,

@@ -266,12 +266,15 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
     maxedges <- Clist$nedges + maxedges.sd*control$GF.init.maxedges.mul
   }
 
+  lasttoggle_flag <- as.integer(!is.null(Clist$lasttoggle))
+
   if(verbose) message("Applying changes...")
   repeat{
     z <- .C("godfather_wrapper",
             as.integer(Clist$tails), as.integer(Clist$heads),
             time = if(is.null(Clist$time)) as.integer(0) else as.integer(Clist$time),
-            lasttoggle = as.integer(NVL(Clist$lasttoggle,0)),             
+            lasttoggle_flag,
+            lasttoggle = as.integer(Clist$lasttoggle),             
             as.integer(Clist$nedges),
             as.integer(Clist$n),
             as.integer(Clist$dir), as.integer(Clist$bipartite),
@@ -307,7 +310,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
     if(verbose) message("Creating new network...")
     newnetwork <- as.network(pending_update_network(nw,z))
     newnetwork %n% "time" <- z$time
-    newnetwork %n% "lasttoggle" <- z$lasttoggle
+    newnetwork %n% "lasttoggle" <- if(lasttoggle_flag) z$lasttoggle else NULL
 
     attr(newnetwork,"stats")<-stats
     newnetwork

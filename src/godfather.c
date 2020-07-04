@@ -20,7 +20,7 @@
  find the changestats that result from starting from an empty network
  and then adding all of the edges to make up an observed network of interest.
 *****************/
-void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *n_edges,
+void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle_flag, int *lasttoggle, int *n_edges,
 		       int *n_nodes, int *directed_flag, int *bipartite, 
 		       int *nterms, char **funnames, char **sonames, double *inputs,
 		       int *total_toggles, int *toggletimes, 
@@ -35,7 +35,7 @@ void godfather_wrapper(int *tails, int *heads, int *time, int *lasttoggle, int *
   Network *nwp;
   Model *m;
 
-  if(*lasttoggle == 0) lasttoggle = NULL;
+  if(!*lasttoggle_flag) lasttoggle = NULL;
 
   MCMCDyn_init_common(tails, heads, *time, lasttoggle, *n_edges,
 		      *n_nodes, *directed_flag, *bipartite, &nwp,
