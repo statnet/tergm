@@ -10,7 +10,8 @@
 #include "changestats_duration.h"
 
 #define CSD_TRANSFORM_ET(et)                    \
-  double ett=0, ett1=1;                        \
+  double ett=0;                                \
+  double ett1=1;                        \
   switch(transform) {                        \
     case 0: ett = et; ett1 = et+1; break;                \
     case 1: ett = log(et); ett1 = log(et+1); break;        \
@@ -31,16 +32,15 @@ X_CHANGESTAT_FN(x_edges_ageinterval_mon){
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
-    for(Edge k=1; k <= N_EDGES; k++){
-      Vertex tail, head;
-      FindithEdge(&tail, &head, k, nwp);
+    EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
       int age = ElapsedTime(tail,head,dur_inf) + 1; // lasttoggle auxiliary has *not* yet been updated via TICK
-      for(unsigned int j=0; j<N_CHANGE_STATS; j++){
-        unsigned int from = INPUT_PARAM[j*2], to = INPUT_PARAM[j*2+1];
+      for(unsigned int j=0; j<N_CHANGE_STATS; j++) {
+        unsigned int from = INPUT_PARAM[j*2];
+        unsigned int to = INPUT_PARAM[j*2+1];
         if(age+1 == from) CHANGE_STAT[j]++; // The tie "ages" into the interval.
         if(to!=0 && age+1 == to) CHANGE_STAT[j]--; // The tie "ages" out of the interval.
-      }
-    }
+      }        
+    });    
   }
 }
 
@@ -64,15 +64,14 @@ S_CHANGESTAT_FN(s_edges_ageinterval_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   ZERO_ALL_CHANGESTATS(i);
-  for (Edge k=1; k <= N_EDGES; k++){
-    Vertex tail, head;
-    FindithEdge(&tail, &head, k, nwp);
+  EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
     int age = ElapsedTime(tail,head,dur_inf) + 1;
     for(unsigned int j=0; j<N_CHANGE_STATS; j++){
-      unsigned int from = INPUT_PARAM[j*2], to = INPUT_PARAM[j*2+1];
+      unsigned int from = INPUT_PARAM[j*2];
+      unsigned int to = INPUT_PARAM[j*2+1];
       if(from<=age && (to==0 || age<to)) CHANGE_STAT[j]++;
     }
-  }
+  });
 }
 
 /*****************
@@ -102,12 +101,10 @@ S_CHANGESTAT_FN(s_edge_ages_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   CHANGE_STAT[0] = 0;
-  for (Edge k=1; k <= N_EDGES; k++){
-    Vertex tail, head;
-    FindithEdge(&tail, &head, k, nwp);
+  EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
     int age = ElapsedTime(tail,head,dur_inf) + 1;
     CHANGE_STAT[0] += age;
-  }
+  });
 }
 
 /*****************
@@ -128,12 +125,10 @@ X_CHANGESTAT_FN(x_edgecov_ages_mon){
     }
     
     // Sum of weights.
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex tail, head;
-      FindithEdge(&tail, &head, k, nwp);
+    EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
       double val = INPUT_ATTRIB[(head-1-noffset)*nrow+(tail-1)];
       CHANGE_STAT[0] += val;
-    }
+    });
   }
 }
 
@@ -166,13 +161,11 @@ S_CHANGESTAT_FN(s_edgecov_ages_mon){
   }
 
   CHANGE_STAT[0] = 0;
-  for (Edge k=1; k <= N_EDGES; k++){
-    Vertex tail, head;
-    FindithEdge(&tail, &head, k, nwp);
+  EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
     double val = INPUT_ATTRIB[(head-1-noffset)*nrow+(tail-1)];
     int age = ElapsedTime(tail,head,dur_inf) + 1;
     CHANGE_STAT[0] += age*val;
-  }
+  });
 }
 
 /*****************
@@ -189,13 +182,11 @@ I_CHANGESTAT_FN(i_mean_age_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
   int transform = INPUT_PARAM[1];
   
-  for(Edge k=1; k <= N_EDGES; k++){
-    Vertex tail, head;
-    FindithEdge(&tail, &head, k, nwp);
+  EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
     int et = ElapsedTime(tail,head,dur_inf);
     CSD_TRANSFORM_ET(et);
     sto[0] += ett1;
-  }
+  });
 }
 
 X_CHANGESTAT_FN(x_mean_age_mon){
@@ -213,13 +204,11 @@ X_CHANGESTAT_FN(x_mean_age_mon){
     } else {
       double oldval = sto[0];
       sto[0] = 0;
-      for(Edge k=1; k <= N_EDGES; k++){
-        Vertex tail, head;
-        FindithEdge(&tail, &head, k, nwp);
+      EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
         int et = ElapsedTime(tail,head,dur_inf) + 1;
         CSD_TRANSFORM_ET(et);
         sto[0] += ett1;
-      }
+      });
       CHANGE_STAT[0] = N_EDGES ? (sto[0] - oldval)/N_EDGES : 0;
     }
   }
@@ -259,13 +248,11 @@ S_CHANGESTAT_FN(s_mean_age_mon){
   int transform = INPUT_PARAM[1]; // Transformation code.
 
   if(N_EDGES>0){
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex tail, head;
-      FindithEdge(&tail, &head, k, nwp);
+    EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
       int et = ElapsedTime(tail,head,dur_inf);
       CSD_TRANSFORM_ET(et);
       CHANGE_STAT[0] += ett1;
-    }
+    });
     
     CHANGE_STAT[0] /= N_EDGES;
   }else{
@@ -293,9 +280,7 @@ I_CHANGESTAT_FN(i_edgecov_mean_age_mon) {
     nrow = INPUT_PARAM[2];
   }
   
-  for(Edge k=1; k <= N_EDGES; k++){
-    Vertex tail, head;
-    FindithEdge(&tail, &head, k, nwp);
+  EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
     double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];   
     if(val!=0){   
       int et = ElapsedTime(tail,head,dur_inf);
@@ -303,7 +288,7 @@ I_CHANGESTAT_FN(i_edgecov_mean_age_mon) {
       sto[0] += ett1*val;
       sto[1] += val;
     }
-  }
+  });
 }
 
 X_CHANGESTAT_FN(x_edgecov_mean_age_mon) {
@@ -329,16 +314,14 @@ X_CHANGESTAT_FN(x_edgecov_mean_age_mon) {
       } else {
         double oldval = sto[0];
         sto[0] = 0;
-        for(Edge k=1; k <= N_EDGES; k++) {
-          Vertex tail, head;
-          FindithEdge(&tail, &head, k, nwp);
+        EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
           double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];   
           if(val!=0) {
             int et = ElapsedTime(tail,head,dur_inf) + 1;
             CSD_TRANSFORM_ET(et);
             sto[0] += ett1*val;
           }
-        }
+        });
         CHANGE_STAT[0] = (sto[0] - oldval)/sto[1];
       }
     }
@@ -402,9 +385,7 @@ S_CHANGESTAT_FN(s_edgecov_mean_age_mon){
     nrow = INPUT_PARAM[2];
   }
 
-  for (Edge k=1; k <= N_EDGES; k++){
-    Vertex tail, head;
-    FindithEdge(&tail, &head, k, nwp);
+  EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
     double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];
     if(val!=0){
       int et = ElapsedTime(tail,head,dur_inf);    
@@ -412,7 +393,7 @@ S_CHANGESTAT_FN(s_edgecov_mean_age_mon){
       s += ett1 * val;
       e += val;
     }
-  }
+  });
    
   if(e!=0){
     CHANGE_STAT[0] = s/e;
@@ -452,10 +433,7 @@ I_CHANGESTAT_FN(i_degree_mean_age_mon){
   
     Vertex deg = INPUT_PARAM[j+2];
       
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex tail, head;
-      FindithEdge(&tail, &head, k, nwp);
-        
+    EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
       unsigned int w = (od[tail]+id[tail]==deg) + (od[head]+id[head]==deg);
         
       if(w){
@@ -464,7 +442,7 @@ I_CHANGESTAT_FN(i_degree_mean_age_mon){
         s0 += ett1*w;
         e0+=w;
       }
-    }
+    });
     
     age[j] = s0;
     count[j] = e0;
@@ -499,10 +477,7 @@ X_CHANGESTAT_FN(x_degree_mean_age_mon){
       
         Vertex deg = INPUT_PARAM[j+2];
         
-        for (Edge k=1; k <= N_EDGES; k++){
-          Vertex tail, head;
-          FindithEdge(&tail, &head, k, nwp);
-          
+        EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
           unsigned int w = (od[tail]+id[tail]==deg) + (od[head]+id[head]==deg);
           
           if(w){
@@ -512,7 +487,7 @@ X_CHANGESTAT_FN(x_degree_mean_age_mon){
             s1 += ett1*w;
             e0+=w;
           }
-        }      
+        });      
       }
       
       CHANGE_STAT[j]=(e0==0?zeroval:s1/e0)-(e0==0?zeroval:s0/e0);
@@ -688,10 +663,7 @@ S_CHANGESTAT_FN(s_degree_mean_age_mon){
     Vertex deg = INPUT_PARAM[j+2];
     Edge e=0;
 
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex tail, head;
-      FindithEdge(&tail, &head, k, nwp);
-      
+    EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
       unsigned int w = (od[tail]+id[tail]==deg ? 1:0) + (od[head]+id[head]==deg ? 1:0);
       
       if(w){
@@ -700,7 +672,7 @@ S_CHANGESTAT_FN(s_degree_mean_age_mon){
         CHANGE_STAT[j] += ett1*w;
         e+=w;
       }
-    }
+    });
     
     if(e) CHANGE_STAT[j] /= e;
     else CHANGE_STAT[j] = zeroval;
@@ -739,11 +711,9 @@ I_CHANGESTAT_FN(i_degree_by_attr_mean_age_mon){
     Vertex deg = INPUT_PARAM[2*j+2];
     int testattr = INPUT_PARAM[2*j+3];
       
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex tail, head;
-      FindithEdge(&tail, &head, k, nwp);
-        
-      Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
+    EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
+      Vertex taildeg = od[tail]+id[tail];
+      Vertex headdeg = od[head]+id[head];
       int tailattr = INPUT_PARAM[2*N_CHANGE_STATS + tail + 1]; 
       int headattr = INPUT_PARAM[2*N_CHANGE_STATS + head + 1]; 
   
@@ -756,7 +726,7 @@ I_CHANGESTAT_FN(i_degree_by_attr_mean_age_mon){
         s0 += ett1*w;
         e0+=w;
       }
-    }
+    });
     
     age[j] = s0;
     count[j] = e0;
@@ -792,11 +762,9 @@ X_CHANGESTAT_FN(x_degree_by_attr_mean_age_mon){
         Vertex deg = INPUT_PARAM[2*j+2];
         int testattr = INPUT_PARAM[2*j+3];
         
-        for (Edge k=1; k <= N_EDGES; k++){
-          Vertex tail, head;
-          FindithEdge(&tail, &head, k, nwp);
-          
-          Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
+        EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
+          Vertex taildeg = od[tail]+id[tail];
+          Vertex headdeg = od[head]+id[head];
           int tailattr = INPUT_PARAM[2*N_CHANGE_STATS + tail + 1]; 
           int headattr = INPUT_PARAM[2*N_CHANGE_STATS + head + 1]; 
   
@@ -810,7 +778,7 @@ X_CHANGESTAT_FN(x_degree_by_attr_mean_age_mon){
             s1 += ett1*w;
             e0+=w;
           }
-        }      
+        });      
       }
       
       CHANGE_STAT[j]=(e0==0?zeroval:s1/e0)-(e0==0?zeroval:s0/e0);
@@ -994,10 +962,9 @@ S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon){
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
     Edge e=0;
 
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex tail, head;
-      FindithEdge(&tail, &head, k, nwp);
-      Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
+    EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
+      Vertex taildeg = od[tail]+id[tail];
+      Vertex headdeg = od[head]+id[head];
       int tailattr = INPUT_PARAM[2*N_CHANGE_STATS + tail + 1]; 
       int headattr = INPUT_PARAM[2*N_CHANGE_STATS + head + 1]; 
     
@@ -1013,7 +980,7 @@ S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon){
         CHANGE_STAT[j] += ett1*w;
         e+=w;
       }
-    }
+    });
     
     if(e) CHANGE_STAT[j] /= e;
     else CHANGE_STAT[j] = zeroval;
@@ -1056,10 +1023,7 @@ I_CHANGESTAT_FN(i_degrange_mean_age_mon){
   
     Vertex from = INPUT_PARAM[j*2+2], to = INPUT_PARAM[j*2+3];
       
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex tail, head;
-      FindithEdge(&tail, &head, k, nwp);
-        
+    EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
       unsigned int w = FROM_TO(od[tail]+id[tail],from,to) + FROM_TO(od[head]+id[head],from,to);
         
       if(w){
@@ -1068,7 +1032,7 @@ I_CHANGESTAT_FN(i_degrange_mean_age_mon){
         s0 += ett1*w;
         e0+=w;
       }
-    }
+    });
     
     age[j] = s0;
     count[j] = e0;
@@ -1103,10 +1067,7 @@ X_CHANGESTAT_FN(x_degrange_mean_age_mon){
       
         Vertex from = INPUT_PARAM[j*2+2], to = INPUT_PARAM[j*2+3];        
         
-        for (Edge k=1; k <= N_EDGES; k++){
-          Vertex tail, head;
-          FindithEdge(&tail, &head, k, nwp);
-  
+        EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
           unsigned int w = FROM_TO(od[tail]+id[tail],from,to) + FROM_TO(od[head]+id[head],from,to);
           
           if(w){
@@ -1116,7 +1077,7 @@ X_CHANGESTAT_FN(x_degrange_mean_age_mon){
             s1 += ett1*w;
             e0+=w;
           }
-        }      
+        });      
       }
       
       CHANGE_STAT[j]=(e0==0?zeroval:s1/e0)-(e0==0?zeroval:s0/e0);
@@ -1312,10 +1273,7 @@ S_CHANGESTAT_FN(s_degrange_mean_age_mon){
     Vertex from = INPUT_PARAM[j*2+2], to = INPUT_PARAM[j*2+3];
     Edge e=0;
 
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex tail, head;
-      FindithEdge(&tail, &head, k, nwp);
-      
+    EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
       unsigned int w = FROM_TO(od[tail]+id[tail],from,to) + FROM_TO(od[head]+id[head],from,to);
       
       if(w){
@@ -1324,7 +1282,7 @@ S_CHANGESTAT_FN(s_degrange_mean_age_mon){
         CHANGE_STAT[j] += ett1*w;
         e+=w;
       }
-    }
+    });
     
     if(e) CHANGE_STAT[j] /= e;
     else CHANGE_STAT[j] = zeroval;
@@ -1365,11 +1323,9 @@ I_CHANGESTAT_FN(i_degrange_by_attr_mean_age_mon){
     int testattr = INPUT_PARAM[3*j+4];
 
       
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex tail, head;
-      FindithEdge(&tail, &head, k, nwp);
-        
-      Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
+    EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
+      Vertex taildeg = od[tail]+id[tail];
+      Vertex headdeg = od[head]+id[head];
       int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail + 1]; 
       int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head + 1]; 
    
@@ -1382,7 +1338,7 @@ I_CHANGESTAT_FN(i_degrange_by_attr_mean_age_mon){
         s0 += ett1*w;
         e0+=w;
       }
-    }
+    });
     
     age[j] = s0;
     count[j] = e0;
@@ -1418,11 +1374,9 @@ X_CHANGESTAT_FN(x_degrange_by_attr_mean_age_mon){
         Vertex from = INPUT_PARAM[3*j+2], to = INPUT_PARAM[3*j+3];
         int testattr = INPUT_PARAM[3*j+4];
         
-        for (Edge k=1; k <= N_EDGES; k++){
-          Vertex tail, head;
-          FindithEdge(&tail, &head, k, nwp);
-  
-          Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
+        EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
+          Vertex taildeg = od[tail]+id[tail];
+          Vertex headdeg = od[head]+id[head];
           int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail + 1]; 
           int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head + 1]; 
    
@@ -1436,7 +1390,7 @@ X_CHANGESTAT_FN(x_degrange_by_attr_mean_age_mon){
             s1 += ett1*w;
             e0+=w;
           }
-        }      
+        });      
       }
       
       CHANGE_STAT[j]=(e0==0?zeroval:s1/e0)-(e0==0?zeroval:s0/e0);
@@ -1644,14 +1598,14 @@ S_CHANGESTAT_FN(s_degrange_by_attr_mean_age_mon){
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
     Edge e=0;
 
-    for (Edge k=1; k <= N_EDGES; k++){
-      Vertex tail, head;
-      FindithEdge(&tail, &head, k, nwp);
-      Vertex taildeg = od[tail]+id[tail], headdeg = od[head]+id[head];
+    EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
+      Vertex taildeg = od[tail]+id[tail];
+      Vertex headdeg = od[head]+id[head];
       int tailattr = INPUT_PARAM[3*N_CHANGE_STATS + tail + 1]; 
       int headattr = INPUT_PARAM[3*N_CHANGE_STATS + head + 1]; 
     
-      Vertex from = INPUT_PARAM[3*j+2], to = INPUT_PARAM[3*j+3];
+      Vertex from = INPUT_PARAM[3*j+2];
+      Vertex to = INPUT_PARAM[3*j+3];
       int testattr = INPUT_PARAM[3*j+4];
 
       unsigned int w = (FROM_TO(taildeg, from, to) && tailattr==testattr) +
@@ -1663,7 +1617,7 @@ S_CHANGESTAT_FN(s_degrange_by_attr_mean_age_mon){
         CHANGE_STAT[j] += ett1*w;
         e+=w;
       }
-    }
+    });
     
     if(e) CHANGE_STAT[j] /= e;
     else CHANGE_STAT[j] = zeroval;
