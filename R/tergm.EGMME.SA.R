@@ -25,7 +25,8 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
     control$SA.plot.progress <- FALSE # So that we don't print a warning every step.
   }
   
-  if(verbose) cat("Starting optimization with with coef_0 = (",theta0, ").\n")
+  if(verbose) message("Starting optimization with with coef_0 = ( ", paste(theta0, collapse = " "), " ).")
+
   ###### Define the optimization run function. ######
   
   do.optimization<-function(states, history, control){
@@ -34,20 +35,20 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
     oh.all <- history$oh.all
     jitters.all <- history$jitters.all
     
-    if(verbose) cat("Running stochastic optimization... ")
+    if(verbose) message("Running stochastic optimization... ", appendLF = FALSE)
     zs <- if(!is.null(ergm.getCluster(control))){
       requireNamespace('parallel')
       # Conveniently, the first argument of tergm.EGMME.SA.Phase2.C
       # is the state of the optimization, so giving clusterApply a
       # list of states will call it for each thread's state.
-      if(verbose) {cat("Calling tergm.EGMME.SA.Phase2.C:\n"); print(gc())}
+      if(verbose) {message("Calling tergm.EGMME.SA.Phase2.C:"); message_print(gc())}
       out <- parallel::clusterApply(ergm.getCluster(control), states, tergm.EGMME.SA.Phase2.C, model, model.mon, proposal, control, verbose=verbose)
-      if(verbose) print(gc())
+      if(verbose) message_print(gc())
       out
     }else{
       list(tergm.EGMME.SA.Phase2.C(states[[1]], model, model.mon, proposal, control, verbose=verbose))
     }
-    if(verbose) cat("Finished. Extracting.\n")
+    if(verbose) message("Finished. Extracting.")
     for(i in seq_along(states)){
 
       # Extend the observation index and thread id vectors.
@@ -200,7 +201,7 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
                         simplify=FALSE
                         )
     
-    cat('========  Phase 1: Burn in, get initial gradient values, and find a configuration under which all targets vary. ========\n',sep="")
+    message('========  Phase 1: Burn in, get initial gradient values, and find a configuration under which all targets vary. ========')
     
     ###### Set up and run the burn-in. ######
 
@@ -210,19 +211,19 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
     control.phase1$time.burnin <- control$SA.burnin
     control.phase1$time.interval <- 1
     
-    cat("Burning in... ")
+    message("Burning in... ", appendLF = FALSE)
     
     zs <- if(!is.null(ergm.getCluster(control))){
       requireNamespace('parallel')
-      if(verbose) {cat("Calling tergm_MCMC_sample:\n"); print(gc())}
+      if(verbose) {message("Calling tergm_MCMC_sample:"); message_print(gc())}
       out <- parallel::clusterApply(ergm.getCluster(control), seq_along(states), function(i) tergm_MCMC_sample(states[[i]]$nw, model, model.mon, proposal, eta=states[[i]]$eta, control=control.phase1, verbose=verbose))
-      if(verbose) print(gc())
+      if(verbose) message_print(gc())
       out
     }else{
       list(tergm_MCMC_sample(states[[1]]$nw, model, model.mon, proposal, eta=states[[1]]$eta, control=control.phase1, verbose=verbose))
     }
     
-    cat("Done.\n")
+    message("Done.")
     
     # Update the state with burn-in results.
     for(i in seq_along(zs)){
@@ -254,15 +255,15 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
     control$SA.burnin <- control$SA.interval <- 10 # TODO: Kirk : check this
   
     if(verbose>1){
-      cat("New interval:",control$SA.interval ,"\n")
+      message("New interval: ", control$SA.interval)
     }  
     
     for(try in 1:control$SA.phase1.tries){
-      if(verbose) cat('======== Attempt ',try,' ========\n',sep="") else cat('Attempt',try,':\n')
+      if(verbose) message('======== Attempt ', try, ' ========') else message('Attempt ', try,' :')
       for(run in 1:control$SA.phase1.minruns){
         tmp <- if(control$SA.restart.on.err) try(do.optimization(states, history, control), silent=!verbose) else do.optimization(states, history, control)
         if(inherits(tmp, "try-error") || all(apply(tmp$history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
-          cat("Something went very wrong. Restarting with smaller gain.\n")
+          message("Something went very wrong. Restarting with smaller gain.")
           control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
           do.restart <- TRUE
           break
@@ -278,7 +279,7 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
       control$gain <- control$SA.init.gain
       out <- if(control$SA.restart.on.err) try(eval.optpars(states, history, control, TRUE,restart>1,FALSE), silent=!verbose) else eval.optpars(states, history, control, TRUE,restart>1,FALSE)
       if(inherits(out, "try-error") || all(apply(history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
-        cat("Something went very wrong. Restarting with smaller gain.\n")
+        message("Something went very wrong. Restarting with smaller gain.")
         control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
         do.restart <- TRUE
         break
@@ -286,7 +287,7 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
       control <- out$control
 
       if(all(!out$ineffectual.pars) && all(!out$bad.fits)){
-        cat("All parameters have some effect and all statistics are moving. Proceeding to Phase 2.\n")
+        message("All parameters have some effect and all statistics are moving. Proceeding to Phase 2.")
         break
       }
       if(try==control$SA.phase1.tries) stop("The optimizer was unable to find a reasonable configuration: one or more statistics are still stuck after multiple tries, and one or more parameters do not appear to have any robust effect.")
@@ -295,10 +296,10 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
     
     ###### Main optimization run. ######
     
-    cat('========  Phase 2: Find and refine the estimate. ========\n',sep="")
+    message('========  Phase 2: Find and refine the estimate. ========')
     
     for(subphase in 1:control$SA.phase2.levels.max){
-      if(verbose) cat('======== Subphase ',subphase,' ========\n',sep="") else cat('Subphase 2.',subphase,' ',sep="")
+      if(verbose) message('======== Subphase ', subphase, ' ========') else message('Subphase 2.', subphase, ' ', appendLF=FALSE)
       
       control$gain <- control$SA.init.gain*control$SA.gain.decay^(subphase-1)
       stepdown.count <- control$SA.stepdown.ct
@@ -306,7 +307,7 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
       for(regain in 1:control$SA.phase2.repeats){
         tmp <- if(control$SA.restart.on.err) try(do.optimization(states, history, control), silent=!verbose) else do.optimization(states, history, control)
         if(inherits(tmp, "try-error") || all(apply(tmp$history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
-          cat("Something went very wrong. Restarting with smaller gain.\n")
+          message("Something went very wrong. Restarting with smaller gain.")
           control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
           do.restart <- TRUE
           break
@@ -317,14 +318,14 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
         }
         
         if(verbose){
-          cat("New parameters:\n")
-          for(state in states) print(state$eta)
+          message("New parameters:")
+          for(state in states) message_print(state$eta)
         }
 
         ## Get updated gain and other values
         out <- if(control$SA.restart.on.err) try(eval.optpars(states, history, control, FALSE,TRUE,TRUE), silent=!verbose) else eval.optpars(states, history, control, FALSE,TRUE,TRUE)
         if(inherits(out, "try-error") || all(apply(history$oh.last[,-(1:p),drop=FALSE],2,var)<sqrt(.Machine$double.eps))){
-          cat("Something went very wrong. Restarting with smaller gain.\n")
+          message("Something went very wrong. Restarting with smaller gain.")
           control$SA.init.gain <- control$SA.init.gain * control$SA.gain.decay
           do.restart <- TRUE
           break
@@ -359,7 +360,7 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
           if(est.2>0) p.val.2 <- 1-p.val.2 # If it's actually getting worse one-sided p-value is thus.
           
           if(verbose){
-            cat("Estimating equations = 0 p-value:",p.val.1,", trending:", p.val.2, ".\n")
+            message("Estimating equations = 0 p-value: ", p.val.1, " , trending: ", p.val.2, " .")
           }
 
           p.vals <- c(p.val.1,p.val.2)
@@ -372,23 +373,23 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
           if(fisher.pval(p.vals)>control$SA.stepdown.p){
             stepdown.count <- stepdown.count - 1
             if(stepdown.count<=0){
-              if(verbose) cat("Estimating equations do not significantly differ from 0 and neither they nor the parameters exhibit a significant trend. Reducing gain.\n")
-              else cat("\\")
+              if(verbose) message("Estimating equations do not significantly differ from 0 and neither they nor the parameters exhibit a significant trend. Reducing gain.")
+              else message("\\", appendLF = FALSE)
               stepdown.count <- control$SA.stepdown.ct
-              if(!verbose) cat("\n")
+              if(!verbose) message("")
               break
             }else{
-              if(verbose) cat("Estimating equations do not significantly differ from 0 and do not exhibit a significant trend. ",stepdown.count,"/",control$SA.stepdown.ct," to go.\n")
-              else cat("\\")
+              if(verbose) message("Estimating equations do not significantly differ from 0 and do not exhibit a significant trend.  ", stepdown.count, " / ", control$SA.stepdown.ct, "  to go.")
+              else message("\\", appendLF = FALSE)
             }
           }else{
             stepdown.count <- control$SA.stepdown.ct
-            if(verbose) cat("Estimating equations significantly differ from 0 or exhibit a significant trend. Resetting counter.\n")
-            else cat("/")
+            if(verbose) message("Estimating equations significantly differ from 0 or exhibit a significant trend. Resetting counter.")
+            else message("/", appendLF = FALSE)
           }
         }else{
-          if(verbose) cat("Problem testing estimating equations. Continuing with current gain.\n")
-          else cat("!/")
+          if(verbose) message("Problem testing estimating equations. Continuing with current gain.")
+          else message("!/", appendLF = FALSE)
 
         }
         if(do.restart) break
@@ -417,12 +418,12 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
       sandwich.se <- sqrt(diag(V.sandwich(out$w,out$G,out$v)))
 
       if(verbose){
-        cat("Approximate standard error of the estimate:\n")
-        print(sandwich.se)        
-        cat("Approximate standard error of window means:\n")
-        print(par.se)
-        cat("par. var. / (std. var. + par. var.):\n")
-        print(par.se^2/(sandwich.se^2+par.se^2))
+        message("Approximate standard error of the estimate:")
+        message_print(sandwich.se)        
+        message("Approximate standard error of window means:")
+        message_print(par.se)
+        message("par. var. / (std. var. + par. var.):")
+        message_print(par.se^2/(sandwich.se^2+par.se^2))
       }
       
       # Test 2:
@@ -444,18 +445,18 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
       chi2 <- mahalanobis(c(nlin.coef),0,ginv(nlin.vcov),inverted=TRUE)
 
       p.val.1 <- pchisq(chi2, length(nlin.coef), lower.tail=FALSE)
-      if(verbose) cat("Local nonlinearity p-value:",p.val.1,"\n")
+      if(verbose) message("Local nonlinearity p-value: ", p.val.1)
 
       if(subphase == control$SA.phase2.levels.max){
-        if(verbose) cat("Maximum number of gain levels exceeded. Stopping.")
+        if(verbose) message("Maximum number of gain levels exceeded. Stopping.", appendLF = FALSE)
       }else{
         if(all(par.se^2/(sandwich.se^2+par.se^2) > control$SA.phase2.max.mc.se)){
-          if(verbose) cat("EGMME does not appear to be estimated with sufficient prescision. Continuing.\n")
+          if(verbose) message("EGMME does not appear to be estimated with sufficient prescision. Continuing.")
           next
         }
         
         if(p.val.1 < control$SA.stop.p){
-          if(verbose) cat("There is evidence of local nonlinearity. Continuing.\n")
+          if(verbose) message("There is evidence of local nonlinearity. Continuing.")
           next
         }
       }
@@ -474,8 +475,8 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
       if(p.free) eta[!model$etamap$offsettheta] <- eta[seq_len(p.free)]
       
       if(verbose){
-        cat("Refining the estimate using the", control$SA.refine,"method. New estimate:\n")
-        print(eta)
+        message("Refining the estimate using the ", control$SA.refine, " method. New estimate:")
+        message_print(eta)
       }
       
       ## Sample to estimate standard error and test if we've actually arrived.
@@ -483,14 +484,15 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
       w <- out$w
       V.par<-matrix(NA,p,p)
       if(control$SA.se){
-        cat('========  Phase 3: Simulate from the fit and estimate standard errors. ========\n',sep="")
+        message('========  Phase 3: Simulate from the fit and estimate standard errors. ========')
         
-        if(verbose)cat("Evaluating target statistics at the estimate.\n")
+        if(verbose) message("Evaluating target statistics at the estimate.")
 
         # This is to avoid the latest sample "pushing out" everything else.
         control$SA.keep.min <- round(nrow(history$oh)/length(states))+control$SA.phase3.samplesize.runs*control$SA.runlength*control$SA.interval
         tmp <- do.dummy.run(states, history, control, control$SA.burnin, control$SA.phase3.samplesize.runs*control$SA.runlength*control$SA.interval, eta=eta)
-        if(verbose)cat("Finished.\n")
+        if(verbose) message("Finished.")
+
         states <- tmp$states
         history <- tmp$history
         rm(tmp); gc()
@@ -503,16 +505,16 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
         ee <- sm.mon %*% ginv(V.stat) %*% G
         p.val.1 <- approx.hotelling.diff.test(ee)$p.value
 
-        if(verbose) cat("Estimating equation = 0 p-value:",p.val.1,"\n")
+        if(verbose) message("Estimating equation = 0 p-value: ", p.val.1)
 
         if(subphase == control$SA.phase2.levels.max){
-          if(verbose) cat("Maximum number of gain levels exceeded. Stopping.")
+          if(verbose) message("Maximum number of gain levels exceeded. Stopping.", appendLF=FALSE)
         }else{
           if(p.val.1 < control$SA.stop.p){
-            if(verbose) cat("Simulated values of estimating equations are not centered around 0. Continuing.\n")
+            if(verbose) message("Simulated values of estimating equations are not centered around 0. Continuing.")
             next
           }else{
-            if(verbose) cat("Simulated values of estimating equations are centered around 0. Stopping.\n")          
+            if(verbose) message("Simulated values of estimating equations are centered around 0. Stopping.")          
           }
         }
         
