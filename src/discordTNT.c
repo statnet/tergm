@@ -99,18 +99,14 @@ MH_P_FN(MH_discordTNT) {
   
   Dyad ndyads = DYADCOUNT(nwp);
   
-  // these ignore overall factor of 1/2 which cancels out in ratio
   double forward_discord = in_discord ? 1.0/nddyads : 0;
   double backward_discord = in_discord ? 0 : 1.0/(1 + nddyads);
   
   double forward_network = in_network ? (0.5/nedges + 0.5/ndyads) : (nedges == 0 ? 1.0/ndyads : 0.5/ndyads);
   double backward_network = in_network ? (nedges == 1 ? 1.0/ndyads : 0.5/ndyads) : (0.5/(nedges + 1) + 0.5/ndyads);
-  
-  if(nddyads == 0) forward_network /= (1 - sto->discordance_fraction);
-  if(nddyads == 1 && in_discord) backward_network /= (1 - sto->discordance_fraction);
-  
-  double forward = sto->discordance_fraction*forward_discord + (1 - sto->discordance_fraction)*forward_network;
-  double backward = sto->discordance_fraction*backward_discord + (1 - sto->discordance_fraction)*backward_network;
+    
+  double forward = (nddyads == 0) ? forward_network : (sto->discordance_fraction*forward_discord + (1 - sto->discordance_fraction)*forward_network);
+  double backward = (nddyads == 1 && in_discord) ? backward_network : (sto->discordance_fraction*backward_discord + (1 - sto->discordance_fraction)*backward_network);
 
   MHp->logratio = log(backward/forward);
 
