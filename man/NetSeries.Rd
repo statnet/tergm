@@ -22,7 +22,7 @@ are be imputed when using conditional estimation. See argument
 \code{imputers} of \code{\link{impute.network.list}} for details.}
 }
 \value{
-A combined network object.
+A network object with temporal metadata.
 }
 \description{
 A function for specifying the LHS of a temporal network series ERGM.

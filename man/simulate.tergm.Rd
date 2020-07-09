@@ -297,15 +297,15 @@ sim1 <- simulate(samplk12, nw.start="last")
 
 # equivalent simulation from formula with network LHS;
 # must pass dynamic=TRUE for tergm simulation
-sim2 <- simulate(samplk2 ~ FormE(~edges+mutual+transitiveties+cyclicalties) +
-                           DissE(~edges+mutual+transitiveties+cyclicalties),
+sim2 <- simulate(samplk2 ~ Form(~edges+mutual+transitiveties+cyclicalties) +
+                           Diss(~edges+mutual+transitiveties+cyclicalties),
                            coef = samplk12$coef,
                            dynamic=TRUE)
 
 # the default simulate output is a networkDynamic, and we can simulate
 # with a networkDynamic LHS as well
-sim3 <- simulate(sim2 ~ FormE(~edges+mutual+transitiveties+cyclicalties) +
-                        DissE(~edges+mutual+transitiveties+cyclicalties),
+sim3 <- simulate(sim2 ~ Form(~edges+mutual+transitiveties+cyclicalties) +
+                        Diss(~edges+mutual+transitiveties+cyclicalties),
                         coef = samplk12$coef,
                         dynamic=TRUE)
 

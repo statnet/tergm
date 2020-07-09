@@ -140,7 +140,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
   state <- ergm_state(nw, model=m)
   m$obs <- summary(m, nw)
 
-  if(verbose) cat("Applying changes...\n")
+  if(verbose) message("Applying changes...")
 
   z <- .Call("godfather_wrapper",
              state,
@@ -164,7 +164,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
   stats <- mcmc(stats, start=if(stats.start) start else start+1)
   
   if(end.network){ 
-    if(verbose) cat("Creating new network...\n")
+    if(verbose) message("Creating new network...")
     newnetwork <- as.network(z$state)
     attr(newnetwork,"stats")<-stats
     newnetwork

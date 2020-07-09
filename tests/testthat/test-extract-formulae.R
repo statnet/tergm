@@ -12,29 +12,29 @@ context("test-extract-formulae.R")
 
 test_that(".extract.fd.formulae behaves reasonably", {
   
-  F1 <- ~FormE(~edges) + DissE(~edges)
+  F1 <- ~Form(~edges) + Diss(~edges)
   
-  F2 <- ~FormE(~edges + gwesp(0,fixed=TRUE)) + DissE(~edges)
+  F2 <- ~Form(~edges + gwesp(0,fixed=TRUE)) + Diss(~edges)
   
-  F3 <- ~FormE(~edges + gwesp(0,fixed=TRUE)) + DissE(~edges) + edges
+  F3 <- ~Form(~edges + gwesp(0,fixed=TRUE)) + Diss(~edges) + edges
   
   X <- ~edges
   
-  F4 <- ~FormE(X) + DissE(X)
+  F4 <- ~Form(X) + Diss(X)
   
-  F5 <- ~FormE(~offset(edges) + gwesp(0,fixed=TRUE)) + offset(DissE(~edges))
+  F5 <- ~Form(~offset(edges) + gwesp(0,fixed=TRUE)) + offset(Diss(~edges))
   
-  F6 <- ~offset(FormE(X)) - DissE(~edges)
+  F6 <- ~offset(Form(X)) - Diss(~edges)
   
   Y <- ~offset(edges)
   
-  F7 <- ~offset(FormE(Y)) - DissE(Y)
+  F7 <- ~offset(Form(Y)) - Diss(Y)
   
-  F8 <- ~-FormE(~edges - triangle) + DissE(~edges) + DissE(~triangle) + offset(DissE(~-triangle))
+  F8 <- ~-Form(~edges - triangle) + Diss(~edges) + Diss(~triangle) + offset(Diss(~-triangle))
   
-  F9 <- ~-offset(FormE(~edges - triangle + offset(gwesp(0,fixed=TRUE)))) + DissE(~edges)
+  F9 <- ~-offset(Form(~edges - triangle + offset(gwesp(0,fixed=TRUE)))) + Diss(~edges)
   
-  F10 <- ~-FormE(~-edges + triangle) + FormE(~-gwesp(0,fixed=TRUE)) - DissE(~-edges) + DissE(~triangle) + DissE(~-gwesp(0,fixed=TRUE))
+  F10 <- ~-Form(~-edges + triangle) + Form(~-gwesp(0,fixed=TRUE)) - Diss(~-edges) + Diss(~triangle) + Diss(~-gwesp(0,fixed=TRUE))
   
   R1 <- .extract.fd.formulae(F1)
   expect_identical(~edges, R1$form)

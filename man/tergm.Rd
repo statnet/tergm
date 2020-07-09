@@ -160,7 +160,7 @@ g0<-network.initialize(n,dir=FALSE)
 #                     edges, degree(1), mean.age
 target.stats<-c(      n*1/2,    n*0.6,        20)
 
-dynfit<-tergm(g0 ~ FormE(~edges + degree(1)) + DissE(~edges),
+dynfit<-tergm(g0 ~ Form(~edges + degree(1)) + Diss(~edges),
                targets = ~edges+degree(1)+mean.age,
                target.stats=target.stats, estimate="EGMME",
                control=control.tergm(SA.plot.progress=TRUE))

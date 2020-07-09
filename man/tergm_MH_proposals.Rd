@@ -40,9 +40,10 @@
       \item{\code{InitErgmProposal.discordTNT}} {
       
         A temporal version of \code{\link[ergm:ergm-proposals]{TNT}}, with approximately
-        50\% of proposed toggles being made on the set of discordant dyads,
-        and approximately 50\% of proposed toggles being TNT proposals from
-        the network.
+        \code{discordance_fraction} of proposed toggles being made on the set of discordant dyads,
+        and approximately \code{1 - discordance_fraction} of proposed toggles being TNT proposals from
+        the network.  The value of \code{discordance_fraction} can be set by the user as a proposal argument,
+        and defaults to \code{0.5}.
       }
       
       \item{\code{InitErgmProposal.discordStratTNT}} {

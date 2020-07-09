@@ -31,7 +31,7 @@
 #'   are be imputed when using conditional estimation. See argument
 #'   \code{imputers} of \code{\link{impute.network.list}} for details.
 #'
-#' @return A combined network object.
+#' @return A network object with temporal metadata.
 #'
 #' @seealso [Help on model specification][ergm-terms] for specific terms.
 #' 
@@ -76,9 +76,7 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
     times <- seq_along(nwl)
   }else stop("Unrecognized format for network series specification. See help for information.")
 
-  nwl0_out <- impute.network.list(nwl, NA.impute)
-
-  nwl0 <- nwl0_out[-length(nwl0_out)]
+  nwl0 <- impute.network.list(nwl[-length(nwl)], NA.impute, nwl.append=nwl[length(nwl)])
 
   nwl0.NA <- sapply(nwl0, network.naedgecount)>0 # Update which networks have missing dyads.
   
@@ -112,6 +110,10 @@ InitErgmTerm.Form <- function(nw, arglist, response=NULL,  ...) {
                       vartypes = c("formula","formula","formula,logical,numeric,expression,call","formula,logical,numeric,expression,call","list","formula,logical,numeric,expression,call","character"),
                       defaultvalues = list(NULL,~1,TRUE,1,NULL,NULL,NULL),
                       required = c(TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE))
+
+  if(!is(nw, "combined_networks")) {
+    return(InitErgmTerm.FormE(nw = nw, arglist = a["formula"], response = response, ...))
+  }
 
   f <- a$formula
   ult(f) <- call("Form1",call("~",ult(f))) # e.g., a~b -> a~Form1(~b)
@@ -157,6 +159,10 @@ InitErgmTerm.Diss <- function(nw, arglist, response=NULL,  ...) {
                       vartypes = c("formula","formula","formula,logical,numeric,expression,call","formula,logical,numeric,expression,call","list","formula,logical,numeric,expression,call","character"),
                       defaultvalues = list(NULL,~1,TRUE,1,NULL,NULL,NULL),
                       required = c(TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE))
+
+  if(!is(nw, "combined_networks")) {
+    return(InitErgmTerm.DissE(nw = nw, arglist = a["formula"], response = response, ...))
+  }
 
   f <- a$formula
   ult(f) <- call("Diss1",call("~",ult(f))) # e.g., a~b -> a~Form1(~b)

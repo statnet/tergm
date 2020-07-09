@@ -253,8 +253,8 @@ test_that("durational terms behave correctly with summary and godfather", {
                              degrange.mean.age(degrange_from, degrange_to, emptyval=5345.4, log=TRUE) + 
                              degree.mean.age(degree_vec, attrname, emptyval=6345.4, log=TRUE) + 
                              degrange.mean.age(degrange_from, degrange_to, attrname, emptyval=7345.4, log=TRUE) +
-                             FormE(~edges) + 
-                             DissE(~edges),
+                             Form(~edges) + 
+                             Diss(~edges),
                         toggles=toggles)
 
   rv <- as.matrix(rv)

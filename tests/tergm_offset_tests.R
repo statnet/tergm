@@ -16,27 +16,27 @@ library(statnet.common)
   set.seed(3)
   
   # default initialization
-  mod1 <- tergm(flobusiness ~ FormE(~edges) + offset(FormE(~degree(3))) + offset(DissE(~edges)), 
+  mod1 <- tergm(flobusiness ~ Form(~edges) + offset(Form(~degree(3))) + offset(Diss(~edges)), 
                  offset.coef=c(0.8,log(9)), 
                  targets="formation",
                  estimate="EGMME"
   )
   
   # init.method set to zeros works
-  mod2 <- tergm(flobusiness ~ FormE(~edges + offset(degree(3))) + offset(DissE(~edges)), 
+  mod2 <- tergm(flobusiness ~ Form(~edges + offset(degree(3))) + offset(Diss(~edges)), 
                  offset.coef=c(0.8,log(9)), 
                  targets="formation",
                  estimate="EGMME",control=control.tergm(init.method='zeros'))
   
   # this works, auto defaulting SAN coefs if they are different from stergm init.form
-  mod3 <- tergm(flobusiness ~ FormE(~edges) + FormE(~offset(degree(3))) + offset(DissE(~edges)), 
+  mod3 <- tergm(flobusiness ~ Form(~edges) + Form(~offset(degree(3))) + offset(Diss(~edges)), 
                  offset.coef=c(0.8,log(9)), 
                  targets="formation", estimate="EGMME",   
                  control=control.tergm(init=c(-3,0.8,log(9)))
   )
   
   # we can explicitly specify the target and target stats
-  mod4 <- tergm(flobusiness ~ FormE(~edges) + offset(FormE(~degree(3))) + offset(DissE(~edges)), 
+  mod4 <- tergm(flobusiness ~ Form(~edges) + offset(Form(~degree(3))) + offset(Diss(~edges)), 
                  offset.coef=c(0.8,log(9)), 
                  targets=~edges, target.stats = 15,
                  estimate="EGMME",   

@@ -50,7 +50,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
       if(is.null(control[[control.transfer[[arg]]]]))
           control[control.transfer[[arg]]] <- list(control[[arg]])
 
-  if (verbose) cat("Initializing Metropolis-Hastings proposal.\n")
+  if (verbose) message("Initializing Metropolis-Hastings proposal.")
   proposal <- ergm_proposal(constraints, weights=control$MCMC.prop.weights, control$MCMC.prop.args, nw, class="t")
   proposal.SAN <- ergm_proposal(constraints, weights=control$SAN.control$SAN.prop.weights, control$SAN.control$SAN.prop.args, nw, class="c")
   
@@ -74,7 +74,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
     if(length(nw.stats)!=length(target.stats))
       stop("Incorrect length of the target.stats vector: should be ", length(nw.stats), " but is ",length(target.stats),".")
         
-    if(verbose) cat("Constructing an approximate response network.\n")
+    if(verbose) message("Constructing an approximate response network.")
     ## If target.stats are given, overwrite the given network and targets
     ## with SAN-ed network and targets.
     
@@ -91,12 +91,12 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
     nw.stats <- summary(model.mon, nw)
 
     if(verbose){
-      cat("SAN summary statistics:\n")
-      print(nw.stats)
-      cat("Meanstats Goal:\n")
-      print(target.stats)
-      cat("Difference: SAN target.stats - Goal target.stats =\n")
-      print(round(nw.stats-target.stats,0))
+      message("SAN summary statistics:")
+      message_print(nw.stats)
+      message("Meanstats Goal:")
+      message_print(target.stats)
+      message("Difference: SAN target.stats - Goal target.stats =")
+      message_print(round(nw.stats-target.stats,0))
     }
   }
 
@@ -108,7 +108,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
   if(!is.null(control$init)){
     # Check length of control$init.
     if(length(control$init)!=length(model$etamap$offsettheta)) {
-      if(verbose) cat("control$init is", control$init, "\n", "number of statistics is",length(model$coef.names), "\n")
+      if(verbose) message("control$init is ", paste(control$init, collapse = " "), "\n", " number of statistics is ", length(model$coef.names))
       stop(paste("Invalid starting formation parameter vector control$init:",
                  "wrong number of parameters."))
     }
@@ -118,11 +118,11 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
 
   initialfit <- tergm.EGMME.initialfit(control$init, nw, model, formula, model.mon, targets, control, verbose)
   
-  if(verbose) cat("Fitting TERGM Equilibrium GMME.\n")
+  if(verbose) message("Fitting TERGM Equilibrium GMME.")
 
   if(control$parallel){
     ergm.getCluster(control, verbose=verbose)
-    if(verbose && !is.null(ergm.getCluster(control))) cat("Using parallel cluster.\n")
+    if(verbose && !is.null(ergm.getCluster(control))) message("Using parallel cluster.")
   }
   
   Cout <- switch(control$EGMME.main.method,
