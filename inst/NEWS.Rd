@@ -65,9 +65,9 @@
 \section{Changes in version 3.6.2}{
   \subsection{BUG FIXES}{
     \itemize{
-      \item Durational terms edges.ageinterval (s_ function) and edgecov.mean.age (s_ and d_ functions) had bugs fixed.
+      \item Durational terms \code{edges.ageinterval} (\code{s_} function) and \code{edgecov.mean.age} (\code{s_} and \code{d_} functions) had bugs fixed.
 
-      \item A bug involving assumptions based on the first entry of the lasttoggle vector has been corrected.
+      \item A bug involving assumptions based on the first entry of the \code{lasttoggle} vector has been corrected.
     }
   }
 
@@ -75,7 +75,7 @@
     \itemize{
       \item The package no longer (incorrectly) requires \R 3.6.0 or the very-very latest version of \code{nlme}.
 
-      \item Progress reports are now printed to stderr rather than stdout.
+      \item Progress reports are now printed to \code{stderr} rather than \code{stdout}.
     }
   }
 }
