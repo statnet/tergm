@@ -321,8 +321,8 @@ control.tergm<-function(init=NULL,
                          force.main = FALSE,                         
 
                          MCMC.prop.weights="default",MCMC.prop.args=NULL,
-                         MCMC.maxedges=20000,
-                         MCMC.maxchanges=20000,
+                         MCMC.maxedges=Inf,
+                         MCMC.maxchanges=1000000,
                          MCMC.packagenames=c(),
                          
                          CMLE.MCMC.burnin = 1024*16,

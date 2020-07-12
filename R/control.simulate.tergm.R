@@ -94,7 +94,7 @@ control.simulate.network.tergm<-function(MCMC.burnin.min=1000,
                                    MCMC.burnin.add=1,
                                    MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                                    MCMC.prop.weights="default",MCMC.prop.args=NULL,
-                                   MCMC.maxedges=20000,
+                                   MCMC.maxedges=Inf,
                                    MCMC.packagenames=c(),
 
                                    term.options=NULL,

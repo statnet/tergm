@@ -27,7 +27,7 @@ control.simulate.network.tergm(
   MCMC.burnin.mul = NULL,
   MCMC.prop.weights = "default",
   MCMC.prop.args = NULL,
-  MCMC.maxedges = 20000,
+  MCMC.maxedges = Inf,
   MCMC.packagenames = c(),
   term.options = NULL,
   MCMC.maxchanges = 1e+06

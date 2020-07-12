@@ -16,7 +16,7 @@ control.simulate.network(
   MCMC.prop.args.form = NULL,
   MCMC.prop.weights.diss = "default",
   MCMC.prop.args.diss = NULL,
-  MCMC.init.maxedges = 20000,
+  MCMC.init.maxedges = Inf,
   MCMC.packagenames = c(),
   term.options = NULL,
   MCMC.init.maxchanges = 1e+06
