@@ -62,7 +62,7 @@
 %% }
 
 
-\section{Changes in version 3.6.2}{
+\section{Changes in version 3.7.0}{
   \subsection{BUG FIXES}{
     \itemize{
       \item Durational terms \code{edges.ageinterval} (\code{s_} function) and \code{edgecov.mean.age} (\code{s_} and \code{d_} functions) had bugs fixed.
