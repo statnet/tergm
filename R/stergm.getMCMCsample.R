@@ -110,7 +110,7 @@ stergm.getMCMCsample <- function(nw, model.form, model.diss, model.mon,
 #' @return returns the MCMC sample as a list containing: \itemize{
 #' \item statsmatrix.form: the matrix of sampled statistics for 'model.form'
 #' RELATIVE TO INITIAL NETWORK \item statsmatrix.diss: the matrix of sampled
-#' statistics for 'model.form' RELATIVE TO INITIAL NETWORK
+#' statistics for 'model.diss' RELATIVE TO INITIAL NETWORK
 #' \item statsmatrix.mon: the matrix of sampled statistics for 'model.mon'
 #' RELATIVE TO INITIAL NETWORK \item newnetwork : the final network from the
 #' sampling process \item changed : a toggle matrix, where the first column is
