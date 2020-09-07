@@ -97,7 +97,7 @@ InitErgmTerm..lasttoggle <- function(nw, arglist, ...){
        coef.names=c(),
        duration=TRUE,
        dependence=FALSE,
-       ext.encode = function(el, nw0) list(time=as.integer(nw0 %n% "time"), lasttoggle=as.integer(nw0 %n% "lasttoggle")),
+       ext.encode = function(el, nw0) list(time=as.integer(NVL(nw0 %n% "time", 0)), lasttoggle=as.integer(nw0 %n% "lasttoggle")),
        ext.decode = function(ext.state, el, nw0){
          nw0 %n% "time" <- ext.state$time
          nw0 %n% "lasttoggle" <- matrix(ext.state$lasttoggle, ncol=3)
