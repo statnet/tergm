@@ -327,8 +327,8 @@ control.stergm<-function(init.form=NULL,
 
                          MCMC.prop.weights.form="default",MCMC.prop.args.form=NULL,
                          MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,
-                         MCMC.maxedges=20000,
-                         MCMC.maxchanges=20000,
+                         MCMC.maxedges=Inf,
+                         MCMC.maxchanges=1000000,
                          MCMC.packagenames=c(),
                          
                          CMLE.MCMC.burnin = 1024*16,

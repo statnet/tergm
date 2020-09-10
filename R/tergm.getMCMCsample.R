@@ -112,7 +112,7 @@ tergm_MCMC_slave <- function(state, eta, control, verbose){
 
   ## should be maxedges, init.maxchanges, and max.maxchanges
   ## add copying logic to MCMCDyn1step_advance, as well as addtnl arg
-  maxedges <- control$MCMC.maxedges
+  maxedges <- NVL(control$MCMC.maxedges, Inf)
   maxchanges <- control$MCMC.maxchanges
   
   z <- .Call("MCMCDyn_wrapper",
@@ -128,7 +128,7 @@ tergm_MCMC_slave <- function(state, eta, control, verbose){
              as.integer(control$time.interval),
              # output settings.
              as.integer(collect),
-             as.integer(maxedges),
+             as.integer(deInf(maxedges, "maxint")),
              as.integer(maxchanges),
              as.integer(control$changes),
              as.integer(verbose),

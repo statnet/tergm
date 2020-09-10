@@ -50,7 +50,7 @@ control.simulate.network<-function(MCMC.burnin.min=1000,
                                    MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
                                    MCMC.prop.weights.form="default",MCMC.prop.args.form=NULL,
                                    MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,                                  
-                                   MCMC.init.maxedges=20000,
+                                   MCMC.init.maxedges=Inf,
                                    MCMC.packagenames=c(),
 
                                    term.options=NULL,
