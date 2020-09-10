@@ -71,7 +71,6 @@ Collate:
     'simulate.tergm.R'
     'stergm.R'
     'tergm-deprecated.R'
-    'stergm.getMCMCsample.R'
     'stergm.utils.R'
     'summary.statistics.networkDynamic.R'
     'summary.tergm.R'
