@@ -86,8 +86,10 @@ I_CHANGESTAT_FN(i__union_lt_net_Network){
   GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
   TailHead dyad;
   kh_foreach_key(dur_inf->discord, dyad, {
+    if(EdgetreeSearch(dyad.tail, dyad.head, auxnet->onwp->outedges) == 0) {
       AddEdgeToTrees(dyad.tail,dyad.head, auxnet->onwp);
-    });
+    }
+  });
 }
 
 U_CHANGESTAT_FN(u__union_lt_net_Network){
