@@ -46,3 +46,65 @@ nw2 %n% "time" <- 2
 stopifnot(all(summary(nw2 ~ Form(~edges + triangle) + Diss(~edges + triangle))==c(4,1,3,0)))
 nw2 %n% "time" <- 3
 stopifnot(all(summary(nw2 ~ Form(~edges + triangle) + Diss(~edges + triangle))==c(4,1,4,1)))
+
+
+
+## test initialization (via dyad-dependent terms in formation model) and time advancement
+nw <- network.initialize(100,dir=F)
+nw <- san(nw ~ edges + offset(concurrent), offset.coef = c(-Inf), target.stats=40)
+
+stopifnot(summary(nw ~ edges) == 40 && summary(nw ~ concurrent) == 0)
+
+nw %n% "time" <- 0
+nw %n% "lasttoggle" <- cbind(as.edgelist(nw), 0)
+
+nw <- simulate(nw ~ FormE(~edges + concurrent) + DissE(~edges), coef = c(1,-Inf,1), dynamic = TRUE, output="final")
+rv <- summary(nw ~ edges + concurrent)
+stopifnot(summary(nw ~ concurrent) == 0)
+stopifnot(nw %n% "time" == 1)
+nw <- simulate(nw ~ FormE(~edges + concurrent) + DissE(~edges), coef = c(1,-Inf,1), dynamic = TRUE, output="final")
+rv <- summary(nw ~ edges + concurrent)
+stopifnot(summary(nw ~ concurrent) == 0)
+stopifnot(nw %n% "time" == 2)
+nw <- simulate(nw ~ FormE(~edges + concurrent) + DissE(~edges), coef = c(1,-Inf,1), dynamic = TRUE, output="final")
+rv <- summary(nw ~ edges + concurrent)
+stopifnot(summary(nw ~ concurrent) == 0)
+stopifnot(nw %n% "time" == 3)
+nw <- simulate(nw ~ FormE(~edges + concurrent) + DissE(~edges), coef = c(1,-Inf,1), dynamic = TRUE, output="final")
+rv <- summary(nw ~ edges + concurrent)
+stopifnot(summary(nw ~ concurrent) == 0)
+stopifnot(nw %n% "time" == 4)
+nw <- simulate(nw ~ FormE(~edges + concurrent) + DissE(~edges), coef = c(1,-Inf,1), dynamic = TRUE, output="final")
+rv <- summary(nw ~ edges + concurrent)
+stopifnot(summary(nw ~ concurrent) == 0)
+stopifnot(nw %n% "time" == 5)
+
+
+nw <- network.initialize(100,dir=F)
+nw <- san(nw ~ edges + offset(triangle), offset.coef = c(-Inf), target.stats=40)
+
+stopifnot(summary(nw ~ edges) == 40 && summary(nw ~ triangle) == 0)
+
+nw %n% "time" <- 0
+nw %n% "lasttoggle" <- cbind(as.edgelist(nw), 0)
+
+nw <- simulate(nw ~ FormE(~edges + triangle) + DissE(~edges), coef = c(-1,-Inf,1), dynamic = TRUE, output="final")
+rv <- summary(nw ~ edges + triangle)
+stopifnot(summary(nw ~ triangle) == 0)
+stopifnot(nw %n% "time" == 1)
+nw <- simulate(nw ~ FormE(~edges + triangle) + DissE(~edges), coef = c(-1,-Inf,1), dynamic = TRUE, output="final")
+rv <- summary(nw ~ edges + triangle)
+stopifnot(summary(nw ~ triangle) == 0)
+stopifnot(nw %n% "time" == 2)
+nw <- simulate(nw ~ FormE(~edges + triangle) + DissE(~edges), coef = c(-1,-Inf,1), dynamic = TRUE, output="final")
+rv <- summary(nw ~ edges + triangle)
+stopifnot(summary(nw ~ triangle) == 0)
+stopifnot(nw %n% "time" == 3)
+nw <- simulate(nw ~ FormE(~edges + triangle) + DissE(~edges), coef = c(-1,-Inf,1), dynamic = TRUE, output="final")
+rv <- summary(nw ~ edges + triangle)
+stopifnot(summary(nw ~ triangle) == 0)
+stopifnot(nw %n% "time" == 4)
+nw <- simulate(nw ~ FormE(~edges + triangle) + DissE(~edges), coef = c(-1,-Inf,1), dynamic = TRUE, output="final")
+rv <- summary(nw ~ edges + triangle)
+stopifnot(summary(nw ~ triangle) == 0)
+stopifnot(nw %n% "time" == 5)
