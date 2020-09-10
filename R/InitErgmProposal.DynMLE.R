@@ -1,4 +1,8 @@
 InitErgmProposal.staticDiscordTNT <- function(arguments, nw, model) {
-  proposal <- list(name = "staticDiscordTNT", pakcage="ergm", iinputs=to_ergm_Cdouble(arguments$constraints$discordTNT$nw))
+  dissolvable <- as.rlebdm(arguments$constraints$discordTNT$nw)
+  formable <- !dissolvable
+  dissolvable <- ergm_dyadgen_select(arguments, nw, NULL, dissolvable)
+  formable <- ergm_dyadgen_select(arguments, nw, NULL, formable)
+  proposal <- list(name = "staticDiscordTNT", pakcage="ergm", formable=formable, dissolvable=dissolvable)
   proposal
 }
