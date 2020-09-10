@@ -43,7 +43,7 @@ Description: An integrated set of extensions to the 'ergm' package to analyze an
 License: GPL-3 + file LICENSE
 URL: http://www.statnet.org
 VignetteBuilder: rmarkdown, knitr
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
 Remotes: github::statnet/statnet.common@master,
@@ -51,3 +51,36 @@ Remotes: github::statnet/statnet.common@master,
     github::statnet/networkDynamic@master,
     github::statnet/ergm-private@dev,
     github::statnet/ergm.multi-private@dev
+Collate: 
+    'InitConstraint.R'
+    'InitErgmProposal.DynMoME.R'
+    'InitErgmTerm.EGMME.R'
+    'InitErgmTerm.duration.R'
+    'InitErgmTerm.netseries.R'
+    'control.simulate.stergm.R'
+    'control.simulate.tergm.R'
+    'control.stergm.R'
+    'control.tergm.R'
+    'gof.tergm.R'
+    'impute.network.list.R'
+    'is.durational.R'
+    'is.lasttoggle.R'
+    'mcmc.diagnostics.tergm.R'
+    'print.tergm.R'
+    'simulate.stergm.R'
+    'simulate.tergm.R'
+    'stergm.R'
+    'tergm-deprecated.R'
+    'stergm.getMCMCsample.R'
+    'stergm.utils.R'
+    'summary.statistics.networkDynamic.R'
+    'summary.tergm.R'
+    'tergm.CMLE.R'
+    'tergm.EGMME.GD.R'
+    'tergm.EGMME.R'
+    'tergm.EGMME.SA.R'
+    'tergm.EGMME.initialfit.R'
+    'tergm.R'
+    'tergm.getMCMCsample.R'
+    'tergm.godfather.R'
+    'zzz.R'
