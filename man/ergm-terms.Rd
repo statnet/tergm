@@ -14,6 +14,8 @@
 \alias{terms.ergm}
 \alias{edge.ages}
 \alias{mean.age}
+\alias{nodefactor.mean.age}
+\alias{nodemix.mean.age}
 \alias{edges.ageinterval}
 \alias{edgecov.ages}
 \alias{edgecov.mean.age}
@@ -66,7 +68,7 @@
       \code{from[i]} but strictly less than \code{to[i]}, of the amount of time elapsed
       since the tie's formation. The optional argument
       \code{byarg} specifies a vertex attribute (see 
-      \link[ergm:node-attr]{Specifying Vertex Attributes and Levels}
+      \link[ergm:nodal_attributes]{Specifying Vertex Attributes and Levels}
       for details). If specified, then separate degree 
       statistics are calculated for nodes having each separate
       value of the attribute.
@@ -88,7 +90,7 @@
       with degree exactly \code{d[i]}, of the amount of time elapsed
       since the tie's formation. The optional argument
       \code{byarg} specifies a vertex attribute (see 
-      \link[ergm:node-attr]{Specifying Vertex Attributes and Levels}
+      \link[ergm:nodal_attributes]{Specifying Vertex Attributes and Levels}
       for details).  If specified, then separate degree 
       statistics are calculated for nodes having each separate
       value of the attribute.
@@ -164,8 +166,7 @@
       and/or if only a few dyads have nonzero weights.  }
     
     
-    \item{\code{mean.age(emptyval=0)} (target-only)}{\emph{Average age of an extant
-	tie:} 
+    \item{\code{mean.age(emptyval=0, log=FALSE)} (target-only)}{\emph{Average age of an extant tie:} 
       This term adds one statistic equaling the average, over all ties
       present in the network, of the amount of time elapsed since
       formation.
@@ -174,9 +175,51 @@
       argument \code{emptyval} can be used to specify the value returned
       if it is. This is, technically, an arbitrary value, but it should
       not have a substantial effect unless a non-negligible fraction of
-      networks at the parameter configuration of interest is empty.  }
+      networks at the parameter configuration of interest is empty.
+      
+      To get mean log age instead of mean age, set \code{log=TRUE}.          
+    }
 
-    
+    \item{\code{nodefactor.mean.age(attr, levels=NULL, emptyval=0, log=FALSE)}}{\emph{Average ages of extant half-ties incident on nodes of specified attribute levels:} 
+      This term adds one statistic for each level of \code{attr}, 
+      equaling the average, over all half-ties incident on nodes of that level,
+      of the amount of time elapsed since formation.
+
+      To control what levels are included, use the \code{levels} argument.  Note that the default
+      \code{levels} value for \code{nodefactor.mean.age} retains all levels, unlike the default
+      for \code{nodefactor}, which omits the first level.
+      
+      See \link[ergm:nodal_attributes]{Specifying Vertex Attributes and Levels} 
+      for details on specifying vertex attributes and levels.
+      
+      The argument \code{emptyval} functions like it does for \code{mean.age},
+      except that a different value may be specified for each level of \code{attr}.
+      The length of \code{emptyval} should either be 1 (in which case that value is
+      used for every level of \code{attr}) or should be equal to the number of retained
+      levels of \code{attr}, in which case the \code{i}th value in \code{emptyval} is used
+      for the \code{i}th retained level of \code{attr}.      
+      
+      To get mean log age instead of mean age, set \code{log=TRUE}; this is applied to all levels.
+    }
+      
+    \item{\code{nodemix.mean.age(attr, b1levels=NULL, b2levels=NULL, levels=NULL, levels2=NULL, emptyval=0, log=FALSE)}}{\emph{Average ages of extant ties of specified mixing types:} 
+      This term adds one statistic for each mixing type of \code{attr}, 
+      equaling the average, over all ties of that mixing type,
+      of the amount of time elapsed since formation.
+      
+      The \code{levels}-related arguments function just like they do for the ordinary \code{nodemix} term.
+      See \link[ergm:nodal_attributes]{Specifying Vertex Attributes and Levels} 
+      for details on specifying vertex attributes and levels.      
+      
+      The argument \code{emptyval} functions like it does for \code{mean.age},
+      except that a different value may be specified for each mixing type of \code{attr}.
+      The length of \code{emptyval} should either be 1 (in which case that value is
+      used for every mixing type of \code{attr}) or should be equal to the number of retained
+      mixing types of \code{attr}, in which case the \code{i}th value in \code{emptyval} is used
+      for the \code{i}th retained mixing type of \code{attr}.
+            
+      To get mean log age instead of mean age, set \code{log=TRUE}; this is applied to all mixing types.
+    }
   }
 }
 \references{
