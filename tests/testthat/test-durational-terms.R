@@ -30,6 +30,10 @@ test_that("durational terms behave correctly with summary and godfather", {
     toggle_tmin <- 11
     toggle_tmax <- 30
   
+    mean_age_levels <- 7
+    mean_age_b1levels <- 6
+    mean_age_b2levels <- 8
+  
     max_levels <- 5
   
     if(nwtype == 1) {
@@ -50,6 +54,51 @@ test_that("durational terms behave correctly with summary and godfather", {
     levels <- sort(unique(attr))
   
     nw %v% attrname <- attr
+    
+    if(nwtype == 1) {
+      mean_age_attr <- rep(seq_len(mean_age_levels), length.out=netsize)
+      n_nodefactor_stats <- mean_age_levels
+      n_nodemix_stats <- mean_age_levels*(mean_age_levels + 1)/2
+      indmat <- matrix(0, nrow=mean_age_levels, ncol=mean_age_levels)
+      indmat[upper.tri(indmat,diag=TRUE)] <- seq_len(n_nodemix_stats)
+      indmat <- indmat + t(indmat) - diag(diag(indmat))
+      nltk <- ceiling(mean_age_levels/2)
+      nodemix_ma_lev <- sample(seq_len(mean_age_levels), nltk, FALSE)
+      nstats_nodemix_no2 <- length(nodemix_ma_lev)*(length(nodemix_ma_lev) + 1)/2
+      nodemix_ma_lev2 <- sample(seq_len(nltk*(nltk + 1)/2), ceiling(nltk*(nltk + 1)/4), FALSE)
+      indmat_subset <- indmat[nodemix_ma_lev, nodemix_ma_lev]
+      nodemix_indices_1 <- unique(indmat_subset[upper.tri(indmat_subset, diag=TRUE)])
+    } else if(nwtype == 2) {
+      mean_age_attr <- c(rep(seq_len(mean_age_b1levels), length.out=bipsize), rep(seq_len(mean_age_b2levels), length.out=netsize-bipsize))
+      n_nodefactor_stats <- max(mean_age_b1levels, mean_age_b2levels)
+      n_nodemix_stats <- mean_age_b1levels*mean_age_b2levels
+      indmat <- matrix(seq_len(n_nodemix_stats),nrow=mean_age_b1levels,ncol=mean_age_b2levels)
+      nltkb1 <- ceiling(mean_age_b1levels/2)
+      nltkb2 <- ceiling(mean_age_b2levels/2)
+      nodemix_ma_b1lev <- sample(seq_len(mean_age_b1levels), nltkb1, FALSE)
+      nodemix_ma_b2lev <- sample(seq_len(mean_age_b2levels), nltkb2, FALSE)
+      nstats_nodemix_no2 <- length(nodemix_ma_b1lev)*length(nodemix_ma_b2lev)
+      nodemix_ma_lev2 <- sample(seq_len(nltkb1*nltkb2), ceiling(nltkb1*nltkb2/2), FALSE)
+      nodemix_indices_1 <- c(indmat[nodemix_ma_b1lev, nodemix_ma_b2lev])
+    } else {
+      mean_age_attr <- rep(seq_len(mean_age_levels), length.out=netsize)
+      n_nodefactor_stats <- mean_age_levels
+      n_nodemix_stats <- mean_age_levels*mean_age_levels
+      indmat <- matrix(seq_len(n_nodemix_stats),nrow=mean_age_levels,ncol=mean_age_levels)
+      nltk <- ceiling(mean_age_levels/2)
+      nodemix_ma_lev <- sample(seq_len(mean_age_levels), nltk, FALSE)
+      nstats_nodemix_no2 <- length(nodemix_ma_lev)*length(nodemix_ma_lev)
+      nodemix_ma_lev2 <- sample(seq_len(nltk*nltk/2), ceiling(nltk*nltk/4), FALSE)
+      nodemix_indices_1 <- c(indmat[nodemix_ma_lev, nodemix_ma_lev])
+    }
+
+    nodemix_indices_2 <- nodemix_indices_1[nodemix_ma_lev2]
+    nodefactor_ma_lev <- sample(seq_len(n_nodefactor_stats), ceiling(n_nodefactor_stats/2), FALSE)
+    
+    nodemix_emptyvals <- runif(length(nodemix_indices_1))
+    nodefactor_emptyvals <- runif(length(nodefactor_ma_lev))
+    
+    nw %v% "mean_age_attr" <- mean_age_attr
     
     init.lasttoggle.times <- sample(init_tmin:init_tmax, NROW(el), TRUE)
     
@@ -78,6 +127,7 @@ test_that("durational terms behave correctly with summary and godfather", {
     }
     
     nw0 %v% attrname <- attr
+    nw0 %v% "mean_age_attr" <- mean_age_attr
     
     ages_from = c(1, 1, 4, 2, 5, 10, 1, 5)
     ages_to = c(2, 3, 15, 5, 7, 12, Inf, Inf) 
@@ -204,6 +254,121 @@ test_that("durational terms behave correctly with summary and godfather", {
       
     expect_equal(unname(summary(nw0 ~ edges.ageinterval(from=ages_from, to=ages_to))), integer(length(ages_from)))  
     expect_equal(unname(summary(nw ~ edges.ageinterval(from=ages_from, to=ages_to))), init_age_counts)  
+
+    ## nodefactor/nodemix mean age tests
+    nodefactor_ages <- numeric(n_nodefactor_stats)
+    nodefactor_log_ages <- numeric(n_nodefactor_stats)
+    nodefactor_counts <- integer(n_nodefactor_stats)
+    
+    attr_elt <- lt
+    attr_elt[,1] <- mean_age_attr[attr_elt[,1]]
+    attr_elt[,2] <- mean_age_attr[attr_elt[,2]]
+    for(k in seq_len(NROW(attr_elt))) {
+      nodefactor_ages[attr_elt[k,1]] <- nodefactor_ages[attr_elt[k,1]] + init_time - attr_elt[k,3] + 1
+      nodefactor_log_ages[attr_elt[k,1]] <- nodefactor_log_ages[attr_elt[k,1]] + log(init_time - attr_elt[k,3] + 1)
+      nodefactor_counts[attr_elt[k,1]] <- nodefactor_counts[attr_elt[k,1]] + 1
+      nodefactor_ages[attr_elt[k,2]] <- nodefactor_ages[attr_elt[k,2]] + init_time - attr_elt[k,3] + 1
+      nodefactor_counts[attr_elt[k,2]] <- nodefactor_counts[attr_elt[k,2]] + 1
+      nodefactor_log_ages[attr_elt[k,2]] <- nodefactor_log_ages[attr_elt[k,2]] + log(init_time - attr_elt[k,3] + 1)
+    }
+    
+    nodefactor_vals <- numeric(n_nodefactor_stats)
+    nodefactor_log_vals <- numeric(n_nodefactor_stats)
+    for(k in seq_len(n_nodefactor_stats)) {
+      if(nodefactor_counts[k] == 0) {
+        ## else 0 for now; emptyval is handled later
+      } else {
+        nodefactor_vals[k] <- nodefactor_ages[k]/nodefactor_counts[k]
+        nodefactor_log_vals[k] <- nodefactor_log_ages[k]/nodefactor_counts[k]
+      }
+    }
+    
+    nodemix_ages <- numeric(n_nodemix_stats)
+    nodemix_log_ages <- numeric(n_nodemix_stats)
+    nodemix_counts <- integer(n_nodemix_stats)
+    
+    for(k in seq_len(NROW(attr_elt))) {
+      this_nodemix_index <- indmat[attr_elt[k,1],attr_elt[k,2]]
+      nodemix_ages[this_nodemix_index] <- nodemix_ages[this_nodemix_index] + init_time - attr_elt[k,3] + 1
+      nodemix_log_ages[this_nodemix_index] <- nodemix_log_ages[this_nodemix_index] + log(init_time - attr_elt[k,3] + 1)
+      nodemix_counts[this_nodemix_index] <- nodemix_counts[this_nodemix_index] + 1
+    }
+    
+    nodemix_vals <- numeric(n_nodemix_stats)
+    nodemix_log_vals <- numeric(n_nodemix_stats)
+    for(k in seq_len(n_nodemix_stats)) {
+      if(nodemix_counts[k] == 0) {
+        ## else 0 for now since we're not passing an emptyval
+      } else {
+        nodemix_vals[k] <- nodemix_ages[k]/nodemix_counts[k]
+        nodemix_log_vals[k] <- nodemix_log_ages[k]/nodemix_counts[k]
+      }
+    }
+
+    ## set nonzero emptyvals here
+    
+    
+    ## at least two each for nodefactor, nodemix mean age; with and without emptyval, with and without log,
+    ## with and without (b1/b2)levels(2), also levels2 without levels for nodemix at least once
+    
+    ## will need to get extraction of correct values as below; ellt is named lt and constructed already above
+    
+    expect_equal(unname(summary(nw0 ~ nodefactor.mean.age("mean_age_attr"))), rep(0, n_nodefactor_stats))
+    expect_equal(unname(summary(nw0 ~ nodefactor.mean.age("mean_age_attr", levels=nodefactor_ma_lev))), rep(0, length(nodefactor_ma_lev)))
+    expect_equal(unname(summary(nw0 ~ nodefactor.mean.age("mean_age_attr", levels=nodefactor_ma_lev, emptyval=nodefactor_emptyvals))), nodefactor_emptyvals)
+    expect_equal(unname(summary(nw0 ~ nodefactor.mean.age("mean_age_attr", levels=nodefactor_ma_lev, emptyval=nodefactor_emptyvals, log=TRUE))), nodefactor_emptyvals)
+
+    expect_equal(unname(summary(nw ~ nodefactor.mean.age("mean_age_attr"))), nodefactor_vals)
+    expect_equal(unname(summary(nw ~ nodefactor.mean.age("mean_age_attr", levels=nodefactor_ma_lev))), nodefactor_vals[nodefactor_ma_lev])
+
+    ## substitute emptyvals for 0s
+    nodefactor_vals[nodefactor_ma_lev][nodefactor_counts[nodefactor_ma_lev] == 0] <- nodefactor_emptyvals[nodefactor_counts[nodefactor_ma_lev] == 0]
+    nodefactor_log_vals[nodefactor_ma_lev][nodefactor_counts[nodefactor_ma_lev] == 0] <- nodefactor_emptyvals[nodefactor_counts[nodefactor_ma_lev] == 0]
+    
+    expect_equal(unname(summary(nw ~ nodefactor.mean.age("mean_age_attr", levels=nodefactor_ma_lev, emptyval=nodefactor_emptyvals))), nodefactor_vals[nodefactor_ma_lev])
+    expect_equal(unname(summary(nw ~ nodefactor.mean.age("mean_age_attr", levels=nodefactor_ma_lev, emptyval=nodefactor_emptyvals, log=TRUE))), nodefactor_log_vals[nodefactor_ma_lev])
+ 
+    if(nwtype == 2) {
+      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr"))), rep(0, n_nodemix_stats))
+      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev))), rep(0, length(nodemix_indices_1)))
+      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", levels2=nodemix_ma_lev2))), rep(0, length(nodemix_ma_lev2)))
+      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, log=TRUE))), rep(0, length(nodemix_indices_1)))
+   
+      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, log=TRUE, emptyval=nodemix_emptyvals))), nodemix_emptyvals)
+      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, levels2=nodemix_ma_lev2, log=TRUE, emptyval=nodemix_emptyvals[nodemix_ma_lev2]))), nodemix_emptyvals[nodemix_ma_lev2])
+   
+      expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr"))), nodemix_vals)
+      expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev))), nodemix_vals[nodemix_indices_1])
+      expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr", levels2=nodemix_ma_lev2))), nodemix_vals[nodemix_ma_lev2])
+      expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, log=TRUE))), nodemix_log_vals[nodemix_indices_1])
+   
+      ## substitute emptyvals for 0s
+      nodemix_vals[nodemix_indices_1][nodemix_counts[nodemix_indices_1] == 0] <- nodemix_emptyvals[nodemix_counts[nodemix_indices_1] == 0]
+      nodemix_log_vals[nodemix_indices_1][nodemix_counts[nodemix_indices_1] == 0] <- nodemix_emptyvals[nodemix_counts[nodemix_indices_1] == 0]
+   
+      expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, log=TRUE, emptyval=nodemix_emptyvals))), nodemix_log_vals[nodemix_indices_1])
+      expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, levels2=nodemix_ma_lev2, log=TRUE, emptyval=nodemix_emptyvals[nodemix_ma_lev2]))), nodemix_log_vals[nodemix_indices_2])
+    } else {    
+      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr"))), rep(0, n_nodemix_stats))
+      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev))), rep(0, length(nodemix_indices_1)))
+      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", levels2=nodemix_ma_lev2))), rep(0, length(nodemix_ma_lev2)))
+      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev, log=TRUE))), rep(0, length(nodemix_indices_1)))
+   
+      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev, log=TRUE, emptyval=nodemix_emptyvals))), nodemix_emptyvals)
+      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev, levels2=nodemix_ma_lev2, log=TRUE, emptyval=nodemix_emptyvals[nodemix_ma_lev2]))), nodemix_emptyvals[nodemix_ma_lev2])
+   
+      expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr"))), nodemix_vals)
+      expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev))), nodemix_vals[nodemix_indices_1])
+      expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr", levels2=nodemix_ma_lev2))), nodemix_vals[nodemix_ma_lev2])
+      expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev, log=TRUE))), nodemix_log_vals[nodemix_indices_1])
+   
+      ## substitute emptyvals for 0s
+      nodemix_vals[nodemix_indices_1][nodemix_counts[nodemix_indices_1] == 0] <- nodemix_emptyvals[nodemix_counts[nodemix_indices_1] == 0]
+      nodemix_log_vals[nodemix_indices_1][nodemix_counts[nodemix_indices_1] == 0] <- nodemix_emptyvals[nodemix_counts[nodemix_indices_1] == 0]
+   
+      expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev, log=TRUE, emptyval=nodemix_emptyvals))), nodemix_log_vals[nodemix_indices_1])
+      expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev, levels2=nodemix_ma_lev2, log=TRUE, emptyval=nodemix_emptyvals[nodemix_ma_lev2]))), nodemix_log_vals[nodemix_indices_2])
+    }
   
     if(nwtype < 3) {
       expect_equal(unname(summary(nw0 ~ degree.mean.age(degree_vec, emptyval=0345.4))), rep(0345.4, length(degree_vec)))  
@@ -287,7 +452,7 @@ test_that("durational terms behave correctly with summary and godfather", {
   
     toggles <- toggle_mat
   
-    if(nwtype < 3) {
+    if(nwtype == 1) {
       rv <- tergm.godfather(nw ~ edges + 
                                  mean.age(emptyval=3425.432) + 
                                  edge.ages + 
@@ -296,6 +461,14 @@ test_that("durational terms behave correctly with summary and godfather", {
                                  mean.age(emptyval=13.1, log=TRUE) + 
                                  edgecov.mean.age("edgewts", emptyval=0.874, log=TRUE) + 
                                  edges.ageinterval(from=ages_from, to=ages_to) +
+                                 nodefactor.mean.age(attr="mean_age_attr") +
+                                 nodemix.mean.age(attr="mean_age_attr") +
+                                 nodefactor.mean.age(attr="mean_age_attr", log=TRUE) +
+                                 nodemix.mean.age(attr="mean_age_attr", log=TRUE) +
+                                 nodefactor.mean.age(attr="mean_age_attr", levels=nodefactor_ma_lev) +
+                                 nodemix.mean.age(attr="mean_age_attr", levels=nodemix_ma_lev,emptyval=nodemix_emptyvals) +
+                                 nodefactor.mean.age(attr="mean_age_attr", log=TRUE, levels=nodefactor_ma_lev,emptyval=nodefactor_emptyvals) +
+                                 nodemix.mean.age(attr="mean_age_attr", log=TRUE, levels=nodemix_ma_lev, levels2=nodemix_ma_lev2) +
                                  degree.mean.age(degree_vec, emptyval=0345.4) + 
                                  degrange.mean.age(degrange_from, degrange_to, emptyval=1345.4) + 
                                  degree.mean.age(degree_vec, attrname, emptyval=2345.4) + 
@@ -307,6 +480,34 @@ test_that("durational terms behave correctly with summary and godfather", {
                                  Form(~edges) + 
                                  Diss(~edges),
                             toggles=toggles)
+    } else if(nwtype == 2) {
+      rv <- tergm.godfather(nw ~ edges + 
+                                 mean.age(emptyval=3425.432) + 
+                                 edge.ages + 
+                                 edgecov.ages("edgewts") + 
+                                 edgecov.mean.age("edgewts", emptyval=exp(pi/5)/3.14) + 
+                                 mean.age(emptyval=13.1, log=TRUE) + 
+                                 edgecov.mean.age("edgewts", emptyval=0.874, log=TRUE) + 
+                                 edges.ageinterval(from=ages_from, to=ages_to) +
+                                 nodefactor.mean.age(attr="mean_age_attr") +
+                                 nodemix.mean.age(attr="mean_age_attr") +
+                                 nodefactor.mean.age(attr="mean_age_attr", log=TRUE) +
+                                 nodemix.mean.age(attr="mean_age_attr", log=TRUE) +
+                                 nodefactor.mean.age(attr="mean_age_attr", levels=nodefactor_ma_lev) +
+                                 nodemix.mean.age(attr="mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev,emptyval=nodemix_emptyvals) +
+                                 nodefactor.mean.age(attr="mean_age_attr", log=TRUE, levels=nodefactor_ma_lev,emptyval=nodefactor_emptyvals) +
+                                 nodemix.mean.age(attr="mean_age_attr", log=TRUE, b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, levels2=nodemix_ma_lev2) +
+                                 degree.mean.age(degree_vec, emptyval=0345.4) + 
+                                 degrange.mean.age(degrange_from, degrange_to, emptyval=1345.4) + 
+                                 degree.mean.age(degree_vec, attrname, emptyval=2345.4) + 
+                                 degrange.mean.age(degrange_from, degrange_to, attrname, emptyval=3345.4) + 
+                                 degree.mean.age(degree_vec, emptyval=4345.4, log=TRUE) + 
+                                 degrange.mean.age(degrange_from, degrange_to, emptyval=5345.4, log=TRUE) + 
+                                 degree.mean.age(degree_vec, attrname, emptyval=6345.4, log=TRUE) + 
+                                 degrange.mean.age(degrange_from, degrange_to, attrname, emptyval=7345.4, log=TRUE) +
+                                 Form(~edges) + 
+                                 Diss(~edges),
+                            toggles=toggles)    
     } else {
       rv <- tergm.godfather(nw ~ edges + 
                                  mean.age(emptyval=3425.432) + 
@@ -316,6 +517,14 @@ test_that("durational terms behave correctly with summary and godfather", {
                                  mean.age(emptyval=13.1, log=TRUE) + 
                                  edgecov.mean.age("edgewts", emptyval=0.874, log=TRUE) + 
                                  edges.ageinterval(from=ages_from, to=ages_to) +
+                                 nodefactor.mean.age(attr="mean_age_attr") +
+                                 nodemix.mean.age(attr="mean_age_attr") +
+                                 nodefactor.mean.age(attr="mean_age_attr", log=TRUE) +
+                                 nodemix.mean.age(attr="mean_age_attr", log=TRUE) +
+                                 nodefactor.mean.age(attr="mean_age_attr", levels=nodefactor_ma_lev) +
+                                 nodemix.mean.age(attr="mean_age_attr", levels=nodemix_ma_lev,emptyval=nodemix_emptyvals) +
+                                 nodefactor.mean.age(attr="mean_age_attr", log=TRUE, levels=nodefactor_ma_lev,emptyval=nodefactor_emptyvals) +
+                                 nodemix.mean.age(attr="mean_age_attr", log=TRUE, levels=nodemix_ma_lev, levels2=nodemix_ma_lev2) +
                                  Form(~edges) + 
                                  Diss(~edges),
                             toggles=toggles)  
@@ -347,8 +556,71 @@ test_that("durational terms behave correctly with summary and godfather", {
         expect_equal(sum(j - el_lts[[j]][,3] + 1 >= ages_from[k] & j - el_lts[[j]][,3] + 1 < ages_to[k]), unname(rv[j - init_time, 7 + k]))
       }
   
+      ## nodefactor/nodemix mean age tests
+      nodefactor_ages <- numeric(n_nodefactor_stats)
+      nodefactor_log_ages <- numeric(n_nodefactor_stats)
+      nodefactor_counts <- integer(n_nodefactor_stats)
+      
+      attr_elt <- el_lts[[j]]
+      attr_elt[,1] <- mean_age_attr[attr_elt[,1]]
+      attr_elt[,2] <- mean_age_attr[attr_elt[,2]]
+      for(k in seq_len(NROW(attr_elt))) {
+        nodefactor_ages[attr_elt[k,1]] <- nodefactor_ages[attr_elt[k,1]] + j - attr_elt[k,3] + 1
+        nodefactor_log_ages[attr_elt[k,1]] <- nodefactor_log_ages[attr_elt[k,1]] + log(j - attr_elt[k,3] + 1)
+        nodefactor_counts[attr_elt[k,1]] <- nodefactor_counts[attr_elt[k,1]] + 1
+        nodefactor_ages[attr_elt[k,2]] <- nodefactor_ages[attr_elt[k,2]] + j - attr_elt[k,3] + 1
+        nodefactor_counts[attr_elt[k,2]] <- nodefactor_counts[attr_elt[k,2]] + 1
+        nodefactor_log_ages[attr_elt[k,2]] <- nodefactor_log_ages[attr_elt[k,2]] + log(j - attr_elt[k,3] + 1)
+      }
+  
+      nodefactor_vals <- numeric(n_nodefactor_stats)
+      nodefactor_log_vals <- numeric(n_nodefactor_stats)
+      for(k in seq_len(n_nodefactor_stats)) {
+        if(nodefactor_counts[k] == 0) {
+          ## else 0 for now; emptyval is handled later
+        } else {
+          nodefactor_vals[k] <- nodefactor_ages[k]/nodefactor_counts[k]
+          nodefactor_log_vals[k] <- nodefactor_log_ages[k]/nodefactor_counts[k]
+        }
+      }
+  
+      nodemix_ages <- numeric(n_nodemix_stats)
+      nodemix_log_ages <- numeric(n_nodemix_stats)
+      nodemix_counts <- integer(n_nodemix_stats)
+      
+      for(k in seq_len(NROW(attr_elt))) {
+        this_nodemix_index <- indmat[attr_elt[k,1],attr_elt[k,2]]
+        nodemix_ages[this_nodemix_index] <- nodemix_ages[this_nodemix_index] + j - attr_elt[k,3] + 1
+        nodemix_log_ages[this_nodemix_index] <- nodemix_log_ages[this_nodemix_index] + log(j - attr_elt[k,3] + 1)
+        nodemix_counts[this_nodemix_index] <- nodemix_counts[this_nodemix_index] + 1
+      }
+  
+      nodemix_vals <- numeric(n_nodemix_stats)
+      nodemix_log_vals <- numeric(n_nodemix_stats)
+      for(k in seq_len(n_nodemix_stats)) {
+        if(nodemix_counts[k] == 0) {
+          ## else 0 for now since we're not passing an emptyval
+        } else {
+          nodemix_vals[k] <- nodemix_ages[k]/nodemix_counts[k]
+          nodemix_log_vals[k] <- nodemix_log_ages[k]/nodemix_counts[k]
+        }
+      }
+
+      expect_equal(nodefactor_vals, unname(rv[j - init_time, 7 + length(ages_from) + seq_len(n_nodefactor_stats)]))
+      expect_equal(nodemix_vals, unname(rv[j - init_time, 7 + length(ages_from) + n_nodefactor_stats + seq_len(n_nodemix_stats)]))
+      expect_equal(nodefactor_log_vals, unname(rv[j - init_time, 7 + length(ages_from) + n_nodefactor_stats + n_nodemix_stats + seq_len(n_nodefactor_stats)]))
+      expect_equal(nodemix_log_vals, unname(rv[j - init_time, 7 + length(ages_from) + 2*n_nodefactor_stats + n_nodemix_stats + seq_len(n_nodemix_stats)]))
+
+      nodemix_vals[nodemix_indices_1][nodemix_counts[nodemix_indices_1] == 0] <- nodemix_emptyvals[nodemix_counts[nodemix_indices_1] == 0]
+      nodefactor_log_vals[nodefactor_ma_lev][nodefactor_counts[nodefactor_ma_lev] == 0] <- nodefactor_emptyvals[nodefactor_counts[nodefactor_ma_lev] == 0]
+
+      expect_equal(nodefactor_vals[nodefactor_ma_lev], unname(rv[j - init_time, 7 + length(ages_from) + 2*n_nodefactor_stats + 2*n_nodemix_stats + seq_along(nodefactor_ma_lev)]))
+      expect_equal(nodemix_vals[nodemix_indices_1], unname(rv[j - init_time, 7 + length(ages_from) + 2*n_nodefactor_stats + 2*n_nodemix_stats + length(nodefactor_ma_lev) + seq_along(nodemix_indices_1)]))
+      expect_equal(nodefactor_log_vals[nodefactor_ma_lev], unname(rv[j - init_time, 7 + length(ages_from) + 2*n_nodefactor_stats + 2*n_nodemix_stats + length(nodefactor_ma_lev) + length(nodemix_indices_1) + seq_along(nodefactor_ma_lev)]))
+      expect_equal(nodemix_log_vals[nodemix_indices_2], unname(rv[j - init_time, 7 + length(ages_from) + 2*n_nodefactor_stats + 2*n_nodemix_stats + 2*length(nodefactor_ma_lev) + length(nodemix_indices_1) + seq_along(nodemix_indices_2)]))
+
       if(nwtype < 3) {  
-        last_index <- 7 + length(ages_from)
+        last_index <- 7 + 2*n_nodefactor_stats + 2*length(nodefactor_ma_lev) + 2*n_nodemix_stats + nstats_nodemix_no2 + length(nodemix_ma_lev2) + length(ages_from)
     
         expect_equal(drma_from_el_lt(degree_vec, degree_vec + 1, el_lts[[j]], j, 0345.4), unname(rv[j - init_time, (last_index + 1):(last_index + length(degree_vec))]))
         last_index <- last_index + length(degree_vec)
@@ -377,8 +649,19 @@ test_that("durational terms behave correctly with summary and godfather", {
     expect_equal(0.874, unname(rv[toggle_tmax + 1 - init_time,7]))
     expect_equal(integer(length(ages_from)), unname(rv[toggle_tmax + 1 - init_time, 8:(8 + length(ages_from) - 1)]))
   
+    expect_equal(rep(0,n_nodefactor_stats), unname(rv[toggle_tmax + 1 - init_time, 7 + length(ages_from) + seq_len(n_nodefactor_stats)]))
+    expect_equal(rep(0,n_nodemix_stats), unname(rv[toggle_tmax + 1 - init_time, 7 + length(ages_from) + n_nodefactor_stats + seq_len(n_nodemix_stats)]))
+    expect_equal(rep(0,n_nodefactor_stats), unname(rv[toggle_tmax + 1 - init_time, 7 + length(ages_from) + n_nodefactor_stats + n_nodemix_stats + seq_len(n_nodefactor_stats)]))
+    expect_equal(rep(0,n_nodemix_stats), unname(rv[toggle_tmax + 1 - init_time, 7 + length(ages_from) + 2*n_nodefactor_stats + n_nodemix_stats + seq_len(n_nodemix_stats)]))
+  
+    expect_equal(rep(0, length(nodefactor_ma_lev)), unname(rv[toggle_tmax + 1 - init_time, 7 + length(ages_from) + 2*n_nodefactor_stats + 2*n_nodemix_stats + seq_along(nodefactor_ma_lev)]))
+    expect_equal(nodemix_emptyvals, unname(rv[toggle_tmax + 1 - init_time, 7 + length(ages_from) + 2*n_nodefactor_stats + 2*n_nodemix_stats + length(nodefactor_ma_lev) + seq_along(nodemix_indices_1)]))
+    expect_equal(nodefactor_emptyvals, unname(rv[toggle_tmax + 1 - init_time, 7 + length(ages_from) + 2*n_nodefactor_stats + 2*n_nodemix_stats + length(nodefactor_ma_lev) + length(nodemix_indices_1) + seq_along(nodefactor_ma_lev)]))
+    expect_equal(rep(0, length(nodemix_indices_2)), unname(rv[toggle_tmax + 1 - init_time, 7 + length(ages_from) + 2*n_nodefactor_stats + 2*n_nodemix_stats + 2*length(nodefactor_ma_lev) + length(nodemix_indices_1) + seq_along(nodemix_indices_2)]))
+  
     if(nwtype < 3) {  
-      last_index <- 7 + length(ages_from)
+      last_index <- 7 + 2*n_nodefactor_stats + 2*length(nodefactor_ma_lev) + 2*n_nodemix_stats + nstats_nodemix_no2 + length(nodemix_ma_lev2) + length(ages_from)
+
       expect_equal(rep(0345.4, length(degree_vec)), unname(rv[toggle_tmax + 1 - init_time, (last_index + 1):(last_index + length(degree_vec))]))
       last_index <- last_index + length(degree_vec)
       expect_equal(rep(1345.4, length(degrange_from)), unname(rv[toggle_tmax + 1 - init_time, (last_index + 1):(last_index + length(degrange_from))]))
