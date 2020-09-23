@@ -260,6 +260,382 @@ S_CHANGESTAT_FN(s_mean_age_mon){
   }
 }
 
+// mean age of half-ties by nodal attribute
+typedef struct {
+  int *nodecov;
+  int *edges;
+  double *ages;
+  double *newages;
+  double *emptyvals;
+  int log;
+} nodefactor_mean_age_storage;
+
+I_CHANGESTAT_FN(i_nodefactor_mean_age) {
+  ALLOC_STORAGE(1, nodefactor_mean_age_storage, sto);
+  
+  sto->nodecov = INTEGER(getListElement(mtp->R, "nodecov"));
+  sto->log = asInteger(getListElement(mtp->R, "log"));
+  sto->emptyvals = REAL(getListElement(mtp->R, "emptynwstats"));
+  sto->edges = Calloc(N_CHANGE_STATS, int);
+  sto->ages = Calloc(N_CHANGE_STATS, double);
+  sto->newages = Calloc(N_CHANGE_STATS, double);
+
+  // populate fields with initial edge set
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
+  
+  int transform = sto->log;
+  
+  EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
+    int et = ElapsedTime(tail,head,dur_inf);
+    CSD_TRANSFORM_ET(et);
+    int index = sto->nodecov[tail];
+    if(index >= 0) {
+      sto->ages[index] += ett1;
+      sto->edges[index]++;
+    }
+    index = sto->nodecov[head];
+    if(index >= 0) {
+      sto->ages[index] += ett1;
+      sto->edges[index]++;
+    }
+  });  
+}
+
+X_CHANGESTAT_FN(x_nodefactor_mean_age) {
+  ZERO_ALL_CHANGESTATS();
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
+    
+  if(type == TICK) {
+    GET_STORAGE(nodefactor_mean_age_storage, sto);
+
+    if(sto->log == 0) {
+      for(int i = 0; i < N_CHANGE_STATS; i++) {
+        sto->ages[i] += sto->edges[i];
+        CHANGE_STAT[i] = sto->edges[i] ? 1 : 0;
+      }
+    } else {
+      int transform = sto->log;
+
+      double *oldages = Calloc(N_CHANGE_STATS, double);
+      memcpy(oldages, sto->ages, N_CHANGE_STATS*sizeof(double));      
+      memset(sto->ages, 0, N_CHANGE_STATS*sizeof(double));
+      
+      EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
+        int et = ElapsedTime(tail, head, dur_inf) + 1;
+        CSD_TRANSFORM_ET(et);
+        
+        int tailindex = sto->nodecov[tail];
+        int headindex = sto->nodecov[head];
+        if(tailindex >= 0) {
+          sto->ages[tailindex] += ett1;
+        }
+        if(headindex >= 0) {
+          sto->ages[headindex] += ett1;
+        }
+      });
+
+      for(int i = 0; i < N_CHANGE_STATS; i++) {
+        CHANGE_STAT[i] = sto->edges[i] ? (sto->ages[i] - oldages[i])/sto->edges[i] : 0;          
+      }
+      
+      Free(oldages);
+    }
+  }  
+}
+
+C_CHANGESTAT_FN(c_nodefactor_mean_age) {
+  GET_STORAGE(nodefactor_mean_age_storage, sto);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+  
+  // NB: need to consider case tailtype == headtype
+  int tailindex = sto->nodecov[tail];
+  int headindex = sto->nodecov[head];
+  
+  if(tailindex == headindex && tailindex >= 0) {
+    double s0 = sto->ages[tailindex], s1 = sto->ages[tailindex]; // Sum of age values of initial and final network.
+    Edge e0 = sto->edges[tailindex], e1 = sto->edges[tailindex]; // Number of edges in initial and final network.
+          
+    int change = edgeflag ? -2 : 2;
+    int et = ElapsedTimeToggle(tail, head, dur_inf, edgeflag);  
+    
+    int transform = sto->log; // Transformation code.      
+    CSD_TRANSFORM_ET(et);
+    
+    s1 += change*ett1;
+    e1 += change;
+    
+    sto->newages[tailindex] = s1;
+  
+    CHANGE_STAT[tailindex] = (e1 == 0 ? sto->emptyvals[tailindex] : s1/e1) - (e0 == 0 ? sto->emptyvals[tailindex] : s0/e0);      
+  } else {
+    if(tailindex >= 0) {
+      double s0 = sto->ages[tailindex], s1 = sto->ages[tailindex]; // Sum of age values of initial and final network.
+      Edge e0 = sto->edges[tailindex], e1 = sto->edges[tailindex]; // Number of edges in initial and final network.
+            
+      int change = edgeflag ? -1 : 1;
+      int et = ElapsedTimeToggle(tail, head, dur_inf, edgeflag);  
+      
+      int transform = sto->log; // Transformation code.      
+      CSD_TRANSFORM_ET(et);
+      
+      s1 += change*ett1;
+      e1 += change;
+      
+      sto->newages[tailindex] = s1;
+    
+      CHANGE_STAT[tailindex] = (e1 == 0 ? sto->emptyvals[tailindex] : s1/e1) - (e0 == 0 ? sto->emptyvals[tailindex] : s0/e0);
+    }
+    if(headindex >= 0) {
+      double s0 = sto->ages[headindex], s1 = sto->ages[headindex]; // Sum of age values of initial and final network.
+      Edge e0 = sto->edges[headindex], e1 = sto->edges[headindex]; // Number of edges in initial and final network.
+            
+      int change = edgeflag ? -1 : 1;
+      int et = ElapsedTimeToggle(tail, head, dur_inf, edgeflag);  
+      
+      int transform = sto->log; // Transformation code.      
+      CSD_TRANSFORM_ET(et);
+      
+      s1 += change*ett1;
+      e1 += change;
+      
+      sto->newages[headindex] = s1;
+    
+      CHANGE_STAT[headindex] = (e1 == 0 ? sto->emptyvals[headindex] : s1/e1) - (e0 == 0 ? sto->emptyvals[headindex] : s0/e0);      
+    }
+  }
+}
+
+U_CHANGESTAT_FN(u_nodefactor_mean_age) {
+  GET_STORAGE(nodefactor_mean_age_storage, sto);
+
+  // note the following is fine even if tailindex == headindex,
+  // although it may be confusing to assign sto->ages[index] twice 
+  // in that case
+  int index = sto->nodecov[tail];
+  if(index >= 0) {
+    sto->ages[index] = sto->newages[index];
+    sto->edges[index] += edgeflag ? -1 : +1;
+  }
+  index = sto->nodecov[head];
+  if(index >= 0) {
+    sto->ages[index] = sto->newages[index];
+    sto->edges[index] += edgeflag ? -1 : +1;
+  }  
+}
+
+F_CHANGESTAT_FN(f_nodefactor_mean_age) {
+  GET_STORAGE(nodefactor_mean_age_storage, sto);
+
+  Free(sto->edges);
+  Free(sto->ages);
+  Free(sto->newages);
+}
+
+S_CHANGESTAT_FN(s_nodefactor_mean_age) {  
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+
+  int *nodecov = INTEGER(getListElement(mtp->R, "nodecov"));
+  double *emptyvals = REAL(getListElement(mtp->R, "emptynwstats"));
+  int transform = asInteger(getListElement(mtp->R, "log"));
+
+  int *edges = Calloc(N_CHANGE_STATS, int);
+  double *ages = Calloc(N_CHANGE_STATS, double);
+  
+  EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
+    int et = ElapsedTime(tail,head,dur_inf);
+    CSD_TRANSFORM_ET(et);
+    
+    int tailindex = nodecov[tail];
+    int headindex = nodecov[head];
+
+    if(tailindex >= 0) {
+      ages[tailindex] += ett1;
+      edges[tailindex]++;
+    }
+    if(headindex >= 0) {
+      ages[headindex] += ett1;
+      edges[headindex]++;        
+    }
+  });
+  
+  for(int i = 0; i < N_CHANGE_STATS; i++) {
+    if(edges[i] > 0) {
+      CHANGE_STAT[i] = ages[i]/edges[i];
+    } else {
+      CHANGE_STAT[i] = emptyvals[i];
+    }
+  }
+}
+
+// mean age of ties by mixing type
+
+// mean age of half-ties by nodal attribute
+typedef struct {
+  int *nodecov;
+  int *edges;
+  int **indmat;
+  double *ages;
+  double *newages;
+  double *emptyvals;
+  int log;
+} nodemix_mean_age_storage;
+
+I_CHANGESTAT_FN(i_nodemix_mean_age) {
+  ALLOC_STORAGE(1, nodemix_mean_age_storage, sto);
+  
+  sto->nodecov = INTEGER(getListElement(mtp->R, "nodecov"));
+  sto->log = asInteger(getListElement(mtp->R, "log"));
+  sto->emptyvals = REAL(getListElement(mtp->R, "emptynwstats"));
+  sto->edges = Calloc(N_CHANGE_STATS, int);
+  sto->ages = Calloc(N_CHANGE_STATS, double);
+  sto->newages = Calloc(N_CHANGE_STATS, double);
+
+  int nr = asInteger(getListElement(mtp->R, "nr"));
+  int nc = asInteger(getListElement(mtp->R, "nc"));
+  
+  sto->indmat = Calloc(nr, int *);
+  sto->indmat[0] = INTEGER(getListElement(mtp->R, "indmat"));
+  for(int i = 1; i < nr; i++) {
+    sto->indmat[i] = sto->indmat[i - 1] + nc;
+  }
+  
+  // populate fields with initial edge set
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
+  
+  int transform = sto->log;
+  
+  EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
+    int et = ElapsedTime(tail,head,dur_inf);
+    CSD_TRANSFORM_ET(et);
+    int index = sto->indmat[sto->nodecov[tail]][sto->nodecov[head]];
+    if(index >= 0) {
+      sto->ages[index] += ett1;
+      sto->edges[index]++;
+    }
+  });  
+}
+
+X_CHANGESTAT_FN(x_nodemix_mean_age) {
+  ZERO_ALL_CHANGESTATS();
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
+    
+  if(type == TICK) {
+    GET_STORAGE(nodemix_mean_age_storage, sto);
+
+    if(sto->log == 0) {
+      for(int i = 0; i < N_CHANGE_STATS; i++) {
+        sto->ages[i] += sto->edges[i];
+        CHANGE_STAT[i] = sto->edges[i] ? 1 : 0;
+      }
+    } else {
+      int transform = sto->log;
+
+      double *oldages = Calloc(N_CHANGE_STATS, double);
+      memcpy(oldages, sto->ages, N_CHANGE_STATS*sizeof(double));      
+      memset(sto->ages, 0, N_CHANGE_STATS*sizeof(double));
+      
+      EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
+        int et = ElapsedTime(tail, head, dur_inf) + 1;
+        CSD_TRANSFORM_ET(et);
+        
+        int index = sto->indmat[sto->nodecov[tail]][sto->nodecov[head]];
+        if(index >= 0) {
+          sto->ages[index] += ett1;
+        }
+      });
+
+      for(int i = 0; i < N_CHANGE_STATS; i++) {
+        CHANGE_STAT[i] = sto->edges[i] ? (sto->ages[i] - oldages[i])/sto->edges[i] : 0;          
+      }
+      
+      Free(oldages);
+    }
+  }  
+}
+
+C_CHANGESTAT_FN(c_nodemix_mean_age) {
+  GET_STORAGE(nodemix_mean_age_storage, sto);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+  
+  int index = sto->indmat[sto->nodecov[tail]][sto->nodecov[head]];
+  if(index >= 0) {
+    double s0 = sto->ages[index], s1 = sto->ages[index]; // Sum of age values of initial and final network.
+    Edge e0 = sto->edges[index], e1 = sto->edges[index]; // Number of edges in initial and final network.
+          
+    int change = edgeflag ? -1 : 1;
+    int et = ElapsedTimeToggle(tail, head, dur_inf, edgeflag);  
+    
+    int transform = sto->log; // Transformation code.      
+    CSD_TRANSFORM_ET(et);
+    
+    s1 += change*ett1;
+    e1 += change;
+    
+    sto->newages[index] = s1;
+  
+    CHANGE_STAT[index] = (e1 == 0 ? sto->emptyvals[index] : s1/e1) - (e0 == 0 ? sto->emptyvals[index] : s0/e0);
+  }  
+}
+
+U_CHANGESTAT_FN(u_nodemix_mean_age) {
+  GET_STORAGE(nodemix_mean_age_storage, sto);
+
+  int index = sto->indmat[sto->nodecov[tail]][sto->nodecov[head]];
+  if(index >= 0) {
+    sto->ages[index] = sto->newages[index];
+    sto->edges[index] += edgeflag ? -1 : +1;
+  }
+}
+
+F_CHANGESTAT_FN(f_nodemix_mean_age) {
+  GET_STORAGE(nodemix_mean_age_storage, sto);
+
+  Free(sto->edges);
+  Free(sto->ages);
+  Free(sto->newages);
+  Free(sto->indmat);  
+}
+
+S_CHANGESTAT_FN(s_nodemix_mean_age) {
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+
+  int *nodecov = INTEGER(getListElement(mtp->R, "nodecov"));
+  double *emptyvals = REAL(getListElement(mtp->R, "emptynwstats"));
+  int transform = asInteger(getListElement(mtp->R, "log"));
+
+  int nr = asInteger(getListElement(mtp->R, "nr"));
+  int nc = asInteger(getListElement(mtp->R, "nc"));
+  
+  int **indmat = Calloc(nr, int *);
+  indmat[0] = INTEGER(getListElement(mtp->R, "indmat"));
+  for(int i = 1; i < nr; i++) {
+    indmat[i] = indmat[i - 1] + nc;
+  }
+
+  int *edges = Calloc(N_CHANGE_STATS, int);
+  double *ages = Calloc(N_CHANGE_STATS, double);
+  
+  EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
+    int et = ElapsedTime(tail,head,dur_inf);
+    CSD_TRANSFORM_ET(et);
+    
+    int index = indmat[nodecov[tail]][nodecov[head]];
+
+    if(index >= 0) {
+      ages[index] += ett1;
+      edges[index]++;
+    }
+  });
+  
+  for(int i = 0; i < N_CHANGE_STATS; i++) {
+    if(edges[i] > 0) {
+      CHANGE_STAT[i] = ages[i]/edges[i];
+    } else {
+      CHANGE_STAT[i] = emptyvals[i];
+    }
+  }  
+}
+
 /*****************
  edgecov_mean_age
 
