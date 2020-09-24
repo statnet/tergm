@@ -448,7 +448,7 @@ test_that("durational terms behave correctly with summary and godfather", {
     }
   
     # toggle off all edges at time toggle_tmax + 1
-    toggle_mat <- rbind(toggle_mat, cbind(toggle_tmax + 1, last_ellt[,1:2]))
+    toggle_mat <- rbind(toggle_mat, cbind(toggle_tmax + 1, last_ellt[,1:2,drop=FALSE]))
   
     toggles <- toggle_mat
   
@@ -479,7 +479,9 @@ test_that("durational terms behave correctly with summary and godfather", {
                                  degrange.mean.age(degrange_from, degrange_to, attrname, emptyval=7345.4, log=TRUE) +
                                  Form(~edges) + 
                                  Diss(~edges),
-                            toggles=toggles)
+                            toggles=toggles,
+                            start=toggle_tmin-1L,
+                            end=toggle_tmax+1L)
     } else if(nwtype == 2) {
       rv <- tergm.godfather(nw ~ edges + 
                                  mean.age(emptyval=3425.432) + 
@@ -507,7 +509,9 @@ test_that("durational terms behave correctly with summary and godfather", {
                                  degrange.mean.age(degrange_from, degrange_to, attrname, emptyval=7345.4, log=TRUE) +
                                  Form(~edges) + 
                                  Diss(~edges),
-                            toggles=toggles)    
+                            toggles=toggles,
+                            start=toggle_tmin-1L,
+                            end=toggle_tmax+1L)    
     } else {
       rv <- tergm.godfather(nw ~ edges + 
                                  mean.age(emptyval=3425.432) + 
@@ -527,7 +531,9 @@ test_that("durational terms behave correctly with summary and godfather", {
                                  nodemix.mean.age(attr="mean_age_attr", log=TRUE, levels=nodemix_ma_lev, levels2=nodemix_ma_lev2) +
                                  Form(~edges) + 
                                  Diss(~edges),
-                            toggles=toggles)  
+                            toggles=toggles,
+                            start=toggle_tmin-1L,
+                            end=toggle_tmax+1L)  
     }
     
     rv <- as.matrix(rv)  
@@ -541,16 +547,14 @@ test_that("durational terms behave correctly with summary and godfather", {
       }    
     }
     
-    # note that the averages will not function correctly if we hit an empty network,
-    # but parameters have been chosen such that we never should, except when it is
-    # forced on the final time step, which we test differently after this loop
     for(j in toggle_tmin:toggle_tmax) {
-      expect_equal(mean(j - el_lts[[j]][,3] + 1), unname(rv[j - init_time,2]))
+      this_iter_has_edges <- NROW(el_lts[[j]]) > 0
+      expect_equal(if(this_iter_has_edges) mean(j - el_lts[[j]][,3] + 1) else 3425.432, unname(rv[j - init_time,2]))
       expect_equal(sum(j - el_lts[[j]][,3] + 1), unname(rv[j - init_time,3]))
-      expect_equal(sum(wts[el_lts_b[[j]][,1:2]]*(j - el_lts[[j]][,3] + 1)), unname(rv[j - init_time, 4]))
-      expect_equal(sum(wts[el_lts_b[[j]][,1:2]]*(j - el_lts[[j]][,3] + 1))/sum(wts[el_lts_b[[j]][,1:2]]), unname(rv[j - init_time, 5]))
-      expect_equal(mean(log(j - el_lts[[j]][,3] + 1)), unname(rv[j - init_time,6]))
-      expect_equal(sum(wts[el_lts_b[[j]][,1:2]]*log(j - el_lts[[j]][,3] + 1))/sum(wts[el_lts_b[[j]][,1:2]]), unname(rv[j - init_time, 7]))
+      expect_equal(sum(wts[el_lts_b[[j]][,1:2,drop=FALSE]]*(j - el_lts[[j]][,3] + 1)), unname(rv[j - init_time, 4]))
+      expect_equal(if(this_iter_has_edges) sum(wts[el_lts_b[[j]][,1:2,drop=FALSE]]*(j - el_lts[[j]][,3] + 1))/sum(wts[el_lts_b[[j]][,1:2,drop=FALSE]]) else exp(pi/5)/3.14, unname(rv[j - init_time, 5]))
+      expect_equal(if(this_iter_has_edges) mean(log(j - el_lts[[j]][,3] + 1)) else 13.1, unname(rv[j - init_time,6]))
+      expect_equal(if(this_iter_has_edges) sum(wts[el_lts_b[[j]][,1:2,drop=FALSE]]*log(j - el_lts[[j]][,3] + 1))/sum(wts[el_lts_b[[j]][,1:2,drop=FALSE]]) else 0.874, unname(rv[j - init_time, 7]))
       
       for(k in seq_len(length(ages_from))) {
         expect_equal(sum(j - el_lts[[j]][,3] + 1 >= ages_from[k] & j - el_lts[[j]][,3] + 1 < ages_to[k]), unname(rv[j - init_time, 7 + k]))
