@@ -60,6 +60,169 @@ InitErgmTerm.mean.age<-function(nw, arglist, ...) {
        auxiliaries = ~.lasttoggle)
 }
 
+InitErgmTerm.nodefactor.mean.age <- function(nw, arglist, ...) {
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c("attr", "levels", "emptyval", "log"),
+                      vartypes = c(ERGM_VATTR_SPEC, ERGM_LEVELS_SPEC, "numeric", "logical"),
+                      defaultvalues = list(NULL, NULL, 0, FALSE),
+                      required = c(TRUE, FALSE, FALSE, FALSE))
+  attrarg <- a$attr                        
+  levels <- a$levels  
+
+  nodecov <- ergm_get_vattr(attrarg, nw)
+  attrname <- attr(nodecov, "name")
+  u <- ergm_attr_levels(levels, nodecov, nw, levels = sort(unique(nodecov)))  
+  
+  if(!is.logical(a$log) || length(a$log) > 1) {
+    ergm_Init_abort("log argument must be a length 1 logical")
+  }  
+
+  cn <- paste(if(a$log) "nodefactor.mean.log.age" else "nodefactor.mean.age", paste(attrname,collapse="."), u, sep=".")
+  
+  if(!is.numeric(a$emptyval)) {
+    ergm_Init_abort("emptyval must be numeric")
+  }
+  
+  if(length(a$emptyval) == 1) {
+    a$emptyval <- rep(a$emptyval, length(cn))
+  } else if(length(a$emptyval) != length(cn)) {
+    ergm_Init_abort("emptyval must be either length 1 or have length equal to the number of statistics")
+  }
+
+  #   Recode to numeric
+  nodecov <- c(0, match(nodecov, u, nomatch = 0)) - 1
+
+  ### Construct the list to return
+  list(name="nodefactor_mean_age",
+       coef.names = cn,
+       dependence=FALSE,
+       duration=TRUE,
+       auxiliaries = ~.lasttoggle,
+       inputs = NULL, # passed by name
+       emptynwstats = as.double(a$emptyval),
+       nodecov = as.integer(nodecov),
+       log = as.integer(a$log))  
+}
+
+InitErgmTerm.nodemix.mean.age <- function(nw, arglist, ...) {
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c("attr", "b1levels", "b2levels", "levels", "levels2", "emptyval", "log"),
+                      vartypes = c(ERGM_VATTR_SPEC, ERGM_LEVELS_SPEC, ERGM_LEVELS_SPEC, ERGM_LEVELS_SPEC, ERGM_LEVELS_SPEC, "numeric", "logical"),
+                      defaultvalues = list(NULL, NULL, NULL, NULL, NULL, 0, FALSE),
+                      required = c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE))
+                      
+  attrarg <- a$attr
+  b1levels <- a$b1levels
+  b2levels <- a$b2levels  
+
+  nodecov <- ergm_get_vattr(attrarg, nw)
+  attrname <- attr(nodecov, "name")
+  
+  if(!is.logical(a$log) || length(a$log) > 1) {
+    ergm_Init_abort("log argument must be a length 1 logical")
+  }  
+  
+  if (is.bipartite(nw)) {
+    #  So undirected network storage but directed mixing
+    
+    b1nodecov <- ergm_get_vattr(attrarg, nw, bip = "b1")
+    b2nodecov <- ergm_get_vattr(attrarg, nw, bip = "b2")
+    
+    b1namescov <- ergm_attr_levels(b1levels, b1nodecov, nw, sort(unique(b1nodecov)))
+    b2namescov <- ergm_attr_levels(b2levels, b2nodecov, nw, sort(unique(b2nodecov)))
+    
+    nr <- length(b1namescov)
+    nc <- length(b2namescov)
+    
+    levels2.list <- transpose(expand.grid(row = b1namescov, col = b2namescov, stringsAsFactors=FALSE))
+    indices2.grid <- expand.grid(row = 1:nr, col = nr + 1:nc)
+   
+    levels2.sel <- ergm_attr_levels(a$levels2, list(row = b1nodecov, col = b2nodecov), nw, levels2.list)
+    
+    rows2keep <- match(levels2.sel,levels2.list, NA)
+    rows2keep <- rows2keep[!is.na(rows2keep)]
+  
+    u <- indices2.grid[rows2keep,]
+  
+    # Recode to numeric
+    b1nodecov <- match(b1nodecov,b1namescov,nomatch=length(b1namescov)+1)
+    b2nodecov <- match(b2nodecov,b2namescov,nomatch=length(b2namescov)+1)
+  
+    namescov <- c(b1namescov, b2namescov)
+    
+    nodecov <- c(b1nodecov, b2nodecov)
+    
+    cn <- paste(if(a$log) "nodemix.mean.log.age" else "nodemix.mean.age", paste(attrname,collapse="."), apply(matrix(namescov[as.matrix(u)],ncol=2),
+                                       1,paste,collapse="."), sep=".")
+                                       
+    ## the +1 for nrow and ncol are needed by the way we code non-included b1 and b2 levels above
+    indmat <- matrix(0L, nrow = nr + 1, ncol = nc + 1)
+    u[,2L] <- u[,2L] - nr
+    indmat[as.matrix(u)] <- seq_len(NROW(u))
+    indmat <- indmat - 1L
+  } else { # So one mode, but could be directed or undirected
+    u <- ergm_attr_levels(a$levels, nodecov, nw, sort(unique(nodecov)))
+    namescov <- u 
+    
+    nr <- length(u)
+    nc <- length(u)
+
+    levels2.list <- transpose(expand.grid(row = u, col = u, stringsAsFactors=FALSE))
+    indices2.grid <- expand.grid(row = 1:nr, col = 1:nc)
+    uun <- as.vector(outer(u,u,paste,sep="."))
+    
+    if (!is.directed(nw)) {
+        rowleqcol <- indices2.grid$row <= indices2.grid$col
+        levels2.list <- levels2.list[rowleqcol]
+        indices2.grid <- indices2.grid[rowleqcol,]
+        uun <- uun[rowleqcol]
+    }    
+   
+    levels2.sel <- ergm_attr_levels(a$levels2, list(row = nodecov, col = nodecov), nw, levels2.list)
+    
+    rows2keep <- match(levels2.sel,levels2.list, NA)
+    rows2keep <- rows2keep[!is.na(rows2keep)]
+  
+    u <- indices2.grid[rows2keep,]
+    uun <- uun[rows2keep]
+
+    nodecov <- match(nodecov,namescov,nomatch=length(namescov)+1)
+    
+    cn <- paste(if(a$log) "nodemix.mean.log.age" else "nodemix.mean.age", paste(attrname,collapse="."), uun, sep=".")
+
+    ## the +1 for nrow and ncol are needed by the way we code non-included b1 and b2 levels above
+    indmat <- matrix(0L, nrow = nr + 1, ncol = nc + 1)
+    indmat[as.matrix(u)] <- seq_len(NROW(u))
+    if(!is.directed(nw)) indmat <- indmat + t(indmat) - diag(diag(indmat))
+    indmat <- indmat - 1L
+  }
+  
+  if(!is.numeric(a$emptyval)) {
+    ergm_Init_abort("emptyval must be numeric")
+  }
+  
+  if(length(a$emptyval) == 1) {
+    a$emptyval <- rep(a$emptyval, length(cn))
+  } else if(length(a$emptyval) != length(cn)) {
+    ergm_Init_abort("emptyval must be either length 1 or have length equal to the number of statistics")
+  }
+    
+  ### Construct the list to return
+  list(name = "nodemix_mean_age", 
+       coef.names = cn, # will need to incorporate log in name
+       dependence = FALSE,
+       emptynwstats = as.double(a$emptyval),
+       duration = TRUE,
+       auxiliaries = ~.lasttoggle,
+       inputs = NULL, # passed by name below; we will also use emptynwstats in the changestat functions
+       log = as.integer(a$log),
+       nr = as.integer(nr + 1),
+       nc = as.integer(nc + 1),
+       indmat = as.integer(t(indmat)),
+       nodecov = as.integer(c(0L, nodecov) - 1L)) # two shifts to make the C code cleaner
+}
+
+
 InitErgmTerm.edgecov.mean.age<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist, 
                       varnames = c("x", "attrname", "emptyval", "log"),

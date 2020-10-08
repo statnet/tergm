@@ -55,7 +55,7 @@ y0<-simulate(y0~edges, constraints=~blockdiag("a"), coef=theta, control=control.
 
 cat("Complete data:\n")
 
-set.seed(123)
+set.seed(125)
 y1<-simulate(y0~edges, constraints=~blockdiag("a"), coef=theta, control=control.simulate(MCMC.burnin=n^2*2), dynamic=FALSE)
 
 # Force CMPLE

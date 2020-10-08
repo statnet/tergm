@@ -13,6 +13,7 @@
 #include "changestats_lasttoggle.h"
 #include "ergm_storage.h"
 #include "tergm_model.h"
+#include "ergm_Rutil.h"
 
 X_CHANGESTAT_FN(x_edges_ageinterval_mon);
 C_CHANGESTAT_FN(c_edges_ageinterval_mon);
@@ -31,6 +32,20 @@ X_CHANGESTAT_FN(x_mean_age_mon);
 C_CHANGESTAT_FN(c_mean_age_mon);
 U_CHANGESTAT_FN(u_mean_age_mon);
 S_CHANGESTAT_FN(s_mean_age_mon);
+
+I_CHANGESTAT_FN(i_nodefactor_mean_age);
+X_CHANGESTAT_FN(x_nodefactor_mean_age);
+C_CHANGESTAT_FN(c_nodefactor_mean_age);
+U_CHANGESTAT_FN(u_nodefactor_mean_age);
+F_CHANGESTAT_FN(f_nodefactor_mean_age);
+S_CHANGESTAT_FN(s_nodefactor_mean_age);
+
+I_CHANGESTAT_FN(i_nodemix_mean_age);
+X_CHANGESTAT_FN(x_nodemix_mean_age);
+C_CHANGESTAT_FN(c_nodemix_mean_age);
+U_CHANGESTAT_FN(u_nodemix_mean_age);
+F_CHANGESTAT_FN(f_nodemix_mean_age);
+S_CHANGESTAT_FN(s_nodemix_mean_age);
 
 I_CHANGESTAT_FN(i_edgecov_mean_age_mon);
 X_CHANGESTAT_FN(x_edgecov_mean_age_mon);
