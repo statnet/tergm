@@ -1,5 +1,5 @@
 Package: tergm
-Version: 3.7.0-2009
+Version: 3.7.0
 Date: 2020-10-08
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
@@ -15,7 +15,7 @@ Authors@R: c(
   person("Li","Wang",role=c("ctb"),email="lxwang@gmail.com"),
   person("Kirk","Li",role=c("ctb"),email="kirkli@uw.edu"))
 Depends:
-    ergm (>= 3.10.1),
+    ergm (>= 3.11),
     network (>= 1.15),
     networkDynamic (>= 0.10.0)
 Imports:
@@ -70,7 +70,4 @@ Collate:
     'summary.statistics.networkDynamic.R'
     'summary.stergm.R'
     'zzz.R'
-Remotes: github::statnet/statnet.common@master,
-    github::statnet/network@master,
-    github::statnet/networkDynamic@master,
-    github::statnet/ergm@master
+Remotes: github::statnet/ergm@3.11

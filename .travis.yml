@@ -12,12 +12,9 @@ matrix:
 sudo: false
 cache: packages
 r_github_packages:
-- statnet/statnet.common
-- statnet/network
-- statnet/networkDynamic
-- statnet/ergm
+- statnet/ergm@3.11
 addons:
   apt:
     packages:
       - r-cran-rmpi
-warnings_are_errors: false
+warnings_are_errors: true
