@@ -5,6 +5,6 @@
  *  open source, and has the attribution requirements (GPL Section 7) at
  *  https://statnet.org/attribution
  *
- *  Copyright 2008-2019 Statnet Commons
+ *  Copyright 2008-2020 Statnet Commons
  */
 #include "ergm_stubs.c"

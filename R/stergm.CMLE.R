@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution
 #
-#  Copyright 2008-2019 Statnet Commons
+#  Copyright 2008-2020 Statnet Commons
 #######################################################################
 stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.coef.form, offset.coef.diss,
                         eval.loglik,
