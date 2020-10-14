@@ -71,4 +71,3 @@ Collate:
     'summary.statistics.networkDynamic.R'
     'summary.stergm.R'
     'zzz.R'
-Remotes: github::statnet/ergm@3.11

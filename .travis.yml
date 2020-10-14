@@ -11,8 +11,6 @@ matrix:
     os: osx
 sudo: false
 cache: packages
-r_github_packages:
-- statnet/ergm@3.11
 addons:
   apt:
     packages:
