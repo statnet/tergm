@@ -68,6 +68,8 @@
       \item Durational terms \code{edges.ageinterval} (\code{s_} function) and \code{edgecov.mean.age} (\code{s_} and \code{d_} functions) had bugs fixed.
 
       \item A bug involving assumptions based on the first entry of the \code{lasttoggle} vector has been corrected.
+
+      \item A number of broken links has been fixed.
     }
   }
 
