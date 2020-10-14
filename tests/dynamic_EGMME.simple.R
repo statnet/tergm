@@ -26,6 +26,7 @@ truth <- coef.exact(target.stats[1]/network.dyadcount(g0),
                     target.stats[2])
 
 # Get a deliberately bad starting network.
+set.seed(0)
 g1<-san(g0~meandeg,target.stats=target.stats[1],verbose=TRUE)
 
 # Fit the model with very poor starting values.
