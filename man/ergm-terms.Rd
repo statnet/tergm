@@ -183,18 +183,18 @@
       Krivitsky P. N. and Morris M.
 (2012). _Fit, Simulate and Diagnose Exponential-Family Models for
 Networks_. Version 3.1.  Project home
-page at <URL: http://www.statnet.org>, <URL:
+page at <URL: https://statnet.org>, <URL:
 CRAN.R-project.org/package=ergm>.
   
 \item  Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
   Egocentric Data with Durational Information. \emph{Pennsylvania State
   University Department of Statistics Technical Report},
-  2012(2012-01). \url{http://stat.psu.edu/research/technical-report-files/2012-technical-reports/modeling-of-dynamic-networks-based-on-egocentric-data-with-durational-information}
+  2012(2012-01). \url{https://web.archive.org/web/20170830053722/https://stat.psu.edu/research/technical-report-files/2012-technical-reports/TR1201A.pdf}
 
 \item  Krivitsky, P.N. (2012). Modeling Tie Duration in ERGM-Based Dynamic
   Network Models. \emph{Pennsylvania State University Department of
   Statistics Technical Report},
-  2012(2012-02). \url{http://stat.psu.edu/research/technical-report-files/2012-technical-reports/TR1201A.pdf}
+  2012(2012-02).
   }
 }
 \seealso{\code{\link[ergm:ergm-terms]{ergm-terms}} (from the \code{\link[=ergm-package]{ergm}} package), \code{\link{ergm}}, \code{\link{network}}, \code{\link{\%v\%}}, \code{\link{\%n\%}}}
