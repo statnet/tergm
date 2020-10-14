@@ -14,7 +14,7 @@ bibentry("Manual", author = structure(list(list(given = "Pavel N.",
     comment = NULL)), class = "person"), title = paste("tergm", 
     ": ", "Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models", 
     sep = ""), organization = paste("The Statnet Project (\\url{", 
-    "https://statnet.org", "})", sep = ""), year = substr("2020-10-08", 
+    "https://statnet.org", "})", sep = ""), year = substr("2020-10-14", 
     1, 4), note = paste("R package version ", "3.7.0", sep = ""), 
     url = paste("https://CRAN.R-project.org/package=", "tergm", 
         sep = ""))
