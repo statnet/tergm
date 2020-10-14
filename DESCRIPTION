@@ -12,10 +12,11 @@ Authors@R: c(
         person("Carter T.", "Butts", role=c("ctb"), email="buttsc@uci.edu"),
 	person("Ayn", "Leslie-Cook", role=c("ctb"), email="aynlc3@uw.edu"),
 	person("Skye", "Bender-deMoll", role=c("ctb"), email="skyebend@skyeome.net"),
-  person("Li","Wang",role=c("ctb"),email="lxwang@gmail.com"),
-  person("Kirk","Li",role=c("ctb"),email="kirkli@uw.edu"))
+        person("Li","Wang",role=c("ctb"),email="lxwang@gmail.com"),
+        person("Kirk","Li",role=c("ctb"),email="kirkli@uw.edu"),
+        person("Chad", "Klumb", role=c("ctb"), email="cklumb@gmail.com"))
 Depends:
-    ergm (>= 3.11),
+    ergm (>= 3.11.0),
     network (>= 1.15),
     networkDynamic (>= 0.10.0)
 Imports:
@@ -36,7 +37,7 @@ Description: An integrated set of extensions to the 'ergm' package to analyze an
 License: GPL-3 + file LICENSE
 URL: http://www.statnet.org
 VignetteBuilder: rmarkdown, knitr
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
 Collate: 

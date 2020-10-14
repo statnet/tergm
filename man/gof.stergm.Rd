@@ -67,7 +67,7 @@ plot(samplk12.gof, plotlogodds=TRUE)
 
 }
 \seealso{
-\code{\link[=stergm]{stergm()}}, \code{\link[=ergm]{ergm()}}, \code{\link[=simulate.stergm]{simulate.stergm()}}, \code{\link[ergm:print.gof]{ergm::print.gof()}}, \code{\link[ergm:plot.gof]{ergm::plot.gof()}},
+\code{\link[=stergm]{stergm()}}, \code{\link[=ergm]{ergm()}}, \code{\link[=simulate.stergm]{simulate.stergm()}}, \code{\link[ergm:gof]{ergm::print.gof()}}, \code{\link[ergm:gof]{ergm::plot.gof()}},
 summary.gof, mcmc.diagnostics.ergm
 }
 \keyword{models}
