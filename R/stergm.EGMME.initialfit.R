@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution
 #
-#  Copyright 2008-2019 Statnet Commons
+#  Copyright 2008-2020 Statnet Commons
 #######################################################################
 stergm.EGMME.initialfit<-function(formation, dissolution, targets, init.form, init.diss, nw, model.form, model.diss, model.mon, control, verbose=FALSE){
 

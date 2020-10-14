@@ -1,14 +1,14 @@
-%  File man/tergm_MH_proposals.Rd in package tergm, part of the Statnet suite
+%  File man/ergm-proposals.Rd in package tergm, part of the Statnet suite
 %  of packages for network analysis, https://statnet.org .
 %
 %  This software is distributed under the GPL-3 license.  It is free,
 %  open source, and has the attribution requirements (GPL Section 7) at
 %  https://statnet.org/attribution
 %
-%  Copyright 2008-2019 Statnet Commons
+%  Copyright 2008-2020 Statnet Commons
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\name{tergm_proposals}
-\alias{tergm_proposals}
+\name{ergm-proposals}
+\alias{ergm-proposals}
 \alias{InitErgmProposal}
 \alias{InitErgmProposal.dissolution}
 \alias{InitErgmProposal.dissolutionTNT}
@@ -37,14 +37,15 @@
 
 \title{Metropolis-Hastings Proposal Methods for TERGM MCMC}
 \description{
-  \code{\link{tergm}}  uses a Metropolis-Hastings (MH) algorithm provided by \code{\link{ergm}} to control the behavior of the Markov Chain Monte Carlo (MCMC) for sampling networks.  The MCMC chain is intended to step around the sample space of possible networks, selecting a network at regular intervals to evaluate the statistics in the model.  For each MCMC step, \eqn{n} (\eqn{n=1} in the simple case) toggles are proposed to change the dyad(s) to the opposite value. The probability of accepting the proposed change is determined by the MH acceptance ratio.  The role of the different MH methods implemented in \code{\link{tergm}} is to vary how the sets of dyads are selected for toggle proposals.  This is used in some cases to improve the performance (speed and mixing) of the algorithm, and in other cases to constrain the sample space.}
+  In each phase (formation and dissolution) \code{\link{tergm}} uses a Metropolis-Hastings (MH) algorithm provided by \code{\link{ergm}} to control the behavior of the Markov Chain Monte Carlo (MCMC) for sampling networks.  The MCMC chain is intended to step around the sample space of possible networks, selecting a network at regular intervals to evaluate the statistics in the model.  For each MCMC step, \eqn{n} (\eqn{n=1} in the simple case) toggles are proposed to change the dyad(s) to the opposite value. The probability of accepting the proposed change is determined by the MH acceptance ratio.  The role of the different MH methods implemented in \code{\link{tergm}} is to vary how the sets of dyads are selected for toggle proposals.  This is used in some cases to improve the performance (speed and mixing) of the algorithm, and in other cases to constrain the sample space.
+
+  Generally, the user does not need to select them directly.}
   
 \details{
 
 \subsection{MH proposal methods implemented in the \code{\link[=tergm-package]{tergm}} package}{
   
 
-  TODO: EXPLAIN TERGM PROPOSAL TYPES HERE
   \itemize{
     \item{InitErgmProposal.dissolution}{}
     \item{InitErgmProposal.dissolutionTNT}{}
@@ -105,5 +106,5 @@
 }
 
 \keyword{models}
-
+\keyword{internal}
 
