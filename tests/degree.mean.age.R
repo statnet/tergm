@@ -51,7 +51,7 @@ dynsim<-simulate(g0 ~ Form(~edges) + Diss(~edges),coef=c(coef.form,coef.diss),ti
                  monitor=~edges+mean.age
                  +degree.mean.age(1:3)+degrange.mean.age(1:2,3:4)+degrange.mean.age(1:2)
                  +degree.mean.age(1:3,"a")+degrange.mean.age(1:2,3:4,"a")+degrange.mean.age(1:2,by="a"), dynamic=TRUE,
-                 constraint="discordTNT"~.
+                 constraints=~.
                  )
 
 dynsim.dup <- duplicated(as.data.frame(t(dynsim)))
