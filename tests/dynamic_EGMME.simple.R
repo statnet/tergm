@@ -26,11 +26,12 @@ truth <- coef.exact(target.stats[1]/network.dyadcount(g0),
                     target.stats[2])
 
 # Get a deliberately bad starting network.
+set.seed(0)
 g1<-san(g0~meandeg,target.stats=target.stats[1],verbose=TRUE)
 
 # Fit the model with very poor starting values.
 set.seed(1)
-dynfit<-tergm(g1 ~ Form(~edges) + Diss(~edges), targets=~edges+mean.age, estimate="EGMME",target.stats=target.stats[-3], constraints="discordTNT"~., verbose=TRUE,control=control.tergm(SA.plot.progress=do.plot,SA.restart.on.err=FALSE,init=c(-log(.95/.05), 1)))
+dynfit<-tergm(g1 ~ Form(~edges) + Diss(~edges), targets=~edges+mean.age, estimate="EGMME",target.stats=target.stats[-3], constraints=~., verbose=TRUE,control=control.tergm(SA.plot.progress=do.plot,SA.restart.on.err=FALSE,init=c(-log(.95/.05), 1)))
 
 print(summary(dynfit))
 mcmc.diagnostics(dynfit)
