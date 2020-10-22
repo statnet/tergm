@@ -55,56 +55,44 @@ Exponential-Family Random Graph Models
   
   For detailed information on how to download and install the software,
   go to the Statnet project website:
-  \url{http://statnet.org}.
+  \url{https://statnet.org}.
   A tutorial, support newsgroup, references and links to further resources are provided there.
-}
-\author{
-  Pavel N. Krivitsky \email{krivitsky@stat.psu.edu} and \cr
-  Mark S. Handcock \email{handcock@stat.ucla.edu},\cr
-  with contributions from \cr
-  David R. Hunter \email{dhunter@stat.psu.edu},\cr
-  Steven M. Goodreau \email{goodreau@u.washington.edu},\cr
-  Martina Morris \email{morrism@u.washington.edu},\cr
-  Nicole Bohme Carnegie \email{nicole.carnegie@nyu.edu}, and\cr
-  Ayn Leslie-Cook \email{aynlc3@uw.edu}
-
-  Maintainer: Pavel N. Krivitsky \email{krivitsky@stat.psu.edu}
 }
 \references{
   \itemize{
   \item Hanneke S, Fu W, and Xing EP (2010). Discrete Temporal Models
   of Social Networks. \emph{Electronic Journal of Statistics}, 2010, 4,
-  585-605. \href{http://dx.doi.org/10.1214/09-EJS548}{\code{doi:10.1214/09-EJS548}}
+  585-605. \href{https://dx.doi.org/10.1214/09-EJS548}{\code{doi:10.1214/09-EJS548}}
   
   \item Krivitsky PN & Handcock MS (2014) A Separable Model for Dynamic Networks. \emph{Journal of the Royal Statistical Society, Series B}, 76(1): 29-46. \doi{10.1111/rssb.12014}
 
 \item  Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
   Egocentric Data with Durational Information. \emph{Pennsylvania State
   University Department of Statistics Technical Report},
-  2012(2012-01). \url{http://stat.psu.edu/research/technical-report-files/2012-technical-reports/modeling-of-dynamic-networks-based-on-egocentric-data-with-durational-information}
+  2012(2012-01). \url{https://web.archive.org/web/20170830053722/https://stat.psu.edu/research/technical-report-files/2012-technical-reports/TR1201A.pdf}
 
 
 \item Butts CT (2008).
  \pkg{network}: A Package for Managing Relational Data in \R.
  \emph{Journal of Statistical Software}, 24(2).
- \url{http://www.jstatsoft.org/v24/i02/}.
+ \url{https://www.jstatsoft.org/v24/i02/}.
 
  \item Goodreau SM, Handcock MS, Hunter DR, Butts CT, Morris M (2008a).
  A \pkg{statnet} Tutorial.
  \emph{Journal of Statistical Software}, 24(8).
- \url{http://www.jstatsoft.org/v24/i08/}.
+ \url{https://www.jstatsoft.org/v24/i08/}.
 
  \item Handcock MS, Hunter DR, Butts CT, Goodreau SM, Krivitsky P, and Morris M (2012).
  \pkg{ergm}: A Package to Fit, Simulate and Diagnose
  Exponential-Family Models for Networks.
  Statnet Project, Seattle, WA.
- Version 3, \url{http://statnet.org}.
+ Version 3, \url{https://statnet.org}.
 
  \item Handcock MS, Hunter DR, Butts CT, Goodreau SM, Krivitsky P, Morris M (2012).
  \pkg{statnet}: Software Tools for the Statistical Modeling of
  Network Data.
  Statnet Project, Seattle, WA.
- Version 3, \url{http://statnet.org}.
+ Version 3, \url{https://statnet.org}.
 
  \item Hunter, D. R. and Handcock, M. S. (2006)
  Inference in curved exponential family models for networks,
@@ -115,13 +103,13 @@ Exponential-Family Random Graph Models
  \pkg{ergm}: A Package to Fit, Simulate and Diagnose
  Exponential-Family Models for Networks.
  \emph{Journal of Statistical Software}, 24(3).
- \url{http://www.jstatsoft.org/v24/i03/}.
+ \url{https://www.jstatsoft.org/v24/i03/}.
  
  \item Morris M, Handcock MS, Hunter DR (2008).
  Specification of Exponential-Family Random Graph Models:
  Terms and Computational Aspects.
  \emph{Journal of Statistical Software}, 24(4).
- \url{http://www.jstatsoft.org/v24/i04/}.
+ \url{https://www.jstatsoft.org/v24/i04/}.
 }  
 }
 \keyword{ package }

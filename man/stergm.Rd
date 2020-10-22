@@ -120,9 +120,7 @@ details. At this time, only linear ERGM terms are allowed.  \itemize{
 \item For a brief demonstration, please see the tergm package vignette:
 \code{browseVignettes(package='tergm')} \item A more detailed tutorial is
 avalible on the statnet wiki:
-\url{http://statnet.csde.washington.edu/workshops/SUNBELT/current/tergm/tergm_tutorial.pdf}
-\item For more usage examples, see the wiki page at
-\url{https://statnet.csde.washington.edu/trac/wiki/tergmUsage} }
+\url{https://statnet.org/Workshops/tergm_tutorial.html} }
 }
 \examples{
 
@@ -173,7 +171,7 @@ summary(samplk123)
 \item Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
 Egocentric Data with Durational Information. \emph{Pennsylvania State
 University Department of Statistics Technical Report}, 2012(2012-01).
-\url{http://stat.psu.edu/research/technical-report-files/2012-technical-reports/modeling-of-dynamic-networks-based-on-egocentric-data-with-durational-information}
+\url{https://web.archive.org/web/20170830053722/https://stat.psu.edu/research/technical-report-files/2012-technical-reports/TR1201A.pdf}
 
 }
 }

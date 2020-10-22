@@ -9,3 +9,4 @@ Rplots.pdf
 ^vignettes/cache/
 ^vignettes/figure/
 ^vignettes/.*.tex$
+^.github$

@@ -50,7 +50,7 @@ library('tergm')
 \tableofcontents
 
 \section{Intro}
-This document is a brief vignette intended to quickly demonstrate the core functionality of \texttt{tergm}.  For a more in-depth tutorial, please see the workshop materials on the \texttt{statnet} wiki: \url{http://statnet.csde.washington.edu/workshops/SUNBELT/current/tergm/tergm_tutorial.pdf}
+This document is a brief vignette intended to quickly demonstrate the core functionality of \texttt{tergm}.  For a more in-depth tutorial, please see the workshop materials on the \texttt{statnet} wiki: \url{https://statnet.org/Workshops/tergm_tutorial.html}.
 
 \section{Getting the software}
 
@@ -788,7 +788,7 @@ Both the \texttt{stergm} functions and the \texttt{networkDynamic} package have 
 which you can learn about and explore through the use of R's many help features. 
 Remember that both of these have only been released publicly for the first time in recent weeks.  
 If you begin to use them in depth in the near future, you will likely have further questions.  If so, we encourage you to join the statnet users' group 
-(\url{http://csde.washington.edu/statnet/statnet_users_group.shtml}), where you can then post your questions (and possibly answer others).  You may also encounter bugs; please use the same 
+(\url{https://csde.washington.edu/statnet/statnet_users_group.shtml}), where you can then post your questions (and possibly answer others).  You may also encounter bugs; please use the same 
 place to report them. Happy stergming!
 \\
 \\

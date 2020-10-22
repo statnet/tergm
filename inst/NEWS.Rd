@@ -62,10 +62,22 @@
 %% }
 
 
-\section{Changes in version 3.6.2}{
+\section{Changes in version 3.7.0}{
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item Durational terms \code{edges.ageinterval} (\code{s_} function) and \code{edgecov.mean.age} (\code{s_} and \code{d_} functions) had bugs fixed.
+
+      \item A bug involving assumptions based on the first entry of the \code{lasttoggle} vector has been corrected.
+
+      \item A number of broken links has been fixed.
+    }
+  }
+
   \subsection{OTHER USER-VISIBLE CHANGES}{
     \itemize{
       \item The package no longer (incorrectly) requires \R 3.6.0 or the very-very latest version of \code{nlme}.
+
+      \item Progress reports are now printed to \code{stderr} rather than \code{stdout}.
     }
   }
 }
@@ -245,7 +257,7 @@
     \subsection{NEW FEATURES}{
      \itemize{
        \item Speed improvements. Internal data handling has been modified to avoid allocating (and passing around) a large matrix of tie ages unless the formula/model explicitly requires tie duration information. This increases speed of model initialization, which is especially helpful when simulating a network where the model must be re-initialized at each timestep (i.e. models with vital dynamics).
-      \item{Simplified specification of offset values in formation model, when using stergm.EGMME with target statistics. Edges dissolution approximation is used to initialize the coefficients for estimation when there is an offset. See \link{http://statnet.csde.washington.edu/trac/wiki/tergmUsage} for examples.}
+      \item{Simplified specification of offset values in formation model, when using stergm.EGMME with target statistics. Edges dissolution approximation is used to initialize the coefficients for estimation when there is an offset. See \link{https://statnet.org/Workshops/tergm_tutorial.html} for examples.}
       \item{Offset terms in the target formula are automatically removed. This includes the case where the target is set equal to formation: \code{targets = "formation"}}
        \item The simulate.networkDynamic and related function now make use of networkDynamics persistant id (PID) functionality. If the network does not have any \code{\link[networkDynamic]{persistent.ids}}  defined for vertices, a vertex.pid will be attached in a vertex attribute  named \code{'tergm_pid'} to facilitate 'bookkeeping' between the networkDynamic argument and the simulated network time step. 
        \item{Parallel functionality: tergm can take user-created clusters as the control.stergm(parallel) control parameter. This is the recommended method for using tergm on a high-performance computing cluster. See \link{ergm-parallel}. Functionality is now implemented via the \code{parallel} package, direct dependence on \code{snow} package is removed}

@@ -27,7 +27,7 @@
 #' \code{mcmc} and can be used directly in the \code{coda} package to assess
 #' MCMC convergence. \emph{Hence all MCMC diagnostic methods available in
 #' \code{coda} are available directly.} See the examples and
-#' \url{http://www.mrc-bsu.cam.ac.uk/software/bugs/the-bugs-project-winbugs/coda-readme/}.
+#' \url{https://www.mrc-bsu.cam.ac.uk/software/bugs/the-bugs-project-winbugs/coda-readme/}.
 #' 
 #' More information can be found by looking at the documentation of
 #' \code{\link{stergm}}.
