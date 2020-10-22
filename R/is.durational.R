@@ -1,11 +1,11 @@
-#  File R/is.durational.R in package ergm, part of the Statnet suite
+#  File R/is.durational.R in package tergm, part of the Statnet suite
 #  of packages for network analysis, https://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution
 #
-#  Copyright 2003-2019 Statnet Commons
+#  Copyright 2008-2020 Statnet Commons
 #######################################################################
 ###############################################################################
 # These functions are used to detect whether a ERGM formula/model/etcs are 
