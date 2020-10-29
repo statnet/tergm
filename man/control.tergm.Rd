@@ -8,7 +8,7 @@ control.tergm(
   init = NULL,
   init.method = NULL,
   force.main = FALSE,
-  MCMC.prop = ~TNT,
+  MCMC.prop = ~discord + TNT,
   MCMC.prop.weights = "default",
   MCMC.prop.args = NULL,
   MCMC.maxedges = Inf,
@@ -119,6 +119,8 @@ are set to zeros.}
 \item{force.main}{Logical: If TRUE, then force MCMC-based
 estimation method, even if the exact MLE can be computed via
 maximum pseudolikelihood estimation.}
+
+\item{MCMC.prop}{Hints and/or constraints for selecting and initializing the proposal.}
 
 \item{MCMC.prop.weights}{Specifies the
 method to allocate probabilities of being proposed to dyads.

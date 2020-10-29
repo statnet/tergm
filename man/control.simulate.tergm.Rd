@@ -10,6 +10,7 @@ control.simulate.tergm(
   MCMC.burnin.max = NULL,
   MCMC.burnin.pval = NULL,
   MCMC.burnin.add = NULL,
+  MCMC.prop = NULL,
   MCMC.prop.weights = NULL,
   MCMC.prop.args = NULL,
   MCMC.maxedges = NULL,
@@ -25,6 +26,7 @@ control.simulate.network.tergm(
   MCMC.burnin.add = 1,
   MCMC.burnin = NULL,
   MCMC.burnin.mul = NULL,
+  MCMC.prop = ~discord + TNT,
   MCMC.prop.weights = "default",
   MCMC.prop.args = NULL,
   MCMC.maxedges = Inf,
@@ -49,6 +51,8 @@ taken.  (Stopping immediately would bias the sampling.)
 
 To use a fixed number of steps, set both \code{MCMC.burnin.min}
 and \code{MCMC.burnin.max} to the desired number of steps.}
+
+\item{MCMC.prop}{Hints and/or constraints for selecting and initializing the proposal.}
 
 \item{MCMC.prop.weights}{Specifies the
 proposal distribution used in the MCMC Metropolis-Hastings

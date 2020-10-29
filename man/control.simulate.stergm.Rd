@@ -12,6 +12,8 @@ control.simulate.network(
   MCMC.burnin.add = 1,
   MCMC.burnin = NULL,
   MCMC.burnin.mul = NULL,
+  MCMC.prop.form = ~discord + TNT,
+  MCMC.prop.diss = ~discord + TNT,
   MCMC.prop.weights.form = "default",
   MCMC.prop.args.form = NULL,
   MCMC.prop.weights.diss = "default",
@@ -29,6 +31,8 @@ control.simulate.stergm(
   MCMC.burnin.add = NULL,
   MCMC.burnin = NULL,
   MCMC.burnin.mul = NULL,
+  MCMC.prop.form = NULL,
+  MCMC.prop.diss = NULL,
   MCMC.prop.weights.form = NULL,
   MCMC.prop.args.form = NULL,
   MCMC.prop.weights.diss = NULL,
@@ -60,6 +64,8 @@ and \code{MCMC.burnin.max} to the desired number of steps.}
 \code{MCMC.burnin.pval}, \code{MCMC.burnin.pval}, and
 \code{MCMC.burnin.add}.}
 
+\item{MCMC.prop.form}{Hints and/or constraints for selecting and initializing the proposal.}
+
 \item{MCMC.prop.weights.form}{Specifies the
 proposal distribution used in the MCMC Metropolis-Hastings
 algorithm.  Possible choices are \code{"TNT"} or \code{"random"}; the
@@ -76,7 +82,7 @@ networks.}
 \item{MCMC.prop.args.form}{An alternative,
 direct way of specifying additional arguments to proposals.}
 
-\item{MCMC.prop.weights.diss, MCMC.prop.args.diss}{Ignored. These are included
+\item{MCMC.prop.weights.diss, MCMC.prop.args.diss, MCMC.prop.diss}{Ignored. These are included
 for backwards compatibility of calls to \code{control}
 functions only; they have no effect on \code{simulate} behavior.}
 
