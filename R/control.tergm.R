@@ -60,6 +60,7 @@
 #'   possible constraints.
 #' @param MCMC.prop.args An alternative,
 #'   direct way of specifying additional arguments to the proposal.
+#' @param MCMC.prop Hints and/or constraints for selecting and initializing the proposal.
 #' @param MCMC.maxedges Maximum number of edges permitted to occur during the simulation.
 #' @param MCMC.maxchanges Maximum number of changes permitted to occur during the simulation.
 #' @param MCMC.packagenames Names of packages in which to look for
@@ -320,7 +321,8 @@ control.tergm<-function(init=NULL,
                          init.method=NULL,
                          force.main = FALSE,                         
 
-                        MCMC.prop=~TNT,
+                         MCMC.prop = ~discord + TNT,
+
                          MCMC.prop.weights="default",MCMC.prop.args=NULL,
                          MCMC.maxedges=Inf,
                          MCMC.maxchanges=1000000,

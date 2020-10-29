@@ -61,6 +61,7 @@
 #' @param MCMC.prop.args.form,MCMC.prop.args.diss An alternative,
 #'   direct way of specifying additional arguments to the proposal in
 #'   the formation/dissolution phase.
+#' @param MCMC.prop.form,MCMC.prop.diss Hints and/or constraints for selecting and initializing the proposal.
 #' @param MCMC.maxedges Maximum number of edges for which to
 #'   allocate space.
 #' @param MCMC.maxchanges Maximum number of changes in dynamic
@@ -324,7 +325,8 @@ control.stergm<-function(init.form=NULL,
                          init.diss=NULL,
                          init.method=NULL,
                          force.main = FALSE,                         
-
+                         MCMC.prop.form = ~discord + TNT,
+                         MCMC.prop.diss = ~discord + TNT,
                          MCMC.prop.weights.form="default",MCMC.prop.args.form=NULL,
                          MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,
                          MCMC.maxedges=Inf,

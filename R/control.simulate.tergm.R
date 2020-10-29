@@ -48,6 +48,7 @@
 #'   networks.
 #' @param MCMC.prop.args An alternative,
 #'   direct way of specifying additional arguments to the proposal.
+#' @param MCMC.prop Hints and/or constraints for selecting and initializing the proposal.
 #' @param MCMC.maxchanges Maximum number of toggles changes for
 #'   which to allocate space.
 #' @param MCMC.packagenames Names of packages in which to look for
@@ -71,7 +72,11 @@ control.simulate.tergm<-function(MCMC.burnin.min=NULL,
                                   MCMC.burnin.max=NULL,
                                   MCMC.burnin.pval=NULL,
                                   MCMC.burnin.add=NULL,
-                                  MCMC.prop.weights=NULL,MCMC.prop.args=NULL,
+                                  
+                                  MCMC.prop=NULL,
+                                  MCMC.prop.weights=NULL,
+                                  MCMC.prop.args=NULL,
+                                  
                                   MCMC.maxedges=NULL,
                                   MCMC.packagenames=NULL,
 
@@ -93,7 +98,11 @@ control.simulate.network.tergm<-function(MCMC.burnin.min=1000,
                                    MCMC.burnin.pval=0.5,
                                    MCMC.burnin.add=1,
                                    MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
-                                   MCMC.prop.weights="default",MCMC.prop.args=NULL,
+                                   
+                                   MCMC.prop = ~discord + TNT,
+                                   MCMC.prop.weights="default",
+                                   MCMC.prop.args=NULL,
+                                   
                                    MCMC.maxedges=Inf,
                                    MCMC.packagenames=c(),
 

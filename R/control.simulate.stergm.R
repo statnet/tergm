@@ -48,6 +48,8 @@ control.simulate.network<-function(MCMC.burnin.min=1000,
                                    MCMC.burnin.pval=0.5,
                                    MCMC.burnin.add=1,
                                    MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
+                                   MCMC.prop.form = ~discord + TNT,
+                                   MCMC.prop.diss = ~discord + TNT,
                                    MCMC.prop.weights.form="default",MCMC.prop.args.form=NULL,
                                    MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,                                  
                                    MCMC.init.maxedges=Inf,
@@ -114,7 +116,8 @@ control.simulate.network<-function(MCMC.burnin.min=1000,
 #'   networks.
 #' @param MCMC.prop.args.form An alternative,
 #'   direct way of specifying additional arguments to proposals.
-#' @param MCMC.prop.weights.diss,MCMC.prop.args.diss Ignored. These are included
+#' @param MCMC.prop.form Hints and/or constraints for selecting and initializing the proposal.
+#' @param MCMC.prop.weights.diss,MCMC.prop.args.diss,MCMC.prop.diss Ignored. These are included
 #'        for backwards compatibility of calls to \code{control}
 #'        functions only; they have no effect on \code{simulate} behavior.
 #' @param MCMC.init.maxchanges Maximum number of toggles changes for
@@ -141,6 +144,8 @@ control.simulate.stergm<-function(MCMC.burnin.min=NULL,
                                   MCMC.burnin.pval=NULL,
                                   MCMC.burnin.add=NULL,
                                   MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
+                                  MCMC.prop.form=NULL,
+                                  MCMC.prop.diss=NULL,                                  
                                   MCMC.prop.weights.form=NULL,MCMC.prop.args.form=NULL,
                                   MCMC.prop.weights.diss=NULL,MCMC.prop.args.diss=NULL,                                  
                                   MCMC.init.maxedges=NULL,

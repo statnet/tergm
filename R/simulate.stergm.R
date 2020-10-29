@@ -216,6 +216,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                              verbose=FALSE,...) {
   check.control.class("simulate.network", "STERGM simulate.network")
 
+  control$MCMC.prop <- control$MCMC.prop.form
   control$MCMC.prop.args <- control$MCMC.prop.args.form
   control$MCMC.prop.weights <- control$MCMC.prop.weights.form
   
@@ -262,6 +263,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     verbose=FALSE, ...){
   check.control.class("simulate.network", "STERGM simulate.network")
 
+  control$MCMC.prop <- control$MCMC.prop.form
   control$MCMC.prop.args <- control$MCMC.prop.args.form
   control$MCMC.prop.weights <- control$MCMC.prop.weights.form
   

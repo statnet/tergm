@@ -181,6 +181,7 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
   
   control$init <- c(control$init.form, control$init.diss) # may be problem if one specified and the other isn't
 
+  control$MCMC.prop <- control$MCMC.prop.form
   control$MCMC.prop.weights <- control$MCMC.prop.weights.form
   control$MCMC.prop.args <- control$MCMC.prop.args.form
 

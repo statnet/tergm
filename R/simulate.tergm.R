@@ -241,6 +241,7 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
                           duration.dependent = NULL,
                           verbose=FALSE, ...){
   if(is(control, "control.simulate.stergm") || is(control, "control.simulate.network")) {
+    control$MCMC.prop <- control$MCMC.prop.form
     control$MCMC.prop.weights <- control$MCMC.prop.weights.form
     control$MCMC.prop.args <- control$MCMC.prop.args.form
     control$maxedges <- control$MCMC.init.maxedges
@@ -252,6 +253,7 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
   
   control.transfer <- list(MCMC.prop.weights="MCMC.prop.weights",
                            MCMC.prop.args="MCMC.prop.args",
+                           MCMC.prop="MCMC.prop",
                            MCMC.packagenames="MCMC.packagenames",
                            MCMC.maxedges="MCMC.maxedges",
                            MCMC.maxchanges="MCMC.maxchanges",
@@ -359,8 +361,8 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
     
   if(!is.null(monitor)) monitor <- nonsimp_update.formula(monitor, nw~., from.new="nw")
   
-  proposal <- ergm_proposal(constraints,control$MCMC.prop.args,nw,
-                            weights=control$MCMC.prop.weights, class="t")
+  proposal <- ergm_proposal(constraints, arguments = control$MCMC.prop.args, nw = nw,
+                            weights = control$MCMC.prop.weights, hints = control$MCMC.prop, class="t")
 
   model <- ergm_model(formula, nw, term.options=control$term.options, extra.aux=list(proposal=proposal$auxiliaries, system=~.lasttoggle))
   proposal$aux.slots <- model$slots.extra.aux$proposal
