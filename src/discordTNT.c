@@ -1154,8 +1154,7 @@ typedef struct {
   
   int in_discord;
   
-  int *influenced_counts;
-  int **influenced;
+  int nstratlevels;
   
   int *currentsubmaxledgestype;
   double **indmat;  
@@ -1175,6 +1174,7 @@ MH_I_FN(Mi_discordBDStratTNT) {
   double *stratheadattrs = MHp->inputs + 1 + nmixtypes;
   
   int nattrcodes = MHp->inputs[1 + 3*nmixtypes];
+  sto->nstratlevels = nattrcodes;
   
   double *strat_vattr = MHp->inputs + 1 + 3*nmixtypes + 1;
   
@@ -1349,21 +1349,7 @@ MH_I_FN(Mi_discordBDStratTNT) {
   sto->BDTDNE = Calloc(nmixtypes, UnsrtEL *);
   sto->nonBDTDNE = Calloc(nmixtypes, UnsrtEL *);
   sto->discordantEdges = Calloc(nmixtypes, UnsrtEL *);
-  
-  sto->influenced_counts = Calloc(nmixtypes, int);
-  sto->influenced = Calloc(nmixtypes, int *);
-  
-  double *influenced_counts_ptr = MHp->inputs + 1 + 3*nmixtypes + 1 + N_NODES + nattrcodes*nattrcodes + 1 + npairings + 1 + 1 + 1 + 2*bdmixtypes + N_NODES + nmixtypes + 1 + sumtypes + sumtypes + 1;
-  double *influenced_ptr = MHp->inputs + 1 + 3*nmixtypes + 1 + N_NODES + nattrcodes*nattrcodes + 1 + npairings + 1 + 1 + 1 + 2*bdmixtypes + N_NODES + nmixtypes + 1 + sumtypes + sumtypes + 1 + nmixtypes;
-  for(int i = 0; i < nmixtypes; i++) {
-    sto->influenced_counts[i] = (int)influenced_counts_ptr[i];
-    sto->influenced[i] = Calloc(sto->influenced_counts[i], int);
-    for(int j = 0; j < sto->influenced_counts[i]; j++) {
-      sto->influenced[i][j] = (int)influenced_ptr[j];
-    }
-    influenced_ptr += sto->influenced_counts[i];
-  }
-  
+    
   // also initialize discord stuff
   for(int i = 0; i < nmixtypes; i++) {
     sto->BDTDNE[i] = UnsrtELInitialize(0, NULL, NULL, FALSE);
@@ -1561,8 +1547,18 @@ MH_P_FN(MH_discordBDStratTNT) {
       // note that if proposedcumprob = 1 in the test above then all mixing types were
       // toggleable before this off-toggle and that will remain the case afterward, so
       // there is nothing to do
-      for(int i = 0; i < sto->influenced_counts[strat_i]; i++) {
-        int infl_i = sto->influenced[strat_i][i];
+      int ntocheck = (2 - ((sto->strattailtype == sto->stratheadtype) || BIPARTITE))*sto->nstratlevels;
+      for(int i = 0; i < ntocheck; i++) {
+        int infl_i;
+        if(i < sto->nstratlevels) {
+          infl_i = sto->indmat[sto->strattailtype][i];
+        } else {
+          infl_i = sto->indmat[i - sto->nstratlevels][sto->stratheadtype];  
+        }
+        if(infl_i < 0 || infl_i == sto->stratmixingtype) {
+          continue;
+        }
+
         if(sto->currentprobvec[infl_i] > 0) {
           continue;
         }
@@ -1595,8 +1591,18 @@ MH_P_FN(MH_discordBDStratTNT) {
       // we are proposing toggling on an edge of the current mixing type, and need to make
       // sure that any influenced mixing type that could be toggled before this toggle
       // can also be toggled after this toggle, or else has its prob subtracted accordingly
-      for(int i = 0; i < sto->influenced_counts[strat_i]; i++) {
-        int infl_i = sto->influenced[strat_i][i];
+      int ntocheck = (2 - ((sto->strattailtype == sto->stratheadtype) || BIPARTITE))*sto->nstratlevels;
+      for(int i = 0; i < ntocheck; i++) {
+        int infl_i;
+        if(i < sto->nstratlevels) {
+          infl_i = sto->indmat[sto->strattailtype][i];
+        } else {
+          infl_i = sto->indmat[i - sto->nstratlevels][sto->stratheadtype];  
+        }
+        if(infl_i < 0 || infl_i == sto->stratmixingtype) {
+          continue;
+        }
+
         if(sto->currentprobvec[infl_i] == 0 || sto->nonDiscordantEdges[infl_i]->nedges > 0 || sto->discordantEdges[infl_i]->nedges > 0) {
           continue;
         }
@@ -1868,8 +1874,18 @@ MH_U_FN(Mu_discordBDStratTNT) {
       sto->currentcumprob = sto->proposedcumprob;
     
       if(edgeflag) {
-        for(int i = 0; i < sto->influenced_counts[sto->stratmixingtype]; i++) {
-          int infl_i = sto->influenced[sto->stratmixingtype][i];
+        int ntocheck = (2 - ((sto->strattailtype == sto->stratheadtype) || BIPARTITE))*sto->nstratlevels;
+        for(int i = 0; i < ntocheck; i++) {
+          int infl_i;
+          if(i < sto->nstratlevels) {
+            infl_i = sto->indmat[sto->strattailtype][i];
+          } else {
+            infl_i = sto->indmat[i - sto->nstratlevels][sto->stratheadtype];  
+          }
+          if(infl_i < 0 || infl_i == sto->stratmixingtype) {
+            continue;
+          }
+
           if(sto->currentprobvec[infl_i] > 0) {
             continue;
           }
@@ -1899,8 +1915,18 @@ MH_U_FN(Mu_discordBDStratTNT) {
           }
         }
       } else {
-        for(int i = 0; i < sto->influenced_counts[sto->stratmixingtype]; i++) {
-          int infl_i = sto->influenced[sto->stratmixingtype][i];
+        int ntocheck = (2 - ((sto->strattailtype == sto->stratheadtype) || BIPARTITE))*sto->nstratlevels;
+        for(int i = 0; i < ntocheck; i++) {
+          int infl_i;
+          if(i < sto->nstratlevels) {
+            infl_i = sto->indmat[sto->strattailtype][i];
+          } else {
+            infl_i = sto->indmat[i - sto->nstratlevels][sto->stratheadtype];  
+          }
+          if(infl_i < 0 || infl_i == sto->stratmixingtype) {
+            continue;
+          }
+
           if(sto->currentprobvec[infl_i] == 0 || sto->nonDiscordantEdges[infl_i]->nedges > 0 || sto->discordantEdges[infl_i]->nedges > 0) {
             continue;
           }
@@ -2112,12 +2138,6 @@ MH_F_FN(Mf_discordBDStratTNT) {
     UnsrtELDestroy(sto->discordantEdges[i]);
     UnsrtELDestroy(sto->nonDiscordantEdges[i]);    
   }
-
-  for(int i = 0; i < sto->nmixtypes; i++) {
-    Free(sto->influenced[i]);
-  }
-  Free(sto->influenced);
-  Free(sto->influenced_counts);
   
   Free(sto->indmat);
   Free(sto->currentsubmaxledgestype);
