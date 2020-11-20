@@ -1200,7 +1200,7 @@ MH_I_FN(Mi_discordBDStratTNT) {
   Edge e;
   for(Vertex tail = 1; tail <= N_NODES; tail++) {
     STEP_THROUGH_OUTEDGES(tail, e, head) {
-      int index = indmat[(int)strat_vattr[tail - 1]][(int)strat_vattr[head - 1]];
+      int index = indmat[strat_vattr[tail]][strat_vattr[head]];
       if(index >= 0) {
         UnsrtELInsert(tail, head, els[index]);
         if(IN_DEG[tail] + OUT_DEG[tail] < bound && IN_DEG[head] + OUT_DEG[head] < bound) {
@@ -1241,14 +1241,14 @@ MH_I_FN(Mi_discordBDStratTNT) {
     attrcounts[i] = (int *)Calloc(bdlevels, int);
   }
   
-  int *nodepos = Calloc(N_NODES, int);
+  int *nodepos = Calloc(N_NODES + 1, int);
   
   for(Vertex vertex = 1; vertex <= N_NODES; vertex++) {
     if(IN_DEG[vertex] + OUT_DEG[vertex] < bound) {
       // add vertex to the submaximal list corresponding to its attribute type
-      nodesvec[(int)strat_vattr[vertex - 1]][(int)bd_vattr[vertex - 1]][attrcounts[(int)strat_vattr[vertex - 1]][(int)bd_vattr[vertex - 1]]] = vertex;
-      nodepos[vertex - 1] = attrcounts[(int)strat_vattr[vertex - 1]][(int)bd_vattr[vertex - 1]];
-      attrcounts[(int)strat_vattr[vertex - 1]][(int)bd_vattr[vertex - 1]]++;
+      nodesvec[strat_vattr[vertex]][bd_vattr[vertex]][attrcounts[strat_vattr[vertex]][bd_vattr[vertex]]] = vertex;
+      nodepos[vertex] = attrcounts[strat_vattr[vertex]][bd_vattr[vertex]];
+      attrcounts[strat_vattr[vertex]][bd_vattr[vertex]]++;
     }
   }
   
@@ -1263,8 +1263,8 @@ MH_I_FN(Mi_discordBDStratTNT) {
   sto->BDheadsbyStrattype[0] = INTEGER(getListElement(MHp->R, "BDheadsbyStrattype"));
   
   for(int i = 1; i < nmixtypes; i++) {
-    sto->BDtailsbyStrattype[i] = sto->BDtailsbyStrattype[i - 1] + (int)sto->BDtypesbyStrattype[i - 1];
-    sto->BDheadsbyStrattype[i] = sto->BDheadsbyStrattype[i - 1] + (int)sto->BDtypesbyStrattype[i - 1];
+    sto->BDtailsbyStrattype[i] = sto->BDtailsbyStrattype[i - 1] + sto->BDtypesbyStrattype[i - 1];
+    sto->BDheadsbyStrattype[i] = sto->BDheadsbyStrattype[i - 1] + sto->BDtypesbyStrattype[i - 1];
   }
   
   int empirical_flag = asInteger(getListElement(MHp->R, "empirical_flag"));
@@ -1296,9 +1296,9 @@ MH_I_FN(Mi_discordBDStratTNT) {
   
   for(int i = 0; i < nmixtypes; i++) {
     Dyad currentdyads = 0;
-    for(int j = 0; j < (int)sto->BDtypesbyStrattype[i]; j++) {
-      int tailcounts = attrcounts[(int)strattailattrs[i]][(int)sto->BDtailsbyStrattype[i][j]];
-      int headcounts = attrcounts[(int)stratheadattrs[i]][(int)sto->BDheadsbyStrattype[i][j]];
+    for(int j = 0; j < sto->BDtypesbyStrattype[i]; j++) {
+      int tailcounts = attrcounts[strattailattrs[i]][sto->BDtailsbyStrattype[i][j]];
+      int headcounts = attrcounts[stratheadattrs[i]][sto->BDheadsbyStrattype[i][j]];
       
       if(strattailattrs[i] != stratheadattrs[i] || sto->BDtailsbyStrattype[i][j] != sto->BDheadsbyStrattype[i][j]) {
         currentdyads += (Dyad)tailcounts*headcounts;
@@ -1405,11 +1405,11 @@ MH_P_FN(MH_discordBDStratTNT) {
   int nedgestype = sto->nonDiscordantEdges[strat_i]->nedges + sto->discordantEdges[strat_i]->nedges;
   
   Dyad ndyadstype = 0;
-  for(int j = 0; j < (int)sto->BDtypesbyStrattype[strat_i]; j++) {
+  for(int j = 0; j < sto->BDtypesbyStrattype[strat_i]; j++) {
     if(strattailtype == stratheadtype && sto->BDtailsbyStrattype[strat_i][j] == sto->BDheadsbyStrattype[strat_i][j]) {
-      ndyadstype += (Dyad)sto->attrcounts[strattailtype][(int)sto->BDtailsbyStrattype[strat_i][j]]*(sto->attrcounts[stratheadtype][(int)sto->BDheadsbyStrattype[strat_i][j]] - 1)/2;
+      ndyadstype += (Dyad)sto->attrcounts[strattailtype][sto->BDtailsbyStrattype[strat_i][j]]*(sto->attrcounts[stratheadtype][sto->BDheadsbyStrattype[strat_i][j]] - 1)/2;
     } else {
-      ndyadstype += (Dyad)sto->attrcounts[strattailtype][(int)sto->BDtailsbyStrattype[strat_i][j]]*sto->attrcounts[stratheadtype][(int)sto->BDheadsbyStrattype[strat_i][j]];
+      ndyadstype += (Dyad)sto->attrcounts[strattailtype][sto->BDtailsbyStrattype[strat_i][j]]*sto->attrcounts[stratheadtype][sto->BDheadsbyStrattype[strat_i][j]];
     }
   }
   
@@ -1440,11 +1440,11 @@ MH_P_FN(MH_discordBDStratTNT) {
       // this rather ugly block of code is just finding the dyad that corresponds
       // to the dyadindex we drew above, and then setting the info for
       // tail and head appropriately
-      for(int j = 0; j < (int)sto->BDtypesbyStrattype[strat_i]; j++) {
+      for(int j = 0; j < sto->BDtypesbyStrattype[strat_i]; j++) {
         Dyad dyadsthistype;
   
-        int tailcounts = sto->attrcounts[strattailtype][(int)sto->BDtailsbyStrattype[strat_i][j]];
-        int headcounts = sto->attrcounts[stratheadtype][(int)sto->BDheadsbyStrattype[strat_i][j]];
+        int tailcounts = sto->attrcounts[strattailtype][sto->BDtailsbyStrattype[strat_i][j]];
+        int headcounts = sto->attrcounts[stratheadtype][sto->BDheadsbyStrattype[strat_i][j]];
   
         if(strattailtype != stratheadtype || sto->BDtailsbyStrattype[strat_i][j] != sto->BDheadsbyStrattype[strat_i][j]) {
           dyadsthistype = (Dyad)tailcounts*headcounts;
@@ -1463,15 +1463,15 @@ MH_P_FN(MH_discordBDStratTNT) {
               headindex = headcounts - 1;
             }
                       
-            tail = sto->nodesvec[strattailtype][(int)sto->BDtailsbyStrattype[strat_i][j]][tailindex];
-            head = sto->nodesvec[stratheadtype][(int)sto->BDheadsbyStrattype[strat_i][j]][headindex];
+            tail = sto->nodesvec[strattailtype][sto->BDtailsbyStrattype[strat_i][j]][tailindex];
+            head = sto->nodesvec[stratheadtype][sto->BDheadsbyStrattype[strat_i][j]][headindex];
           } else {
             dyadindex /= 2;
             tailindex = dyadindex / headcounts;
             headindex = dyadindex % headcounts;
             
-            tail = sto->nodesvec[strattailtype][(int)sto->BDtailsbyStrattype[strat_i][j]][tailindex];
-            head = sto->nodesvec[stratheadtype][(int)sto->BDheadsbyStrattype[strat_i][j]][headindex];
+            tail = sto->nodesvec[strattailtype][sto->BDtailsbyStrattype[strat_i][j]][tailindex];
+            head = sto->nodesvec[stratheadtype][sto->BDheadsbyStrattype[strat_i][j]][headindex];
           }
               
           if(tail > head) {
@@ -1517,11 +1517,11 @@ MH_P_FN(MH_discordBDStratTNT) {
 
   sto->in_discord = in_discord;
 
-  sto->strattailtype = sto->strat_vattr[Mtail[0] - 1];
-  sto->stratheadtype = sto->strat_vattr[Mhead[0] - 1];
+  sto->strattailtype = sto->strat_vattr[Mtail[0]];
+  sto->stratheadtype = sto->strat_vattr[Mhead[0]];
     
-  sto->bdtailtype = sto->bd_vattr[Mtail[0] - 1];
-  sto->bdheadtype = sto->bd_vattr[Mhead[0] - 1];
+  sto->bdtailtype = sto->bd_vattr[Mtail[0]];
+  sto->bdheadtype = sto->bd_vattr[Mhead[0]];
 
   sto->tailmaxl = IN_DEG[Mtail[0]] + OUT_DEG[Mtail[0]] == sto->bound - 1 + in_network;
   sto->headmaxl = IN_DEG[Mhead[0]] + OUT_DEG[Mhead[0]] == sto->bound - 1 + in_network;
@@ -1560,13 +1560,13 @@ MH_P_FN(MH_discordBDStratTNT) {
         // we need to check if that changes after hypothetically removing the proposed edge
         int anytoggleable = FALSE;
         
-        for(int j = 0; j < (int)sto->BDtypesbyStrattype[infl_i]; j++) {
+        for(int j = 0; j < sto->BDtypesbyStrattype[infl_i]; j++) {
           // adjustments
           int proposedtailadjustment = (sto->strattailtype == sto->strattailtypes[infl_i] && sto->bdtailtype == sto->BDtailsbyStrattype[infl_i][j] && sto->tailmaxl) + (sto->stratheadtype == sto->strattailtypes[infl_i] && sto->bdheadtype == sto->BDtailsbyStrattype[infl_i][j] && sto->headmaxl);
           int proposedheadadjustment = (sto->strattailtype == sto->stratheadtypes[infl_i] && sto->bdtailtype == sto->BDheadsbyStrattype[infl_i][j] && sto->tailmaxl) + (sto->stratheadtype == sto->stratheadtypes[infl_i] && sto->bdheadtype == sto->BDheadsbyStrattype[infl_i][j] && sto->headmaxl);
           
-          int tailcounts = sto->attrcounts[(int)sto->strattailtypes[infl_i]][(int)sto->BDtailsbyStrattype[infl_i][j]];
-          int headcounts = sto->attrcounts[(int)sto->stratheadtypes[infl_i]][(int)sto->BDheadsbyStrattype[infl_i][j]];
+          int tailcounts = sto->attrcounts[sto->strattailtypes[infl_i]][sto->BDtailsbyStrattype[infl_i][j]];
+          int headcounts = sto->attrcounts[sto->stratheadtypes[infl_i]][sto->BDheadsbyStrattype[infl_i][j]];
           
           proposedtailadjustment = -proposedtailadjustment;
           proposedheadadjustment = -proposedheadadjustment;
@@ -1604,13 +1604,13 @@ MH_P_FN(MH_discordBDStratTNT) {
         // we need to check if that changes after hypothetically removing the proposed edge
         int anytoggleable = FALSE;
         
-        for(int j = 0; j < (int)sto->BDtypesbyStrattype[infl_i]; j++) {
+        for(int j = 0; j < sto->BDtypesbyStrattype[infl_i]; j++) {
           // adjustments
           int proposedtailadjustment = (sto->strattailtype == sto->strattailtypes[infl_i] && sto->bdtailtype == sto->BDtailsbyStrattype[infl_i][j] && sto->tailmaxl) + (sto->stratheadtype == sto->strattailtypes[infl_i] && sto->bdheadtype == sto->BDtailsbyStrattype[infl_i][j] && sto->headmaxl);
           int proposedheadadjustment = (sto->strattailtype == sto->stratheadtypes[infl_i] && sto->bdtailtype == sto->BDheadsbyStrattype[infl_i][j] && sto->tailmaxl) + (sto->stratheadtype == sto->stratheadtypes[infl_i] && sto->bdheadtype == sto->BDheadsbyStrattype[infl_i][j] && sto->headmaxl);
           
-          int tailcounts = sto->attrcounts[(int)sto->strattailtypes[infl_i]][(int)sto->BDtailsbyStrattype[infl_i][j]];
-          int headcounts = sto->attrcounts[(int)sto->stratheadtypes[infl_i]][(int)sto->BDheadsbyStrattype[infl_i][j]];
+          int tailcounts = sto->attrcounts[sto->strattailtypes[infl_i]][sto->BDtailsbyStrattype[infl_i][j]];
+          int headcounts = sto->attrcounts[sto->stratheadtypes[infl_i]][sto->BDheadsbyStrattype[infl_i][j]];
                 
           if(tailcounts > proposedtailadjustment && headcounts > proposedheadadjustment + (sto->strattailtypes[infl_i] == sto->stratheadtypes[infl_i] && sto->BDtailsbyStrattype[infl_i][j] == sto->BDheadsbyStrattype[infl_i][j])) {
             anytoggleable = TRUE;
@@ -1630,26 +1630,26 @@ MH_P_FN(MH_discordBDStratTNT) {
 
   int delta = in_network ? +1 : -1;
 
-  for(int j = 0; j < (int)sto->BDtypesbyStrattype[strat_i]; j++) {
+  for(int j = 0; j < sto->BDtypesbyStrattype[strat_i]; j++) {
     int corr = 0;
     int ha = 0;
 
     if(sto->strattailtype == sto->stratheadtypes[strat_i] && sto->bdtailtype == sto->BDheadsbyStrattype[strat_i][j] && sto->tailmaxl) {
       ha += delta;
-      corr += sto->attrcounts[(int)sto->strattailtypes[strat_i]][(int)sto->BDtailsbyStrattype[strat_i][j]];
+      corr += sto->attrcounts[sto->strattailtypes[strat_i]][sto->BDtailsbyStrattype[strat_i][j]];
     }
       
     if(sto->stratheadtype == sto->stratheadtypes[strat_i] && sto->bdheadtype == sto->BDheadsbyStrattype[strat_i][j] && sto->headmaxl) {
       ha += delta;
-      corr += sto->attrcounts[(int)sto->strattailtypes[strat_i]][(int)sto->BDtailsbyStrattype[strat_i][j]];        
+      corr += sto->attrcounts[sto->strattailtypes[strat_i]][sto->BDtailsbyStrattype[strat_i][j]];        
     }
       
     if(sto->strattailtype == sto->strattailtypes[strat_i] && sto->bdtailtype == sto->BDtailsbyStrattype[strat_i][j] && sto->tailmaxl) {
-      corr += sto->attrcounts[(int)sto->stratheadtypes[strat_i]][(int)sto->BDheadsbyStrattype[strat_i][j]] + ha;
+      corr += sto->attrcounts[sto->stratheadtypes[strat_i]][sto->BDheadsbyStrattype[strat_i][j]] + ha;
     }
       
     if(sto->stratheadtype == sto->strattailtypes[strat_i] && sto->bdheadtype == sto->BDtailsbyStrattype[strat_i][j] && sto->headmaxl) {
-      corr += sto->attrcounts[(int)sto->stratheadtypes[strat_i]][(int)sto->BDheadsbyStrattype[strat_i][j]] + ha;
+      corr += sto->attrcounts[sto->stratheadtypes[strat_i]][sto->BDheadsbyStrattype[strat_i][j]] + ha;
     }
       
     if(sto->strattailtypes[strat_i] == sto->stratheadtypes[strat_i] && sto->BDtailsbyStrattype[strat_i][j] == sto->BDheadsbyStrattype[strat_i][j]) {
@@ -1689,12 +1689,12 @@ MH_P_FN(MH_discordBDStratTNT) {
     if(sto->tailmaxl) {
       propnddyadstype += in_discord;
       STEP_THROUGH_OUTEDGES_NET(Mtail[0], e, v, sto->combined_BDTDNE) {
-        if(sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]] == strat_i) {
+        if(sto->indmat[sto->strattailtype][sto->strat_vattr[v]] == strat_i) {
           propnddyadstype--;
         }
       }
       STEP_THROUGH_INEDGES_NET(Mtail[0], e, v, sto->combined_BDTDNE) {
-        if(sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]] == strat_i) {
+        if(sto->indmat[sto->strattailtype][sto->strat_vattr[v]] == strat_i) {
           propnddyadstype--;
         }
       }
@@ -1703,12 +1703,12 @@ MH_P_FN(MH_discordBDStratTNT) {
     if(sto->headmaxl) {
       propnddyadstype += in_discord;
       STEP_THROUGH_OUTEDGES_NET(Mhead[0], e, v, sto->combined_BDTDNE) {
-        if(sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]] == strat_i) {
+        if(sto->indmat[sto->stratheadtype][sto->strat_vattr[v]] == strat_i) {
           propnddyadstype--;
         }
       }
       STEP_THROUGH_INEDGES_NET(Mhead[0], e, v, sto->combined_BDTDNE) {
-        if(sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]] == strat_i) {
+        if(sto->indmat[sto->stratheadtype][sto->strat_vattr[v]] == strat_i) {
           propnddyadstype--;
         }
       }
@@ -1717,12 +1717,12 @@ MH_P_FN(MH_discordBDStratTNT) {
     // may increase propnddyads, but only if other endpoint is also submaximal
     if(sto->tailmaxl) {
       STEP_THROUGH_OUTEDGES_NET(Mtail[0], e, v, sto->combined_nonBDTDNE) {
-        if(sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]] == strat_i && IN_DEG[v] + OUT_DEG[v] < sto->bound) {
+        if(sto->indmat[sto->strattailtype][sto->strat_vattr[v]] == strat_i && IN_DEG[v] + OUT_DEG[v] < sto->bound) {
           propnddyadstype++;
         }
       }
       STEP_THROUGH_INEDGES_NET(Mtail[0], e, v, sto->combined_nonBDTDNE) {
-        if(sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]] == strat_i && IN_DEG[v] + OUT_DEG[v] < sto->bound) {
+        if(sto->indmat[sto->strattailtype][sto->strat_vattr[v]] == strat_i && IN_DEG[v] + OUT_DEG[v] < sto->bound) {
           propnddyadstype++;
         }
       }
@@ -1730,12 +1730,12 @@ MH_P_FN(MH_discordBDStratTNT) {
     
     if(sto->headmaxl) {
       STEP_THROUGH_OUTEDGES_NET(Mhead[0], e, v, sto->combined_nonBDTDNE) {
-        if(sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]] == strat_i && IN_DEG[v] + OUT_DEG[v] < sto->bound) {
+        if(sto->indmat[sto->stratheadtype][sto->strat_vattr[v]] == strat_i && IN_DEG[v] + OUT_DEG[v] < sto->bound) {
           propnddyadstype++;
         }
       }
       STEP_THROUGH_INEDGES_NET(Mhead[0], e, v, sto->combined_nonBDTDNE) {
-        if(sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]] == strat_i && IN_DEG[v] + OUT_DEG[v] < sto->bound) {
+        if(sto->indmat[sto->stratheadtype][sto->strat_vattr[v]] == strat_i && IN_DEG[v] + OUT_DEG[v] < sto->bound) {
           propnddyadstype++;
         }
       }
@@ -1763,12 +1763,12 @@ MH_P_FN(MH_discordBDStratTNT) {
   // since that was handled separately above
   if(sto->tailmaxl) {
     STEP_THROUGH_OUTEDGES(Mtail[0], e, v) {
-      if(v != Mhead[0] && IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]] == strat_i) {
+      if(v != Mhead[0] && IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->strattailtype][sto->strat_vattr[v]] == strat_i) {
         proposedsubmaxledgestype += delta;
       }
     }
     STEP_THROUGH_INEDGES(Mtail[0], e, v) {
-      if(IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]] == strat_i) {
+      if(IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->strattailtype][sto->strat_vattr[v]] == strat_i) {
         proposedsubmaxledgestype += delta;
       }
     }
@@ -1777,12 +1777,12 @@ MH_P_FN(MH_discordBDStratTNT) {
   // ditto head
   if(sto->headmaxl) {
     STEP_THROUGH_OUTEDGES(Mhead[0], e, v) {
-      if(IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]] == strat_i) {
+      if(IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->stratheadtype][sto->strat_vattr[v]] == strat_i) {
         proposedsubmaxledgestype += delta;
       }
     }
     STEP_THROUGH_INEDGES(Mhead[0], e, v) {
-      if(v != Mtail[0] && IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]] == strat_i) {
+      if(v != Mtail[0] && IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->stratheadtype][sto->strat_vattr[v]] == strat_i) {
         proposedsubmaxledgestype += delta;
       }
     }
@@ -1834,13 +1834,13 @@ MH_U_FN(Mu_discordBDStratTNT) {
   // since that was handled separately above
   if(sto->tailmaxl) {
     STEP_THROUGH_OUTEDGES(tail, e, v) {
-      if(v != head && IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]] >= 0) {
-        sto->currentsubmaxledgestype[(int)sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]]] += delta;
+      if(v != head && IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->strattailtype][sto->strat_vattr[v]] >= 0) {
+        sto->currentsubmaxledgestype[sto->indmat[sto->strattailtype][sto->strat_vattr[v]]] += delta;
       }
     }
     STEP_THROUGH_INEDGES(tail, e, v) {
-      if(IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]] >= 0) {
-        sto->currentsubmaxledgestype[(int)sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]]] += delta;
+      if(IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->strattailtype][sto->strat_vattr[v]] >= 0) {
+        sto->currentsubmaxledgestype[sto->indmat[sto->strattailtype][sto->strat_vattr[v]]] += delta;
       }
     }
   }
@@ -1848,13 +1848,13 @@ MH_U_FN(Mu_discordBDStratTNT) {
   // ditto head
   if(sto->headmaxl) {
     STEP_THROUGH_OUTEDGES(head, e, v) {
-      if(IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]] >= 0) {
-        sto->currentsubmaxledgestype[(int)sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]]] += delta;
+      if(IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->stratheadtype][sto->strat_vattr[v]] >= 0) {
+        sto->currentsubmaxledgestype[sto->indmat[sto->stratheadtype][sto->strat_vattr[v]]] += delta;
       }
     }
     STEP_THROUGH_INEDGES(head, e, v) {
-      if(v != tail && IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]] >= 0) {
-        sto->currentsubmaxledgestype[(int)sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]]] += delta;
+      if(v != tail && IN_DEG[v] + OUT_DEG[v] < sto->bound && sto->indmat[sto->stratheadtype][sto->strat_vattr[v]] >= 0) {
+        sto->currentsubmaxledgestype[sto->indmat[sto->stratheadtype][sto->strat_vattr[v]]] += delta;
       }
     }
   }  
@@ -1886,13 +1886,13 @@ MH_U_FN(Mu_discordBDStratTNT) {
   
           int anytoggleable = FALSE;
           
-          for(int j = 0; j < (int)sto->BDtypesbyStrattype[infl_i]; j++) {
+          for(int j = 0; j < sto->BDtypesbyStrattype[infl_i]; j++) {
             // adjustments
             int proposedtailadjustment = (sto->strattailtype == sto->strattailtypes[infl_i] && sto->bdtailtype == sto->BDtailsbyStrattype[infl_i][j] && sto->tailmaxl) + (sto->stratheadtype == sto->strattailtypes[infl_i] && sto->bdheadtype == sto->BDtailsbyStrattype[infl_i][j] && sto->headmaxl);
             int proposedheadadjustment = (sto->strattailtype == sto->stratheadtypes[infl_i] && sto->bdtailtype == sto->BDheadsbyStrattype[infl_i][j] && sto->tailmaxl) + (sto->stratheadtype == sto->stratheadtypes[infl_i] && sto->bdheadtype == sto->BDheadsbyStrattype[infl_i][j] && sto->headmaxl);
             
-            int tailcounts = sto->attrcounts[(int)sto->strattailtypes[infl_i]][(int)sto->BDtailsbyStrattype[infl_i][j]];
-            int headcounts = sto->attrcounts[(int)sto->stratheadtypes[infl_i]][(int)sto->BDheadsbyStrattype[infl_i][j]];
+            int tailcounts = sto->attrcounts[sto->strattailtypes[infl_i]][sto->BDtailsbyStrattype[infl_i][j]];
+            int headcounts = sto->attrcounts[sto->stratheadtypes[infl_i]][sto->BDheadsbyStrattype[infl_i][j]];
             
             proposedtailadjustment = -proposedtailadjustment;
             proposedheadadjustment = -proposedheadadjustment;
@@ -1927,13 +1927,13 @@ MH_U_FN(Mu_discordBDStratTNT) {
   
           int anytoggleable = FALSE;
           
-          for(int j = 0; j < (int)sto->BDtypesbyStrattype[infl_i]; j++) {
+          for(int j = 0; j < sto->BDtypesbyStrattype[infl_i]; j++) {
             // adjustments
             int proposedtailadjustment = (sto->strattailtype == sto->strattailtypes[infl_i] && sto->bdtailtype == sto->BDtailsbyStrattype[infl_i][j] && sto->tailmaxl) + (sto->stratheadtype == sto->strattailtypes[infl_i] && sto->bdheadtype == sto->BDtailsbyStrattype[infl_i][j] && sto->headmaxl);
             int proposedheadadjustment = (sto->strattailtype == sto->stratheadtypes[infl_i] && sto->bdtailtype == sto->BDheadsbyStrattype[infl_i][j] && sto->tailmaxl) + (sto->stratheadtype == sto->stratheadtypes[infl_i] && sto->bdheadtype == sto->BDheadsbyStrattype[infl_i][j] && sto->headmaxl);
             
-            int tailcounts = sto->attrcounts[(int)sto->strattailtypes[infl_i]][(int)sto->BDtailsbyStrattype[infl_i][j]];
-            int headcounts = sto->attrcounts[(int)sto->stratheadtypes[infl_i]][(int)sto->BDheadsbyStrattype[infl_i][j]];
+            int tailcounts = sto->attrcounts[sto->strattailtypes[infl_i]][sto->BDtailsbyStrattype[infl_i][j]];
+            int headcounts = sto->attrcounts[sto->stratheadtypes[infl_i]][sto->BDheadsbyStrattype[infl_i][j]];
                       
             if(tailcounts > proposedtailadjustment && headcounts > proposedheadadjustment + (sto->strattailtypes[infl_i] == sto->stratheadtypes[infl_i] && sto->BDtailsbyStrattype[infl_i][j] == sto->BDheadsbyStrattype[infl_i][j])) {
               anytoggleable = TRUE;
@@ -1978,7 +1978,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
     if(sto->tailmaxl) {
       // tail will be newly submaxl after toggle, so add it to the appropriate node list
       sto->nodesvec[sto->strattailtype][sto->bdtailtype][sto->attrcounts[sto->strattailtype][sto->bdtailtype]] = tail;
-      sto->nodepos[tail - 1] = sto->attrcounts[sto->strattailtype][sto->bdtailtype];
+      sto->nodepos[tail] = sto->attrcounts[sto->strattailtype][sto->bdtailtype];
       sto->attrcounts[sto->strattailtype][sto->bdtailtype]++;
       
       // iterate over all nonBDTDNEs with tail as an endpoint; if other endpoint is also
@@ -1988,7 +1988,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
       
       STEP_THROUGH_OUTEDGES_NET(tail, e, v, sto->combined_nonBDTDNE) {
         if(IN_DEG[v] + OUT_DEG[v] < sto->bound) {
-          int stratmixingtype = sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]];
+          int stratmixingtype = sto->indmat[sto->strattailtype][sto->strat_vattr[v]];
           UnsrtELDelete(tail, v, sto->nonBDTDNE[stratmixingtype]);
           UnsrtELInsert(tail, v, sto->BDTDNE[stratmixingtype]);
           UnsrtELInsert(tail, v, sto->transferEL);
@@ -1997,7 +1997,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
       
       STEP_THROUGH_INEDGES_NET(tail, e, v, sto->combined_nonBDTDNE) {
         if(IN_DEG[v] + OUT_DEG[v] < sto->bound) {
-          int stratmixingtype = sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]];
+          int stratmixingtype = sto->indmat[sto->strattailtype][sto->strat_vattr[v]];
           UnsrtELDelete(v, tail, sto->nonBDTDNE[stratmixingtype]);
           UnsrtELInsert(v, tail, sto->BDTDNE[stratmixingtype]);
           UnsrtELInsert(v, tail, sto->transferEL);
@@ -2013,14 +2013,14 @@ MH_U_FN(Mu_discordBDStratTNT) {
     if(sto->headmaxl) {
       // head will be newly submaxl after toggle, so add it to the appropriate node list    
       sto->nodesvec[sto->stratheadtype][sto->bdheadtype][sto->attrcounts[sto->stratheadtype][sto->bdheadtype]] = head;
-      sto->nodepos[head - 1] = sto->attrcounts[sto->stratheadtype][sto->bdheadtype];
+      sto->nodepos[head] = sto->attrcounts[sto->stratheadtype][sto->bdheadtype];
       sto->attrcounts[sto->stratheadtype][sto->bdheadtype]++;
 
       sto->transferEL->nedges = 0;      
       
       STEP_THROUGH_OUTEDGES_NET(head, e, v, sto->combined_nonBDTDNE) {
         if(IN_DEG[v] + OUT_DEG[v] < sto->bound) {
-          int stratmixingtype = sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]];
+          int stratmixingtype = sto->indmat[sto->stratheadtype][sto->strat_vattr[v]];
           UnsrtELDelete(head, v, sto->nonBDTDNE[stratmixingtype]);
           UnsrtELInsert(head, v, sto->BDTDNE[stratmixingtype]);
           UnsrtELInsert(head, v, sto->transferEL);
@@ -2029,7 +2029,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
       
       STEP_THROUGH_INEDGES_NET(head, e, v, sto->combined_nonBDTDNE) {
         if(IN_DEG[v] + OUT_DEG[v] < sto->bound) {
-          int stratmixingtype = sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]];
+          int stratmixingtype = sto->indmat[sto->stratheadtype][sto->strat_vattr[v]];
           UnsrtELDelete(v, head, sto->nonBDTDNE[stratmixingtype]);
           UnsrtELInsert(v, head, sto->BDTDNE[stratmixingtype]);
           UnsrtELInsert(v, head, sto->transferEL);
@@ -2044,21 +2044,21 @@ MH_U_FN(Mu_discordBDStratTNT) {
   } else {
     if(sto->tailmaxl) {
       // tail will be newly maxl after toggle, so remove it from the appropriate node list
-      sto->nodesvec[sto->strattailtype][sto->bdtailtype][sto->nodepos[tail - 1]] = sto->nodesvec[sto->strattailtype][sto->bdtailtype][sto->attrcounts[sto->strattailtype][sto->bdtailtype] - 1];
-      sto->nodepos[sto->nodesvec[sto->strattailtype][sto->bdtailtype][sto->nodepos[tail - 1]] - 1] = sto->nodepos[tail - 1];
+      sto->nodesvec[sto->strattailtype][sto->bdtailtype][sto->nodepos[tail]] = sto->nodesvec[sto->strattailtype][sto->bdtailtype][sto->attrcounts[sto->strattailtype][sto->bdtailtype] - 1];
+      sto->nodepos[sto->nodesvec[sto->strattailtype][sto->bdtailtype][sto->nodepos[tail]]] = sto->nodepos[tail];
       sto->attrcounts[sto->strattailtype][sto->bdtailtype]--;
 
       sto->transferEL->nedges = 0;
 
       STEP_THROUGH_OUTEDGES_NET(tail, e, v, sto->combined_BDTDNE) {
-        int stratmixingtype = sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]];
+        int stratmixingtype = sto->indmat[sto->strattailtype][sto->strat_vattr[v]];
         UnsrtELDelete(tail, v, sto->BDTDNE[stratmixingtype]);
         UnsrtELInsert(tail, v, sto->nonBDTDNE[stratmixingtype]);
         UnsrtELInsert(tail, v, sto->transferEL);        
       }
 
       STEP_THROUGH_INEDGES_NET(tail, e, v, sto->combined_BDTDNE) {
-        int stratmixingtype = sto->indmat[sto->strattailtype][(int)sto->strat_vattr[v - 1]];
+        int stratmixingtype = sto->indmat[sto->strattailtype][sto->strat_vattr[v]];
         UnsrtELDelete(v, tail, sto->BDTDNE[stratmixingtype]);
         UnsrtELInsert(v, tail, sto->nonBDTDNE[stratmixingtype]);
         UnsrtELInsert(v, tail, sto->transferEL);
@@ -2072,21 +2072,21 @@ MH_U_FN(Mu_discordBDStratTNT) {
     
     if(sto->headmaxl) {
       // head will be newly maxl after toggle, so remove it from the appropriate node list
-      sto->nodesvec[sto->stratheadtype][sto->bdheadtype][sto->nodepos[head - 1]] = sto->nodesvec[sto->stratheadtype][sto->bdheadtype][sto->attrcounts[sto->stratheadtype][sto->bdheadtype] - 1];
-      sto->nodepos[sto->nodesvec[sto->stratheadtype][sto->bdheadtype][sto->nodepos[head - 1]] - 1] = sto->nodepos[head - 1];
+      sto->nodesvec[sto->stratheadtype][sto->bdheadtype][sto->nodepos[head]] = sto->nodesvec[sto->stratheadtype][sto->bdheadtype][sto->attrcounts[sto->stratheadtype][sto->bdheadtype] - 1];
+      sto->nodepos[sto->nodesvec[sto->stratheadtype][sto->bdheadtype][sto->nodepos[head]]] = sto->nodepos[head];
       sto->attrcounts[sto->stratheadtype][sto->bdheadtype]--;
 
       sto->transferEL->nedges = 0;
 
       STEP_THROUGH_OUTEDGES_NET(head, e, v, sto->combined_BDTDNE) {
-        int stratmixingtype = sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]];
+        int stratmixingtype = sto->indmat[sto->stratheadtype][sto->strat_vattr[v]];
         UnsrtELDelete(head, v, sto->BDTDNE[stratmixingtype]);
         UnsrtELInsert(head, v, sto->nonBDTDNE[stratmixingtype]);
         UnsrtELInsert(head, v, sto->transferEL);        
       }
 
       STEP_THROUGH_INEDGES_NET(head, e, v, sto->combined_BDTDNE) {
-        int stratmixingtype = sto->indmat[sto->stratheadtype][(int)sto->strat_vattr[v - 1]];
+        int stratmixingtype = sto->indmat[sto->stratheadtype][sto->strat_vattr[v]];
         UnsrtELDelete(v, head, sto->BDTDNE[stratmixingtype]);
         UnsrtELInsert(v, head, sto->nonBDTDNE[stratmixingtype]);
         UnsrtELInsert(v, head, sto->transferEL);
