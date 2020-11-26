@@ -295,13 +295,9 @@ MH_X_FN(Mx_discordStratTNT) {
     // transfer discordant edges to nondiscordant edges
     // clear discordant edges and discordant nonedges
     for(int i = 0; i < sto->nmixtypes; i++) {
-      Vertex *tails = sto->discordantELs[i]->tails;
-      Vertex *heads = sto->discordantELs[i]->heads;
-      int nedges = sto->discordantELs[i]->nedges;
-      
       // UnsrtELs start at index 1 here
-      for(int j = 1; j <= nedges; j++) {
-        UnsrtELInsert(tails[j], heads[j], sto->nonDiscordantELs[i]);
+      for(int j = 1; j <= sto->discordantELs[i]->nedges; j++) {
+        UnsrtELInsert(sto->discordantELs[i]->tails[j], sto->discordantELs[i]->heads[j], sto->nonDiscordantELs[i]);
       }
       
       sto->discordantELs[i]->nedges = 0;
@@ -612,10 +608,6 @@ MH_X_FN(Mx_discordBDTNT) {
     sto->BDTDNE->nedges = 0;
     sto->nonBDTDNE->nedges = 0;
     sto->discordantEdges->nedges = 0;
-
-    sto->BDTDNE->lindex = 0;
-    sto->nonBDTDNE->lindex = 0;
-    sto->discordantEdges->lindex = 0;
     
     // for now, destroy and recreate each time step (can we do this more efficiently?)
     NetworkDestroy(sto->combined_BDTDNE);
@@ -1124,7 +1116,6 @@ typedef struct {
   double proposedcumprob;
   
   double *originalprobvec;
-  double *currentprobvec;
   
   WtPop *wtp;
 
@@ -1158,6 +1149,9 @@ typedef struct {
   
   int *currentsubmaxledgestype;
   int **indmat;  
+  
+  int nmixtypestoupdate;
+  int *mixtypestoupdate;  
 } discordBDStratTNTStorage;
 
 MH_I_FN(Mi_discordBDStratTNT) {
@@ -1325,14 +1319,13 @@ MH_I_FN(Mi_discordBDStratTNT) {
   sto->nodesvec = nodesvec;
   sto->attrcounts = attrcounts;
     
-  sto->currentprobvec = currentprobvec;
-  
   sto->currentcumprob = sumprobs;
   
   sto->proposedcumprob = 1;
   
   sto->bound = bound;
   sto->nmixtypes = nmixtypes;
+  sto->mixtypestoupdate = Calloc(nmixtypes, int);
   
   sto->strat_vattr = strat_vattr;
   sto->bd_vattr = bd_vattr;
@@ -1357,7 +1350,7 @@ MH_I_FN(Mi_discordBDStratTNT) {
 
   sto->transferEL = UnsrtELInitialize(0, NULL, NULL, FALSE);
   
-  sto->wtp = WtPopInitialize(sto->nmixtypes, sto->currentprobvec);  
+  sto->wtp = WtPopInitialize(sto->nmixtypes, currentprobvec);  
 }
 
 MH_X_FN(Mx_discordBDStratTNT) {
@@ -1373,11 +1366,7 @@ MH_X_FN(Mx_discordBDStratTNT) {
       // clear all the discordance information
       sto->BDTDNE[i]->nedges = 0;
       sto->nonBDTDNE[i]->nedges = 0;
-      sto->discordantEdges[i]->nedges = 0;
-      
-      sto->BDTDNE[i]->lindex = 0;
-      sto->nonBDTDNE[i]->lindex = 0;
-      sto->discordantEdges[i]->lindex = 0;      
+      sto->discordantEdges[i]->nedges = 0;      
     }
     
     // for now, destroy and recreate each time step (can we do this more efficiently?)
@@ -1530,6 +1519,7 @@ MH_P_FN(MH_discordBDStratTNT) {
   // mixing types that can be influenced by toggles made on 
   // the current mixing type
   sto->proposedcumprob = sto->currentcumprob;
+  sto->nmixtypestoupdate = 0; // reset counter  
   // avoid these somewhat expensive checks in the typical case
   // where you have enough submaximal nodes that you cannot
   // be exhausting any mixing types of toggleable dyads
@@ -1553,7 +1543,7 @@ MH_P_FN(MH_discordBDStratTNT) {
           continue;
         }
 
-        if(sto->currentprobvec[infl_i] > 0) {
+        if(WtPopGetWt(infl_i, sto->wtp) > 0) {
           continue;
         }
         // else there are no toggleable dyads of type infl_i in the current network;
@@ -1579,6 +1569,8 @@ MH_P_FN(MH_discordBDStratTNT) {
         
         if(anytoggleable) {
           sto->proposedcumprob += sto->originalprobvec[infl_i];
+          sto->mixtypestoupdate[sto->nmixtypestoupdate] = infl_i;
+          sto->nmixtypestoupdate++;          
         }
       }
     } else if(!in_network) {
@@ -1597,7 +1589,7 @@ MH_P_FN(MH_discordBDStratTNT) {
           continue;
         }
 
-        if(sto->currentprobvec[infl_i] == 0 || sto->nonDiscordantEdges[infl_i]->nedges > 0 || sto->discordantEdges[infl_i]->nedges > 0) {
+        if(WtPopGetWt(infl_i, sto->wtp) == 0 || sto->nonDiscordantEdges[infl_i]->nedges > 0 || sto->discordantEdges[infl_i]->nedges > 0) {
           continue;
         }
         // else there are no toggleable dyads of type infl_i in the current network;
@@ -1620,6 +1612,8 @@ MH_P_FN(MH_discordBDStratTNT) {
         
         if(!anytoggleable) {
           sto->proposedcumprob -= sto->originalprobvec[infl_i];
+          sto->mixtypestoupdate[sto->nmixtypestoupdate] = infl_i;
+          sto->nmixtypestoupdate++;          
         }
       }    
     }
@@ -1811,6 +1805,21 @@ MH_P_FN(MH_discordBDStratTNT) {
 MH_U_FN(Mu_discordBDStratTNT) {   
   GET_STORAGE(discordBDStratTNTStorage, sto);
 
+  // if any strat mixing types have changed toggleability status, update prob info accordingly
+  if(sto->nmixtypestoupdate > 0) {
+    sto->currentcumprob = sto->proposedcumprob;
+
+    if(edgeflag) {
+      for(int i = 0; i < sto->nmixtypestoupdate; i++) {
+        WtPopSetWt(sto->mixtypestoupdate[i], sto->originalprobvec[sto->mixtypestoupdate[i]], sto->wtp);          
+      }
+    } else {
+      for(int i = 0; i < sto->nmixtypestoupdate; i++) {
+        WtPopSetWt(sto->mixtypestoupdate[i], 0, sto->wtp);          
+      }
+    }
+  }
+
   // if we are adding an edge that will be submaximal in the post-toggle 
   // network, then increment currentsubmaxledgestype for this particular edge
   if(!edgeflag && !sto->tailmaxl && !sto->headmaxl) {
@@ -1858,97 +1867,6 @@ MH_U_FN(Mu_discordBDStratTNT) {
       }
     }
   }  
-
-  // skip the next block if we have enough submaximal nodes that
-  // no strat type toggleability status can possibly have changed
-  if(sto->attrcounts[sto->strattailtype][sto->bdtailtype] <= 2 || sto->attrcounts[sto->stratheadtype][sto->bdheadtype] <= 2) {
-    // avoid copying in the common case where all strat types are toggleable in both the current and proposed networks
-    if(sto->currentcumprob != 1 || sto->proposedcumprob != 1) {
-      // copy cumprobs in case they're different
-      sto->currentcumprob = sto->proposedcumprob;
-    
-      if(edgeflag) {
-        int ntocheck = (2 - ((sto->strattailtype == sto->stratheadtype) || BIPARTITE))*sto->nstratlevels;
-        for(int i = 0; i < ntocheck; i++) {
-          int infl_i;
-          if(i < sto->nstratlevels) {
-            infl_i = sto->indmat[sto->strattailtype][i];
-          } else {
-            infl_i = sto->indmat[i - sto->nstratlevels][sto->stratheadtype];  
-          }
-          if(infl_i < 0 || infl_i == sto->stratmixingtype) {
-            continue;
-          }
-
-          if(sto->currentprobvec[infl_i] > 0) {
-            continue;
-          }
-  
-          int anytoggleable = FALSE;
-          
-          for(int j = 0; j < sto->BDtypesbyStrattype[infl_i]; j++) {
-            // adjustments
-            int proposedtailadjustment = (sto->strattailtype == sto->strattailtypes[infl_i] && sto->bdtailtype == sto->BDtailsbyStrattype[infl_i][j] && sto->tailmaxl) + (sto->stratheadtype == sto->strattailtypes[infl_i] && sto->bdheadtype == sto->BDtailsbyStrattype[infl_i][j] && sto->headmaxl);
-            int proposedheadadjustment = (sto->strattailtype == sto->stratheadtypes[infl_i] && sto->bdtailtype == sto->BDheadsbyStrattype[infl_i][j] && sto->tailmaxl) + (sto->stratheadtype == sto->stratheadtypes[infl_i] && sto->bdheadtype == sto->BDheadsbyStrattype[infl_i][j] && sto->headmaxl);
-            
-            int tailcounts = sto->attrcounts[sto->strattailtypes[infl_i]][sto->BDtailsbyStrattype[infl_i][j]];
-            int headcounts = sto->attrcounts[sto->stratheadtypes[infl_i]][sto->BDheadsbyStrattype[infl_i][j]];
-            
-            proposedtailadjustment = -proposedtailadjustment;
-            proposedheadadjustment = -proposedheadadjustment;
-            
-            if(tailcounts > proposedtailadjustment && headcounts > proposedheadadjustment + (sto->strattailtypes[infl_i] == sto->stratheadtypes[infl_i] && sto->BDtailsbyStrattype[infl_i][j] == sto->BDheadsbyStrattype[infl_i][j])) {
-              anytoggleable = TRUE;
-              break;
-            }      
-          }
-          
-          if(anytoggleable) {
-            sto->currentprobvec[infl_i] = sto->originalprobvec[infl_i];
-            WtPopSetWt(infl_i, sto->originalprobvec[infl_i], sto->wtp);
-          }
-        }
-      } else {
-        int ntocheck = (2 - ((sto->strattailtype == sto->stratheadtype) || BIPARTITE))*sto->nstratlevels;
-        for(int i = 0; i < ntocheck; i++) {
-          int infl_i;
-          if(i < sto->nstratlevels) {
-            infl_i = sto->indmat[sto->strattailtype][i];
-          } else {
-            infl_i = sto->indmat[i - sto->nstratlevels][sto->stratheadtype];  
-          }
-          if(infl_i < 0 || infl_i == sto->stratmixingtype) {
-            continue;
-          }
-
-          if(sto->currentprobvec[infl_i] == 0 || sto->nonDiscordantEdges[infl_i]->nedges > 0 || sto->discordantEdges[infl_i]->nedges > 0) {
-            continue;
-          }
-  
-          int anytoggleable = FALSE;
-          
-          for(int j = 0; j < sto->BDtypesbyStrattype[infl_i]; j++) {
-            // adjustments
-            int proposedtailadjustment = (sto->strattailtype == sto->strattailtypes[infl_i] && sto->bdtailtype == sto->BDtailsbyStrattype[infl_i][j] && sto->tailmaxl) + (sto->stratheadtype == sto->strattailtypes[infl_i] && sto->bdheadtype == sto->BDtailsbyStrattype[infl_i][j] && sto->headmaxl);
-            int proposedheadadjustment = (sto->strattailtype == sto->stratheadtypes[infl_i] && sto->bdtailtype == sto->BDheadsbyStrattype[infl_i][j] && sto->tailmaxl) + (sto->stratheadtype == sto->stratheadtypes[infl_i] && sto->bdheadtype == sto->BDheadsbyStrattype[infl_i][j] && sto->headmaxl);
-            
-            int tailcounts = sto->attrcounts[sto->strattailtypes[infl_i]][sto->BDtailsbyStrattype[infl_i][j]];
-            int headcounts = sto->attrcounts[sto->stratheadtypes[infl_i]][sto->BDheadsbyStrattype[infl_i][j]];
-                      
-            if(tailcounts > proposedtailadjustment && headcounts > proposedheadadjustment + (sto->strattailtypes[infl_i] == sto->stratheadtypes[infl_i] && sto->BDtailsbyStrattype[infl_i][j] == sto->BDheadsbyStrattype[infl_i][j])) {
-              anytoggleable = TRUE;
-              break;
-            }      
-          }
-          
-          if(!anytoggleable) {
-            sto->currentprobvec[infl_i] = 0;
-            WtPopSetWt(infl_i, 0, sto->wtp);
-          }
-        }    
-      }
-    }
-  }
     
   // add or remove the dyad being toggled from the relevant edge set
   if(edgeflag) {
@@ -2120,7 +2038,8 @@ MH_F_FN(Mf_discordBDStratTNT) {
   }
   Free(sto->nodesvec);
   
-  Free(sto->currentprobvec);
+  Free(sto->originalprobvec);  
+  Free(sto->mixtypestoupdate);
   
   Free(sto->nodepos);
     
@@ -2143,6 +2062,9 @@ MH_F_FN(Mf_discordBDStratTNT) {
   NetworkDestroy(sto->combined_BDTDNE);
   NetworkDestroy(sto->combined_nonBDTDNE);
   UnsrtELDestroy(sto->transferEL);
+  
+  Free(sto->BDtailsbyStrattype);
+  Free(sto->BDheadsbyStrattype);  
   
   WtPopDestroy(sto->wtp);  
   // MHp->storage itself should be Freed by MHProposalDestroy
