@@ -26,14 +26,16 @@ InitErgmProposal.discordTNT <- function(arguments, nw, model) {
 }
 
 InitErgmProposal.discordStratTNT <- function(arguments, nw, model) {
-  stp <- ergm:::InitErgmProposal.StratTNT(arguments, nw)
-  proposal <- list(name = "discordStratTNT", inputs=stp$inputs, auxiliaries = ~.lasttoggle)
+  proposal <- ergm:::InitErgmProposal.StratTNT(arguments, nw)
+  proposal$name <- "discordStratTNT"
+  proposal$auxiliaries <- ~.lasttoggle
   proposal
 }
 
 InitErgmProposal.discordBDTNT <- function(arguments, nw, model) {
-  stp <- ergm:::InitErgmProposal.BDTNT(arguments, nw)
-  proposal <- list(name = "discordBDTNT", inputs=stp$inputs, auxiliaries = ~.lasttoggle)
+  proposal <- ergm:::InitErgmProposal.BDTNT(arguments, nw)
+  proposal$name <- "discordBDTNT"
+  proposal$auxiliaries <- ~.lasttoggle
   proposal
 }
 
