@@ -191,6 +191,7 @@ MH_I_FN(Mi_discordStratTNT) {
   int nattrcodes = asInteger(getListElement(MHp->R, "nlevels"));
   
   int *vattr = INTEGER(getListElement(MHp->R, "nodecov"));
+  vattr--; // so node indices line up correctly
   
   ALLOC_STORAGE(1, discordStratTNTStorage, sto);
   
@@ -218,7 +219,7 @@ MH_I_FN(Mi_discordStratTNT) {
   Edge e;
   for(Vertex tail = 1; tail <= N_NODES; tail++) {
     STEP_THROUGH_OUTEDGES(tail, e, head) {
-      int index = indmat[(int)vattr[tail - 1]][(int)vattr[head - 1]];
+      int index = indmat[vattr[tail]][vattr[head]];
       if(index >= 0) {
         UnsrtELInsert(tail, head, sto->nonDiscordantELs[index]);
       }
@@ -229,18 +230,18 @@ MH_I_FN(Mi_discordStratTNT) {
   int *nodecountsbycode = INTEGER(getListElement(MHp->R, "nodecountsbycode"));
   sto->nodecountsbycode = Calloc(nattrcodes, int);
   for(int i = 0; i < nattrcodes; i++) {
-    sto->nodecountsbycode[i] = (int)nodecountsbycode[i];
+    sto->nodecountsbycode[i] = nodecountsbycode[i];
   }
   
   int *inputnodesbycode = INTEGER(getListElement(MHp->R, "nodeindicesbycode"));
   
   sto->nodesbycode = Calloc(nattrcodes, Vertex *);
   for(int i = 0; i < nattrcodes; i++) {
-    sto->nodesbycode[i] = Calloc((int)nodecountsbycode[i], Vertex);
-    for(int j = 0; j < (int)nodecountsbycode[i]; j++) {
+    sto->nodesbycode[i] = Calloc(nodecountsbycode[i], Vertex);
+    for(int j = 0; j < nodecountsbycode[i]; j++) {
       sto->nodesbycode[i][j] = inputnodesbycode[j];
     }
-    inputnodesbycode += (int)nodecountsbycode[i];
+    inputnodesbycode += nodecountsbycode[i];
   }
   
   sto->nmixtypes = nmixtypes;  
@@ -525,24 +526,25 @@ MH_I_FN(Mi_discordBDTNT) {
   int *headtypes = INTEGER(getListElement(MHp->R, "allowed.heads")); // As in struct.
   
   int *vattr = INTEGER(getListElement(MHp->R, "nodecov")); // As in struct.
-    
+  vattr--; // so node indices line up correctly
+  
   Vertex **nodesvec = (Vertex **)Calloc(nlevels, Vertex *);
   
   int *attrcounts = (int *)Calloc(nlevels, int);
     
   for(int i = 0; i < nlevels; i++) {
     // make room for maximum number of nodes of each type
-    nodesvec[i] = (Vertex *)Calloc((int)nodecountsbycode[i], Vertex);
+    nodesvec[i] = (Vertex *)Calloc(nodecountsbycode[i], Vertex);
   }
 
-  int *nodepos = Calloc(N_NODES, int);
+  int *nodepos = Calloc(N_NODES + 1, int);
 
   for(Vertex vertex = 1; vertex <= N_NODES; vertex++) {
     if(IN_DEG[vertex] + OUT_DEG[vertex] < bound) {
       // add vertex to the submaximal list corresponding to its attribute type
-      nodesvec[(int)vattr[vertex - 1]][attrcounts[(int)vattr[vertex - 1]]] = vertex;
-      nodepos[vertex - 1] = attrcounts[(int)vattr[vertex - 1]];
-      attrcounts[(int)vattr[vertex - 1]]++;
+      nodesvec[vattr[vertex]][attrcounts[vattr[vertex]]] = vertex;
+      nodepos[vertex] = attrcounts[vattr[vertex]];
+      attrcounts[vattr[vertex]]++;
     }
   }
   
@@ -550,9 +552,9 @@ MH_I_FN(Mi_discordBDTNT) {
   Dyad currentdyads = 0;    
   for(int i = 0; i < nmixtypes; i++) {
     if(tailtypes[i] == headtypes[i]) {
-      currentdyads += (Dyad)attrcounts[(int)tailtypes[i]]*(attrcounts[(int)headtypes[i]] - 1)/2;
+      currentdyads += (Dyad)attrcounts[tailtypes[i]]*(attrcounts[headtypes[i]] - 1)/2;
     } else {
-      currentdyads += (Dyad)attrcounts[(int)tailtypes[i]]*attrcounts[(int)headtypes[i]];
+      currentdyads += (Dyad)attrcounts[tailtypes[i]]*attrcounts[headtypes[i]];
     }
   }
 
@@ -573,8 +575,8 @@ MH_I_FN(Mi_discordBDTNT) {
   sto->tailtypes = Calloc(nmixtypes, int);
   sto->headtypes = Calloc(nmixtypes, int);
   for(int i = 0; i < nmixtypes; i++) {
-    sto->tailtypes[i] = (int)tailtypes[i];
-    sto->headtypes[i] = (int)headtypes[i];    
+    sto->tailtypes[i] = tailtypes[i];
+    sto->headtypes[i] = headtypes[i];    
   }
 
   sto->nonDiscordantEdges = UnsrtELInitialize(0, NULL, NULL, FALSE);
@@ -697,8 +699,8 @@ MH_P_FN(MH_discordBDTNT) {
   
   sto->in_discord = in_discord;
   
-  sto->tailtype = sto->vattr[Mtail[0] - 1];
-  sto->headtype = sto->vattr[Mhead[0] - 1];    
+  sto->tailtype = sto->vattr[Mtail[0]];
+  sto->headtype = sto->vattr[Mhead[0]];    
   
   sto->tailmaxl = IN_DEG[Mtail[0]] + OUT_DEG[Mtail[0]] == sto->bound - 1 + in_network;
   sto->headmaxl = IN_DEG[Mhead[0]] + OUT_DEG[Mhead[0]] == sto->bound - 1 + in_network;   
@@ -715,20 +717,20 @@ MH_P_FN(MH_discordBDTNT) {
 
     if(sto->tailtype == sto->headtypes[i] && sto->tailmaxl) {
       ha += delta;
-      corr += sto->attrcounts[(int)sto->tailtypes[i]];
+      corr += sto->attrcounts[sto->tailtypes[i]];
     }
       
     if(sto->headtype == sto->headtypes[i] && sto->headmaxl) {
       ha += delta;
-      corr += sto->attrcounts[(int)sto->tailtypes[i]];        
+      corr += sto->attrcounts[sto->tailtypes[i]];        
     }
       
     if(sto->tailtype == sto->tailtypes[i] && sto->tailmaxl) {
-      corr += sto->attrcounts[(int)sto->headtypes[i]] + ha;
+      corr += sto->attrcounts[sto->headtypes[i]] + ha;
     }
       
     if(sto->headtype == sto->tailtypes[i] && sto->headmaxl) {
-      corr += sto->attrcounts[(int)sto->headtypes[i]] + ha;
+      corr += sto->attrcounts[sto->headtypes[i]] + ha;
     }
       
     if(sto->tailtypes[i] == sto->headtypes[i]) {
@@ -908,7 +910,7 @@ MH_U_FN(Mu_discordBDTNT) {
     if(sto->tailmaxl) {
       // tail will be newly submaxl after toggle, so add it to the appropriate node list
       sto->nodesvec[sto->tailtype][sto->attrcounts[sto->tailtype]] = tail;
-      sto->nodepos[tail - 1] = sto->attrcounts[sto->tailtype];
+      sto->nodepos[tail] = sto->attrcounts[sto->tailtype];
       sto->attrcounts[sto->tailtype]++;
       
       // iterate over all nonBDTDNEs with tail as an endpoint; if other endpoint is also
@@ -941,7 +943,7 @@ MH_U_FN(Mu_discordBDTNT) {
     if(sto->headmaxl) {
       // head will be newly submaxl after toggle, so add it to the appropriate node list    
       sto->nodesvec[sto->headtype][sto->attrcounts[sto->headtype]] = head;
-      sto->nodepos[head - 1] = sto->attrcounts[sto->headtype];
+      sto->nodepos[head] = sto->attrcounts[sto->headtype];
       sto->attrcounts[sto->headtype]++;
 
       // iterate over all nonBDTDNEs with head as an endpoint; if other endpoint is also
@@ -974,8 +976,8 @@ MH_U_FN(Mu_discordBDTNT) {
       // tail will be newly maxl after toggle, so remove it from the appropriate node list, updating nodepos
       // for whatever node is currently at the end of sto->nodesvec[sto->tailtype], since that will be
       // moved into tail's position
-      sto->nodepos[sto->nodesvec[sto->tailtype][sto->attrcounts[sto->tailtype] - 1] - 1] = sto->nodepos[tail - 1];
-      sto->nodesvec[sto->tailtype][sto->nodepos[tail - 1]] = sto->nodesvec[sto->tailtype][sto->attrcounts[sto->tailtype] - 1];
+      sto->nodesvec[sto->tailtype][sto->nodepos[tail]] = sto->nodesvec[sto->tailtype][sto->attrcounts[sto->tailtype] - 1];
+      sto->nodepos[sto->nodesvec[sto->tailtype][sto->nodepos[tail]]] = sto->nodepos[tail];
       sto->attrcounts[sto->tailtype]--;
 
       // transfer all BDTDNEs with tail as an endpoint to nonBDTDNE
@@ -1003,8 +1005,8 @@ MH_U_FN(Mu_discordBDTNT) {
       // head will be newly maxl after toggle, so remove it from the appropriate node list, updating nodepos
       // for whatever node is currently at the end of sto->nodesvec[sto->headtype], since that will be
       // moved into head's position
-      sto->nodepos[sto->nodesvec[sto->headtype][sto->attrcounts[sto->headtype] - 1] - 1] = sto->nodepos[head - 1];
-      sto->nodesvec[sto->headtype][sto->nodepos[head - 1]] = sto->nodesvec[sto->headtype][sto->attrcounts[sto->headtype] - 1];
+      sto->nodesvec[sto->headtype][sto->nodepos[head]] = sto->nodesvec[sto->headtype][sto->attrcounts[sto->headtype] - 1];
+      sto->nodepos[sto->nodesvec[sto->headtype][sto->nodepos[head]]] = sto->nodepos[head];
       sto->attrcounts[sto->headtype]--;
 
       sto->transferEL->nedges = 0;
@@ -1138,6 +1140,7 @@ MH_I_FN(Mi_discordBDStratTNT) {
   sto->nstratlevels = nattrcodes;
   
   int *strat_vattr = INTEGER(getListElement(MHp->R, "strat_vattr"));
+  strat_vattr--; // so node indices line up correctly
   
   UnsrtEL **els = (UnsrtEL **)Calloc(nmixtypes, UnsrtEL *);
       
@@ -1177,9 +1180,9 @@ MH_I_FN(Mi_discordBDStratTNT) {
   int bdlevels = asInteger(getListElement(MHp->R, "bd_levels"));
   
   int *bd_vattr = INTEGER(getListElement(MHp->R, "bd_vattr"));
+  bd_vattr--; // so node indices line up correctly
   
   int *nodecountsbypairedcode = INTEGER(getListElement(MHp->R, "nodecountsbypairedcode"));
-  
   
   int **nodecountsmat = (int **)Calloc(nattrcodes, int *);
   nodecountsmat[0] = nodecountsbypairedcode;
