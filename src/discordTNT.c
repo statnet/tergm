@@ -780,11 +780,12 @@ MH_P_FN(MH_discordBDStratTNT) {
 
   int strattailtype = sto->static_sto->strattailtypes[strat_i];
   int stratheadtype = sto->static_sto->stratheadtypes[strat_i];
-    
+  int strat_diag = strattailtype == stratheadtype;
+  
   // number of edges of this mixing type
   int nedgestype = sto->nonDiscordantEdges[strat_i]->nedges + sto->discordantEdges[strat_i]->nedges;
   
-  Dyad ndyadstype = NodeListDyadCount(sto->static_sto->attrcounts[strattailtype], sto->static_sto->attrcounts[stratheadtype], sto->static_sto->BDtailsbyStrattype[strat_i], sto->static_sto->BDheadsbyStrattype[strat_i], sto->static_sto->BDtypesbyStrattype[strat_i], strattailtype == stratheadtype, DIRECTED);
+  Dyad ndyadstype = NodeListDyadCount(sto->static_sto->attrcounts[strattailtype], sto->static_sto->attrcounts[stratheadtype], sto->static_sto->bd_tails, sto->static_sto->bd_heads, sto->static_sto->bd_mixtypes[strat_diag], strat_diag, DIRECTED);
   
   int nddyadstype = sto->discordantEdges[strat_i]->nedges + sto->BDTDNE[strat_i]->nedges;
   
@@ -809,13 +810,13 @@ MH_P_FN(MH_discordBDStratTNT) {
                            Mhead, // head
                            sto->static_sto->nodesvec[strattailtype], // tails
                            sto->static_sto->nodesvec[stratheadtype], // heads
-                           sto->static_sto->BDtailsbyStrattype[strat_i], // tailattrs
-                           sto->static_sto->BDheadsbyStrattype[strat_i], // headattrs
+                           sto->static_sto->bd_tails, // tailattrs
+                           sto->static_sto->bd_heads, // headattrs
                            sto->static_sto->attrcounts[strattailtype], // tailcounts
                            sto->static_sto->attrcounts[stratheadtype], // headcounts
-                           sto->static_sto->BDtypesbyStrattype[strat_i], // length
+                           sto->static_sto->bd_mixtypes[strat_diag], // length
                            ndyadstype, // dyadcount
-                           strattailtype == stratheadtype, // diagonal
+                           strat_diag, // diagonal
                            DIRECTED); // directed; always FALSE in discordBDStratTNT
          
       in_network = IS_OUTEDGE(Mtail[0],Mhead[0]);
@@ -866,7 +867,7 @@ MH_P_FN(MH_discordBDStratTNT) {
   }
 
   // compute proposed dyad count for current mixing type (only)
-  Dyad proposeddyadstype = NodeListDyadCount(sto->static_sto->attrcounts[strattailtype], sto->static_sto->attrcounts[stratheadtype], sto->static_sto->BDtailsbyStrattype[strat_i], sto->static_sto->BDheadsbyStrattype[strat_i], sto->static_sto->BDtypesbyStrattype[strat_i], strattailtype == stratheadtype, DIRECTED);
+  Dyad proposeddyadstype = NodeListDyadCount(sto->static_sto->attrcounts[strattailtype], sto->static_sto->attrcounts[stratheadtype], sto->static_sto->bd_tails, sto->static_sto->bd_heads, sto->static_sto->bd_mixtypes[strat_diag], strat_diag, DIRECTED);
     
   // here we compute the proposedcumprob, checking only those
   // mixing types that can be influenced by toggles made on 
@@ -879,7 +880,7 @@ MH_P_FN(MH_discordBDStratTNT) {
   if(sto->static_sto->attrcounts[sto->static_sto->strattailtype][sto->static_sto->bdtailtype] <= 2 || sto->static_sto->attrcounts[sto->static_sto->stratheadtype][sto->static_sto->bdheadtype] <= 2) {
     
     // how many strat types do we need to check?
-    int ntocheck = (sto->static_sto->strattailtype == sto->static_sto->stratheadtype) ? sto->static_sto->nstratlevels : 2*sto->static_sto->nstratlevels;
+    int ntocheck = strat_diag ? sto->static_sto->nstratlevels : 2*sto->static_sto->nstratlevels;
 
     for(int i = 0; i < ntocheck; i++) {
       // find the index of the i'th strat type we need to check, by looking it up in the indmat
@@ -895,7 +896,7 @@ MH_P_FN(MH_discordBDStratTNT) {
       int toggle_curr = WtPopGetWt(infl_i, sto->static_sto->wtp) > 0;
       
       // will we be able to toggle this mixing type in the proposed network? 
-      int toggle_prop = sto->nonDiscordantEdges[infl_i]->nedges > 0 || sto->discordantEdges[infl_i]->nedges > 0 || NodeListDyadCountPositive(sto->static_sto->attrcounts[sto->static_sto->strattailtypes[infl_i]], sto->static_sto->attrcounts[sto->static_sto->stratheadtypes[infl_i]], sto->static_sto->BDtailsbyStrattype[infl_i], sto->static_sto->BDheadsbyStrattype[infl_i], sto->static_sto->BDtypesbyStrattype[infl_i], sto->static_sto->strattailtypes[infl_i] == sto->static_sto->stratheadtypes[infl_i]);
+      int toggle_prop = sto->nonDiscordantEdges[infl_i]->nedges > 0 || sto->discordantEdges[infl_i]->nedges > 0 || NodeListDyadCountPositive(sto->static_sto->attrcounts[sto->static_sto->strattailtypes[infl_i]], sto->static_sto->attrcounts[sto->static_sto->stratheadtypes[infl_i]], sto->static_sto->bd_tails, sto->static_sto->bd_heads, sto->static_sto->bd_mixtypes[sto->static_sto->strattailtypes[infl_i] == sto->static_sto->stratheadtypes[infl_i]], sto->static_sto->strattailtypes[infl_i] == sto->static_sto->stratheadtypes[infl_i]);
       
       // will there be a change in toggleability status?
       int change = toggle_curr - toggle_prop;
