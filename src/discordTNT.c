@@ -943,7 +943,7 @@ MH_P_FN(MH_discordBDStratTNT) {
         }
       }
       STEP_THROUGH_INEDGES_NET(Mtail[0], e, v, sto->combined_BDTDNE) {
-        if(sto->static_sto->indmat[sto->static_sto->strattailtype][sto->static_sto->strat_vattr[v]] == strat_i) {
+        if(sto->static_sto->indmat[sto->static_sto->strat_vattr[v]][sto->static_sto->strattailtype] == strat_i) {
           propnddyadstype--;
         }
       }
@@ -957,7 +957,7 @@ MH_P_FN(MH_discordBDStratTNT) {
         }
       }
       STEP_THROUGH_INEDGES_NET(Mhead[0], e, v, sto->combined_BDTDNE) {
-        if(sto->static_sto->indmat[sto->static_sto->stratheadtype][sto->static_sto->strat_vattr[v]] == strat_i) {
+        if(sto->static_sto->indmat[sto->static_sto->strat_vattr[v]][sto->static_sto->stratheadtype] == strat_i) {
           propnddyadstype--;
         }
       }
@@ -971,7 +971,7 @@ MH_P_FN(MH_discordBDStratTNT) {
         }
       }
       STEP_THROUGH_INEDGES_NET(Mtail[0], e, v, sto->combined_nonBDTDNE) {
-        if(sto->static_sto->indmat[sto->static_sto->strattailtype][sto->static_sto->strat_vattr[v]] == strat_i && IN_DEG[v] + OUT_DEG[v] < sto->static_sto->bound) {
+        if(sto->static_sto->indmat[sto->static_sto->strat_vattr[v]][sto->static_sto->strattailtype] == strat_i && IN_DEG[v] + OUT_DEG[v] < sto->static_sto->bound) {
           propnddyadstype++;
         }
       }
@@ -984,7 +984,7 @@ MH_P_FN(MH_discordBDStratTNT) {
         }
       }
       STEP_THROUGH_INEDGES_NET(Mhead[0], e, v, sto->combined_nonBDTDNE) {
-        if(sto->static_sto->indmat[sto->static_sto->stratheadtype][sto->static_sto->strat_vattr[v]] == strat_i && IN_DEG[v] + OUT_DEG[v] < sto->static_sto->bound) {
+        if(sto->static_sto->indmat[sto->static_sto->strat_vattr[v]][sto->static_sto->stratheadtype] == strat_i && IN_DEG[v] + OUT_DEG[v] < sto->static_sto->bound) {
           propnddyadstype++;
         }
       }
@@ -1019,7 +1019,7 @@ MH_P_FN(MH_discordBDStratTNT) {
       }
     }
     STEP_THROUGH_INEDGES(Mtail[0], e, v) {
-      if(IN_DEG[v] + OUT_DEG[v] < sto->static_sto->bound && sto->static_sto->indmat[sto->static_sto->strattailtype][sto->static_sto->strat_vattr[v]] == strat_i) {
+      if(IN_DEG[v] + OUT_DEG[v] < sto->static_sto->bound && sto->static_sto->indmat[sto->static_sto->strat_vattr[v]][sto->static_sto->strattailtype] == strat_i) {
         proposedsubmaxledgestype += delta;
       }
     }
@@ -1033,7 +1033,7 @@ MH_P_FN(MH_discordBDStratTNT) {
       }
     }
     STEP_THROUGH_INEDGES(Mhead[0], e, v) {
-      if(v != Mtail[0] && IN_DEG[v] + OUT_DEG[v] < sto->static_sto->bound && sto->static_sto->indmat[sto->static_sto->stratheadtype][sto->static_sto->strat_vattr[v]] == strat_i) {
+      if(v != Mtail[0] && IN_DEG[v] + OUT_DEG[v] < sto->static_sto->bound && sto->static_sto->indmat[sto->static_sto->strat_vattr[v]][sto->static_sto->stratheadtype] == strat_i) {
         proposedsubmaxledgestype += delta;
       }
     }
@@ -1108,7 +1108,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
     
     STEP_THROUGH_INEDGES_NET(tail, e, v, potential_removal_net) {
       if(!edgeflag || IN_DEG[v] + OUT_DEG[v] < sto->static_sto->bound) {
-        int stratmixingtype = sto->static_sto->indmat[sto->static_sto->strattailtype][sto->static_sto->strat_vattr[v]];
+        int stratmixingtype = sto->static_sto->indmat[sto->static_sto->strat_vattr[v]][sto->static_sto->strattailtype];
         UnsrtELToggleKnown(v, tail, sto->nonBDTDNE[stratmixingtype], edgeflag);
         UnsrtELToggleKnown(v, tail, sto->BDTDNE[stratmixingtype], !edgeflag);
         UnsrtELInsert(v, tail, sto->transferEL);
@@ -1131,7 +1131,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
     
     STEP_THROUGH_INEDGES_NET(head, e, v, potential_removal_net) {
       if(!edgeflag || IN_DEG[v] + OUT_DEG[v] < sto->static_sto->bound) {
-        int stratmixingtype = sto->static_sto->indmat[sto->static_sto->stratheadtype][sto->static_sto->strat_vattr[v]];
+        int stratmixingtype = sto->static_sto->indmat[sto->static_sto->strat_vattr[v]][sto->static_sto->stratheadtype];
         UnsrtELToggleKnown(v, head, sto->nonBDTDNE[stratmixingtype], edgeflag);
         UnsrtELToggleKnown(v, head, sto->BDTDNE[stratmixingtype], !edgeflag);
         UnsrtELInsert(v, head, sto->transferEL);
@@ -1171,8 +1171,8 @@ MH_U_FN(Mu_discordBDStratTNT) {
       }
     }
     STEP_THROUGH_INEDGES(tail, e, v) {
-      if(IN_DEG[v] + OUT_DEG[v] < sto->static_sto->bound && sto->static_sto->indmat[sto->static_sto->strattailtype][sto->static_sto->strat_vattr[v]] >= 0) {
-        sto->static_sto->currentsubmaxledgestype[sto->static_sto->indmat[sto->static_sto->strattailtype][sto->static_sto->strat_vattr[v]]] += delta;
+      if(IN_DEG[v] + OUT_DEG[v] < sto->static_sto->bound && sto->static_sto->indmat[sto->static_sto->strat_vattr[v]][sto->static_sto->strattailtype] >= 0) {
+        sto->static_sto->currentsubmaxledgestype[sto->static_sto->indmat[sto->static_sto->strat_vattr[v]][sto->static_sto->strattailtype]] += delta;
       }
     }
   }
@@ -1185,8 +1185,8 @@ MH_U_FN(Mu_discordBDStratTNT) {
       }
     }
     STEP_THROUGH_INEDGES(head, e, v) {
-      if(v != tail && IN_DEG[v] + OUT_DEG[v] < sto->static_sto->bound && sto->static_sto->indmat[sto->static_sto->stratheadtype][sto->static_sto->strat_vattr[v]] >= 0) {
-        sto->static_sto->currentsubmaxledgestype[sto->static_sto->indmat[sto->static_sto->stratheadtype][sto->static_sto->strat_vattr[v]]] += delta;
+      if(v != tail && IN_DEG[v] + OUT_DEG[v] < sto->static_sto->bound && sto->static_sto->indmat[sto->static_sto->strat_vattr[v]][sto->static_sto->stratheadtype] >= 0) {
+        sto->static_sto->currentsubmaxledgestype[sto->static_sto->indmat[sto->static_sto->strat_vattr[v]][sto->static_sto->stratheadtype]] += delta;
       }
     }
   }  
