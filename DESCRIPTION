@@ -1,6 +1,6 @@
 Package: tergm
-Version: 4.0.0-2033
-Date: 2020-10-22
+Version: 4.0.0-2063
+Date: 2020-12-26
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
 	person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="pavel@statnet.org", comment=c(ORCID="0000-0002-9101-3362")),

@@ -144,15 +144,8 @@ InitErgmTerm.Form1 <- function(nw, arglist, response=NULL,  ...){
                       vartypes = c("formula"),
                       defaultvalues = list(NULL),
                       required = c(TRUE))
-  
-  
-  # get the network and formula
-  f <- a$formula
 
-  if(length(f)==2) f <- nonsimp_update.formula(f, nw~.)
-  else nw <- ergm.getnetwork(f)
-  
-  m <- ergm_model(f, nw, response=response,...)
+  m <- ergm_model(a$formula, nw, response=response,...)
   
   c(list(name="on_union_net_Network", pkgname="ergm",
          auxiliaries = ~.union.net((nw%n%".PrevNets")[[1]], implementation="Network"),
@@ -192,15 +185,8 @@ InitErgmTerm.Diss1 <- function(nw, arglist, response=NULL,  ...){
                       vartypes = c("formula"),
                       defaultvalues = list(NULL),
                       required = c(TRUE))
-  
-  
-  # get the network and formula
-  f <- a$formula
 
-  if(length(f)==2) f <- nonsimp_update.formula(f, nw~.)
-  else nw <- ergm.getnetwork(f)
-  
-  m <- ergm_model(f, nw, response=response,...)
+  m <- ergm_model(a$formula, nw, response=response,...)
   
   c(list(name="on_intersect_net_Network", pkgname="ergm",
          auxiliaries = ~.intersect.net((nw%n%".PrevNets")[[1]], implementation="Network"),

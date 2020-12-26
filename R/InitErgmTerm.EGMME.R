@@ -14,13 +14,7 @@ InitErgmTerm.FormE <- function(nw, arglist, response=NULL,  ...) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  # get the network and formula
-  f <- a$formula
-
-  if(length(f)==2) f <- nonsimp_update.formula(f, nw~.)
-  else nw <- ergm.getnetwork(f)
-  
-  m <- ergm_model(f, nw, response=response,...)
+  m <- ergm_model(a$formula, nw, response=response,...)
 
   c(list(name="on_union_lt_net_Network",
          auxiliaries = ~.union.lt.net + .lasttoggle + .previous.lt.net,
@@ -51,13 +45,7 @@ InitErgmTerm.DissE <- function(nw, arglist, response=NULL,  ...) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-    # get the network and formula
-  f <- a$formula
-
-  if(length(f)==2) f <- nonsimp_update.formula(f, nw~.)
-  else nw <- ergm.getnetwork(f)
-  
-  m <- ergm_model(f, nw, response=response,...)
+  m <- ergm_model(a$formula, nw, response=response,...)
 
   c(list(name="on_intersect_lt_net_Network",
          auxiliaries = ~.intersect.lt.net() + .lasttoggle,
