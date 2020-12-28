@@ -300,11 +300,6 @@ test_that("simulate.tergm behaves reasonably", {
   
   # the N operator's call to get_multinet_nattr_tibble fails with these network attributes....
   # they are not needed for the cmle fit, so just take them out for now
-  nw1 %n% "lasttoggle" <- NULL
-  nw2 %n% "lasttoggle" <- NULL
-  nw3 %n% "lasttoggle" <- NULL
-  nw4 %n% "lasttoggle" <- NULL
-
   nw1 %n% "net.obs.period" <- NULL
   nw2 %n% "net.obs.period" <- NULL
   nw3 %n% "net.obs.period" <- NULL
