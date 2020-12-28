@@ -285,3 +285,121 @@ test_that("simulate.networkDynamic behaves reasonably", {
   expect_identical(unname(summary(network.collapse(new_nwD_constr, at = 10) ~ concurrent)), 0)
   expect_identical(unname(summary(network.collapse(new_nwD_constr2, at = 20) ~ concurrent)), 0)
 })
+
+test_that("simulate.tergm behaves reasonably", {
+  nw <- network.initialize(100, directed = FALSE)
+
+  nw1 <- simulate(nw ~ Form(~edges) + Diss(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final")
+  nw2 <- simulate(nw1 ~ Form(~edges) + Diss(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final")
+  nw3 <- simulate(nw2 ~ Form(~edges) + Diss(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final")
+  nw4 <- simulate(nw3 ~ Form(~edges) + Diss(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final")
+
+  nw100 <- simulate(nw ~ Form(~edges) + Diss(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final", time.slices = 100)
+
+  nwx <- network(100, directed = FALSE)
+  
+  # the N operator's call to get_multinet_nattr_tibble fails with these network attributes....
+  # they are not needed for the cmle fit, so just take them out for now
+  nw1 %n% "lasttoggle" <- NULL
+  nw2 %n% "lasttoggle" <- NULL
+  nw3 %n% "lasttoggle" <- NULL
+  nw4 %n% "lasttoggle" <- NULL
+
+  nw1 %n% "net.obs.period" <- NULL
+  nw2 %n% "net.obs.period" <- NULL
+  nw3 %n% "net.obs.period" <- NULL
+  nw4 %n% "net.obs.period" <- NULL
+  
+  nwL <- list(nw1, nw2, nw3, nw4)
+
+  # pretty fast
+  set.seed(0)
+  CMLE <- tergm(nwL ~ Form(~edges) + Diss(~edges), estimate="CMLE")
+
+  # this one can take a few minutes...
+  set.seed(0)
+  EGMME <- tergm(nw100 ~ Form(~edges) + Diss(~edges), targets = ~edges + mean.age, target.stats = c(120.9842, 3.718282), estimate = "EGMME")
+
+  set.seed(0)
+  rv_EGMME <- simulate(EGMME, output = "final")
+
+  set.seed(0)
+  rv_EGMME_x <- simulate(EGMME, nw.start = nwx, output = "final")
+  
+  set.seed(0)
+  rv_CMLE_first <- simulate(CMLE, nw.start = "first", output = "final")  
+  set.seed(0)
+  rv_CMLE_last <- simulate(CMLE, nw.start = "last", output = "final")  
+
+  set.seed(0)
+  rv_CMLE_x <- simulate(CMLE, nw.start = nwx, output = "final")  
+
+  set.seed(0)
+  expect_error(simulate(CMLE, nw.start = 0, output = "final"))
+  set.seed(0)
+  rv_CMLE_1 <- simulate(CMLE, nw.start = 1, output = "final")  
+  set.seed(0)
+  rv_CMLE_2 <- simulate(CMLE, nw.start = 2, output = "final")  
+  set.seed(0)
+  rv_CMLE_3 <- simulate(CMLE, nw.start = 3, output = "final")  
+  set.seed(0)
+  rv_CMLE_4 <- simulate(CMLE, nw.start = 4, output = "final")  
+  set.seed(0)
+  expect_error(simulate(CMLE, nw.start = 5, output = "final"))
+
+  set.seed(0)
+  rv_E_nw <- simulate(EGMME$network ~ Form(~edges) + Diss(~edges), coef = EGMME$coef, monitor = EGMME$targets, output = "final", dynamic = TRUE)
+
+  set.seed(0)
+  rv_E_x_nw <- simulate(nwx ~ Form(~edges) + Diss(~edges), coef = EGMME$coef, monitor = EGMME$targets, output = "final", dynamic = TRUE)
+
+  set.seed(0)
+  rv_C_first_nw <- simulate(nw1 ~ Form(~edges) + Diss(~edges), coef = CMLE$coef, output = "final", dynamic = TRUE)  
+  set.seed(0)
+  rv_C_last_nw <- simulate(nw4 ~ Form(~edges) + Diss(~edges), coef = CMLE$coef, output = "final", dynamic = TRUE)  
+
+  set.seed(0)
+  rv_C_x_nw <- simulate(nwx ~ Form(~edges) + Diss(~edges), coef = CMLE$coef, output = "final", dynamic = TRUE)  
+
+  set.seed(0)
+  rv_C_1_nw <- simulate(nw1 ~ Form(~edges) + Diss(~edges), coef = CMLE$coef, output = "final", dynamic = TRUE)    
+  set.seed(0)
+  rv_C_2_nw <- simulate(nw2 ~ Form(~edges) + Diss(~edges), coef = CMLE$coef, output = "final", dynamic = TRUE)    
+  set.seed(0)
+  rv_C_3_nw <- simulate(nw3 ~ Form(~edges) + Diss(~edges), coef = CMLE$coef, output = "final", dynamic = TRUE)    
+  set.seed(0)
+  rv_C_4_nw <- simulate(nw4 ~ Form(~edges) + Diss(~edges), coef = CMLE$coef, output = "final", dynamic = TRUE)    
+
+  ## subset network attributes to those present in direct simulations of the original networks to avoid
+  ## considering unrelated attributes introduced during the CMLE fit
+  names_to_keep <- list.network.attributes(rv_C_first_nw)
+
+  rv_CMLE_first$gal <- rv_CMLE_first$gal[names_to_keep]
+  rv_CMLE_last$gal <- rv_CMLE_last$gal[names_to_keep]
+  rv_CMLE_x$gal <- rv_CMLE_x$gal[names_to_keep]
+  rv_CMLE_1$gal <- rv_CMLE_1$gal[names_to_keep]
+  rv_CMLE_2$gal <- rv_CMLE_2$gal[names_to_keep]
+  rv_CMLE_3$gal <- rv_CMLE_3$gal[names_to_keep]
+  rv_CMLE_4$gal <- rv_CMLE_4$gal[names_to_keep]
+
+  rv_C_first_nw$gal <- rv_C_first_nw$gal[names_to_keep]
+  rv_C_last_nw$gal <- rv_C_last_nw$gal[names_to_keep]
+  rv_C_x_nw$gal <- rv_C_x_nw$gal[names_to_keep]
+  rv_C_1_nw$gal <- rv_C_1_nw$gal[names_to_keep]
+  rv_C_2_nw$gal <- rv_C_2_nw$gal[names_to_keep]
+  rv_C_3_nw$gal <- rv_C_3_nw$gal[names_to_keep]
+  rv_C_4_nw$gal <- rv_C_4_nw$gal[names_to_keep]
+  
+  expect_equal(rv_EGMME, rv_E_nw)
+  expect_equal(rv_EGMME_x, rv_E_x_nw)
+  
+  expect_equal(rv_CMLE_first, rv_C_first_nw)  
+  expect_equal(rv_CMLE_last, rv_C_last_nw)  
+
+  expect_equal(rv_CMLE_x, rv_C_x_nw)  
+
+  expect_equal(rv_CMLE_1, rv_C_1_nw)  
+  expect_equal(rv_CMLE_2, rv_C_2_nw)  
+  expect_equal(rv_CMLE_3, rv_C_3_nw)  
+  expect_equal(rv_CMLE_4, rv_C_4_nw)  
+}
