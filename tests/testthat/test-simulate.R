@@ -402,4 +402,4 @@ test_that("simulate.tergm behaves reasonably", {
   expect_equal(rv_CMLE_2, rv_C_2_nw)  
   expect_equal(rv_CMLE_3, rv_C_3_nw)  
   expect_equal(rv_CMLE_4, rv_C_4_nw)  
-}
+})
