@@ -169,3 +169,119 @@ test_that("simulate_formula.networkDynamic behaves reasonably", {
   nwlt5 <- nwlt5[wtk5,,drop=FALSE]
   expect_identical(nwlt5[order(nwlt5[,1], nwlt5[,2]),,drop=FALSE], nwdlt5[order(nwdlt5[,1], nwdlt5[,2]),,drop=FALSE])  
 })
+
+test_that("simulate.network behaves reasonably", {
+  nw <- network.initialize(100, directed = FALSE)
+
+  ## obtain some results with the old interface
+  set.seed(0)
+  old_nw1 <- simulate(nw, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, output = "final")
+  old_nw2 <- simulate(old_nw1, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, output = "final")
+  old_nw4 <- simulate(old_nw2, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, output = "final", time.slices = 2)
+  old_nw5 <- simulate(old_nw2, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, output = "final", time.start = 3, time.slices = 2)
+  old_nw6 <- simulate(old_nw5, formation = attr(old_nw5, "formation"), dissolution = attr(old_nw5, "dissolution"), coef.form = attr(old_nw5, "coef.form"), coef.diss = attr(old_nw5, "coef.diss"), output = "final")
+
+  old_stats_nw <- simulate(old_nw6, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, time.slices = 10, output = "final", stats.form = TRUE, stats.diss = TRUE, monitor = ~triangle + degree(1))
+  old_stats <- simulate(old_nw6, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, time.slices = 10, output = "stats", stats.form = TRUE, stats.diss = TRUE, monitor = ~triangle + degree(1))
+
+  ## obtain what should be the same results with the new interface
+  set.seed(0)
+  new_nw1 <- simulate(nw ~ edges + concurrent, coef = c(-3, 0.5), output = "final", dynamic = TRUE)
+  new_nw2 <- simulate(new_nw1 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "final", dynamic = TRUE)
+  new_nw4 <- simulate(new_nw2 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "final", time.slices = 2, dynamic = TRUE)
+  new_nw5 <- simulate(new_nw2 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "final", time.start = 3, time.slices = 2, dynamic = TRUE)
+  new_nw6 <- simulate(attr(new_nw5, "formula"), coef = attr(new_nw5, "coef"), output = "final", basis = new_nw5, dynamic = TRUE)
+
+  new_stats_nw <- simulate(new_nw6 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "final", time.slices = 10, stats = TRUE, monitor = ~triangle + degree(1), dynamic = TRUE)
+  new_stats <- simulate(new_nw6 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "stats", time.slices = 10, stats = TRUE, monitor = ~triangle + degree(1), dynamic = TRUE)
+  
+  ## test for equality (attributes will differ)
+  expect_equal(old_nw1, new_nw1, check.attributes = FALSE)
+  expect_equal(old_nw2, new_nw2, check.attributes = FALSE)
+  expect_equal(old_nw4, new_nw4, check.attributes = FALSE)
+  expect_equal(old_nw5, new_nw5, check.attributes = FALSE)
+  expect_equal(old_nw6, new_nw6, check.attributes = FALSE)
+
+  expect_identical(attr(old_stats_nw, "stats"), attr(new_stats_nw, "stats"))
+  expect_identical(attr(old_stats_nw, "stats.gen"), attr(new_stats_nw, "stats.gen"))
+  expect_identical(cbind(attr(old_stats_nw, "stats.form"), attr(old_stats_nw, "stats.diss")), as.matrix(attr(new_stats_nw, "stats.gen")))
+
+  expect_identical(old_stats$stats, new_stats$stats)
+  expect_identical(old_stats$stats.gen, new_stats$stats.gen)
+  expect_identical(cbind(old_stats$stats.form, old_stats$stats.diss), as.matrix(new_stats$stats.gen))
+})
+
+test_that("simulate.networkDynamic behaves reasonably", {
+  nw <- network.initialize(100, directed = FALSE)
+
+  ## obtain some results with the old interface
+  set.seed(2)
+  old_nwD1 <- simulate(nw, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1)
+  old_nwD2 <- simulate(old_nwD1, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1)
+  old_nwD4 <- simulate(old_nwD2, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, time.slices = 2)
+  old_nwD5 <- simulate(old_nwD2, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, time.start = 3, time.slices = 2)
+  old_nwD6 <- simulate(old_nwD5, formation = attr(old_nwD5, "formation"), dissolution = attr(old_nwD5, "dissolution"), coef.form = attr(old_nwD5, "coef.form"), coef.diss = attr(old_nwD5, "coef.diss"))
+
+  old_nwD7 <- simulate(old_nwD6)
+
+  old_stats_nwD <- simulate(old_nwD6, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, time.slices = 10, stats.form = TRUE, stats.diss = TRUE, monitor = ~triangle + degree(1))
+  old_stats <- simulate(old_nwD6, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, time.slices = 10, output = "stats", stats.form = TRUE, stats.diss = TRUE, monitor = ~triangle + degree(1))
+
+  old_nwD8 <- simulate(old_stats_nwD)
+
+  old_nwD_constr <- simulate(nw, constraints = ~BD(bound=1), formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, time.slices = 10)
+  old_nwD_constr2 <- simulate(old_nwD_constr, time.slices=10)
+
+  ## obtain what should be the same results with the new interface
+  set.seed(2)
+  new_nwD1 <- simulate(nw ~ edges + concurrent, coef = c(-3, 0.5), dynamic = TRUE)
+  new_nwD2 <- simulate(new_nwD1 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), dynamic = TRUE)
+  new_nwD4 <- simulate(new_nwD2 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), time.slices = 2, dynamic = TRUE)
+  new_nwD5 <- simulate(new_nwD2 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), time.start = 3, time.slices = 2, dynamic = TRUE)
+  new_nwD6 <- simulate(attr(new_nwD5, "formula"), coef = attr(new_nwD5, "coef"), basis = new_nwD5, dynamic = TRUE)
+
+  new_nwD7 <- simulate(new_nwD6 ~ Form(~edges + concurrent) + Diss(~edges), dynamic = TRUE)
+
+  new_stats_nwD <- simulate(new_nwD6 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), time.slices = 10, stats = TRUE, monitor = ~triangle + degree(1), dynamic = TRUE)
+  new_stats <- simulate(new_nwD6 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "stats", time.slices = 10, stats = TRUE, monitor = ~triangle + degree(1), dynamic = TRUE)
+
+  new_nwD8 <- simulate(new_stats_nwD ~ Form(~edges + concurrent) + Diss(~edges), dynamic = TRUE)
+  
+  new_nwD_constr <- simulate(nw ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), constraints = ~BD(bound=1), time.slices = 10, dynamic = TRUE)
+  new_nwD_constr2 <- simulate(new_nwD_constr ~ Form(~edges + concurrent) + Diss(~edges), time.slices = 10, dynamic = TRUE)
+
+  ## test for equality (attributes will differ)
+  expect_equal(old_nwD1, new_nwD1, check.attributes = FALSE)
+  expect_equal(old_nwD2, new_nwD2, check.attributes = FALSE)
+  expect_equal(old_nwD4, new_nwD4, check.attributes = FALSE)
+  expect_equal(old_nwD5, new_nwD5, check.attributes = FALSE)
+  expect_equal(old_nwD6, new_nwD6, check.attributes = FALSE)
+  expect_equal(old_nwD7, new_nwD7, check.attributes = FALSE)
+  expect_equal(old_nwD8, new_nwD8, check.attributes = FALSE)
+
+  expect_true(!is.null(attr(old_nwD8, "stats")))
+  expect_true(!is.null(attr(new_nwD8, "stats")))
+
+  expect_identical(attr(old_nwD8, "stats"), attr(new_nwD8, "stats"))
+
+  expect_identical(attr(old_stats_nwD, "stats"), attr(new_stats_nwD, "stats"))
+  expect_identical(attr(old_stats_nwD, "stats.gen"), attr(new_stats_nwD, "stats.gen"))
+  expect_identical(cbind(attr(old_stats_nwD, "stats.form"), attr(old_stats_nwD, "stats.diss")), as.matrix(attr(new_stats_nwD, "stats.gen")))
+
+  expect_identical(old_stats$stats, new_stats$stats)
+  expect_identical(old_stats$stats.gen, new_stats$stats.gen)
+  expect_identical(cbind(old_stats$stats.form, old_stats$stats.diss), as.matrix(new_stats$stats.gen))
+
+  expect_equal(old_nwD_constr, new_nwD_constr, check.attributes = FALSE)
+  expect_equal(old_nwD_constr2, new_nwD_constr2, check.attributes = FALSE)
+
+  expect_true(summary(network.collapse(old_nwD_constr, at = 10) ~ edges) > 0)
+  expect_true(summary(network.collapse(old_nwD_constr2, at = 20) ~ edges) > 0)
+  expect_true(summary(network.collapse(new_nwD_constr, at = 10) ~ edges) > 0)
+  expect_true(summary(network.collapse(new_nwD_constr2, at = 20) ~ edges) > 0)
+
+  expect_identical(unname(summary(network.collapse(old_nwD_constr, at = 10) ~ concurrent)), 0)
+  expect_identical(unname(summary(network.collapse(old_nwD_constr2, at = 20) ~ concurrent)), 0)
+  expect_identical(unname(summary(network.collapse(new_nwD_constr, at = 10) ~ concurrent)), 0)
+  expect_identical(unname(summary(network.collapse(new_nwD_constr2, at = 20) ~ concurrent)), 0)
+})
