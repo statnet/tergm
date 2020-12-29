@@ -298,13 +298,6 @@ test_that("simulate.tergm behaves reasonably", {
 
   nwx <- network(100, directed = FALSE)
   
-  # the N operator's call to get_multinet_nattr_tibble fails with these network attributes....
-  # they are not needed for the cmle fit, so just take them out for now
-  nw1 %n% "net.obs.period" <- NULL
-  nw2 %n% "net.obs.period" <- NULL
-  nw3 %n% "net.obs.period" <- NULL
-  nw4 %n% "net.obs.period" <- NULL
-  
   nwL <- list(nw1, nw2, nw3, nw4)
 
   # pretty fast
