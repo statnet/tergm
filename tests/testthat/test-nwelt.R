@@ -152,3 +152,38 @@ test_that("network.extract.with.lasttoggle behaves reasonably", {
   expect_identical(nwe %n% "time", 10)
   expect_identical(nwe %n% "lasttoggle", lt_4)
 })
+
+test_that("network.extract.with.lasttoggle handles both edges and non-edges appropriately", {
+  nw <- network.initialize(5, dir=FALSE)
+  
+  edge_toggles <- matrix(c(1L, 1L, 3L,
+                           1L, 1L, 4L,
+                           2L, 4L, 5L,
+                           3L, 1L, 3L,
+                           4L, 1L, 4L), ncol = 3, byrow = TRUE)
+                           
+  nwd <- networkDynamic(base.net = nw, edge.toggles = edge_toggles)
+  deactivate.vertices(nwd, onset = 2, terminus = Inf, v = c(2), deactivate.edges = TRUE)
+  deactivate.vertices(nwd, onset = 4, terminus = Inf, v = c(4), deactivate.edges = TRUE)
+  
+  nw0 <- network.extract.with.lasttoggle(nwd, at = 0, TRUE)
+  nw1 <- network.extract.with.lasttoggle(nwd, at = 1, TRUE)
+  nw2 <- network.extract.with.lasttoggle(nwd, at = 2, TRUE)
+  nw3 <- network.extract.with.lasttoggle(nwd, at = 3, TRUE)
+  nw4 <- network.extract.with.lasttoggle(nwd, at = 4, TRUE)
+  nw5 <- network.extract.with.lasttoggle(nwd, at = 5, TRUE)
+  
+  expect_true(network.edgecount(nw0) == 0)
+  expect_true(network.edgecount(nw1) == 2 && nw1[1,3] && nw1[1,4])
+  expect_true(network.edgecount(nw2) == 3 && nw2[1,2] && nw2[1,3] && nw2[3,4])
+  expect_true(network.edgecount(nw3) == 2 && nw3[1,3] && nw3[3,4])
+  expect_true(network.edgecount(nw4) == 0)
+  expect_true(network.edgecount(nw5) == 0)
+  
+  expect_identical(nw0 %n% "lasttoggle", matrix(0L, nrow = 0L, ncol = 3L))
+  expect_identical(nw1 %n% "lasttoggle", matrix(c(1L, 3L, 1L, 1L, 4L, 1L), nrow = 2L, ncol = 3L, byrow = TRUE))
+  expect_identical(nw2 %n% "lasttoggle", matrix(c(1L, 2L, 1L, 1L, 3L, 1L, 3L, 4L, 2L), nrow = 3L, ncol = 3L, byrow = TRUE))
+  expect_identical(nw3 %n% "lasttoggle", matrix(c(1L, 3L, 1L, 3L, 4L, 2L, 1L, 2L, 3L), nrow = 3L, ncol = 3L, byrow = TRUE))
+  expect_identical(nw4 %n% "lasttoggle", matrix(0L, nrow = 0L, ncol = 3L))
+  expect_identical(nw5 %n% "lasttoggle", matrix(0L, nrow = 0L, ncol = 3L))
+})

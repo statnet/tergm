@@ -57,98 +57,72 @@ get.dev <- local({
 # time of every edge that is extant at `at` as well as the last toggle
 # time for non-edges that were toggled off at time at.
 network.extract.with.lasttoggle <- function(nwd, at){
-  nw <- network.extract(nwd, at=at)
-  # check if the appropriate pid is defined, and if not, add it
-  if (is.null(nwd%n%'vertex.pid')) {
-    nw %v% "tergm_pid" <- which(is.active(nwd, at=at, v=seq_len(network.size(nwd))))
-  }
-
-    ## first, get lasttoggles times for all edges that are extant at time at
-    lttails <- unlist(lapply(nw$mel, "[[", "outl"))
-    ltheads <- unlist(lapply(nw$mel, "[[", "inl"))
-    ltlts <- unlist(lapply(lapply(lapply(nw$mel, "[[", "atl"), "[[", 
+    # first obtain all tails, heads, and lasttoggle times <= at in the nwd
+    tails <- unlist(lapply(nwd$mel, "[[", "outl"))
+    heads <- unlist(lapply(nwd$mel, "[[", "inl"))
+    lts <- unlist(lapply(lapply(lapply(nwd$mel, "[[", "atl"), "[[", 
                     "active"), function(x) suppressWarnings(max(x[x <= at]))))
 
-    # check for NULL
-    wp <- NVL2(ltlts, which(ltlts != -Inf), NULL)
+    # which edges are active at time at?
+    active_edges <- is.active(nwd, at = at, e = seq_along(nwd$mel))
     
-    lttails <- lttails[wp]
-    ltheads <- ltheads[wp]
-    ltlts <- ltlts[wp]
-
-    ltlts <- as.integer(ltlts)
-
-    w <- lttails & ltheads
-
-    lttails <- lttails[w]
-    ltheads <- ltheads[w]
-    ltlts <- ltlts[w]
+    # which edges have non-default lasttoggle times? (handling NULL case separately)
+    has_lasttoggle_time <- NVL2(lts, lts != -Inf, NULL)
     
-    if(!is.directed(nw)) {
-      lttmp <- lttails
-      w2 <- lttails > ltheads
-      lttails[w2] <- ltheads[w2]
-      ltheads[w2] <- lttmp[w2]
-    }
+    # which edges to keep in lasttoggle?
+    which_to_keep <- active_edges & has_lasttoggle_time
 
-    lasttoggle_edges <- matrix(c(lttails, ltheads, ltlts), nrow=length(lttails), ncol=3)
-    
+    lttails <- tails[which_to_keep]
+    ltheads <- heads[which_to_keep]
+    ltlts <- lts[which_to_keep]
+
     ## now *additionally* get lasttoggle times (of at) for all edges that were toggled off at time at
-    nw_non <- network.extract(nwd, at = at - 1)
-
-    lttails <- unlist(lapply(nw_non$mel, "[[", "outl"))
-    ltheads <- unlist(lapply(nw_non$mel, "[[", "inl"))
-    ltlts <- unlist(lapply(lapply(lapply(nw_non$mel, "[[", "atl"), "[[", 
-                    "active"), function(x) suppressWarnings(at %in% x[,2])))
-
-    # check for NULL
-    wp <- NVL2(ltlts, which(ltlts), NULL)
+    relevant_nonedges <- is.active(nwd, at = at - 1, e = seq_along(nwd$mel)) & !is.active(nwd, at = at, e = seq_along(nwd$mel))
     
-    lttails <- lttails[wp]
-    ltheads <- ltheads[wp]
-    ltlts <- rep(at, length(wp))
-    
-    ltlts <- as.integer(ltlts)
+    lttails <- c(lttails, tails[relevant_nonedges])
+    ltheads <- c(ltheads, heads[relevant_nonedges])
+    ltlts <- c(ltlts, rep(at, sum(relevant_nonedges)))
 
+    ## it is apparently allowed that tail or head may be 0 which means we should omit that edge....
     w <- lttails & ltheads
 
     lttails <- lttails[w]
     ltheads <- ltheads[w]
     ltlts <- ltlts[w]
     
-    if(!is.directed(nw_non)) {
+    ## now ensure things have the correct type and tail < head if undirected
+    ltlts <- as.integer(ltlts)
+    
+    if(!is.directed(nwd)) {
       lttmp <- lttails
       w2 <- lttails > ltheads
       lttails[w2] <- ltheads[w2]
       ltheads[w2] <- lttmp[w2]
     }
 
-    lasttoggle_nonedges <- matrix(c(lttails, ltheads, ltlts), nrow=length(lttails), ncol=3)
-
-    ## now recode vertex ids for time at and remove any (non)edges that join nodes that are no longer
-    ## active at time at
+    lasttoggle <- matrix(c(lttails, ltheads, ltlts), nrow=length(lttails), ncol=3)
+    ## this is the matrix we want except that the nodal indices are relative
+    ## to the entire networkDynamic; we want them just for the network collapsed
+    ## to time at, so we now adjust the indices to account for any inactive nodes
     
+    ## what nodes are active at time at?
     ia <- is.active(nwd, at=at, v=seq_len(network.size(nwd)))
-    w <- which(is.active(nwd, at=at-1, v=seq_len(network.size(nwd))))
+    w <- which(ia)
 
-    lttails_recode <- w[lttails]
-    ltheads_recode <- w[ltheads]
-    
-    wtk <- which(ia[lttails_recode] & ia[ltheads_recode])
-    
-    lasttoggle_nonedges <- lasttoggle_nonedges[wtk,,drop=FALSE]
-    
-    # now give the heads and tails their vertex ids at time at
-    
-    cs <- as.integer(cumsum(ia))
-    
-    lasttoggle_nonedges[,1:2] <- cs[lasttoggle_nonedges[,1:2]]
-    
-    lasttoggle <- rbind(lasttoggle_edges, lasttoggle_nonedges)
+    ## if n is (the index of) a node in the complete networkDynamic, then cs_ia[n] is 
+    ## the index of node n in the collapsed network, assuming n is active in that network
+    cs_ia <- cumsum(ia)
 
+    ## take the subset of lasttoggle where both nodes are active at time at
+    lasttoggle <- lasttoggle[lasttoggle[,1] %in% w & lasttoggle[,2] %in% w,,drop=FALSE]
+
+    ## recode the active nodes so they are relative to the collapsed network
+    lasttoggle[,1:2] <- cs_ia[lasttoggle[,1:2]]
+    
+    ## ensure correct type
     storage.mode(lasttoggle) <- "integer"    
 
-  nw <- network.collapse(nwd, at=at) #  Convert to a network network.
+  nw <- network.collapse(nwd, at = at) #  Convert to a network network.
   nw %n% "time" <- at
   nw %n% "lasttoggle" <- lasttoggle
   nw
