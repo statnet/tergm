@@ -71,7 +71,7 @@
 #'   per time step used in CMLE fitting.
 #' @param CMLE.MCMC.interval Number of Metropolis-Hastings steps
 #'   between successive draws when running MCMC MLE.
-#' @param CMLE.control Control parameters used
+#' @param CMLE.ergm Control parameters used
 #'   to fit the CMLE.  See \code{\link{control.ergm}}.
 #' @param CMLE.NA.impute In TERGM CMLE, missing dyads in
 #'   transitioned-to networks are accommodated using methods of
@@ -139,8 +139,8 @@
 #' @param SAN.nsteps.times Multiplier for \code{SAN.nsteps} relative to
 #' \code{MCMC.burnin}. This lets one control the amount of SAN burn-in
 #' (arguably, the most important of SAN parameters) without overriding the
-#' other SAN.control defaults.
-#' @param SAN.control SAN control parameters.  See
+#' other SAN defaults.
+#' @param SAN SAN control parameters.  See
 #'   \code{\link{control.san}}
 #' @param SA.restarts Maximum number of times to restart a failed
 #'   optimization process.
@@ -330,7 +330,7 @@ control.tergm<-function(init=NULL,
 
                          CMLE.MCMC.burnin = 1024*16,
                          CMLE.MCMC.interval = 1024,
-                         CMLE.control=control.ergm(init=init, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights, MCMC.prop.args=MCMC.prop.args, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.ergm=control.ergm(init=init, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights, MCMC.prop.args=MCMC.prop.args, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
 
                          CMLE.NA.impute=c(),
                          CMLE.term.check.override=FALSE,
@@ -348,7 +348,7 @@ control.tergm<-function(init=NULL,
                          
                          SAN.maxit=4,
                          SAN.nsteps.times=8,
-                         SAN.control=control.san(
+                         SAN=control.san(
                            term.options=term.options,
                            SAN.maxit=SAN.maxit,
                            SAN.prop.weights=MCMC.prop.weights,

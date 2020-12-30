@@ -75,10 +75,10 @@
 #'   fitting.
 #' @param CMLE.MCMC.interval Number of Metropolis-Hastings steps
 #'   between successive draws when running MCMC MLE.
-#' @param CMLE.control A convenience argument for specifying both
-#'   \code{CMLE.control.form} and \code{CMLE.control.diss} at once.
+#' @param CMLE.ergm A convenience argument for specifying both
+#'   \code{CMLE.form.ergm} and \code{CMLE.diss.ergm} at once.
 #'   See \code{\link{control.ergm}}.
-#' @param CMLE.control.form,CMLE.control.diss Control parameters used
+#' @param CMLE.form.ergm,CMLE.diss.ergm Control parameters used
 #'   to fit the CMLE for the formation/dissolution ERGM.  See
 #'   \code{\link{control.ergm}}.
 #' @param CMLE.NA.impute In STERGM CMLE, missing dyads in
@@ -145,8 +145,8 @@
 #' @param SAN.nsteps.times Multiplier for \code{SAN.nsteps} relative to
 #' \code{MCMC.burnin}. This lets one control the amount of SAN burn-in
 #' (arguably, the most important of SAN parameters) without overriding the
-#' other SAN.control defaults.
-#' @param SAN.control SAN control parameters.  See
+#' other SAN defaults.
+#' @param SAN SAN control parameters.  See
 #'   \code{\link{control.san}}
 #' @param SA.restarts Maximum number of times to restart a failed
 #'   optimization process.
@@ -302,6 +302,11 @@
 #'   \code{EGMME.MCMC.burnin.pval}, \code{EGMME.MCMC.burnin.pval},
 #'   \code{EGMME.MCMC.burnin.add} and \code{CMLE.MCMC.burnin} and
 #'   \code{CMLE.MCMC.interval}.
+#'
+#' @param \dots Additional arguments, passed to other functions This argument
+#' is helpful because it collects any control parameters that have been
+#' deprecated; a warning message is printed in case of deprecated arguments.
+#'
 #' @return A list with arguments as components.
 #' @seealso \code{\link{stergm}}. The
 #'   \code{\link{control.simulate.stergm}} function performs a similar
@@ -335,10 +340,9 @@ control.stergm<-function(init.form=NULL,
                          
                          CMLE.MCMC.burnin = 1024*16,
                          CMLE.MCMC.interval = 1024,
-                         CMLE.control=NULL,
-                         CMLE.control.form=control.ergm(init=init.form, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
-                         CMLE.control.diss=control.ergm(init=init.diss, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
-
+                         CMLE.ergm=NULL,
+                         CMLE.form.ergm=control.ergm(init=init.form, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.diss.ergm=control.ergm(init=init.diss, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
                          CMLE.NA.impute=c(),
                          CMLE.term.check.override=FALSE,
                          
@@ -353,7 +357,7 @@ control.stergm<-function(init.form=NULL,
                          
                          SAN.maxit=4,
                          SAN.nsteps.times=8,
-                         SAN.control=control.san(
+                         SAN=control.san(
                            term.options=term.options,
                            SAN.maxit=SAN.maxit,
                            SAN.prop.weights=MCMC.prop.weights.form,
@@ -427,18 +431,35 @@ control.stergm<-function(init.form=NULL,
                          seed=NULL,
                          parallel=0,
                          parallel.type=NULL,
-                         parallel.version.check=TRUE){
+                         parallel.version.check=TRUE,
+                         ...){
 
   if(!is.null(MCMC.burnin) || !is.null(MCMC.burnin.mul)) stop("Control parameters MCMC.burnin and MCMC.burnin.mul are no longer used. See help for EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max, EGMME.MCMC.burnin.pval, EGMME.MCMC.burnin.pval, and CMLE.MCMC.burnin and CMLE.MCMC.interval for their replacements.")
 
+  old.controls <- list(SAN.control="SAN",
+                       CMLE.ergm="CMLE.ergm",
+                       CMLE.form.ergm="CMLE.form.ergm",
+                       CMLE.diss.ergm="CMLE.diss.ergm"
+                       )
+
   match.arg.pars=c("EGMME.main.method","SA.refine")
 
-  if(!is.null(CMLE.control)) CMLE.control.form <- CMLE.control.diss <- CMLE.control
-  
+  if(!is.null(CMLE.ergm)) CMLE.form.ergm <- CMLE.diss.ergm <- CMLE.ergm
+
   control<-list()
   formal.args<-formals(sys.function())
+  formal.args[["..."]]<-NULL
   for(arg in names(formal.args))
     control[arg]<-list(get(arg))
+
+  for(arg in names(list(...))){
+    if(!is.null(old.controls[[arg]])){
+      warning("Passing ",arg," to control.stergm(...) is deprecated and may be removed in a future version. Specify it as control.ergm(",old.controls[[arg]],"=...) instead.")
+      control[old.controls[[arg]]]<-list(list(...)[[arg]])
+    }else{
+      stop("Unrecognized control parameter: ",arg,".")
+    }
+  }
 
   for(arg in match.arg.pars)
     control[arg]<-list(match.arg(control[[arg]][1],eval(formal.args[[arg]])))

@@ -185,8 +185,8 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
   control$MCMC.prop.weights <- control$MCMC.prop.weights.form
   control$MCMC.prop.args <- control$MCMC.prop.args.form
 
-  control$CMLE.control <- control$CMLE.control.form
-  control$CMLE.control$init <- control$init
+  control$CMLE.ergm <- control$CMLE.form.ergm
+  control$CMLE.ergm$init <- control$init
   
   control <- set.control.class("control.tergm")
   

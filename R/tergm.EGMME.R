@@ -52,10 +52,10 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
 
   if (verbose) message("Initializing Metropolis-Hastings proposal.")
   proposal <- ergm_proposal(constraints, weights = control$MCMC.prop.weights, arguments = control$MCMC.prop.args, nw = nw, hints = control$MCMC.prop, class="t")
-  proposal.SAN <- ergm_proposal(constraints, weights = control$SAN.control$SAN.prop.weights, arguments = control$SAN.control$SAN.prop.args, nw = nw, hints = control$SAN.control$SAN.prop, class="c")
+  proposal.SAN <- ergm_proposal(constraints, weights = control$SAN$SAN.prop.weights, arguments = control$SAN$SAN.prop.args, nw = nw, hints = control$SAN$SAN.prop, class="c")
   
   model <- ergm_model(formula, nw, term.options=control$term.options, extra.aux=list(proposal=proposal$auxiliaries, system=~.lasttoggle))
-  model.SAN <- ergm_model(SAN.formula, nw, term.options=control$SAN.control$term.options, extra.aux=list(proposal=proposal.SAN$auxiliaries))  
+  model.SAN <- ergm_model(SAN.formula, nw, term.options=control$SAN$term.options, extra.aux=list(proposal=proposal.SAN$auxiliaries))  
   
   proposal$aux.slots <- model$slots.extra.aux$proposal
   proposal.SAN$aux.slots <- model.SAN$slots.extra.aux$proposal
@@ -81,7 +81,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
     nw <- TARGET_STATS <-
         san(model.SAN, basis=nw, target.stats=target.stats,
             constraints=proposal.SAN,
-            control=control$SAN.control,
+            control=control$SAN,
             only.last=TRUE,
             verbose=verbose,
             offset.coef=SAN.offsets)

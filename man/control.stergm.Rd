@@ -20,14 +20,14 @@ control.stergm(
   MCMC.packagenames = c(),
   CMLE.MCMC.burnin = 1024 * 16,
   CMLE.MCMC.interval = 1024,
-  CMLE.control = NULL,
-  CMLE.control.form = control.ergm(init = init.form, MCMC.burnin = CMLE.MCMC.burnin,
+  CMLE.ergm = NULL,
+  CMLE.form.ergm = control.ergm(init = init.form, MCMC.burnin = CMLE.MCMC.burnin,
     MCMC.interval = CMLE.MCMC.interval, MCMC.prop.weights = MCMC.prop.weights.form,
     MCMC.prop.args = MCMC.prop.args.form, MCMC.maxedges = MCMC.maxedges,
     MCMC.packagenames = MCMC.packagenames, parallel = parallel, parallel.type =
     parallel.type, parallel.version.check = parallel.version.check, force.main =
     force.main),
-  CMLE.control.diss = control.ergm(init = init.diss, MCMC.burnin = CMLE.MCMC.burnin,
+  CMLE.diss.ergm = control.ergm(init = init.diss, MCMC.burnin = CMLE.MCMC.burnin,
     MCMC.interval = CMLE.MCMC.interval, MCMC.prop.weights = MCMC.prop.weights.diss,
     MCMC.prop.args = MCMC.prop.args.diss, MCMC.maxedges = MCMC.maxedges,
     MCMC.packagenames = MCMC.packagenames, parallel = parallel, parallel.type =
@@ -44,7 +44,7 @@ control.stergm(
   MCMC.burnin.mul = NULL,
   SAN.maxit = 4,
   SAN.nsteps.times = 8,
-  SAN.control = control.san(term.options = term.options, SAN.maxit = SAN.maxit,
+  SAN = control.san(term.options = term.options, SAN.maxit = SAN.maxit,
     SAN.prop.weights = MCMC.prop.weights.form, SAN.prop.args = MCMC.prop.args.form,
     SAN.nsteps = round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max)) *
     SAN.nsteps.times, SAN.packagenames = MCMC.packagenames, parallel = parallel,
@@ -92,7 +92,8 @@ control.stergm(
   seed = NULL,
   parallel = 0,
   parallel.type = NULL,
-  parallel.version.check = TRUE
+  parallel.version.check = TRUE,
+  ...
 )
 }
 \arguments{
@@ -161,11 +162,11 @@ fitting.}
 \item{CMLE.MCMC.interval}{Number of Metropolis-Hastings steps
 between successive draws when running MCMC MLE.}
 
-\item{CMLE.control}{A convenience argument for specifying both
-\code{CMLE.control.form} and \code{CMLE.control.diss} at once.
+\item{CMLE.ergm}{A convenience argument for specifying both
+\code{CMLE.form.ergm} and \code{CMLE.diss.ergm} at once.
 See \code{\link{control.ergm}}.}
 
-\item{CMLE.control.form, CMLE.control.diss}{Control parameters used
+\item{CMLE.form.ergm, CMLE.diss.ergm}{Control parameters used
 to fit the CMLE for the formation/dissolution ERGM.  See
 \code{\link{control.ergm}}.}
 
@@ -245,9 +246,9 @@ to obtain a network with statistics close to those specified.}
 \item{SAN.nsteps.times}{Multiplier for \code{SAN.nsteps} relative to
 \code{MCMC.burnin}. This lets one control the amount of SAN burn-in
 (arguably, the most important of SAN parameters) without overriding the
-other SAN.control defaults.}
+other SAN defaults.}
 
-\item{SAN.control}{SAN control parameters.  See
+\item{SAN}{SAN control parameters.  See
 \code{\link{control.san}}}
 
 \item{SA.restarts}{Maximum number of times to restart a failed
@@ -434,6 +435,10 @@ values are \code{"MPI"} and \code{"PSOCK"}. Defaults to using the
 \item{parallel.version.check}{Logical: If TRUE, check that the
 version of \code{\link[=ergm-package]{ergm}} running on the slave
 nodes is the same as that running on the master node.}
+
+\item{\dots}{Additional arguments, passed to other functions This argument
+is helpful because it collects any control parameters that have been
+deprecated; a warning message is printed in case of deprecated arguments.}
 }
 \value{
 A list with arguments as components.
