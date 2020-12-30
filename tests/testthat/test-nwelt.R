@@ -166,12 +166,12 @@ test_that("network.extract.with.lasttoggle handles both edges and non-edges appr
   deactivate.vertices(nwd, onset = 2, terminus = Inf, v = c(2), deactivate.edges = TRUE)
   deactivate.vertices(nwd, onset = 4, terminus = Inf, v = c(4), deactivate.edges = TRUE)
   
-  nw0 <- network.extract.with.lasttoggle(nwd, at = 0, TRUE)
-  nw1 <- network.extract.with.lasttoggle(nwd, at = 1, TRUE)
-  nw2 <- network.extract.with.lasttoggle(nwd, at = 2, TRUE)
-  nw3 <- network.extract.with.lasttoggle(nwd, at = 3, TRUE)
-  nw4 <- network.extract.with.lasttoggle(nwd, at = 4, TRUE)
-  nw5 <- network.extract.with.lasttoggle(nwd, at = 5, TRUE)
+  nw0 <- network.extract.with.lasttoggle(nwd, at = 0)
+  nw1 <- network.extract.with.lasttoggle(nwd, at = 1)
+  nw2 <- network.extract.with.lasttoggle(nwd, at = 2)
+  nw3 <- network.extract.with.lasttoggle(nwd, at = 3)
+  nw4 <- network.extract.with.lasttoggle(nwd, at = 4)
+  nw5 <- network.extract.with.lasttoggle(nwd, at = 5)
   
   expect_true(network.edgecount(nw0) == 0)
   expect_true(network.edgecount(nw1) == 2 && nw1[1,3] && nw1[1,4])
