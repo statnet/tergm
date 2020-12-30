@@ -43,7 +43,7 @@ SEXP MCMCDynSArun_wrapper(SEXP stateR,
      the discord hashtable. */
   StoreTimeAndLasttoggle *dur_inf = (StoreTimeAndLasttoggle *)m->termarray->aux_storage[asInteger(getListElement(getListElement(m->R, "slots.extra.aux"), "system"))];
 
-  double *inputdev = Calloc(m->n_stats, double);
+  double *inputdev = R_calloc(m->n_stats, double);
   memcpy(inputdev + m->n_stats - asInteger(nstatsmonitor), REAL(init_dev), asInteger(nstatsmonitor)*sizeof(double));
   
   SEXP opt_history = PROTECT(allocVector(REALSXP, (2*m->n_stats - asInteger(nstatsmonitor))*asInteger(runlength)*asInteger(SA_interval)));
@@ -72,8 +72,6 @@ SEXP MCMCDynSArun_wrapper(SEXP stateR,
   
   SEXP nw_diff = PROTECT(allocVector(REALSXP, asInteger(nstatsmonitor)));
   memcpy(REAL(nw_diff), inputdev + m->n_stats - asInteger(nstatsmonitor), asInteger(nstatsmonitor)*sizeof(double));
-  
-  Free(inputdev);
   
   const char *outn[] = {"status", "opt.history", "state", "eta", "nw.diff", ""};
   SEXP outl = PROTECT(mkNamed(VECSXP, outn));
@@ -139,6 +137,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s,
 
     // Burn in
     for(unsigned int j=0;j < SA_burnin;j++){
+      R_CheckUserInterrupt();
       MCMCDynStatus status = MCMCDyn1Step(s,
                       dur_inf,
                       eta,
@@ -157,6 +156,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s,
 
     // Sampling run
     for(unsigned int j=0;j < SA_interval;j++){
+      R_CheckUserInterrupt();
       MCMCDynStatus status = MCMCDyn1Step(s,
                       dur_inf,
                       eta,

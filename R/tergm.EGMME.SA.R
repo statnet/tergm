@@ -548,6 +548,8 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
 
 tergm.EGMME.SA.Phase2.C <- function(state, model, model.mon,
                              proposal, control, verbose) {
+  on.exit(ergm_Cstate_clear())
+
   model.comb <- c(model, model.mon)
   proposal$aux.slots <- model.comb$slots.extra.aux$proposal
   

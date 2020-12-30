@@ -68,6 +68,8 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
                            stats.start=FALSE,
                            verbose=FALSE,
                            control=control.tergm.godfather()){
+  on.exit(ergm_Cstate_clear())
+
   check.control.class("tergm.godfather", "tergm.godfather")
 
   nw <- ergm.getnetwork(formula)

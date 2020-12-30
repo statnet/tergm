@@ -108,6 +108,8 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
 #' @useDynLib tergm
 #' @export
 tergm_MCMC_slave <- function(state, eta, control, verbose){
+  on.exit(ergm_Cstate_clear())
+
   collect <- if(!is.null(control$collect)) control$collect else TRUE
 
   ## should be maxedges, init.maxchanges, and max.maxchanges

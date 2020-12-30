@@ -131,6 +131,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
   /* Burn in step. */
 
   for(i=0;i<burnin;i++){
+    R_CheckUserInterrupt();
     MCMCDynStatus status = MCMCDyn1Step(s,
                     dur_inf,
                     eta,
@@ -164,6 +165,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
 
     /* This then adds the change statistics to these values */
     for(j=0;j<interval;j++){
+      R_CheckUserInterrupt();
       MCMCDynStatus status = MCMCDyn1Step(s,
                       dur_inf,
                       eta,
