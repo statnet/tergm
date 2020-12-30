@@ -148,7 +148,7 @@ coefficients tried and target statistics simulated.}
 statistics sampled at the estimate.}
 \item{covar}{The full estimated
 variance-covariance matrix of the parameter estimates for EGMME. (Note that
-although the CMLE formation parameter estimates are independent of the
+although the CMLE.form.ergmation parameter estimates are independent of the
 dissolution parameter estimates due to the separability assumption, this is
 not necessarily the case for EGMME.) }
 \item{formation.fit, dissolution.fit}{For CMLE and CMPLE, \code{\link{ergm}} objects from

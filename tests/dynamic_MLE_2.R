@@ -73,7 +73,7 @@ stopifnot(z.error(diss.mle(y0,y1,y2), fit$dissolution.fit) <= tolerance)
 for(prop.weight in prop.weights){
 cat("====",prop.weight,"====\n")
 set.seed(543)
-fit<-stergm(list(y0,y1,y2), formation=~edges, dissolution=~edges, estimate="CMLE", control=control.stergm(CMLE.control=control.ergm(force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2,3))
+fit<-stergm(list(y0,y1,y2), formation=~edges, dissolution=~edges, estimate="CMLE", control=control.stergm(CMLE.ergm=control.ergm(force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2,3))
 
 stopifnot(fit$estimate=="CMLE", fit$formation.fit$estimate=="MLE", fit$dissolution.fit$estimate=="MLE")
 stopifnot(z.error(form.mle(y0,y1,y2), fit$formation.fit) <= tolerance)
@@ -108,7 +108,7 @@ stopifnot(z.error(diss.mle(y0,y1,y2m), fit$dissolution.fit) <= tolerance)
 for(prop.weight in prop.weights){
 cat("====",prop.weight,"====\n")
 set.seed(234)
-fit<-stergm(list(y0,y1,y2m), formation=~edges, dissolution=~edges, estimate="CMLE", control=control.stergm(CMLE.control=control.ergm(force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2,3))
+fit<-stergm(list(y0,y1,y2m), formation=~edges, dissolution=~edges, estimate="CMLE", control=control.stergm(CMLE.ergm=control.ergm(force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2,3))
 
 stopifnot(fit$estimate=="CMLE", fit$formation.fit$estimate=="MLE", fit$dissolution.fit$estimate=="MLE")
 stopifnot(z.error(form.mle(y0,y1,y2m), fit$formation.fit) <= tolerance)

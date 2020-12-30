@@ -109,33 +109,33 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   environment(constraints.diss) <- environment()
   
   # Apply initial values passed to control.stergm() the separate controls, if necessary.
-  if(is.null(control$CMLE.control.form$init)) control$CMLE.control.form$init <- control$init.form
-  if(is.null(control$CMLE.control.diss$init)) control$CMLE.control.diss$init <- control$init.diss
+  if(is.null(control$CMLE.form.ergm$init)) control$CMLE.form.ergm$init <- control$init.form
+  if(is.null(control$CMLE.diss.ergm$init)) control$CMLE.diss.ergm$init <- control$init.diss
  
   model.form<-ergm_model(formation, y.form, initialfit=TRUE)
   model.diss<-ergm_model(dissolution, y.diss, initialfit=TRUE)
 
-  if(!is.null(control$CMLE.control.form$init)){
-    # Check length of control$CMLE.control.form$init.
-    if(length(control$CMLE.control.form$init)!=length(model.form$etamap$offsettheta)) {
-      if(verbose) message("control$CMLE.control.form$init is ", paste(control$CMLE.control.form$init, collapse = " "), "\n", " number of statistics is ", length(model.form$coef.names))
-      stop(paste("Invalid starting formation parameter vector control$CMLE.control.form$init:",
+  if(!is.null(control$CMLE.form.ergm$init)){
+    # Check length of control$CMLE.form.ergm$init.
+    if(length(control$CMLE.form.ergm$init)!=length(model.form$etamap$offsettheta)) {
+      if(verbose) message("control$CMLE.form.ergm$init is ", paste(control$CMLE.form.ergm$init, collapse = " "), "\n", " number of statistics is ", length(model.form$coef.names))
+      stop(paste("Invalid starting formation parameter vector control$CMLE.form.ergm$init:",
                  "wrong number of parameters."))
     }
-  }else control$CMLE.control.form$init <- rep(NA, length(model.form$etamap$offsettheta)) # Set the default value of control$CMLE.control.form$init.
-  if(!is.null(offset.coef.form)) control$CMLE.control.form$init[model.form$etamap$offsettheta]<-offset.coef.form
-  names(control$CMLE.control.form$init) <- model.form$coef.names
+  }else control$CMLE.form.ergm$init <- rep(NA, length(model.form$etamap$offsettheta)) # Set the default value of control$CMLE.form.ergm$init.
+  if(!is.null(offset.coef.form)) control$CMLE.form.ergm$init[model.form$etamap$offsettheta]<-offset.coef.form
+  names(control$CMLE.form.ergm$init) <- model.form$coef.names
 
-  if(!is.null(control$CMLE.control.diss$init)){
-    # Check length of control$CMLE.control.diss$init.
-    if(length(control$CMLE.control.diss$init)!=length(model.diss$etamap$offsettheta)) {
-      if(verbose) message("control$CMLE.control.diss$init is ", paste(control$CMLE.control.diss$init, collapse = " "), "\n", " number of statistics is ", length(model.diss$coef.names))
-      stop(paste("Invalid starting dissolution parameter vector control$CMLE.control.diss$init:",
+  if(!is.null(control$CMLE.diss.ergm$init)){
+    # Check length of control$CMLE.diss.ergm$init.
+    if(length(control$CMLE.diss.ergm$init)!=length(model.diss$etamap$offsettheta)) {
+      if(verbose) message("control$CMLE.diss.ergm$init is ", paste(control$CMLE.diss.ergm$init, collapse = " "), "\n", " number of statistics is ", length(model.diss$coef.names))
+      stop(paste("Invalid starting dissolution parameter vector control$CMLE.diss.ergm$init:",
                  "wrong number of parameters."))
     }
-  }else control$CMLE.control.diss$init <- rep(NA, length(model.diss$etamap$offsettheta)) # Set the default value of control$CMLE.control.diss$init.  
-  if(!is.null(offset.coef.diss)) control$CMLE.control.diss$init[model.diss$etamap$offsettheta]<-offset.coef.diss
-  names(control$CMLE.control.diss$init) <- model.diss$coef.names
+  }else control$CMLE.diss.ergm$init <- rep(NA, length(model.diss$etamap$offsettheta)) # Set the default value of control$CMLE.diss.ergm$init.
+  if(!is.null(offset.coef.diss)) control$CMLE.diss.ergm$init[model.diss$etamap$offsettheta]<-offset.coef.diss
+  names(control$CMLE.diss.ergm$init) <- model.diss$coef.names
 
 
   # Translate the "estimate" from the stergm() argument to the ergm() argument.
@@ -145,9 +145,9 @@ stergm.CMLE <- function(nw, formation, dissolution, constraints, times, offset.c
   
   # Now, call the ergm()s:
   message("Fitting formation...")
-  fit.form <- ergm(formation, constraints=constraints.form, offset.coef=offset.coef.form, eval.loglik=eval.loglik, estimate=ergm.estimate, control=control$CMLE.control.form, verbose=verbose)
+  fit.form <- ergm(formation, constraints=constraints.form, offset.coef=offset.coef.form, eval.loglik=eval.loglik, estimate=ergm.estimate, control=control$CMLE.form.ergm, verbose=verbose)
   message("Fitting dissolution...")
-  fit.diss <- ergm(dissolution, constraints=constraints.diss, offset.coef=offset.coef.diss, eval.loglik=eval.loglik, estimate=ergm.estimate, control=control$CMLE.control.diss, verbose=verbose)
+  fit.diss <- ergm(dissolution, constraints=constraints.diss, offset.coef=offset.coef.diss, eval.loglik=eval.loglik, estimate=ergm.estimate, control=control$CMLE.diss.ergm, verbose=verbose)
 
   # Construct the output list. Conveniently, this is mainly a list consisting of two ergms.
   
