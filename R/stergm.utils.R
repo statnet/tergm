@@ -56,16 +56,13 @@ get.dev <- local({
 # a numeric matrix named "lasttoggle" representing the last toggle 
 # time of every edge that is extant at `at` as well as the last toggle
 # time for non-edges that were toggled off at time at.
-#
-# updates: lasttoggle is NULL when duration.dependent is FALSE
-network.extract.with.lasttoggle <- function(nwd, at, duration.dependent){
+network.extract.with.lasttoggle <- function(nwd, at){
   nw <- network.extract(nwd, at=at)
   # check if the appropriate pid is defined, and if not, add it
   if (is.null(nwd%n%'vertex.pid')) {
     nw %v% "tergm_pid" <- which(is.active(nwd, at=at, v=seq_len(network.size(nwd))))
   }
 
-  if(duration.dependent) {
     ## first, get lasttoggles times for all edges that are extant at time at
     lttails <- unlist(lapply(nw$mel, "[[", "outl"))
     ltheads <- unlist(lapply(nw$mel, "[[", "inl"))
@@ -150,9 +147,6 @@ network.extract.with.lasttoggle <- function(nwd, at, duration.dependent){
     lasttoggle <- rbind(lasttoggle_edges, lasttoggle_nonedges)
 
     storage.mode(lasttoggle) <- "integer"    
-  } else {  # non-duration dependent model
-    lasttoggle <- NULL
-  }
 
   nw <- network.collapse(nwd, at=at) #  Convert to a network network.
   nw %n% "time" <- at

@@ -130,10 +130,10 @@ test_that("simulate_formula.networkDynamic behaves reasonably", {
   nwel4 <- as.edgelist(nw4)
   nwel5 <- as.edgelist(nw5)
   
-  nw_from_nwd1 <- network.extract.with.lasttoggle(nwd1, at=1, TRUE)
-  nw_from_nwd2 <- network.extract.with.lasttoggle(nwd2, at=2, TRUE)
-  nw_from_nwd4 <- network.extract.with.lasttoggle(nwd4, at=4, TRUE)
-  nw_from_nwd5 <- network.extract.with.lasttoggle(nwd5, at=5, TRUE)
+  nw_from_nwd1 <- network.extract.with.lasttoggle(nwd1, at=1)
+  nw_from_nwd2 <- network.extract.with.lasttoggle(nwd2, at=2)
+  nw_from_nwd4 <- network.extract.with.lasttoggle(nwd4, at=4)
+  nw_from_nwd5 <- network.extract.with.lasttoggle(nwd5, at=5)
 
   nwdlt1 <- nw_from_nwd1 %n% "lasttoggle"
   nwdlt2 <- nw_from_nwd2 %n% "lasttoggle"

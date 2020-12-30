@@ -25,7 +25,6 @@
   output = c("networkDynamic", "stats", "changes", "final", "ergm_state"),
   stats.form = FALSE,
   stats.diss = FALSE,
-  duration.dependent = NULL,
   verbose = FALSE,
   ...
 )
@@ -49,7 +48,6 @@
   output = c("networkDynamic", "stats", "changes", "final", "ergm_state"),
   stats.form = FALSE,
   stats.diss = FALSE,
-  duration.dependent = NULL,
   verbose = FALSE,
   ...
 )
@@ -130,11 +128,6 @@ formation/dissolution model statistics. This is not the recommended method:
 use \code{monitor} argument instead.  Note that if either \code{stats.form}
 or \code{stats.diss} is \code{TRUE}, all generative model statistics will be
 returned.}
-
-\item{duration.dependent}{Logical: Whether the model terms in formula or
-model are duration dependent. E.g., if a duration-dependent term is used in
-estimation/simulation model, the probability of forming or dissolving a tie
-may dependent on the age the dyad status.}
 
 \item{verbose}{Logical: If TRUE, extra information is printed as the Markov
 chain progresses.}

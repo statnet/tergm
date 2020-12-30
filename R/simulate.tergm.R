@@ -111,10 +111,6 @@
 #' @param stats Logical: Whether to return
 #' model statistics. This is not the recommended method:
 #' use \code{monitor} argument instead.
-#' @param duration.dependent Logical: Whether the model terms in formula or
-#' model are duration dependent. E.g., if a duration-dependent term is used in
-#' estimation/simulation model, the probability of forming or dissolving a tie
-#' may dependent on the age the dyad status.
 #' @param verbose Logical: If TRUE, extra information is printed as the Markov
 #' chain progresses.
 #' @param \dots Further arguments passed to or used by methods.
@@ -238,7 +234,6 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
                           output=c("networkDynamic", "stats", "changes", "final", "ergm_state"),
                           nw.start = NULL,
                           stats = FALSE,
-                          duration.dependent = NULL,
                           verbose=FALSE, ...){
   if(is(control, "control.simulate.stergm") || is(control, "control.simulate.network")) {
     control$MCMC.prop <- control$MCMC.prop.form
@@ -285,10 +280,8 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
   }else if(is.networkDynamic(nw.start)){
     stop("Using a networkDynamic to start a simulation from a TERGM is not supported at this time.")
   }
-  
-  duration.dependent <- NVL(duration.dependent, is.lasttoggle(nw.start,object$formula,monitor=object$monitor))
-  
-  simulate_formula.network(object=object$formula, basis=nw.start,nsim=nsim,coef=coef, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, output=match.arg(output), stats=stats, duration.dependent=duration.dependent, verbose=verbose, dynamic=TRUE, ...)
+    
+  simulate_formula.network(object=object$formula, basis=nw.start,nsim=nsim,coef=coef, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, output=match.arg(output), stats=stats, verbose=verbose, dynamic=TRUE, ...)
 }
 
 
@@ -303,7 +296,6 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                              control=control.simulate.network.tergm(),
                              output=c("networkDynamic", "stats", "changes", "final", "ergm_state"),
                              stats = FALSE,
-                             duration.dependent=NULL,
                              verbose=FALSE,
                              ..., basis=eval_lhs.formula(object), dynamic=FALSE) {
                              
@@ -529,7 +521,6 @@ simulate_formula.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     control=control.simulate.network.tergm(),
                                     output=c("networkDynamic", "stats", "changes", "final", "ergm_state"),
                                     stats = FALSE,
-                                    duration.dependent = NULL,
                                     verbose=FALSE, ..., basis=eval_lhs.formula(object), dynamic=FALSE){
 
   if(!dynamic) {
@@ -563,10 +554,7 @@ simulate_formula.networkDynamic <- function(object, nsim=1, seed=NULL,
   
   # extract nwd to nw
   
-  if(is.null(duration.dependent))
-    duration.dependent <- is.lasttoggle(object,formula,monitor=monitor)
-  
-  nw <- network.extract.with.lasttoggle(object, start, duration.dependent)
+  nw <- network.extract.with.lasttoggle(object, start)
 
   output <- match.arg(output)
   # get back a 'changes' matrix for the next sim step with columns 'time','tail','head','to'
@@ -578,7 +566,6 @@ simulate_formula.networkDynamic <- function(object, nsim=1, seed=NULL,
                           control=control,          
                           output=switch(output, networkDynamic = "changes", output),
                           stats = stats,
-                          duration.dependent=duration.dependent,
                           verbose=verbose, dynamic=dynamic, ...)
   
   ## Map the vertex IDs back to the original dynamic network from the static sim:

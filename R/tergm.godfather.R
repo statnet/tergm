@@ -108,7 +108,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
       stop("Network size and/or composition appears to change in the interval between start and end. This is not supported by ergm.godfather() at this time.")
 
     # Finally, we are ready to extract the network.
-    nw <- network.extract.with.lasttoggle(nw, at=start, TRUE)
+    nw <- network.extract.with.lasttoggle(nw, at=start)
 
   }else{
     if(is.null(toggles)) stop("Either pass a networkDynamic, or provide change or toggle information.")

@@ -49,8 +49,6 @@
 #                  'changes' will be switched to FALSE if either of
 #                  'time.burnin' or 'time.interval' do not have their default
 #                  values; default=TRUE
-#   duration.dependent : whether the model/formula are durational dependent
-#                  default=NULL
 #   verbose      : whether to print out information on the status of
 #                  the simulations; default=FALSE
 #
@@ -154,10 +152,6 @@
 #' use \code{monitor} argument instead.  Note that if either \code{stats.form}
 #' or \code{stats.diss} is \code{TRUE}, all generative model statistics will be
 #' returned.
-#' @param duration.dependent Logical: Whether the model terms in formula or
-#' model are duration dependent. E.g., if a duration-dependent term is used in
-#' estimation/simulation model, the probability of forming or dissolving a tie
-#' may dependent on the age the dyad status.
 #' @param verbose Logical: If TRUE, extra information is printed as the Markov
 #' chain progresses.
 #' @param \dots Further arguments passed to or used by methods.
@@ -212,7 +206,6 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                              output=c("networkDynamic", "stats", "changes", "final", "ergm_state"),
                              stats.form = FALSE,
                              stats.diss = FALSE,
-                             duration.dependent=NULL,
                              verbose=FALSE,...) {
   check.control.class("simulate.network", "STERGM simulate.network")
 
@@ -228,7 +221,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   output <- match.arg(output)
 
   rv <- simulate(object ~ Form(formation) + Diss(dissolution), nsim=nsim, seed=seed, coef = c(coef.form, coef.diss), constraints=constraints,
-                 monitor=monitor, time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval, time.offset=time.offset, control=control, output=output, stats = stats.form || stats.diss, duration.dependent=duration.dependent, verbose=verbose, dynamic=TRUE, ...)
+                 monitor=monitor, time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval, time.offset=time.offset, control=control, output=output, stats = stats.form || stats.diss, verbose=verbose, dynamic=TRUE, ...)
          
   if(output != "stats") {
     attributes(rv) <- c(attributes(rv), list(formation = formation, dissolution = dissolution, coef.form = coef.form, coef.diss = coef.diss))
@@ -259,7 +252,6 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     output=c("networkDynamic", "stats", "changes", "final", "ergm_state"),
                                     stats.form = FALSE,
                                     stats.diss = FALSE,
-                                    duration.dependent = NULL,
                                     verbose=FALSE, ...){
   check.control.class("simulate.network", "STERGM simulate.network")
 
@@ -275,7 +267,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   output <- match.arg(output)
 
   rv <- simulate(object ~ Form(formation) + Diss(dissolution), nsim=nsim, seed=seed, coef = c(coef.form, coef.diss), constraints=constraints,
-                 monitor=monitor, time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval, time.offset=time.offset, control=control, output=output, stats = stats.form || stats.diss, duration.dependent=duration.dependent, verbose=verbose, dynamic=TRUE, ...)
+                 monitor=monitor, time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval, time.offset=time.offset, control=control, output=output, stats = stats.form || stats.diss, verbose=verbose, dynamic=TRUE, ...)
 
   if(output != "stats") {
     attributes(rv) <- c(attributes(rv), list(formation = formation, dissolution = dissolution, coef.form = coef.form, coef.diss = coef.diss))
