@@ -41,7 +41,7 @@ Exponential-Family Random Graph Models
   and Handcock (2013). The latter model allows familiar ERGM terms and
   statistics to be reused in a dynamic context, interpreted in terms of
   formation and dissolution of ties. Krivitsky (2012) suggested a method
-  for fitting dyanmic models when only a cross-sectional network is
+  for fitting dynamic models when only a cross-sectional network is
   available, provided some temporal information for it is available as
   well.
 
