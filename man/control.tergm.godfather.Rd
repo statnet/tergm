@@ -4,12 +4,11 @@
 \alias{control.tergm.godfather}
 \title{Control parameters for \code{\link[=tergm.godfather]{tergm.godfather()}}.}
 \usage{
-control.tergm.godfather(GF.init.maxedges.mul = 5)
+control.tergm.godfather(term.options = NULL)
 }
 \arguments{
-\item{GF.init.maxedges.mul}{How much space
-is allocated for the edgelist of the final network. It is used
-adaptively, so should not be greater than \code{10}.}
+\item{term.options}{A list of optional settings such as calculation
+tuning options to be passed to the \code{InitErgmTerm} functions.}
 }
 \description{
 Returns a list of its arguments.
