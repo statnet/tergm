@@ -13,30 +13,38 @@
 \alias{ergm.constraints}
 \alias{constraints.ergm}
 
-\alias{InitErgmConstraint.atleast}
-\alias{InitErgmConstraint.atmost}
+\alias{discord}
+\alias{discordTNT}
+\alias{InitErgmConstraint.discord}
+\alias{InitErgmConstraint.discordTNT}
 
 \docType{methods}
 
-\title{Formation and Dissolution Constraints for Exponential Family Random Graph Models}
+\title{Hints and Constraints for Temporal Exponential Family Random Graph Models}
 \description{
-  This page describes the network sample space constraints
-  that are included with the
+  This page describes the hints and network sample 
+  space constraints that are included with the
   \code{\link[=tergm-package]{tergm}} package. For more information, and
-  instructions for using constraints, see
+  instructions for using hints and constraints, see
   \code{\link[ergm]{ergm-constraints}} and \code{\link{ergm}}.
 }
-\section{Constraints implemented in  the \code{\link[=tergm-package]{tergm}} package}{
+\section{Hints implemented in the \code{\link[=tergm-package]{tergm}} package}{
   \describe{
-    \item{\code{atleast(nw)}}{\emph{The Formation Constraint:}
-      Preserve all ties in network \code{nw}. Only dyads that are not
-      ties in \code{nw} may be changed.
+    \item{\code{discord}}{\emph{The Dynamic Discordance Hint:}
+      Propose toggling discordant dyads with greater 
+      frequency (typically about 50 percent).  May be used in
+      EGMME fitting and dynamic simulation.
     }
-    \item{\code{atmost(nw)}}{\emph{The Dissolution Constraint:}
-      Prevent all nonties in network \code{nw}. Only dyads that have
-      ties in \code{nw} may be changed.
+    \item{\code{discordTNT(ref)}}{\emph{The Static Discordance Hint:}
+      A static version of \code{discord}, used in CMLE
+      fitting, where \code{ref} is the reference data used
+      to define discordance status.  
     }   
   }
+}
+\section{Constraints implemented in the \code{\link[=tergm-package]{tergm}} package}{
+  At present there are no constraints implemented in the 
+  \code{\link[=tergm-package]{tergm}} package.
 }
 
 \references{
