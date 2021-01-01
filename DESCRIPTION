@@ -53,7 +53,6 @@ Remotes: github::statnet/statnet.common@master,
     github::statnet/ergm-private@dev,
     github::statnet/ergm.multi-private@dev
 Collate: 
-    'InitConstraint.R'
     'InitErgmConstraint.hints.R'
     'InitErgmProposal.DynMLE.R'
     'InitErgmProposal.DynMoME.R'
