@@ -10,6 +10,7 @@
 \name{ergm-proposals}
 \alias{ergm-proposals}
 \alias{InitErgmProposal}
+\alias{InitErgmProposal.staticDiscordTNT}
 \alias{InitErgmProposal.discordTNT}
 \alias{InitErgmProposal.discordStratTNT}
 \alias{InitErgmProposal.discordBDTNT}
@@ -33,12 +34,20 @@
   performance (speed and mixing) of the algorithm, and in other cases to 
   constrain the sample space.
 
-  Generally, the user does not need to select them directly.
+  The user may specify proposals directly if need be, but is encouraged to 
+  utilize the hints and constraints UI instead.
 }
   
 \details{
   \subsection{MH proposal methods implemented in the \code{\link[=tergm-package]{tergm}} package}{
     \itemize{
+      \item{\code{InitErgmProposal.staticDiscordTNT}} {
+      
+        A version of \code{\link[ergm:ergm-proposals]{TNT}} appropriate for CMLE fitting, 
+        with proposals stratified both by discordance status and edge status.  The argument
+        \code{ref} specifies the data relative to which discordance status is defined.
+      }
+
       \item{\code{InitErgmProposal.discordTNT}} {
       
         A temporal version of \code{\link[ergm:ergm-proposals]{TNT}}, with approximately
@@ -63,7 +72,9 @@
         A temporal version of \code{\link[ergm:ergm-proposals]{BDTNT}}, with approximately
         50\% of proposed toggles being made on the set of discordant dyads,
         and approximately 50\% of proposed toggles being TNT proposals from
-        the network, all subject to the bounded degree constraints.
+        the network, all subject to the bounded degree constraints, which are
+        imposed on the instantaneous network state (rather than the formation or 
+        dissolution networks).
 
         Proposal arguments are the same as for \code{\link[ergm:ergm-proposals]{BDTNT}}.      
       }    
@@ -74,7 +85,8 @@
         strat mixing type, approximately 50\% of proposed toggles are made on
         discordant dyads, and approximately 50\% of proposed toggles are
         TNT proposals from the network, all subject to the bounded degree
-        constraints.
+        constraints, which are imposed on the instantaneous network state 
+        (rather than the formation or dissolution networks).
 
         Proposal arguments are the same as for \code{\link[ergm:ergm-proposals]{BDStratTNT}}.
       }    
