@@ -12,6 +12,8 @@
 \alias{ergm.terms}
 \alias{terms-ergm}
 \alias{terms.ergm}
+\alias{Form}
+\alias{Diss}
 \alias{edge.ages}
 \alias{mean.age}
 \alias{nodefactor.mean.age}
@@ -21,6 +23,8 @@
 \alias{edgecov.mean.age}
 \alias{degree.mean.age}
 \alias{degrange.mean.age}
+\alias{InitErgmTerm.Form}
+\alias{InitErgmTerm.Diss}
 \alias{InitErgmTerm.edge.ages}
 \alias{InitErgmTerm.edgecov}
 \alias{InitErgmTerm.edgecov.ages}
@@ -34,21 +38,34 @@
 \title{Temporally-Sensitive Terms used in Exponential Family Random Graph Models}
 \description{
   Unlike ordinary \code{\link[ergm]{ergm-terms}}, which take only a single
-  network as an argument, the terms documented here also take into
-  account the "ages" of extant ties in the network: the time elapsed since
-  their formation.
-
-  As implemented, many of these terms cannot be used to "drive" the process
-  of network evolution, but they can be used as target statistics to
-  infer the terms that do. More concretely, they may appear in
-  \code{targets=} or \code{monitor=} formulas of
-  \code{\link{stergm}}, \code{\link{simulate.stergm}}, or
-  \code{\link[ergm]{summary.formula}} (with an ERGM formula), but they may
-  not appear in their \code{\link[=stergm]{formation=}} and
-  \code{\link[=stergm]{dissolution=}} formulas. These terms are marked with
-  "(target-only)".
+  network as an argument, the terms documented here may also take into account
+  the elapsed time since each dyad in the network was last toggled.  As currently 
+  implemented, such "durational" terms may not be used in the formation
+  or dissolution models (whether specified separably with \code{formation} and 
+  \code{dissolution} arguments in the old style, or inside \code{Form} and 
+  \code{Diss} operator terms in the new style), but may be used as targets, monitors,
+  or summary statistics, and may also appear as non-separable effects 
+  in the generative model (necessarily specified in the new style).  The ability to 
+  use these terms in the formation and dissolution models may be added in the future.
 
   All terms listed here are binary.
+}
+
+\section{Formation and Dissolution Operator Terms included in the
+  \code{\link[=tergm-package]{tergm}} package}{
+  \describe{
+    \item{\code{Form(formula,lm=~1,subset=TRUE,weights=1,contrasts,offset,label)}}{
+      \emph{The Formation Operator Term:} This term accepts a model formula
+      \code{formula} and produces the corresponding formation model.  Arguments other 
+      than \code{formula} are only applied in the CMLE setting.
+    }
+    
+    \item{\code{Diss(formula,lm=~1,subset=TRUE,weights=1,contrasts,offset,label)}}{
+      \emph{The Dissolution Operator Term:} This term accepts a model formula
+      \code{formula} and produces the corresponding dissolution model.  Arguments other 
+      than \code{formula} are only applied in the CMLE setting.
+    }
+  }
 }
 
 \section{Terms to represent network statistics included in the
@@ -56,7 +73,7 @@
   \describe{
 
     \item{\code{degrange.mean.age(from, to=+Inf, byarg=NULL, emptyval=0)}
-      (target-only)}{\emph{Average age of ties incident on nodes having
+      }{\emph{Average age of ties incident on nodes having
       degree in a given range:} 
       The \code{from} and \code{to} arguments are vectors of distinct
       integers or \code{+Inf}, for \code{to}. If one of the vectors has
@@ -82,7 +99,7 @@
       with specified degree. }
 
     \item{\code{degree.mean.age(d, byarg=NULL,
-	emptyval=0)} (target-only)}{\emph{Average age of ties incident
+	emptyval=0)}}{\emph{Average age of ties incident
 	on nodes having a given degree:}
       The \code{d} argument is a vector of distinct integers. This term adds one
       network statistic to the model for each element in \code{d}; the \eqn{i}th
@@ -104,7 +121,7 @@
       with specified degree.  }
 
     
-    \item{\code{edges.ageinterval(from, to=+Inf)} (dissolution- and target-only)}{\emph{Number of edges
+    \item{\code{edges.ageinterval(from, to=+Inf)}}{\emph{Number of edges
       with age falling into a specified range:}
       This term counts the number of edges in the network for
       which the time elapsed since formation is greater than or equal to
@@ -118,7 +135,7 @@
       hazard function in the interval directly.
     }
 
-    \item{\code{edge.ages} (target-only)}{\emph{Sum of ages of extant
+    \item{\code{edge.ages}}{\emph{Sum of ages of extant
 	ties:} 
       This term adds one statistic equaling sum, over all ties
       present in the network, of the amount of time elapsed since
@@ -130,7 +147,7 @@
       is to get an intended average duration.
     }
 
-    \item{\code{edgecov.ages(x, attrname=NULL)} (target-only)}{\emph{Weighted sum of ages of extant
+    \item{\code{edgecov.ages(x, attrname=NULL)}}{\emph{Weighted sum of ages of extant
 	ties:} 
       This term adds one statistic equaling sum, over all ties
       present in the network, of the amount of time elapsed since
@@ -147,7 +164,7 @@
     }
     
     \item{\code{edgecov.mean.age(x, attrname=NULL,
-	emptyval=0)} (target-only)}{\emph{Weighted average age of an extant
+	emptyval=0)}}{\emph{Weighted average age of an extant
 	tie:} 
       This term adds one statistic equaling the average, over all ties
       present in the network, of the amount of time elapsed since
@@ -166,7 +183,7 @@
       and/or if only a few dyads have nonzero weights.  }
     
     
-    \item{\code{mean.age(emptyval=0, log=FALSE)} (target-only)}{\emph{Average age of an extant tie:} 
+    \item{\code{mean.age(emptyval=0, log=FALSE)}}{\emph{Average age of an extant tie:} 
       This term adds one statistic equaling the average, over all ties
       present in the network, of the amount of time elapsed since
       formation.
