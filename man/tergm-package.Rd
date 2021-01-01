@@ -47,7 +47,7 @@ Exponential-Family Random Graph Models
 
   This package aims to implement these and other ERGM-based models for
   network evoluation. At this time, it implements, via the
-  \code{\link{stergm}} function, the STERGMs, both a conditional MLE
+  \code{\link{tergm}} function, the (S)TERGMs, both a conditional MLE
   (CMLE) fitting to a series of networks and an Equilibrium Generalized
   Method of Moments Estimation (EGMME) for fitting to a single network
   with temporal information. For further development, see the referenced
