@@ -22,7 +22,7 @@
 %\alias{to.networkDynamic.lasttoggle}
 
 
-\alias{control.logLik.stergm}
+%\alias{control.logLik.stergm}
 %\alias{stergm.CMLE}
 %\alias{stergm.EGMME}
 %\alias{stergm.EGMME.GD}
