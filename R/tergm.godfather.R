@@ -196,17 +196,15 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
 #'
 #' Returns a list of its arguments.
 #'
-#' @param GF.init.maxedges.mul How much space
-#'   is allocated for the edgelist of the final network. It is used
-#'   adaptively, so should not be greater than \code{10}.
+#' @param term.options A list of optional settings such as calculation
+#'   tuning options to be passed to the \code{InitErgmTerm} functions.
 #' 
 #' @export control.tergm.godfather
-control.tergm.godfather<-function(GF.init.maxedges.mul=5
-              ){
-    control<-list()
-    for(arg in names(formals(sys.function())))
-      control[arg]<-list(get(arg))
-
-    control <- set.control.class("control.tergm.godfather")
-    control
-  }
+control.tergm.godfather <- function(term.options = NULL) {
+  control<-list()
+  for(arg in names(formals(sys.function())))
+    control[arg]<-list(get(arg))
+  
+  control <- set.control.class("control.tergm.godfather")
+  control
+}
