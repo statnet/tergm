@@ -2,13 +2,13 @@
 % Please edit documentation in R/mcmc.diagnostics.tergm.R
 \name{mcmc.diagnostics.tergm}
 \alias{mcmc.diagnostics.tergm}
-\title{Conduct MCMC diagnostics on an ergm or stergm fit}
+\title{Conduct MCMC diagnostics on an ergm or tergm fit}
 \usage{
 \method{mcmc.diagnostics}{tergm}(object, center = TRUE, esteq = TRUE, vars.per.page = 3, ...)
 }
 \arguments{
-\item{object}{A stergm object.  See documentation for
-\code{\link{stergm}}.}
+\item{object}{A tergm object.  See documentation for
+\code{\link{tergm}}.}
 
 \item{center}{Logical: If TRUE, ; center the samples on the
 observed statistics.}
@@ -32,7 +32,7 @@ plots and summary output based on those plots.
 }
 \description{
 This function prints diagnistic information and creates simple diagnostic
-plots for the MCMC sampled statistics produced from a \code{\link{stergm}}
+plots for the MCMC sampled statistics produced from a \code{\link{tergm}}
 fit.
 }
 \details{
@@ -40,7 +40,7 @@ The plots produced are a trace of the sampled output and a density estimate
 for each variable in the chain.  The diagnostics printed include
 correlations and convergence diagnostics.
 
-In fact, an \code{object} contains the matrix of statistics from the MCMC
+In fact, an ergm or tergm fit contains the matrix of statistics from the MCMC
 run as component \code{$sample}.  This matrix is actually an object of class
 \code{mcmc} and can be used directly in the \code{coda} package to assess
 MCMC convergence. \emph{Hence all MCMC diagnostic methods available in
@@ -48,7 +48,7 @@ MCMC convergence. \emph{Hence all MCMC diagnostic methods available in
 \url{https://www.mrc-bsu.cam.ac.uk/software/bugs/the-bugs-project-winbugs/coda-readme/}.
 
 More information can be found by looking at the documentation of
-\code{\link{stergm}}.
+\code{\link{tergm}}.
 }
 \references{
 Raftery, A.E. and Lewis, S.M. (1995).  The number of
@@ -63,7 +63,7 @@ is based on the FORTRAN program \code{gibbsit} written by Steven Lewis which
 is available from the Statlib archive.
 }
 \seealso{
-\code{\link{ergm}}, \code{\link{stergm}},\code{network}
+\code{\link{ergm}}, \code{\link{tergm}}, \code{network}
 package, \code{coda} package, \code{\link{summary.ergm}}
 }
 \keyword{models}
