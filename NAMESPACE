@@ -2,7 +2,6 @@
 
 S3method(gof,tergm)
 S3method(is.durational,"NULL")
-S3method(is.durational,character)
 S3method(is.durational,ergm_model)
 S3method(is.durational,ergm_state)
 S3method(is.durational,formula)
