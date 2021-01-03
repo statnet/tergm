@@ -26,39 +26,44 @@ tergm_MCMC_slave(state, eta, control, verbose)
 
 \item{model.mon}{the optional monitoring model, as returned by \code{\link{ergm_model}}}
 
-\item{proposal}{a list of parameters needed for
-proposals}
+\item{proposal}{the proposal, as returned by \code{\link{ergm_proposal}}}
 
-\item{control}{list of control paramters, probably from
-\code{\link{control.tergm}}}
+\item{control}{the list of control parameters}
+
+\item{theta}{the vector of curved parameters}
 
 \item{verbose}{logical; whether this and other functions should be verbose}
 
-\item{eta}{vector of natural parameters.}
+\item{eta}{the vector of natural parameters}
 }
 \value{
-returns the MCMC sample as a list containing: \itemize{
-\item statsmatrix: the matrix of sampled statistics for 'model'
-RELATIVE TO INITIAL NETWORK \item newnetwork : the final network from the
-sampling process \item changed : a toggle matrix, where the first column is
-the timestamp of the toggle and the 2nd and 3rd columns are the head & tail
-of the toggle; this is only returned if \code{control$changes} is not NULL
-\item maxchanges : the "MCMC Dyn workspace"; see 'maxchanges' in the input
-param list }
+returns the MCMC sample as a list containing:
+\itemize{
+\item statsmatrix.gen: the matrix of sampled statistics for \code{model},
+relative to the initial network
+\item statsmatrix.mon: the matrix of sampled statistics for \code{model.mon},
+relative to the initial network
+\item newnetwork: \code{ergm_state} with the final network from the
+sampling process
+\item changed: a matrix of changes, where the first column is
+the timestamp of the change, the second and third columns are the tail and head
+(respectively) of the changed dyad, and the fourth column is the edge state to which
+the dyad was changed; this is only returned if \code{control$changes} is \code{TRUE}
+\item maxchanges: the \code{maxchanges} value from the control list
+}
 }
 \description{
 \code{tergm_MCMC_sample} is a low-level internal function not intended to
 be called directly by end users. It collects a sample of networks and
-returns the statistics of each sample, along with
-a toggle matrix of the changes needed from the original network to each in
-the sample.
+returns the statistics of each sample, along with a toggle matrix of the
+changes needed from the original network to each in the sample.
 
 \code{tergm_MCMC_slave} is an even
 lower-level function that actually calls the C code.
 }
 \details{
-This function is normally called inside \code{\link{simulate.tergm}} to
-prepare inputs for the C sampling code and return its results
+This function is normally called inside \code{\link{simulate.tergm}} functions
+to prepare inputs for the C sampling code and return its results
 }
 \seealso{
 \code{\link{simulate.tergm}}
