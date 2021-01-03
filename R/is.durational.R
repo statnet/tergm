@@ -15,18 +15,15 @@
 ###############################################################################
 
 
-#' Testing for durational dependent models
+#' Testing for duration dependent models
 #' 
-#' These functions test whether an ERGM model or formula is durational
-#' dependent or not. If the formula or model does not include any terms that
-#' need information about the duration of existing ties, the ergm proceass can
-#' use more efficient internal data structures.
+#' These functions test whether an ERGM is duration dependent or not.
 #' 
-#' @param object An \code{\link{ergm}} object or an ERGM formula, or some
-#' characters, e.g., object="all" for monitoring purpose.
+#' @param object An ERGM formula, \code{\link{ergm_model}} object, or
+#'                 \code{\link{ergm_state}} object.
 #' @param \dots Unused at this time.
-#' @return \code{TRUE} if the ERGM terms in the formula or model are durational
-#' dependent ; \code{FALSE} otherwise.
+#' @return \code{TRUE} if the ERGM terms in the model are duration dependent; 
+#'           \code{FALSE} otherwise.
 #' @keywords model
 #' @export
 is.durational<-function(object,...) UseMethod("is.durational")
@@ -37,20 +34,14 @@ is.durational<-function(object,...) UseMethod("is.durational")
 #' @export
 is.durational.NULL <- function(object, ...) FALSE # By convention.
 
-#' @rdname is.durational
-#' @description The method for `character` always returns `FALSE` by
-#'   convention.
-#' @export
-is.durational.character <- function(object,...) FALSE # for mon="all"
-
-#' @describeIn is.durational Test if the model has duration-dependent terms, which call for [lasttoggle] data structures.
+#' @describeIn is.durational Test if the \code{\link{ergm_model}} has duration-dependent terms, which call for \code{\link{lasttoggle}} data structures.
 #' @export
 is.durational.ergm_model <- function(object, ...){
 #' @import purrr
   map(object$terms, "duration") %>% unlist %>% NVL(FALSE) %>% max
 }
 
-#' @describeIn is.durational Test if the ergm_state has duration-dependent terms, which call for [lasttoggle] data structures.
+#' @describeIn is.durational Test if the \code{\link{ergm_state}} has duration-dependent terms, which call for \code{\link{lasttoggle}} data structures.
 #' @export
 is.durational.ergm_state <- function(object, ...){
   is.durational(object$model)
