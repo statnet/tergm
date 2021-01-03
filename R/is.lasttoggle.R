@@ -14,17 +14,24 @@
 
 #' @rdname lasttoggle
 #' @name lasttoggle
-#' @title Lasttoggle placeholder RD
+#' @title Lasttoggle
 #' 
-#' This needs to be written (or links to it removed) before the 4.0 release.
+#' @description A data structure used by \code{tergm} for tracking of limited information
+#'                about dyad edge histories.
+#' 
+#' @details The \code{tergm} package handles durational information attached to \code{\link{network}}
+#'            objects by way of the \code{lasttoggle} data structure.  This data structure is a 3-column
+#'            matrix; the first two columns are tails and heads (respectively) of dyads, and the third
+#'            column is the last time at which the dyad was toggled.  The default last toggle time is
+#'            \code{-INT_MAX/2}.  Last toggle times for non-edges are periodically cleared in the C code.
 NULL
 
 is.lasttoggle <- function(nw, formation=NULL, dissolution=NULL, monitor=NULL, targets=NULL) {  
   if(!is.null(formation))
-    formation<-nonsimp_update.formula(formation,nw~., from.new="nw")
+    formation <- nonsimp_update.formula(formation, nw~., from.new="nw")
   
   if(!is.null(dissolution))  
-    dissolution<-nonsimp_update.formula(dissolution,nw~., from.new="nw")
+    dissolution <- nonsimp_update.formula(dissolution, nw~., from.new="nw")
 
   if(is(monitor, "formula"))
     monitor <- nonsimp_update.formula(monitor, nw~., from.new="nw")
