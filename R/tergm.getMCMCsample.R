@@ -12,31 +12,35 @@
 #' 
 #' \code{tergm_MCMC_sample} is a low-level internal function not intended to
 #' be called directly by end users. It collects a sample of networks and
-#' returns the statistics of each sample, along with
-#' a toggle matrix of the changes needed from the original network to each in
-#' the sample.
+#' returns the statistics of each sample, along with a toggle matrix of the 
+#' changes needed from the original network to each in the sample.
 #' 
-#' This function is normally called inside \code{\link{simulate.tergm}} to
-#' prepare inputs for the C sampling code and return its results
+#' This function is normally called inside \code{\link{simulate.tergm}} functions
+#' to prepare inputs for the C sampling code and return its results
 #' 
 #' @aliases tergm_MCMC_sample tergm_MCMC_slave
 #' @param nw a \code{\link{network}} object
 #' @param model the model, as returned by \code{\link{ergm_model}}
 #' @param model.mon the optional monitoring model, as returned by \code{\link{ergm_model}}
-#' @param proposal a list of parameters needed for
-#' proposals
-#' @param eta vector of natural parameters.
-#' @param control list of control paramters, probably from
-#' \code{\link{control.tergm}}
+#' @param proposal the proposal, as returned by \code{\link{ergm_proposal}}
+#' @param theta the vector of curved parameters
+#' @param eta the vector of natural parameters
+#' @param control the list of control parameters
 #' @param verbose logical; whether this and other functions should be verbose
-#' @return returns the MCMC sample as a list containing: \itemize{
-#' \item statsmatrix: the matrix of sampled statistics for 'model'
-#' RELATIVE TO INITIAL NETWORK \item newnetwork : the final network from the
-#' sampling process \item changed : a toggle matrix, where the first column is
-#' the timestamp of the toggle and the 2nd and 3rd columns are the head & tail
-#' of the toggle; this is only returned if `control$changes` is not NULL
-#' \item maxchanges : the "MCMC Dyn workspace"; see 'maxchanges' in the input
-#' param list }
+#' @return returns the MCMC sample as a list containing: 
+#' \itemize{
+#'   \item statsmatrix.gen: the matrix of sampled statistics for \code{model},
+#'     relative to the initial network
+#'   \item statsmatrix.mon: the matrix of sampled statistics for \code{model.mon},
+#'     relative to the initial network 
+#'   \item newnetwork: \code{ergm_state} with the final network from the
+#'     sampling process 
+#'   \item changed: a matrix of changes, where the first column is
+#'     the timestamp of the change, the second and third columns are the tail and head
+#'     (respectively) of the changed dyad, and the fourth column is the edge state to which
+#'     the dyad was changed; this is only returned if \code{control$changes} is \code{TRUE}
+#'   \item maxchanges: the \code{maxchanges} value from the control list
+#' }
 #' @seealso \code{\link{simulate.tergm}}
 #' @keywords internal
 #' @export
@@ -64,7 +68,6 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
   
   z <- tergm_MCMC_slave(state, eta.comb, control, verbose)
 
-  # check that this is the correct replacement for as.network(pending_update_network(...))
   state <- z$state
   
   diffedgelist<-if(control$changes) {
@@ -91,8 +94,8 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
     statsmatrix.gen <- statsmatrix
     statsmatrix.mon <- NULL
   } else {
-    statsmatrix.gen <- statsmatrix[,1:(NCOL(statsmatrix) - model.mon$etamap$etalength),drop=FALSE]
-    statsmatrix.mon <- statsmatrix[,(NCOL(statsmatrix) - model.mon$etamap$etalength + 1):NCOL(statsmatrix),drop=FALSE]
+    statsmatrix.gen <- statsmatrix[,seq_len(nparam(model, canonical = TRUE)),drop=FALSE]
+    statsmatrix.mon <- statsmatrix[,-seq_len(nparam(model, canonical = TRUE)),drop=FALSE]
   }
 
   list(statsmatrix.gen=statsmatrix.gen,
@@ -112,8 +115,6 @@ tergm_MCMC_slave <- function(state, eta, control, verbose){
 
   collect <- if(!is.null(control$collect)) control$collect else TRUE
 
-  ## should be maxedges, init.maxchanges, and max.maxchanges
-  ## add copying logic to MCMCDyn1step_advance, as well as addtnl arg
   maxedges <- NVL(control$MCMC.maxedges, Inf)
   maxchanges <- control$MCMC.maxchanges
   
