@@ -28,90 +28,89 @@
 #'   being greater than \code{MCMC.burnin.pval}), or
 #'   \code{MCMC.burnin.max} steps are proposed, whichever comes first,
 #'   the simulation is stopped after an additional
-#'   \code{MCMC.burnin.add} times the number of elapsed steps had been
+#'   \code{MCMC.burnin.add} times the number of elapsed steps have been
 #'   taken.  (Stopping immediately would bias the sampling.)
 #' 
-#'   To use a fixed number of steps, set both \code{MCMC.burnin.min}
-#'   and \code{MCMC.burnin.max} to the desired number of steps.
-#' @param MCMC.prop.weights Specifies the
-#'   proposal distribution used in the MCMC Metropolis-Hastings
-#'   algorithm. Possible
-#'   choices are \code{"TNT"} or \code{"random"}; the
-#'   \code{"default"}.  The \code{TNT} (tie / no tie) option puts
-#'   roughly equal weight on selecting a dyad with or without a tie as
-#'   a candidate for toggling, whereas the \code{random} option puts
-#'   equal weight on all possible dyads, though the interpretation of
-#'   \code{random} may change according to the constraints in place.
-#'   When no constraints are in place, the default is TNT, which
-#'   appears to improve Markov chain mixing particularly for networks
-#'   with a low edge density, as is typical of many realistic social
-#'   networks.
-#' @param MCMC.prop.args An alternative,
-#'   direct way of specifying additional arguments to the proposal.
+#'   To use a fixed number of steps, set \code{MCMC.burnin.min}
+#'   and \code{MCMC.burnin.max} to the same value.
+#'
+#' @param MCMC.prop.weights Specifies the proposal weighting scheme to 
+#'   be used in the MCMC Metropolis-Hastings algorithm.  Possible
+#'   choices may be determined by calling \code{\link{ergm_proposal_table}}.
+#'
+#' @param MCMC.prop.args An alternative, direct way of specifying 
+#'   additional arguments to the proposal.
+#'
 #' @param MCMC.prop Hints and/or constraints for selecting and initializing the proposal.
-#' @param MCMC.maxchanges Maximum number of toggles changes for
+#'
+#' @param MCMC.maxchanges Maximum number of changes for
 #'   which to allocate space.
+#'
 #' @param MCMC.packagenames Names of packages in which to look for
 #'   change statistic functions in addition to those
 #'   autodetected. This argument should not be needed outside of very
 #'   strange setups.
-#' @param term.options A list of additional arguments to be passed to term initializers. It can also be set globally via `option(ergm.term=list(...))`.
+#'
+#' @param term.options A list of additional arguments to be passed to term initializers. 
+#'   It can also be set globally via \code{options(ergm.term=list(...))}.
+#'
 #' @param MCMC.maxedges Maximum number of edges expected in
 #'   network.
-#' @param MCMC.burnin,MCMC.burnin.mul No longer used. See
-#'   \code{MCMC.burnin.min}, \code{MCMC.burnin.max},
-#'   \code{MCMC.burnin.pval}, \code{MCMC.burnin.pval}, and
-#'   \code{MCMC.burnin.add}.
+#'
 #' @return A list with arguments as components.
+#'
 #' @seealso \code{\link{simulate.tergm}},
 #'   \code{\link{simulate.formula}}.  \code{\link{control.tergm}}
 #'   performs a similar function for \code{\link{tergm}}.
+#'
 #' @keywords models
+#'
 #' @export control.simulate.tergm
-control.simulate.tergm<-function(MCMC.burnin.min=NULL,
-                                  MCMC.burnin.max=NULL,
-                                  MCMC.burnin.pval=NULL,
-                                  MCMC.burnin.add=NULL,
-                                  
-                                  MCMC.prop=NULL,
-                                  MCMC.prop.weights=NULL,
-                                  MCMC.prop.args=NULL,
-                                  
-                                  MCMC.maxedges=NULL,
-                                  MCMC.packagenames=NULL,
+control.simulate.tergm <- function(MCMC.burnin.min = NULL,
+                                   MCMC.burnin.max = NULL,
+                                   MCMC.burnin.pval = NULL,
+                                   MCMC.burnin.add = NULL,
+                                   
+                                   MCMC.prop = NULL,
+                                   MCMC.prop.weights = NULL,
+                                   MCMC.prop.args = NULL,
+                                   
+                                   MCMC.maxedges = NULL,
+                                   MCMC.maxchanges = NULL,
+                                   
+                                   term.options = NULL,
+                                   
+                                   MCMC.packagenames = NULL) {
 
-                                  term.options=NULL,
-                                  
-                                  MCMC.maxchanges=NULL){
-    control<-list()
-    for(arg in names(formals(sys.function())))
-      control[arg]<-list(get(arg))
+  control <- list()
+  for(arg in names(formals(sys.function())))
+    control[arg] <- list(get(arg))
 
-    set.control.class("control.simulate.tergm")
-  }
+  set.control.class("control.simulate.tergm")
+}
 
 
 #' @rdname control.simulate.tergm
 #' @export control.simulate.network.tergm
-control.simulate.network.tergm<-function(MCMC.burnin.min=1000,
-                                   MCMC.burnin.max=100000,
-                                   MCMC.burnin.pval=0.5,
-                                   MCMC.burnin.add=1,
-                                   MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
-                                   
-                                   MCMC.prop = ~discord + TNT,
-                                   MCMC.prop.weights="default",
-                                   MCMC.prop.args=NULL,
-                                   
-                                   MCMC.maxedges=Inf,
-                                   MCMC.packagenames=c(),
+control.simulate.network.tergm <- function(MCMC.burnin.min = 1000,
+                                           MCMC.burnin.max = 100000,
+                                           MCMC.burnin.pval = 0.5,
+                                           MCMC.burnin.add = 1,
+                                           
+                                           MCMC.prop = ~discord + TNT,
+                                           MCMC.prop.weights = "default",
+                                           MCMC.prop.args = NULL,
+                                           
+                                           MCMC.maxedges = Inf,
+                                           MCMC.maxchanges = 1000000,
+                                           
+                                           term.options = NULL,
+                                           
+                                           MCMC.packagenames = c()) {
+                                           
+  control <- list()
+  for(arg in names(formals(sys.function())))
+    control[arg] <- list(get(arg))
 
-                                   term.options=NULL,
-                                   
-                                   MCMC.maxchanges=1000000){
-    control<-list()
-    for(arg in names(formals(sys.function())))
-      control[arg]<-list(get(arg))
-
-    set.control.class("control.simulate.network.tergm")
-  }
+  set.control.class("control.simulate.network.tergm")
+}
