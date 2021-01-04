@@ -34,24 +34,22 @@ LHS of \code{formula} is not a \code{\link{networkDynamic}}.}
 giving the dyads which had changed. Can only be used if LHS of
 \code{formula} is not a \code{\link{networkDynamic}}.}
 
-\item{start}{Time from which to start applying changes. Note that
-the first set of changes will take effect at
-\code{start+1}. Defaults to the time point 1 before the earliest
-change passed.}
+\item{start}{Time from which to start applying changes.  Note that
+the first set of changes will take effect at \code{start + 1}.
+Defaults to the time point 1 before the earliest change passed.}
 
-\item{end}{Time from which to finish applying changes. Defaults to
+\item{end}{Time at which to finish applying changes.  Defaults to
 the last time point at which a change occurs.}
 
-\item{end.network}{Whether to return a network that
+\item{end.network}{Whether to return the network that
 results. Defaults to \code{FALSE}.}
 
 \item{stats.start}{Whether to return the network statistics at
 \code{start} (before any changes are applied) as the first row of
 the statistics matrix.  Defaults to \code{FALSE}, to produce
-output similar to that of
-\code{\link[=simulate.tergm]{simulate}} for TERGMs when
-\code{output="stats"}, where initial network's statistics are not
-returned.}
+output similar to that of \code{\link[=simulate.tergm]{simulate}}
+for TERGMs when \code{output="stats"}, where initial network's
+statistics are not returned.}
 
 \item{verbose}{Whether to print progress messages.}
 
@@ -59,16 +57,16 @@ returned.}
 \code{\link{control.tergm.godfather}}.}
 }
 \value{
-If \code{end.network==FALSE} (the default), an
+If \code{end.network} is \code{FALSE} (the default), an
 \code{\link{mcmc}} object with the requested network statistics
-associed with the network series produced by applying the
+associated with the network series produced by applying the
 specified changes. Its \code{\link{mcmc}} attributes encode the
 timing information: so \code{\link{start}(out)} gives the time
 point associated with the first row returned, and
 \code{\link{end}(out)} out the last. The "thinning interval" is
 always 1.
 
-If \code{end.network==TRUE}, return a \code{\link{network}} object with
+If \code{end.network} is \code{TRUE}, return a \code{\link{network}} object with
 \code{\link{lasttoggle}} "extension", representing the final network, with a
 matrix of statistics described in the previous paragraph attached to it as
 an \code{attr}-style attribute \code{"stats"}.
