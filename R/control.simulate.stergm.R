@@ -43,29 +43,33 @@
 
 #' @rdname control.simulate.stergm
 #' @export control.simulate.network
-control.simulate.network<-function(MCMC.burnin.min=1000,
-                                   MCMC.burnin.max=100000,
-                                   MCMC.burnin.pval=0.5,
-                                   MCMC.burnin.add=1,
-                                   MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
-                                   MCMC.prop.form = ~discord + TNT,
-                                   MCMC.prop.diss = ~discord + TNT,
-                                   MCMC.prop.weights.form="default",MCMC.prop.args.form=NULL,
-                                   MCMC.prop.weights.diss="default",MCMC.prop.args.diss=NULL,                                  
-                                   MCMC.init.maxedges=Inf,
-                                   MCMC.packagenames=c(),
-
-                                   term.options=NULL,
+control.simulate.network <- function(MCMC.burnin.min = 1000,
+                                     MCMC.burnin.max = 100000,
+                                     MCMC.burnin.pval = 0.5,
+                                     MCMC.burnin.add = 1,
+                                     
+                                     MCMC.prop.form = ~discord + TNT,
+                                     MCMC.prop.diss = ~discord + TNT,
+                                     
+                                     MCMC.prop.weights.form = "default",
+                                     MCMC.prop.weights.diss = "default",
+                                                                        
+                                     MCMC.prop.args.form = NULL,
+                                     MCMC.prop.args.diss = NULL,                                  
                                    
-                                   MCMC.init.maxchanges=1000000){
-    if(!is.null(MCMC.burnin) || !is.null(MCMC.burnin.mul)) stop("Control parameters MCMC.burnin and MCMC.burnin.mul are no longer used. See help for EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max, EGMME.MCMC.burnin.pval, EGMME.MCMC.burnin.pval, and CMLE.MCMC.burnin and CMLE.MCMC.interval for their replacements.")
-    control<-list()
-    for(arg in names(formals(sys.function())))
-      control[arg]<-list(get(arg))
+                                     MCMC.init.maxedges = Inf,
+                                     MCMC.init.maxchanges = 1000000,
 
-    set.control.class("control.simulate.network")
-  }
+                                     term.options = NULL,
+                                     
+                                     MCMC.packagenames = c()) {
+                                     
+  control <- list()
+  for(arg in names(formals(sys.function())))
+    control[arg] <- list(get(arg))
 
+  set.control.class("control.simulate.network")
+}
 
 
 #' Auxiliary for Controlling Separable Temporal ERGM Simulation
@@ -83,8 +87,8 @@ control.simulate.network<-function(MCMC.burnin.min=1000,
 #' \code{control.simulate.stergm} or \code{control.simulate.network} object 
 #' is passed to one of the \code{\link{simulate.stergm}} functions, 
 #' the corresponding \code{\link{simulate.tergm}} function is invoked,
-#' and uses the formation proposal arguments and weights, ignoring the 
-#' dissolution proposal arguments and weights.
+#' and uses the formation proposal control arguments, ignoring the 
+#' dissolution proposal control arguments.
 #' 
 #' @param
 #'   MCMC.burnin.min,MCMC.burnin.max,MCMC.burnin.pval,MCMC.burnin.add
@@ -97,69 +101,72 @@ control.simulate.network<-function(MCMC.burnin.min=1000,
 #'   being greater than \code{MCMC.burnin.pval}), or
 #'   \code{MCMC.burnin.max} steps are proposed, whichever comes first,
 #'   the simulation is stopped after an additional
-#'   \code{MCMC.burnin.add} times the number of elapsed steps had been
+#'   \code{MCMC.burnin.add} times the number of elapsed steps have been
 #'   taken.  (Stopping immediately would bias the sampling.)
 #' 
-#'   To use a fixed number of steps, set both \code{MCMC.burnin.min}
-#'   and \code{MCMC.burnin.max} to the desired number of steps.
-#' @param MCMC.prop.weights.form Specifies the
-#'   proposal distribution used in the MCMC Metropolis-Hastings
-#'   algorithm.  Possible choices are \code{"TNT"} or \code{"random"}; the
-#'   \code{"default"}.  The \code{TNT} (tie / no tie) option puts
-#'   roughly equal weight on selecting a dyad with or without a tie as
-#'   a candidate for toggling, whereas the \code{random} option puts
-#'   equal weight on all possible dyads, though the interpretation of
-#'   \code{random} may change according to the constraints in place.
-#'   When no constraints are in place, the default is TNT, which
-#'   appears to improve Markov chain mixing particularly for networks
-#'   with a low edge density, as is typical of many realistic social
-#'   networks.
+#'   To use a fixed number of steps, set \code{MCMC.burnin.min}
+#'   and \code{MCMC.burnin.max} to the same value.
+#' 
+#' @param MCMC.prop.weights.form Specifies the proposal weighting scheme to 
+#'   be used in the MCMC Metropolis-Hastings algorithm.  Possible
+#'   choices may be determined by calling \code{\link{ergm_proposal_table}}.
+#' 
 #' @param MCMC.prop.args.form An alternative,
 #'   direct way of specifying additional arguments to proposals.
+#' 
 #' @param MCMC.prop.form Hints and/or constraints for selecting and initializing the proposal.
+#' 
 #' @param MCMC.prop.weights.diss,MCMC.prop.args.diss,MCMC.prop.diss Ignored. These are included
 #'        for backwards compatibility of calls to \code{control}
 #'        functions only; they have no effect on \code{simulate} behavior.
-#' @param MCMC.init.maxchanges Maximum number of toggles changes for
+#'
+#' @param MCMC.init.maxchanges Maximum number of changes for
 #'   which to allocate space.
+#' 
 #' @param MCMC.packagenames Names of packages in which to look for
 #'   change statistic functions in addition to those
 #'   autodetected. This argument should not be needed outside of very
 #'   strange setups.
-#' @param term.options A list of additional arguments to be passed to term initializers. It can also be set globally via `option(ergm.term=list(...))`.
+#'
+#' @param term.options A list of additional arguments to be passed to term initializers. 
+#'   It can also be set globally via \code{options(ergm.term=list(...))}.
+#' 
 #' @param MCMC.init.maxedges Maximum number of edges expected in
 #'   network.
-#' @param MCMC.burnin,MCMC.burnin.mul No longer used. See
-#'   \code{MCMC.burnin.min}, \code{MCMC.burnin.max},
-#'   \code{MCMC.burnin.pval}, \code{MCMC.burnin.pval}, and
-#'   \code{MCMC.burnin.add}.
+#' 
 #' @return A list with arguments as components.
+#' 
 #' @seealso \code{\link{simulate.stergm}},
 #'   \code{\link{simulate.formula}}.  \code{\link{control.stergm}}
 #'   performs a similar function for \code{\link{stergm}}.
+#'
 #' @keywords models
+#'
 #' @export control.simulate.stergm
-control.simulate.stergm<-function(MCMC.burnin.min=NULL,
-                                  MCMC.burnin.max=NULL,
-                                  MCMC.burnin.pval=NULL,
-                                  MCMC.burnin.add=NULL,
-                                  MCMC.burnin=NULL, MCMC.burnin.mul=NULL,
-                                  MCMC.prop.form=NULL,
-                                  MCMC.prop.diss=NULL,                                  
-                                  MCMC.prop.weights.form=NULL,MCMC.prop.args.form=NULL,
-                                  MCMC.prop.weights.diss=NULL,MCMC.prop.args.diss=NULL,                                  
-                                  MCMC.init.maxedges=NULL,
-                                  MCMC.packagenames=NULL,
-
-                                  term.options=NULL,
+control.simulate.stergm <- function(MCMC.burnin.min = NULL,
+                                    MCMC.burnin.max = NULL,
+                                    MCMC.burnin.pval = NULL,
+                                    MCMC.burnin.add = NULL,
                                   
-                                  MCMC.init.maxchanges=NULL){
-    if(!is.null(MCMC.burnin) || !is.null(MCMC.burnin.mul)) stop("Control parameters MCMC.burnin and MCMC.burnin.mul are no longer used. See help for EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max, EGMME.MCMC.burnin.pval, EGMME.MCMC.burnin.pval, and CMLE.MCMC.burnin and CMLE.MCMC.interval for their replacements.")
-    control<-list()
-    for(arg in names(formals(sys.function())))
-      control[arg]<-list(get(arg))
+                                    MCMC.prop.form = NULL,
+                                    MCMC.prop.diss = NULL,                                  
+                                    
+                                    MCMC.prop.weights.form = NULL,
+                                    MCMC.prop.weights.diss = NULL,
 
-    set.control.class("control.simulate.stergm")
-  }
+                                    MCMC.prop.args.form = NULL,                                    
+                                    MCMC.prop.args.diss = NULL,                                  
+                                    
+                                    MCMC.init.maxedges = NULL,
+                                    MCMC.init.maxchanges = NULL,
+                                    
+                                    term.options = NULL,
+                                    
+                                    MCMC.packagenames = NULL) {
 
+  control <- list()
+  for(arg in names(formals(sys.function())))
+    control[arg] <- list(get(arg))
 
+  set.control.class("control.simulate.stergm")
+}
