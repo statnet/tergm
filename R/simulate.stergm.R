@@ -108,11 +108,6 @@
 #' formula and the reference measure, the constraints define the distribution
 #' of networks being modeled.
 #' 
-#' It is also possible to specify a proposal function directly by passing a
-#' string with the function's name. In that case, arguments to the proposal
-#' should be specified through the \code{MCMC.prop.args.form} argument to
-#' \code{\link{control.simulate.network}}.
-#' 
 #' The default is \code{~.}, for an unconstrained model.
 #' 
 #' See the [ERGM constraints][ergm-constraints] documentation for the
@@ -137,25 +132,26 @@
 #' @param time.offset Argument specifying the offset between the point when the
 #' state of the network is sampled (\code{time.start}) and the the beginning of
 #' the spell that should be recorded for the newly simulated network state.
-#' @param control A list of control parameters for algorithm tuning.
-#' Constructed using \code{\link{control.simulate.network}}.  These are mapped
-#' to \code{\link{control.simulate.network.tergm}} controls by assigning
-#' \code{MCMC.prop.args.form} and \code{MCMC.prop.weights.form} to 
-#' \code{MCMC.prop.args} and \code{MCMC.prop.weights} respectively, and assigning
-#' \code{MCMC.init.maxedges} and \code{MCMC.init.maxchanges} to \code{MCMC.maxedges}
-#' and \code{MCMC.maxchanges} respectively.
+#' @param control A list of control parameters for algorithm tuning,
+#' constructed using \code{\link{control.simulate.network}}.  These are mapped
+#' to \code{\link{control.simulate.network.tergm}} controls by assigning:
+#'   \item \code{MCMC.prop.form} to \code{MCMC.prop},
+#'   \item \code{MCMC.prop.args.form} to \code{MCMC.prop.args},
+#'   \item \code{MCMC.prop.weights.form} to \code{MCMC.prop.weights},
+#'   \item \code{MCMC.init.maxedges} to \code{MCMC.maxedges}, and
+#'   \item \code{MCMC.init.maxchanges} to \code{MCMC.maxchanges}.
 #' @param output A character vector specifying output type: one of
 #' "networkDynamic" (the default), "stats", "changes", "final", and
 #' "ergm_state", with partial matching allowed.
 #' @param stats.form,stats.diss Logical: Whether to return
 #' formation/dissolution model statistics. This is not the recommended method:
-#' use \code{monitor} argument instead.  Note that if either \code{stats.form}
+#' use the \code{monitor} argument instead.  Note that if either \code{stats.form}
 #' or \code{stats.diss} is \code{TRUE}, all generative model statistics will be
 #' returned.
-#' @param verbose Logical: If TRUE, extra information is printed as the Markov
+#' @param verbose Logical: If \code{TRUE}, extra information is printed as the Markov
 #' chain progresses.
 #' @param \dots Further arguments passed to or used by methods.
-#' @return Depends on the \code{output} argument.  See \link{simulate.tergm}
+#' @return Depends on the \code{output} argument.  See \code{\link{simulate.tergm}}
 #'         for details.  Note that some formation/dissolution separated
 #'         information is also attached to the return value for calls made through
 #'         \code{simulate.network} and \code{simulate.networkDynamic} in
