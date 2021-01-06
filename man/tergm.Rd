@@ -102,9 +102,6 @@ print out progress information. Higher values result in more output.}
 \value{
 \code{\link{tergm}} returns an object of class \code{\link{tergm}}
 that is a list consisting of the following elements:
-
-\code{\link{tergm}} returns an object of class \code{\link{tergm}}
-that is a list consisting of the following elements:
 \item{formula}{The model formula.}
 \item{coef}{The fitted model coefficients.}
 \item{targets}{For EGMME, the targets formula.}
