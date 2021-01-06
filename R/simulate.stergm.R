@@ -135,14 +135,16 @@
 #' @param control A list of control parameters for algorithm tuning,
 #' constructed using \code{\link{control.simulate.network}}.  These are mapped
 #' to \code{\link{control.simulate.network.tergm}} controls by assigning:
+#' \itemize{
 #'   \item \code{MCMC.prop.form} to \code{MCMC.prop},
 #'   \item \code{MCMC.prop.args.form} to \code{MCMC.prop.args},
 #'   \item \code{MCMC.prop.weights.form} to \code{MCMC.prop.weights},
 #'   \item \code{MCMC.init.maxedges} to \code{MCMC.maxedges}, and
 #'   \item \code{MCMC.init.maxchanges} to \code{MCMC.maxchanges}.
+#' }
 #' @param output A character vector specifying output type: one of
-#' "networkDynamic" (the default), "stats", "changes", "final", and
-#' "ergm_state", with partial matching allowed.
+#' \code{"networkDynamic"} (the default), \code{"stats"}, \code{"changes"},
+#' \code{"final"}, and \code{"ergm_state"}, with partial matching allowed.
 #' @param stats.form,stats.diss Logical: Whether to return
 #' formation/dissolution model statistics. This is not the recommended method:
 #' use the \code{monitor} argument instead.  Note that if either \code{stats.form}
