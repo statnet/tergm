@@ -241,7 +241,7 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
     control$MCMC.prop.args <- control$MCMC.prop.args.form
     control$maxedges <- control$MCMC.init.maxedges
     control$maxchanges <- control$MCMC.init.maxchanges
-    class(control) <- "control.simulate.tergm"
+    control <- set.control.class("control.simulate.tergm")
   }  
   
   check.control.class(c("simulate.tergm","simulate.network.tergm"), "simulate.tergm")
