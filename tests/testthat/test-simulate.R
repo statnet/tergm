@@ -106,14 +106,14 @@ test_that("simulate_formula.networkDynamic behaves reasonably", {
   nw1 <- simulate(nw ~ edges, coef = c(-3), output = "final", dynamic = TRUE)
   nw2 <- simulate(nw1 ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), output = "final", dynamic = TRUE)
   nw4 <- simulate(nw2 ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), output = "final", time.slices = 2, dynamic = TRUE)
-  nw5 <- simulate(nw2 ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), output = "final", time.start = 3, time.slices = 2, dynamic = TRUE)
+  nw5 <- expect_warning(simulate(nw2 ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), output = "final", time.start = 3, time.slices = 2, dynamic = TRUE))
   
   set.seed(0)
   nw <- network.initialize(100, directed = FALSE)
   nwd1 <- simulate(nw ~ edges, coef = c(-3), dynamic = TRUE)
   nwd2 <- simulate(nwd1 ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), dynamic = TRUE)
   nwd4 <- simulate(nwd2 ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), time.slices = 2, dynamic = TRUE)
-  nwd5 <- simulate(nwd2 ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), time.start = 3, time.slices = 2, dynamic = TRUE)
+  nwd5 <- expect_warning(simulate(nwd2 ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), time.start = 3, time.slices = 2, dynamic = TRUE))
   
   expect_identical(nw1 %n% "time", as.integer(.get.last.obs.time(nwd1)))
   expect_identical(nw2 %n% "time", as.integer(.get.last.obs.time(nwd2)))
@@ -178,7 +178,7 @@ test_that("simulate.network behaves reasonably", {
   old_nw1 <- simulate(nw, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, output = "final")
   old_nw2 <- simulate(old_nw1, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, output = "final")
   old_nw4 <- simulate(old_nw2, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, output = "final", time.slices = 2)
-  old_nw5 <- simulate(old_nw2, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, output = "final", time.start = 3, time.slices = 2)
+  old_nw5 <- expect_warning(simulate(old_nw2, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, output = "final", time.start = 3, time.slices = 2))
   old_nw6 <- simulate(old_nw5, formation = attr(old_nw5, "formation"), dissolution = attr(old_nw5, "dissolution"), coef.form = attr(old_nw5, "coef.form"), coef.diss = attr(old_nw5, "coef.diss"), output = "final")
 
   old_stats_nw <- simulate(old_nw6, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, time.slices = 10, output = "final", stats.form = TRUE, stats.diss = TRUE, monitor = ~triangle + degree(1))
@@ -189,7 +189,7 @@ test_that("simulate.network behaves reasonably", {
   new_nw1 <- simulate(nw ~ edges + concurrent, coef = c(-3, 0.5), output = "final", dynamic = TRUE)
   new_nw2 <- simulate(new_nw1 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "final", dynamic = TRUE)
   new_nw4 <- simulate(new_nw2 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "final", time.slices = 2, dynamic = TRUE)
-  new_nw5 <- simulate(new_nw2 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "final", time.start = 3, time.slices = 2, dynamic = TRUE)
+  new_nw5 <- expect_warning(simulate(new_nw2 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "final", time.start = 3, time.slices = 2, dynamic = TRUE))
   new_nw6 <- simulate(attr(new_nw5, "formula"), coef = attr(new_nw5, "coef"), output = "final", basis = new_nw5, dynamic = TRUE)
 
   new_stats_nw <- simulate(new_nw6 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "final", time.slices = 10, stats = TRUE, monitor = ~triangle + degree(1), dynamic = TRUE)
@@ -219,7 +219,7 @@ test_that("simulate.networkDynamic behaves reasonably", {
   old_nwD1 <- simulate(nw, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1)
   old_nwD2 <- simulate(old_nwD1, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1)
   old_nwD4 <- simulate(old_nwD2, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, time.slices = 2)
-  old_nwD5 <- simulate(old_nwD2, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, time.start = 3, time.slices = 2)
+  old_nwD5 <- expect_warning(simulate(old_nwD2, formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, time.start = 3, time.slices = 2))
   old_nwD6 <- simulate(old_nwD5, formation = attr(old_nwD5, "formation"), dissolution = attr(old_nwD5, "dissolution"), coef.form = attr(old_nwD5, "coef.form"), coef.diss = attr(old_nwD5, "coef.diss"))
 
   old_nwD7 <- simulate(old_nwD6)
@@ -237,7 +237,7 @@ test_that("simulate.networkDynamic behaves reasonably", {
   new_nwD1 <- simulate(nw ~ edges + concurrent, coef = c(-3, 0.5), dynamic = TRUE)
   new_nwD2 <- simulate(new_nwD1 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), dynamic = TRUE)
   new_nwD4 <- simulate(new_nwD2 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), time.slices = 2, dynamic = TRUE)
-  new_nwD5 <- simulate(new_nwD2 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), time.start = 3, time.slices = 2, dynamic = TRUE)
+  new_nwD5 <- expect_warning(simulate(new_nwD2 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), time.start = 3, time.slices = 2, dynamic = TRUE))
   new_nwD6 <- simulate(attr(new_nwD5, "formula"), coef = attr(new_nwD5, "coef"), basis = new_nwD5, dynamic = TRUE)
 
   new_nwD7 <- simulate(new_nwD6 ~ Form(~edges + concurrent) + Diss(~edges), dynamic = TRUE)
