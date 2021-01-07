@@ -58,13 +58,15 @@ get.dev <- local({
 # time for non-edges that were toggled off at time at.
 network.extract.with.lasttoggle <- function(nwd, at){
   # first obtain all tails, heads, and lasttoggle times <= at in the nwd
-  tails <- unlist(lapply(nwd$mel, "[[", "outl"))
-  heads <- unlist(lapply(nwd$mel, "[[", "inl"))
+  valid_eids <- valid.eids(nwd)
+
+  tails <- unlist(lapply(nwd$mel, "[[", "outl"))[valid_eids]
+  heads <- unlist(lapply(nwd$mel, "[[", "inl"))[valid_eids]
   lts <- unlist(lapply(lapply(lapply(nwd$mel, "[[", "atl"), "[[", 
-                  "active"), function(x) suppressWarnings(max(x[x <= at]))))
+                  "active"), function(x) suppressWarnings(max(x[x <= at]))))[valid_eids]
 
   # which edges are active at time at?
-  active_edges <- is.active(nwd, at = at, e = seq_along(nwd$mel))
+  active_edges <- is.active(nwd, at = at, e = valid_eids)
   
   # which edges have non-default lasttoggle times? (handling NULL case separately)
   has_lasttoggle_time <- NVL2(lts, lts != -Inf, NULL)
@@ -77,7 +79,7 @@ network.extract.with.lasttoggle <- function(nwd, at){
   ltlts <- lts[which_to_keep]
 
   ## now *additionally* get lasttoggle times (of at) for all edges that were toggled off at time at
-  relevant_nonedges <- is.active(nwd, at = at - 1, e = seq_along(nwd$mel)) & !is.active(nwd, at = at, e = seq_along(nwd$mel))
+  relevant_nonedges <- is.active(nwd, at = at - 1, e = valid_eids) & !is.active(nwd, at = at, e = valid_eids)
   
   lttails <- c(lttails, tails[relevant_nonedges])
   ltheads <- c(ltheads, heads[relevant_nonedges])
