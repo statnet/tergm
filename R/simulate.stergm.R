@@ -124,11 +124,9 @@
 #' @param time.start An optional argument specifying the time point at which
 #' the simulation is to start. See Details for further information.
 #' @param time.burnin Number of time steps to discard before starting to
-#' collect network statistics. Actual network will only be returned if
-#' \code{time.burnin==0}.
+#' collect network statistics.
 #' @param time.interval Number of time steps between successive recordings of
-#' network statistics. Actual network will only be returned if
-#' \code{time.interval==1}.
+#' network statistics.
 #' @param time.offset Argument specifying the offset between the point when the
 #' state of the network is sampled (\code{time.start}) and the the beginning of
 #' the spell that should be recorded for the newly simulated network state.
