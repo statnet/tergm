@@ -133,6 +133,20 @@ by assigning:
 \code{"networkDynamic"} (the default), \code{"stats"}, \code{"changes"}, \code{"final"}, and
 \code{"ergm_state"}, with partial matching allowed. See Value section for details.}
 
+\item{nw.start}{A specification for the starting network to be used by
+\code{simulate.tergm}, optional for EGMME fits, but required for CMLE and
+CMPLE fits: \describe{ \item{a numeric index \code{i}}{use \code{i}th time-point's
+network, where the first network in the series used to fit the model is
+defined to be at the first time point;}
+\item{\code{"first"} or \code{"last"}}{the first or last time point used in
+fitting the model; or}
+\item{\code{network}}{specify the network directly.}
+}
+\code{\link{networkDynamic}}s
+cannot be used as starting networks for \code{simulate.tergm} at this time.
+(They can be used as starting networks for \code{simulate_formula.networkDynamic},
+of course.)}
+
 \item{stats}{Logical: Whether to return
 model statistics. This is not the recommended method:
 use \code{monitor} argument instead.}
