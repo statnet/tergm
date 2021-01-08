@@ -95,12 +95,10 @@ defaults), advances the process one time step.}
 the simulation is to start. See Details for further information.}
 
 \item{time.burnin}{Number of time steps to discard before starting to
-collect network statistics. Actual network will only be returned if
-\code{time.burnin==0}.}
+collect network statistics.}
 
 \item{time.interval}{Number of time steps between successive recordings of
-network statistics. Actual network will only be returned if
-\code{time.interval==1}.}
+network statistics.}
 
 \item{time.offset}{Argument specifying the offset between the point when the
 state of the network is sampled (\code{time.start}) and the the beginning of

@@ -89,11 +89,6 @@ separated by \dQuote{+} operators.  Together with the model terms in the
 formula and the reference measure, the constraints define the distribution
 of networks being modeled.
 
-It is also possible to specify a proposal function directly by passing a
-string with the function's name. In that case, arguments to the proposal
-should be specified through the \code{MCMC.prop.args} argument to
-\code{\link{control.simulate.tergm}}.
-
 The default is \code{~.}, for an unconstrained model.
 
 See the \link[=ergm-constraints]{ERGM constraints} documentation for the
@@ -114,37 +109,29 @@ defaults), advances the process one time step.}
 the simulation is to start. See Details for further information.}
 
 \item{time.burnin}{Number of time steps to discard before starting to
-collect network statistics. Actual network will only be returned if
-\code{time.burnin==0}.}
+collect network statistics.}
 
 \item{time.interval}{Number of time steps between successive recordings of
-network statistics. Actual network will only be returned if
-\code{time.interval==1}.}
+network statistics.}
 
 \item{control}{A list of control parameters for algorithm tuning.
 Constructed using \code{\link{control.simulate.tergm}} or
-\code{\link{control.simulate.network.tergm}}.}
+\code{\link{control.simulate.network.tergm}}.  For backwards compatibility,
+control lists from \code{\link{control.simulate.stergm}} and
+\code{\link{control.simulate.network}} are allowed in calls to
+\code{simulate.tergm}; they are mapped to \code{control.simulate.tergm}
+by assigning:
+\itemize{
+\item \code{MCMC.prop.form} to \code{MCMC.prop},
+\item \code{MCMC.prop.args.form} to \code{MCMC.prop.args},
+\item \code{MCMC.prop.weights.form} to \code{MCMC.prop.weights},
+\item \code{MCMC.init.maxedges} to \code{MCMC.maxedges}, and
+\item \code{MCMC.init.maxchanges} to \code{MCMC.maxchanges}.
+}}
 
 \item{output}{A character vector specifying output type: one of
-"networkDynamic" (the default), "stats", and "changes", with partial
-matching allowed. See Value section for details.}
-
-\item{nw.start}{A specification for the starting network to be used by
-\code{simulate.tergm}, optional for EGMME fits, but required for CMLE and
-CMPLE fits: \describe{ \item{a numeric index }{use \code{i}th time-point's
-network, where the first network in the series used to fit the model is
-defined to be at the first time point;}
-\item{\code{i}}{use \code{i}th
-time-point's network, where the first network in the series used to fit the
-model is defined to be at the first time point;}
-\item{\code{"first"} or \code{"last"}}{the first or last time point used in
-fitting the model; or}
-\item{\code{network}}{specify the network directly.}
-}
-\code{\link{networkDynamic}}s
-cannot be used as starting networks for \code{simulate.stergm} at this time.
-(They can be used as starting networks for \code{simulate.networkDynamic},
-of course.)}
+\code{"networkDynamic"} (the default), \code{"stats"}, \code{"changes"}, \code{"final"}, and
+\code{"ergm_state"}, with partial matching allowed. See Value section for details.}
 
 \item{stats}{Logical: Whether to return
 model statistics. This is not the recommended method:
@@ -217,28 +204,19 @@ absent at time point \eqn{4} and present at time point \eqn{5};
 while a row \code{c(5,2,3,0)} indicates that in that time, that
 tie was dissolved, so that it is was present at time point \eqn{4}
 and absent at time point \eqn{5}.
-Additionally, same attributes (\code{\link{attr}}, not network
+Additionally, the same attributes (\code{\link{attr}}, not network
 attributes) as with \code{output=="networkDynamic"} are attached.
 When \code{nsim>1}, a list of these change matrices is returned.}
 \item{"final"}{A \code{\link[network]{network}}
-object representing the last network in the series generated. This
-is not implemented in the method for
-\code{\link[networkDynamic]{networkDynamic}}.
-\code{\link{lasttoggle}} attributes are also included.
-Additionally, attributes (\code{\link{attr}}, not network
-attributes) are attached as follows:
-\describe{
-\item{formula, monitor:}{Model and monitoring formulas used in the simulation, respectively.}
-\item{stats, stats.gen:}{Network statistics as above.}
-\item{coef:}{Coefficients used in the simulation.}
-\item{changes}{A four-column matrix summarizing the changes in the
-\code{"changes"} output. (This may be removed in the future.)}
-}
+object representing the last network in the series generated.
+\code{\link{lasttoggle}} and \code{time} attributes are also included.
+Additionally, the same attributes (\code{\link{attr}}, not network
+attributes) as with \code{output=="networkDynamic"} are attached.
 When \code{nsim>1}, a \code{\link{network.list}} of these
 \code{\link{network}}s is returned.
 }
 \item{"ergm_state"}{The \code{\link[ergm]{ergm_state}} object resulting
-from the simulation.}
+from the simulation.  Attributes are attached as for other output types.}
 Note that when using \code{simulate_formula.networkDynamic} with either
 \code{"final"} or \code{"ergm_state"} for \code{output}, the nodes
 included in these objects are those produced by \code{network.collapse}
