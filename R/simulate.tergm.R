@@ -101,7 +101,6 @@
 #' CMPLE fits: \describe{ \item{a numeric index `i`}{use \code{i}th time-point's
 #' network, where the first network in the series used to fit the model is
 #' defined to be at the first time point;}
-#' model is defined to be at the first time point;}
 #' \item{`"first"` or `"last"`}{the first or last time point used in
 #' fitting the model; or}
 #' \item{`network`}{specify the network directly.}
