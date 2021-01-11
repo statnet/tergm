@@ -24,9 +24,7 @@
 #' \item For a brief demonstration, please see the tergm package vignette:
 #' \code{browseVignettes(package='tergm')} \item A more detailed tutorial is
 #' avalible on the statnet wiki:
-#' \url{http://statnet.csde.washington.edu/workshops/SUNBELT/current/tergm/tergm_tutorial.pdf}
-#' \item For more usage examples, see the wiki page at
-#' \url{https://statnet.csde.washington.edu/trac/wiki/tergmUsage} }
+#' \url{https://statnet.org/Workshops/tergm_tutorial.html} }
 #' 
 #' @param formula an ERGM formula.
 #' @param constraints A one-sided formula specifying one or more constraints on
