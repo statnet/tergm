@@ -92,6 +92,7 @@ We call $g(y)$ the statistics of the model, and $\delta(y_{ij})$ the ``change st
 Fitting an ERGM usually begins with obtaining data:
 
 <<>>=
+set.seed(0) # for reproducibility
 library(ergm)
 options(ergm.term=list(cache.sp=FALSE))
 data("florentine")
