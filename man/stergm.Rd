@@ -18,7 +18,8 @@ stergm(
   eval.loglik = NVL(getOption("tergm.eval.loglik"), getOption("ergm.eval.loglik")),
   control = control.stergm(),
   verbose = FALSE,
-  ...
+  ...,
+  SAN.offsets = NULL
 )
 }
 \arguments{
@@ -38,11 +39,6 @@ similar to the \code{formula} argument. Multiple constraints may be given,
 separated by \dQuote{+} operators.  Together with the model terms in the
 formula and the reference measure, the constraints define the distribution
 of networks being modeled.
-
-It is also possible to specify a proposal function directly by passing a
-string with the function's name. In that case, arguments to the proposal
-should be specified through the \code{prop.args} argument to
-\code{\link{control.ergm}}.
 
 The default is \code{~.}, for an unconstrained model.
 
@@ -67,7 +63,7 @@ observed. Default to \code{c(0,1)} if \code{nw} is a
 \code{1:length(nw)} (all transitions) if \code{nw} is a
 \code{\link{network.list}} or a \code{\link{list}}. Unused for
 EGMME. Note that at this time, the selected time points will be
-treated as temporally adjacent. Irregluarly spaced time series
+treated as temporally adjacent. Irregularly spaced time series
 are not supported at this time.}
 
 \item{offset.coef.form}{Numeric vector to specify offset formation
@@ -80,7 +76,8 @@ parameters.}
 statistics whose moments are used for the EGMME. Unused for CMLE and CMPLE.
 Targets is required for EGMME estimation. It may contain any valid ergm
 terms. If specified as "formation" or "dissolution", it copies the formula
-from the respective model. Any offset terms are removed automatically.}
+from the respective model. Any offset terms are used only during the
+preliminary SAN run; they are removed automatically for the EGMME proper.}
 
 \item{target.stats}{A vector specifying the values of the \code{targets}
 statistics that EGMME will try to match.  Defaults to the statistics of
@@ -99,6 +96,8 @@ Constructed using \code{\link{control.stergm}}.  Remapped to
 print out progress information. Higher values result in more output.}
 
 \item{\dots}{Additional arguments, to be passed to lower-level functions.}
+
+\item{SAN.offsets}{Offset coefficients (if any) to use during the SAN run.}
 }
 \value{
 \code{\link{stergm}} returns an object of class \code{\link{tergm}};
@@ -119,7 +118,7 @@ Generalized Method of Moments Estimator (EGMME) (Krivitsky, 2009).
 details. At this time, only linear ERGM terms are allowed.  \itemize{
 \item For a brief demonstration, please see the tergm package vignette:
 \code{browseVignettes(package='tergm')} \item A more detailed tutorial is
-avalible on the statnet wiki:
+available on the statnet wiki:
 \url{https://statnet.org/Workshops/tergm_tutorial.html} }
 }
 \examples{
