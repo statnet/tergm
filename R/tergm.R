@@ -15,7 +15,7 @@
 
 #' Temporal Exponential-Family Random Graph Models
 #' 
-#' \code{\link{tergm}} is used for finding Temporal ERGMs' (TERGMs) and Separable Temporal ERGMs' (TERGMs)
+#' \code{\link{tergm}} is used for finding Temporal ERGMs' (TERGMs) and Separable Temporal ERGMs' (STERGMs)
 #' Conditional MLE (CMLE) (Krivitsky and Handcock, 2010) and Equilibrium
 #' Generalized Method of Moments Estimator (EGMME) (Krivitsky, 2009).
 #' 
@@ -23,7 +23,7 @@
 #' details. At this time, only linear ERGM terms are allowed.  \itemize{
 #' \item For a brief demonstration, please see the tergm package vignette:
 #' \code{browseVignettes(package='tergm')} \item A more detailed tutorial is
-#' avalible on the statnet wiki:
+#' available on the statnet wiki:
 #' \url{https://statnet.org/Workshops/tergm_tutorial.html} }
 #' 
 #' @param formula an ERGM formula.
@@ -33,11 +33,6 @@
 #' separated by \dQuote{+} operators.  Together with the model terms in the
 #' formula and the reference measure, the constraints define the distribution
 #' of networks being modeled.
-#' 
-#' It is also possible to specify a proposal function directly by passing a
-#' string with the function's name. In that case, arguments to the proposal
-#' should be specified through the \code{prop.args} argument to
-#' \code{\link{control.ergm}}.
 #' 
 #' The default is \code{~.}, for an unconstrained model.
 #' 
@@ -90,6 +85,7 @@
 #' \item{targets}{For EGMME, the targets formula.}
 #' \item{target.stats}{For EGMME, the target statistics.}
 #' \item{estimate}{The type of estimate.}
+#' \item{constraints}{The constraints used.}
 #' \item{opt.history}{For EGMME, a matrix containing the full trace of 
 #' the optimization process: coefficients tried and target statistics simulated.}
 #' \item{sample}{For EGMME, an \code{\link{mcmc}} object containing target
@@ -98,10 +94,14 @@
 #' variance-covariance matrix of the parameter estimates.}
 #' \item{fit}{For CMLE and CMPLE, an \code{\link{ergm}} object from
 #' fitting the model. For EGMME, stripped down \code{\link{ergm}}-like lists.}
-#' \item{network}{For \code{estimate=="EGMME"}, the original network; for \code{estimate=="CMLE"}
+#' \item{network}{For \code{estimate=="EGMME"}, the post-SAN network (or the original
+#' network if SAN is not run); for \code{estimate=="CMLE"}
 #' or \code{estimate=="CMPLE"}, a \code{\link{network.list}} (a discrete series
 #' of networks) to which the model was fit.}
 #' \item{control}{The control parameters used to fit the model.}
+#' 
+#' At this time, the \code{EGMME} \code{tergm} object also carries
+#' some additional fit-related information (this may be changed in the future).
 #' 
 #' See the method \code{\link{print.tergm}} for details on how an
 #' \code{\link{tergm}} object is printed.  Note that the method
