@@ -40,9 +40,8 @@
 #'   using the method specified by
 #'   \code{\link[=control.ergm]{control$init.method}}.
 #' 
-#'   } Passing \code{control.ergm(init=coef(prev.fit))} can be used to
-#'   "resume" an uncoverged \code{\link{tergm}} run, but see
-#'   \code{\link{enformulate.curved}}.
+#'   } Passing coefficients from a previous run can be used to
+#'   "resume" an uncoverged \code{\link{tergm}} run.
 #' @param init.method Estimation method used to acquire initial values
 #'   for estimation. If \code{NULL} (the default), the initial values
 #'   are computed using the edges dissolution approximation (Carnegie
@@ -51,15 +50,8 @@
 #' @param force.main Logical: If TRUE, then force MCMC-based
 #'   estimation method, even if the exact MLE can be computed via
 #'   maximum pseudolikelihood estimation.
-#' @param MCMC.prop.weights Specifies the
-#'   method to allocate probabilities of being proposed to dyads.
-#'   Defaults to \code{"default"},
-#'   which picks a reasonable default for the specified
-#'   constraint. Possible values include \code{"TNT"},
-#'   \code{"random"}, though not all values may be used with all
-#'   possible constraints.
-#' @param MCMC.prop.args An alternative,
-#'   direct way of specifying additional arguments to the proposal.
+#' @param MCMC.prop.weights Specifies the proposal weighting to use.
+#' @param MCMC.prop.args A direct way of specifying arguments to the proposal.
 #' @param MCMC.prop Hints and/or constraints for selecting and initializing the proposal.
 #' @param MCMC.maxedges Maximum number of edges permitted to occur during the simulation.
 #' @param MCMC.maxchanges Maximum number of changes permitted to occur during the simulation.
@@ -67,8 +59,7 @@
 #'   change statistic functions in addition to those
 #'   autodetected. This argument should not be needed outside of very
 #'   strange setups.
-#' @param CMLE.MCMC.burnin Maximum number of Metropolis-Hastings steps
-#'   per time step used in CMLE fitting.
+#' @param CMLE.MCMC.burnin Burnin used in CMLE fitting.
 #' @param CMLE.MCMC.interval Number of Metropolis-Hastings steps
 #'   between successive draws when running MCMC MLE.
 #' @param CMLE.ergm Control parameters used
@@ -86,7 +77,7 @@
 #'   with an error if any transitioned-from networks have missing
 #'   dyads.
 #' @param CMLE.term.check.override The method
-#'   \code{\link{stergm}{stergm}} uses at this time to fit a series of
+#'   \code{\link{tergm}{tergm}} uses at this time to fit a series of
 #'   more than two networks requires certain assumptions to be made
 #'   about the ERGM terms being used, which are tested before a fit is
 #'   attempted. This test sometimes fails despite the model being
@@ -112,9 +103,9 @@
 #'   \code{EGMME.MCMC.burnin.add} times the number of elapsed steps
 #'   had been taken. (Stopping immediately would bias the sampling.)
 #' 
-#'   To use a fixed number of steps, set both
+#'   To use a fixed number of steps, set 
 #'   \code{EGMME.MCMC.burnin.min} and \code{EGMME.MCMC.burnin.max} to
-#'   the desired number of steps.
+#'   the same value.
 #' @param EGMME.MCMC.burnin.pval,EGMME.MCMC.burnin.add Number of
 #'   Metropolis-Hastings steps 
 #'   per time step used in EGMME fitting. By default, this is
@@ -130,9 +121,9 @@
 #'   \code{EGMME.MCMC.burnin.add} times the number of elapsed steps
 #'   had been taken. (Stopping immediately would bias the sampling.)
 #' 
-#'   To use a fixed number of steps, set both
+#'   To use a fixed number of steps, set 
 #'   \code{EGMME.MCMC.burnin.min} and \code{EGMME.MCMC.burnin.max} to
-#'   the desired number of steps.
+#'   the same value.
 #' @param SAN.maxit When \code{target.stats} argument is passed to
 #' [ergm()], the maximum number of attempts to use \code{\link{san}}
 #' to obtain a network with statistics close to those specified.
@@ -150,7 +141,7 @@
 #'   about the fit as it proceeds. If \code{SA.plot.progress==TRUE},
 #'   plot the trajectories of the parameters and target statistics as
 #'   the optimization progresses. If \code{SA.plot.stats==TRUE}, plot
-#'   a heatmap reprsenting correlations of target statistics and a
+#'   a heatmap representing correlations of target statistics and a
 #'   heatmap representing the estimated gradient.
 #' 
 #'   Do NOT use these with non-interactive plotting devices like
