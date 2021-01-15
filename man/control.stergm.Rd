@@ -22,17 +22,17 @@ control.stergm(
   CMLE.MCMC.interval = 1024,
   CMLE.ergm = NULL,
   CMLE.form.ergm = control.ergm(init = init.form, MCMC.burnin = CMLE.MCMC.burnin,
-    MCMC.interval = CMLE.MCMC.interval, MCMC.prop.weights = MCMC.prop.weights.form,
-    MCMC.prop.args = MCMC.prop.args.form, MCMC.maxedges = MCMC.maxedges,
-    MCMC.packagenames = MCMC.packagenames, parallel = parallel, parallel.type =
-    parallel.type, parallel.version.check = parallel.version.check, force.main =
-    force.main),
+    MCMC.interval = CMLE.MCMC.interval, MCMC.prop = MCMC.prop.form, MCMC.prop.weights =
+    MCMC.prop.weights.form, MCMC.prop.args = MCMC.prop.args.form, MCMC.maxedges =
+    MCMC.maxedges, MCMC.packagenames = MCMC.packagenames, parallel = parallel,
+    parallel.type = parallel.type, parallel.version.check = parallel.version.check,
+    force.main = force.main),
   CMLE.diss.ergm = control.ergm(init = init.diss, MCMC.burnin = CMLE.MCMC.burnin,
-    MCMC.interval = CMLE.MCMC.interval, MCMC.prop.weights = MCMC.prop.weights.diss,
-    MCMC.prop.args = MCMC.prop.args.diss, MCMC.maxedges = MCMC.maxedges,
-    MCMC.packagenames = MCMC.packagenames, parallel = parallel, parallel.type =
-    parallel.type, parallel.version.check = parallel.version.check, force.main =
-    force.main),
+    MCMC.interval = CMLE.MCMC.interval, MCMC.prop = MCMC.prop.diss, MCMC.prop.weights =
+    MCMC.prop.weights.diss, MCMC.prop.args = MCMC.prop.args.diss, MCMC.maxedges =
+    MCMC.maxedges, MCMC.packagenames = MCMC.packagenames, parallel = parallel,
+    parallel.type = parallel.type, parallel.version.check = parallel.version.check,
+    force.main = force.main),
   CMLE.NA.impute = c(),
   CMLE.term.check.override = FALSE,
   EGMME.main.method = c("Gradient-Descent"),
@@ -44,11 +44,12 @@ control.stergm(
   MCMC.burnin.mul = NULL,
   SAN.maxit = 4,
   SAN.nsteps.times = 8,
-  SAN = control.san(term.options = term.options, SAN.maxit = SAN.maxit,
-    SAN.prop.weights = MCMC.prop.weights.form, SAN.prop.args = MCMC.prop.args.form,
-    SAN.nsteps = round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max)) *
-    SAN.nsteps.times, SAN.packagenames = MCMC.packagenames, parallel = parallel,
-    parallel.type = parallel.type, parallel.version.check = parallel.version.check),
+  SAN = control.san(term.options = term.options, SAN.maxit = SAN.maxit, SAN.prop =
+    MCMC.prop.form, SAN.prop.weights = MCMC.prop.weights.form, SAN.prop.args =
+    MCMC.prop.args.form, SAN.nsteps = round(sqrt(EGMME.MCMC.burnin.min *
+    EGMME.MCMC.burnin.max)) * SAN.nsteps.times, SAN.packagenames = MCMC.packagenames,
+    parallel = parallel, parallel.type = parallel.type, parallel.version.check =
+    parallel.version.check),
   SA.restarts = 10,
   SA.burnin = 1000,
   SA.plot.progress = FALSE,
@@ -107,7 +108,7 @@ If a numeric vector is given, the elements of the vector are
 interpreted as follows: \itemize{ \item Elements corresponding to
 terms enclosed in \code{offset()} are used as the fixed offset
 coefficients. These should match the offset values given in
-\code{offset.coef.form}.
+\code{offset.coef.form} and \code{offset.coef.diss}.
 
 \item Elements that do not correspond to offset terms and are not
 \code{NA} are used as starting values in the estimation.
@@ -116,9 +117,8 @@ coefficients. These should match the offset values given in
 using the method specified by
 \code{\link[=control.ergm]{control$init.method}}.
 
-} Passing \code{control.ergm(init=coef(prev.fit))} can be used to
-"resume" an uncoverged \code{\link{stergm}} run, but see
-\code{\link{enformulate.curved}}.}
+} Passing coefficients from a previous run can be used to
+"resume" an uncoverged \code{\link{stergm}} run.}
 
 \item{init.method}{Estimation method used to acquire initial values
 for estimation. If \code{NULL} (the default), the initial values
@@ -130,19 +130,13 @@ are set to zeros.}
 estimation method, even if the exact MLE can be computed via
 maximum pseudolikelihood estimation.}
 
-\item{MCMC.prop.form, MCMC.prop.diss}{Hints and/or constraints for selecting and initializing the proposal.}
+\item{MCMC.prop.form}{Hints and/or constraints for selecting and initializing the proposal.}
 
-\item{MCMC.prop.weights.form, MCMC.prop.weights.diss}{Specifies the
-method to allocate probabilities of being proposed to dyads in
-the formation/dissolution phase. Defaults to \code{"default"},
-which picks a reasonable default for the specified
-constraint. Possible values include \code{"TNT"},
-\code{"random"}, though not all values may be used with all
-possible constraints.}
+\item{MCMC.prop.weights.form}{Specifies the proposal weighting to use.}
 
-\item{MCMC.prop.args.form, MCMC.prop.args.diss}{An alternative,
-direct way of specifying additional arguments to the proposal in
-the formation/dissolution phase.}
+\item{MCMC.prop.args.form}{A direct way of specifying arguments to the proposal.}
+
+\item{MCMC.prop.weights.diss, MCMC.prop.args.diss, MCMC.prop.diss}{Ignored.}
 
 \item{MCMC.maxedges}{Maximum number of edges for which to
 allocate space.}
@@ -155,9 +149,7 @@ change statistic functions in addition to those
 autodetected. This argument should not be needed outside of very
 strange setups.}
 
-\item{CMLE.MCMC.burnin}{Maximum number of Metropolis-Hastings steps
-per phase (formation and dissolution) per time step used in CMLE
-fitting.}
+\item{CMLE.MCMC.burnin}{Burnin used in CMLE fitting.}
 
 \item{CMLE.MCMC.interval}{Number of Metropolis-Hastings steps
 between successive draws when running MCMC MLE.}
@@ -166,9 +158,10 @@ between successive draws when running MCMC MLE.}
 \code{CMLE.form.ergm} and \code{CMLE.diss.ergm} at once.
 See \code{\link{control.ergm}}.}
 
-\item{CMLE.form.ergm, CMLE.diss.ergm}{Control parameters used
-to fit the CMLE for the formation/dissolution ERGM.  See
+\item{CMLE.form.ergm}{Control parameters used to fit the CMLE.  See
 \code{\link{control.ergm}}.}
+
+\item{CMLE.diss.ergm}{Ignored.}
 
 \item{CMLE.NA.impute}{In STERGM CMLE, missing dyads in
 transitioned-to networks are accommodated using methods of
@@ -196,12 +189,11 @@ Equilibrium Generalized Method of Moments estimator.  Currently
 only "Gradient-Descent" is implemented.}
 
 \item{EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max, }{Number of
-Metropolis-Hastings steps per phase (formation and dissolution)
+Metropolis-Hastings steps
 per time step used in EGMME fitting. By default, this is
 determined adaptively by keeping track of increments in the
 Hamming distance between the transitioned-from network and the
-network being sampled (formation network or dissolution
-network). Once \code{EGMME.MCMC.burnin.min} steps have elapsed,
+network being sampled. Once \code{EGMME.MCMC.burnin.min} steps have elapsed,
 the increments are tested against 0, and when their average
 number becomes statistically indistinguishable from 0 (with the
 p-value being greater than \code{EGMME.MCMC.burnin.pval}), or
@@ -210,17 +202,16 @@ first, the simulation is stopped after an additional
 \code{EGMME.MCMC.burnin.add} times the number of elapsed steps
 had been taken. (Stopping immediately would bias the sampling.)
 
-To use a fixed number of steps, set both
+To use a fixed number of steps, set
 \code{EGMME.MCMC.burnin.min} and \code{EGMME.MCMC.burnin.max} to
-the desired number of steps.}
+the same value.}
 
 \item{EGMME.MCMC.burnin.pval, EGMME.MCMC.burnin.add}{Number of
-Metropolis-Hastings steps per phase (formation and dissolution)
+Metropolis-Hastings steps
 per time step used in EGMME fitting. By default, this is
 determined adaptively by keeping track of increments in the
 Hamming distance between the transitioned-from network and the
-network being sampled (formation network or dissolution
-network). Once \code{EGMME.MCMC.burnin.min} steps have elapsed,
+network being sampled. Once \code{EGMME.MCMC.burnin.min} steps have elapsed,
 the increments are tested against 0, and when their average
 number becomes statistically indistinguishable from 0 (with the
 p-value being greater than \code{EGMME.MCMC.burnin.pval}), or
@@ -229,9 +220,9 @@ first, the simulation is stopped after an additional
 \code{EGMME.MCMC.burnin.add} times the number of elapsed steps
 had been taken. (Stopping immediately would bias the sampling.)
 
-To use a fixed number of steps, set both
+To use a fixed number of steps, set
 \code{EGMME.MCMC.burnin.min} and \code{EGMME.MCMC.burnin.max} to
-the desired number of steps.}
+the same value.}
 
 \item{MCMC.burnin, MCMC.burnin.mul}{No longer used. See
 \code{EGMME.MCMC.burnin.min}, \code{EGMME.MCMC.burnin.max},
@@ -261,7 +252,7 @@ network before beginning the optimization.}
 about the fit as it proceeds. If \code{SA.plot.progress==TRUE},
 plot the trajectories of the parameters and target statistics as
 the optimization progresses. If \code{SA.plot.stats==TRUE}, plot
-a heatmap reprsenting correlations of target statistics and a
+a heatmap representing correlations of target statistics and a
 heatmap representing the estimated gradient.
 
 Do NOT use these with non-interactive plotting devices like
@@ -449,6 +440,16 @@ Auxiliary function as user interface for fine-tuning 'stergm' fitting.
 \details{
 This function is only used within a call to the \code{\link{stergm}}
 function.  See the \code{usage} section in \code{\link{stergm}} for details.
+Generally speaking, \code{control.stergm} is remapped to \code{control.tergm},
+with dissolution controls ignored and formation controls used as controls
+for the overall \code{tergm} process.  An exception to this rule is the
+\code{init.form} and \code{init.diss} control arguments, both of which
+should be passed if one wishes to specify \code{init} for the \code{tergm}
+by way of \code{control.stergm} (the value of \code{init} being the concatenation
+of \code{init.form} and \code{init.diss}).
+
+It is recommended that new code make use of \code{tergm} and \code{control.tergm}
+directly; \code{stergm} wrappers are included only for backwards compatibility.
 }
 \references{
 \itemize{ \item Boer, P., Huisman, M., Snijders,
@@ -467,7 +468,7 @@ Algorithm for Fitting ERGMs, Penn State Department of Statistics Technical
 Report.  }
 }
 \seealso{
-\code{\link{stergm}}. The
+\code{\link{stergm}},\code{\link{tergm}},\code{\link{control.tergm}}. The
 \code{\link{control.simulate.stergm}} function performs a similar
-function for \code{\link{simulate.stergm}}.
+function for \code{\link{simulate.tergm}}.
 }

@@ -17,10 +17,10 @@ control.tergm(
   CMLE.MCMC.burnin = 1024 * 16,
   CMLE.MCMC.interval = 1024,
   CMLE.ergm = control.ergm(init = init, MCMC.burnin = CMLE.MCMC.burnin, MCMC.interval =
-    CMLE.MCMC.interval, MCMC.prop.weights = MCMC.prop.weights, MCMC.prop.args =
-    MCMC.prop.args, MCMC.maxedges = MCMC.maxedges, MCMC.packagenames = MCMC.packagenames,
-    parallel = parallel, parallel.type = parallel.type, parallel.version.check =
-    parallel.version.check, force.main = force.main),
+    CMLE.MCMC.interval, MCMC.prop = MCMC.prop, MCMC.prop.weights = MCMC.prop.weights,
+    MCMC.prop.args = MCMC.prop.args, MCMC.maxedges = MCMC.maxedges, MCMC.packagenames =
+    MCMC.packagenames, parallel = parallel, parallel.type = parallel.type,
+    parallel.version.check = parallel.version.check, force.main = force.main),
   CMLE.NA.impute = c(),
   CMLE.term.check.override = FALSE,
   EGMME.main.method = c("Gradient-Descent"),
@@ -33,12 +33,12 @@ control.tergm(
   MCMC.burnin.mul = NULL,
   SAN.maxit = 4,
   SAN.nsteps.times = 8,
-  SAN = control.san(term.options = term.options, SAN.maxit = SAN.maxit,
-    SAN.prop.weights = MCMC.prop.weights, SAN.prop.args = MCMC.prop.args, SAN.nsteps =
-    round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max)) * SAN.nsteps.times,
-    SAN.packagenames = MCMC.packagenames, parallel = parallel, parallel.type =
-    parallel.type, parallel.version.check = parallel.version.check, parallel.inherit.MT =
-    parallel.inherit.MT),
+  SAN = control.san(term.options = term.options, SAN.maxit = SAN.maxit, SAN.prop =
+    MCMC.prop, SAN.prop.weights = MCMC.prop.weights, SAN.prop.args = MCMC.prop.args,
+    SAN.nsteps = round(sqrt(EGMME.MCMC.burnin.min * EGMME.MCMC.burnin.max)) *
+    SAN.nsteps.times, SAN.packagenames = MCMC.packagenames, parallel = parallel,
+    parallel.type = parallel.type, parallel.version.check = parallel.version.check,
+    parallel.inherit.MT = parallel.inherit.MT),
   SA.restarts = 10,
   SA.burnin = 1000,
   SA.plot.progress = FALSE,
@@ -106,9 +106,8 @@ coefficients. These should match the offset values given in
 using the method specified by
 \code{\link[=control.ergm]{control$init.method}}.
 
-} Passing \code{control.ergm(init=coef(prev.fit))} can be used to
-"resume" an uncoverged \code{\link{tergm}} run, but see
-\code{\link{enformulate.curved}}.}
+} Passing coefficients from a previous run can be used to
+"resume" an uncoverged \code{\link{tergm}} run.}
 
 \item{init.method}{Estimation method used to acquire initial values
 for estimation. If \code{NULL} (the default), the initial values
@@ -122,16 +121,9 @@ maximum pseudolikelihood estimation.}
 
 \item{MCMC.prop}{Hints and/or constraints for selecting and initializing the proposal.}
 
-\item{MCMC.prop.weights}{Specifies the
-method to allocate probabilities of being proposed to dyads.
-Defaults to \code{"default"},
-which picks a reasonable default for the specified
-constraint. Possible values include \code{"TNT"},
-\code{"random"}, though not all values may be used with all
-possible constraints.}
+\item{MCMC.prop.weights}{Specifies the proposal weighting to use.}
 
-\item{MCMC.prop.args}{An alternative,
-direct way of specifying additional arguments to the proposal.}
+\item{MCMC.prop.args}{A direct way of specifying arguments to the proposal.}
 
 \item{MCMC.maxedges}{Maximum number of edges permitted to occur during the simulation.}
 
@@ -142,8 +134,7 @@ change statistic functions in addition to those
 autodetected. This argument should not be needed outside of very
 strange setups.}
 
-\item{CMLE.MCMC.burnin}{Maximum number of Metropolis-Hastings steps
-per time step used in CMLE fitting.}
+\item{CMLE.MCMC.burnin}{Burnin used in CMLE fitting.}
 
 \item{CMLE.MCMC.interval}{Number of Metropolis-Hastings steps
 between successive draws when running MCMC MLE.}
@@ -165,7 +156,7 @@ with an error if any transitioned-from networks have missing
 dyads.}
 
 \item{CMLE.term.check.override}{The method
-\code{\link{stergm}{stergm}} uses at this time to fit a series of
+\code{\link{tergm}{tergm}} uses at this time to fit a series of
 more than two networks requires certain assumptions to be made
 about the ERGM terms being used, which are tested before a fit is
 attempted. This test sometimes fails despite the model being
@@ -194,9 +185,9 @@ first, the simulation is stopped after an additional
 \code{EGMME.MCMC.burnin.add} times the number of elapsed steps
 had been taken. (Stopping immediately would bias the sampling.)
 
-To use a fixed number of steps, set both
+To use a fixed number of steps, set
 \code{EGMME.MCMC.burnin.min} and \code{EGMME.MCMC.burnin.max} to
-the desired number of steps.}
+the same value.}
 
 \item{EGMME.MCMC.burnin.pval, EGMME.MCMC.burnin.add}{Number of
 Metropolis-Hastings steps
@@ -213,9 +204,9 @@ first, the simulation is stopped after an additional
 \code{EGMME.MCMC.burnin.add} times the number of elapsed steps
 had been taken. (Stopping immediately would bias the sampling.)
 
-To use a fixed number of steps, set both
+To use a fixed number of steps, set
 \code{EGMME.MCMC.burnin.min} and \code{EGMME.MCMC.burnin.max} to
-the desired number of steps.}
+the same value.}
 
 \item{MCMC.burnin, MCMC.burnin.mul}{No longer used. See
 \code{EGMME.MCMC.burnin.min}, \code{EGMME.MCMC.burnin.max},
@@ -245,7 +236,7 @@ network before beginning the optimization.}
 about the fit as it proceeds. If \code{SA.plot.progress==TRUE},
 plot the trajectories of the parameters and target statistics as
 the optimization progresses. If \code{SA.plot.stats==TRUE}, plot
-a heatmap reprsenting correlations of target statistics and a
+a heatmap representing correlations of target statistics and a
 heatmap representing the estimated gradient.
 
 Do NOT use these with non-interactive plotting devices like
