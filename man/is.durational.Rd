@@ -16,7 +16,7 @@ is.durational(object, ...)
 
 \method{is.durational}{ergm_state}(object, ...)
 
-\method{is.durational}{formula}(object, response = NULL, basis = NULL, ...)
+\method{is.durational}{formula}(object, response = NULL, basis = ergm.getnetwork(object), ...)
 }
 \arguments{
 \item{object}{An ERGM formula, \code{\link{ergm_model}} object, or

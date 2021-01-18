@@ -7,20 +7,20 @@
 #
 #  Copyright 2008-2020 Statnet Commons
 #######################################################################
-InitErgmTerm.FormE <- function(nw, arglist, response=NULL,  ...) {
+InitErgmTerm.FormE <- function(nw, arglist,  ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  m <- ergm_model(a$formula, nw, response=response,...)
+  m <- ergm_model(a$formula, nw,...)
 
   c(list(name="on_union_lt_net_Network",
          auxiliaries = ~.union.lt.net + .lasttoggle + .previous.lt.net,
          submodel = m,
          duration=TRUE),
-    wrap.ergm_model(m, nw, response=response, function(x) paste0('Form(',x,')')))
+    wrap.ergm_model(m, nw, function(x) paste0('Form(',x,')')))
 }
 
 InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
@@ -38,20 +38,20 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
 }
 
 
-InitErgmTerm.DissE <- function(nw, arglist, response=NULL,  ...) {
+InitErgmTerm.DissE <- function(nw, arglist,  ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  m <- ergm_model(a$formula, nw, response=response,...)
+  m <- ergm_model(a$formula, nw,...)
 
   c(list(name="on_intersect_lt_net_Network",
          auxiliaries = ~.intersect.lt.net() + .lasttoggle,
          submodel = m,
          duration=TRUE),
-    wrap.ergm_model(m, nw, response=response, function(x) paste0('Diss(',x,')')))
+    wrap.ergm_model(m, nw, function(x) paste0('Diss(',x,')')))
 }
 
 InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {

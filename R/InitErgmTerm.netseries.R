@@ -113,7 +113,7 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
 }
 
 
-InitErgmTerm.Form <- function(nw, arglist, response=NULL,  ...) {
+InitErgmTerm.Form <- function(nw, arglist,  ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula","lm","subset","weights","contrasts","offset","label"),
                       vartypes = c("formula","formula","formula,logical,numeric,expression,call","formula,logical,numeric,expression,call","list","formula,logical,numeric,expression,call","character"),
@@ -121,7 +121,7 @@ InitErgmTerm.Form <- function(nw, arglist, response=NULL,  ...) {
                       required = c(TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE))
 
   if(!is(nw, "combined_networks")) {
-    return(InitErgmTerm.FormE(nw = nw, arglist = a["formula"], response = response, ...))
+    return(InitErgmTerm.FormE(nw = nw, arglist = a["formula"], ...))
   }
 
   f <- a$formula
@@ -131,31 +131,31 @@ InitErgmTerm.Form <- function(nw, arglist, response=NULL,  ...) {
 
   # Just call N() operator.
   term <- as.call(c(list(as.name("N")),a))
-  out <- call.ErgmTerm(term, env=environment(f), nw=nw, response=response, ...)
+  out <- call.ErgmTerm(term, env=environment(f), nw=nw, ...)
   out
   # TODO: Fix coefficient names.
 }
 
 #' @importFrom utils modifyList
 # One formation transition
-InitErgmTerm.Form1 <- function(nw, arglist, response=NULL,  ...){
+InitErgmTerm.Form1 <- function(nw, arglist,  ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  m <- ergm_model(a$formula, nw, response=response,...)
+  m <- ergm_model(a$formula, nw,...)
   
   c(list(name="on_union_net_Network", pkgname="ergm",
          auxiliaries = ~.union.net((nw%n%".PrevNets")[[1]], implementation="Network"),
          submodel = m),
-    modifyList(wrap.ergm_model(m, nw, response, function(x) paste0('Form(',x,')')),
-               list(emptynwstats=summary(m, (nw%n%".PrevNets")[[1]], response=response)))
+    modifyList(wrap.ergm_model(m, nw, function(x) paste0('Form(',x,')')),
+               list(emptynwstats=summary(m, (nw%n%".PrevNets")[[1]])))
     )
 }
 
-InitErgmTerm.Diss <- function(nw, arglist, response=NULL,  ...) {
+InitErgmTerm.Diss <- function(nw, arglist,  ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula","lm","subset","weights","contrasts","offset","label"),
                       vartypes = c("formula","formula","formula,logical,numeric,expression,call","formula,logical,numeric,expression,call","list","formula,logical,numeric,expression,call","character"),
@@ -163,7 +163,7 @@ InitErgmTerm.Diss <- function(nw, arglist, response=NULL,  ...) {
                       required = c(TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE))
 
   if(!is(nw, "combined_networks")) {
-    return(InitErgmTerm.DissE(nw = nw, arglist = a["formula"], response = response, ...))
+    return(InitErgmTerm.DissE(nw = nw, arglist = a["formula"], ...))
   }
 
   f <- a$formula
@@ -173,23 +173,23 @@ InitErgmTerm.Diss <- function(nw, arglist, response=NULL,  ...) {
 
   # Just call N() operator.
   term <- as.call(c(list(as.name("N")),a))
-  out <- call.ErgmTerm(term, env=environment(f), nw=nw, response=response, ...)
+  out <- call.ErgmTerm(term, env=environment(f), nw=nw, ...)
   out
   # TODO: Fix coefficient names.
 }
 
 # One dissolution transition
-InitErgmTerm.Diss1 <- function(nw, arglist, response=NULL,  ...){
+InitErgmTerm.Diss1 <- function(nw, arglist,  ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  m <- ergm_model(a$formula, nw, response=response,...)
+  m <- ergm_model(a$formula, nw,...)
   
   c(list(name="on_intersect_net_Network", pkgname="ergm",
          auxiliaries = ~.intersect.net((nw%n%".PrevNets")[[1]], implementation="Network"),
          submodel = m),
-    wrap.ergm_model(m, nw, response, function(x) paste0('Diss(',x,')')))
+    wrap.ergm_model(m, nw, function(x) paste0('Diss(',x,')')))
 }

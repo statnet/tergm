@@ -50,20 +50,12 @@ is.durational.ergm_state <- function(object, ...){
 #' @rdname is.durational
 #' @param response,basis See [ergm()].
 #' @export
-is.durational.formula<-function(object,response=NULL,basis=NULL,...){
+is.durational.formula<-function(object,response=NULL,basis=ergm.getnetwork(object),...){
   # If basis is not null, replace network in formula by basis.
   # In either case, let nw be network object from formula.
-  if(is.null(nw <- basis)) {
-    nw <- ergm.getnetwork(object)
-  }
   
-  nw <- as.network(nw, populate=FALSE)
-  if(!is.network(nw)){
-    stop("A network object on the LHS of the formula or via",
-         " the 'basis' argument must be given")
-  }
-  
-  m<-ergm_model(object, nw, response=response, ...)
+  nw <- basis
+  ergm_preprocess_response(nw,response)
+  m<-ergm_model(object, nw, ...)
   is.durational(m)
 }
-
