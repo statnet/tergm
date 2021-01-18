@@ -8,7 +8,7 @@
 #  Copyright 2008-2020 Statnet Commons
 #######################################################################
 InitErgmProposal.staticDiscordTNT <- function(arguments, nw, model) {
-  dissolvable <- as.rlebdm(arguments$constraints$discordTNT$nw)
+  dissolvable <- as.rlebdm(arguments$constraints$discord$nw)
   formable <- !dissolvable
   dissolvable <- ergm_dyadgen_select(arguments, nw, dissolvable)
   formable <- ergm_dyadgen_select(arguments, nw, formable)

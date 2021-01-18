@@ -107,7 +107,7 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
   nw <- Networks(nwl)
   # Add previous networks combined.
   .PrevNet <- Networks(nwl0)
-  nw %ergmlhs% "constraints" <- nonsimp_update.formula(nw%ergmlhs%"constraints", .~.+discordTNT(.PrevNet), from.new=".PrevNet")
+  nw %ergmlhs% "constraints" <- nonsimp_update.formula(nw%ergmlhs%"constraints", .~.+discord(.PrevNet), from.new=".PrevNet")
 
   nw
 }

@@ -7,16 +7,10 @@
 #
 #  Copyright 2008-2020 Statnet Commons
 #######################################################################
-InitErgmConstraint.discordTNT<-function(lhs.nw, ref, ...){
+InitErgmConstraint.discord <- function(lhs.nw, ref=NULL, ...){
   nw <- if(is.character(ref)) lhs.nw %n% ref else lhs.nw
 
-  if(length(list(...)))
-     ergm_Init_abort(paste("discordTNT hint only takes one arguments at this time."))
+  if(...length())
+     ergm_Init_abort(paste("discord hint takes at most one arguments at this time."))
    list(dependence = FALSE, priority=10, nw=nw)
-}
-  
-InitErgmConstraint.discord <- function(lhs.nw, ...) {
-   if(length(list(...)))
-     ergm_Init_abort(paste("discord hint does not take arguments at this time."))
-   list(dependence = FALSE, priority=10)
 }
