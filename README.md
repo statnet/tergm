@@ -1,6 +1,5 @@
 # `tergm`: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 
-[![Build Status](https://travis-ci.org/statnet/tergm.svg?branch=master)](https://travis-ci.org/statnet/tergm)
 [![rstudio mirror downloads](https://cranlogs.r-pkg.org/badges/tergm?color=2ED968)](https://cranlogs.r-pkg.org/)
 [![cran version](https://www.r-pkg.org/badges/version/tergm)](https://cran.r-project.org/package=tergm)
 [![R build status](https://github.com/statnet/tergm/workflows/R-CMD-check/badge.svg)](https://github.com/statnet/tergm/actions)
