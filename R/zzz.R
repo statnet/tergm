@@ -19,7 +19,7 @@
 }
 
 .RegisterProposals <- function(){
-  ergm_proposal_table("c", "Bernoulli", "|.dyads|TNT&discordTNT",  1, "discordTNT", "staticDiscordTNT")
+  ergm_proposal_table("c", "Bernoulli", "|.dyads|TNT&discord",  1, "discordTNT", "staticDiscordTNT")
   ergm_proposal_table("t", "Bernoulli", "|discord&TNT",  1, "discordTNT", "discordTNT")
   ergm_proposal_table("t", "Bernoulli", "|Strat|discord&TNT",  0, "discordStratTNT", "discordStratTNT")
   ergm_proposal_table("t", "Bernoulli", "|BD|discord&TNT",  0, "discordBDTNT", "discordBDTNT")
