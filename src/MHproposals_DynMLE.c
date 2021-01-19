@@ -19,6 +19,8 @@ MH_I_FN(Mi_staticDiscordTNT){
   ALLOC_STORAGE(2, DyadGen *, storage);
   storage[0] = DyadGenInitializeR(getListElement(MHp->R, "formable"), nwp, TRUE);
   storage[1] = DyadGenInitializeR(getListElement(MHp->R, "dissolvable"), nwp, TRUE);
+
+  if(storage[0]->ndyads==0 && storage[1]->ndyads==0) error("At least one of the dyad sets has to have toggleable dyads.");
 }
 
 
@@ -28,7 +30,7 @@ MH_P_FN(MH_staticDiscordTNT) {
 
   DyadGen *activegen, *inactivegen;
 
-  if(unif_rand() < MH_INPUTS[0]){ // Propose from the formables.
+  if(storage[1]->ndyads==0 || (storage[0]->ndyads!=0 && unif_rand()<MH_INPUTS[0])){ // Propose from the formables.
     activegen = storage[0];
     inactivegen = storage[1];
   }else{ // Propose from the dissolvables.
