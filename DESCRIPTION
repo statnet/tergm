@@ -1,6 +1,6 @@
 Package: tergm
-Version: 4.0.0-2141
-Date: 2021-01-19
+Version: 4.0.0-2142
+Date: 2021-01-22
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
 	person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="pavel@statnet.org", comment=c(ORCID="0000-0002-9101-3362")),
@@ -63,19 +63,15 @@ Collate:
     'control.simulate.tergm.R'
     'control.stergm.R'
     'control.tergm.R'
-    'gof.tergm.R'
     'impute.network.list.R'
     'is.durational.R'
     'is.lasttoggle.R'
-    'mcmc.diagnostics.tergm.R'
-    'print.tergm.R'
     'simulate.stergm.R'
     'simulate.tergm.R'
     'stergm.R'
     'tergm-deprecated.R'
     'stergm.utils.R'
     'summary.statistics.networkDynamic.R'
-    'summary.tergm.R'
     'tergm.CMLE.R'
     'tergm.EGMME.GD.R'
     'tergm.EGMME.R'

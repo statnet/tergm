@@ -276,7 +276,7 @@
 #'   statistics at the final estimate and compute the covariance
 #'   matrix (and hence standard errors) of the parameters. This sample
 #'   is stored and can also be used by
-#'   \code{\link{mcmc.diagnostics.tergm}} to assess convergence.
+#'   [mcmc.diagnostics()] to assess convergence.
 #' @param SA.phase3.samplesize.runs This many optimization runs will
 #'   be used to determine whether the optimization has converged and
 #'   to estimate the standard errors.

@@ -42,6 +42,7 @@
 #' # at discrete time points
 #' summary(my.nD~isolates+edges, at=1:10)
 #' @importFrom ergm summary_formula
+#' @importFrom utils getS3method
 #' @export
 summary_formula.networkDynamic <- function(object, at,..., basis=NULL){
   if (missing(at) || !is.numeric(at)){

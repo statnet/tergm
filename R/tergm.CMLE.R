@@ -23,9 +23,6 @@ tergm.CMLE <- function(formula, times, ...,
   formula <- nonsimp_update.formula(formula, NetSeries~., from.new="NetSeries")
   
   fit <- ergm(formula, ..., control=control$CMLE.ergm)
-
-  # TODO: Figure out what additional information to attach.
-  list(formula = formula,
-       coef = fit$coef,
-       fit=fit)
+  class(fit) <- c("tergm_CMLE", "tergm", class(fit))
+  fit
 }

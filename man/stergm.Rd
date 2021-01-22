@@ -101,12 +101,7 @@ print out progress information. Higher values result in more output.}
 }
 \value{
 \code{\link{stergm}} returns an object of class \code{\link{tergm}};
-see \code{\link{tergm}} for details.
-
-See the method \code{\link{print.tergm}} for details on how an
-\code{\link{tergm}} object is printed.  Note that the method
-\code{\link{summary.tergm}} returns a summary of the relevant parts of the
-\code{\link{tergm}} object in concise summary format.
+see \code{\link[=tergm]{tergm()}} for details and methods.
 }
 \description{
 \code{\link{stergm}} is used for finding Separable Temporal ERGMs' (STERGMs)

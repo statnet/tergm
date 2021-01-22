@@ -254,16 +254,17 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
 
   control <- set.control.class("control.simulate.network.tergm")
 
+  nw <- object$network
   if(is.null(nw.start)){
-    if(is.network(object$network)) nw.start <- object$network
+    if(is.network(object$network)) nw.start <- nw
     else stop('Simulating from TERGM CMLE fit requires the starting network to be specified in the nw.start argument: "first", "last", a numeric index of the network in the series (with "first"==1), or a network (NOT networkDynamic at this time).')
   }else if(is.numeric(nw.start)){
-    nwl <- uncombine_network(eval_lhs.formula(object$formula))
+    nwl <- uncombine_network(nw)
     if(nw.start == 1) nw.start <- (nwl[[1]] %n% ".PrevNets")[[1]]
     else nw.start <- nwl[[nw.start - 1]]
     if(!is.network(nw.start)) stop("Invalid starting network specification.")
   }else if(is.character(nw.start)){
-    nwl <- uncombine_network(eval_lhs.formula(object$formula))
+    nwl <- uncombine_network(nw)
     nw.start <- switch(nw.start,
                        first = (nwl[[1]] %n% ".PrevNets")[[1]],
                        last = nwl[[length(nwl)]],
@@ -272,7 +273,7 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
   }else if(is.networkDynamic(nw.start)){
     stop("Using a networkDynamic to start a simulation from a TERGM is not supported at this time.")
   }
-    
+
   simulate_formula.network(object=object$formula, basis=nw.start,nsim=nsim,coef=coef, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, output=match.arg(output), stats=stats, verbose=verbose, dynamic=TRUE, ...)
 }
 

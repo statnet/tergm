@@ -133,33 +133,22 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
                  stop("Method ", control$EGMME.main.method, " is not implemented.")
                 )
 
-  out <- list(network = nw,
-              formula = formula,
-              coef = Cout$eta,              
-              targets = targets, 
-              target.stats=model.mon$target.stats, 
-              estimate=estimate, 
-              covar = Cout$covar, 
-              opt.history=Cout$opt.history, 
-              sample=Cout$sample, 
-              sample.obs=NULL, 
-              control=control, 
-              reference = ~Bernoulli, 
-              mc.se = Cout$mc.se, 
-              constraints = constraints,
-              fit = with(Cout, list(network=nw, 
-                                    formula=formula, 
-                                    coef = eta, 
-                                    covar=covar, 
-                                    etamap = model$etamap, 
-                                    offset = model$etamap$offsettheta, 
-                                    constraints=constraints, 
-                                    estimate=estimate, 
-                                    control=control, 
-                                    reference = ~Bernoulli, 
-                                    mc.se = mc.se, 
-                                    ergm_version = packageVersion("ergm"))))
-  class(out$fit)<-"ergm"
-  
+#' @importFrom utils getS3method
+  out <- c(Cout,
+           list(network = nw,
+                coef = Cout$eta,
+                targets = targets,
+                target.stats=model.mon$target.stats,
+                estimate=estimate,
+                sample.obs=NULL,
+                control=control,
+                reference = ~Bernoulli,
+                constraints = constraints,
+                etamap = model$etamap,
+                offset = model$etamap$offsettheta,
+                mle.lik = NA,
+                ergm_version = packageVersion("ergm")))
+
+  class(out) <- c("tergm_EGMME", "tergm", "ergm")
   out
 }

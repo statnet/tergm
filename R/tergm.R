@@ -78,35 +78,12 @@
 #' @param verbose logical or integer; if TRUE or positive, the program will
 #' print out progress information. Higher values result in more output.
 #' @param \dots Additional arguments, to be passed to lower-level functions.
-#' @return \code{\link{tergm}} returns an object of class \code{\link{tergm}}
-#' that is a list consisting of the following elements:
-#' \item{formula}{The model formula.}
-#' \item{coef}{The fitted model coefficients.}
-#' \item{targets}{For EGMME, the targets formula.}
-#' \item{target.stats}{For EGMME, the target statistics.}
-#' \item{estimate}{The type of estimate.}
-#' \item{constraints}{The constraints used.}
-#' \item{opt.history}{For EGMME, a matrix containing the full trace of 
-#' the optimization process: coefficients tried and target statistics simulated.}
-#' \item{sample}{For EGMME, an \code{\link{mcmc}} object containing target
-#' statistics sampled at the estimate.}
-#' \item{covar}{For EGMME, the full estimated
-#' variance-covariance matrix of the parameter estimates.}
-#' \item{fit}{For CMLE and CMPLE, an \code{\link{ergm}} object from
-#' fitting the model. For EGMME, stripped down \code{\link{ergm}}-like lists.}
-#' \item{network}{For \code{estimate=="EGMME"}, the post-SAN network (or the original
-#' network if SAN is not run); for \code{estimate=="CMLE"}
-#' or \code{estimate=="CMPLE"}, a \code{\link{network.list}} (a discrete series
-#' of networks) to which the model was fit.}
-#' \item{control}{The control parameters used to fit the model.}
-#' 
-#' At this time, the \code{EGMME} \code{tergm} object also carries
-#' some additional fit-related information (this may be changed in the future).
-#' 
-#' See the method \code{\link{print.tergm}} for details on how an
-#' \code{\link{tergm}} object is printed.  Note that the method
-#' \code{\link{summary.tergm}} returns a summary of the relevant parts of the
-#' \code{\link{tergm}} object in concise summary format.
+#'
+#' @return \code{\link{tergm}} returns an object of class `tergm` that
+#'   inherits from `ergm` and has the usual methods ([coef.ergm()],
+#'   [summary.ergm()], [mcmc.diagnostics()], etc.) implemented for
+#'   it. Note that [gof()] only works for the CMLE method.
+#'
 #' @seealso ergm, network, \%v\%, \%n\%, \code{\link{ergm-terms}}
 #' @references \itemize{
 #'
@@ -145,10 +122,20 @@
 #'                   Form(~edges+mutual+transitiveties+cyclicalties)+
 #'                   Diss(~edges+mutual+transitiveties+cyclicalties),
 #'                   estimate="CMLE")
-#' 
+#'
 #' mcmc.diagnostics(samplk12)
 #' summary(samplk12)
-#' 
+#'
+#' samplk12.gof <- gof(samplk12)
+#'
+#' samplk12.gof
+#'
+#' summary(samplk12.gof)
+#'
+#' plot(samplk12.gof)
+#'
+#' plot(samplk12.gof, plotlogodds=TRUE)
+#'
 #' # Fit a transition from Time 1 to Time 2 and from Time 2 to Time 3 jointly
 #' samplk123 <- tergm(list(samplk1, samplk2, samplk3)~
 #'                    Form(~edges+mutual+transitiveties+cyclicalties)+
@@ -160,6 +147,7 @@
 #' }
 #' @import network
 #' @import networkDynamic
+#' @importFrom utils packageVersion
 #' @export
 tergm <- function(formula, constraints = ~., estimate, times=NULL, offset.coef=NULL,
                    targets=NULL, target.stats=NULL, SAN.offsets = NULL,
@@ -167,7 +155,9 @@ tergm <- function(formula, constraints = ~., estimate, times=NULL, offset.coef=N
                    control=control.tergm(),
                    verbose=FALSE, ...) {
   check.control.class("tergm", "tergm")
-  
+
+  tergm_call <- match.call(ergm)
+
   if(!is.null(control$seed))  set.seed(as.integer(control$seed))
 
   estimate <- match.arg(estimate,c("CMLE","CMPLE","EGMME"))
@@ -182,11 +172,36 @@ tergm <- function(formula, constraints = ~., estimate, times=NULL, offset.coef=N
                   offset.coef,
                   targets, target.stats, SAN.offsets, estimate, control, verbose)
                 )
-  
+
+  out$call <- tergm_call
+  out$formula <- formula
   out$estimate <- estimate
+  out$estimate.desc <- switch(estimate,
+                              CMPLE = if(out$MPLE_is_MLE) "Conditional Maximum Likelihood"
+                                     else "Conditional Maximum Pseudolikelihood",
+                              CMLE = paste(switch(control$CMLE.ergm$main.method,
+                                                  MCMLE = "Monte Carlo",
+                                                  `Stochastic-Approximation`="Stochastic Approximation",
+                                             `Robbins-Monro`="Robbins-Monro",
+                                             `Stepping`="Hummel Stepping"),
+                                           "Conditional Maximum Likelihood"),
+                              EGMME = switch(control$EGMME.main.method,
+                                             `Gradient-Descent`="Gradient Descent Equilibrium Generalized Method of Moments Results"))
   out$control <- control
   out$constraints <- constraints
-  
-  class(out)<-c("tergm","ergm")
+  out$tergm_version <- packageVersion("tergm")
+
   out
 }
+
+# Trivial functions taking care of the differences between EGMME and MLE-based methods.
+
+#' @noRd
+#' @export
+gof.tergm_EGMME <- function (object, ...)
+  stop("Goodness of fit for TERGM EGMME is not implemented at this time.")
+
+#' @noRd
+#' @importFrom ergm mcmc.diagnostics
+#' @export
+mcmc.diagnostics.tergm_EGMME <- function(object, ...) NextMethod("mcmc.diagnostics", object, esteq=FALSE, ...)

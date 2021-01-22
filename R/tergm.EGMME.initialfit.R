@@ -84,6 +84,6 @@ tergm.EGMME.initialfit<-function(init, nw, model, formula, model.mon, formula.mo
     }
   }
   out <- list(formula=formula, coef = init, targets = formula.mon, target.stats=model.mon$target.stats, nw = nw, control = control, fit = list(coef=init, etamap = model$etamap))
-  class(out)<-"tergm"
+  class(out) <- c("tergm_EGMME", "tergm", "ergm")
   out
 }
