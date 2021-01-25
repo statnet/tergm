@@ -44,7 +44,7 @@ test_that("discordStratTNT behaves reasonably", {
                        dynamic = TRUE,
                        output = "final",
                        control = control)
-    summ_stats <- summary(nw_sim ~ nodemix("vattr"))
+    summ_stats <- summary(nw_sim ~ nodemix("vattr", levels2=TRUE))
     expect_true(summ_stats["mix.vattr.A.A"] == 0)
     expect_true(summ_stats["mix.vattr.B.B"] == 0)
     expect_true(summ_stats["mix.vattr.A.B"] > 0)
@@ -81,7 +81,7 @@ test_that("discordBDTNT behaves reasonably", {
                          dynamic = TRUE,
                          output = "final",
                          control = control)
-      summ_stats <- summary(nw_sim ~ nodemix("vattr") + degrange(deg_bound + 1))
+      summ_stats <- summary(nw_sim ~ nodemix("vattr", levels2=TRUE) + degrange(deg_bound + 1))
       expect_true(summ_stats[paste0("deg", deg_bound + 1, "+")] == 0)
       expect_true(summ_stats["mix.vattr.A.A"] == 0)
       expect_true(summ_stats["mix.vattr.B.B"] == 0)
@@ -125,7 +125,7 @@ test_that("discordBDStratTNT behaves reasonably", {
                          dynamic = TRUE,
                          output = "final",
                          control = control)
-      summ_stats <- summary(nw_sim ~ nodemix("vattr") + nodemix("sex") + degrange(deg_bound + 1))
+      summ_stats <- summary(nw_sim ~ nodemix("vattr", levels2=TRUE) + nodemix("sex", levels2=TRUE) + degrange(deg_bound + 1))
       expect_true(summ_stats["mix.vattr.A.A"] == 0)
       expect_true(summ_stats["mix.vattr.B.B"] == 0)
       expect_true(summ_stats["mix.vattr.A.B"] > 0)
@@ -191,8 +191,8 @@ test_that("discordBDStratTNT behaves reasonably", {
                       output = "final",
                       control = control)
   
-  expect_true(summary(out_one ~ nodemix("sex"))["mix.sex.F.M"] == 100L)
-  expect_true(summary(out_one ~ nodemix("uncommon"))["mix.uncommon.A.B"] == 100L)
+  expect_true(summary(out_one ~ nodemix("sex", levels2=TRUE))["mix.sex.F.M"] == 100L)
+  expect_true(summary(out_one ~ nodemix("uncommon", levels2=TRUE))["mix.uncommon.A.B"] == 100L)
   expect_true(network.edgecount(out_one) == 100L)
   
   control$MCMC.prop.args$bound <- 2
@@ -203,8 +203,8 @@ test_that("discordBDStratTNT behaves reasonably", {
                       output = "final",
                       control = control)
   
-  expect_true(summary(out_two ~ nodemix("sex"))["mix.sex.F.M"] == network.edgecount(out_two))
-  expect_true(summary(out_two ~ nodemix("uncommon"))["mix.uncommon.A.B"] == network.edgecount(out_two))
+  expect_true(summary(out_two ~ nodemix("sex", levels2=TRUE))["mix.sex.F.M"] == network.edgecount(out_two))
+  expect_true(summary(out_two ~ nodemix("uncommon", levels2=TRUE))["mix.uncommon.A.B"] == network.edgecount(out_two))
   expect_true(19 <= network.edgecount(out_two) && network.edgecount(out_two) <= 20L)
   
   ## now allow ties to O but continue to give them zero proposal weight
@@ -219,8 +219,8 @@ test_that("discordBDStratTNT behaves reasonably", {
                         output = "final",
                         control = control)
   
-  expect_true(summary(out_three ~ nodemix("sex"))["mix.sex.F.M"] == network.edgecount(out_three))
-  expect_true(summary(out_three ~ nodemix("uncommon"))["mix.uncommon.A.B"] == network.edgecount(out_three))
+  expect_true(summary(out_three ~ nodemix("sex", levels2=TRUE))["mix.sex.F.M"] == network.edgecount(out_three))
+  expect_true(summary(out_three ~ nodemix("uncommon", levels2=TRUE))["mix.uncommon.A.B"] == network.edgecount(out_three))
   expect_true(19 <= network.edgecount(out_three) && network.edgecount(out_three) <= 20L)
 
   ## now allow M-M ties and remove degree bound
@@ -236,10 +236,10 @@ test_that("discordBDStratTNT behaves reasonably", {
                        output = "final",
                        control = control)
   
-  expect_true(summary(out_four ~ nodemix("sex"))["mix.sex.F.M"] == 100L)
-  expect_true(summary(out_four ~ nodemix("uncommon"))["mix.uncommon.A.B"] == 100L)
-  expect_true(summary(out_four ~ nodemix("sex"))["mix.sex.M.M"] == 100L)
-  expect_true(summary(out_four ~ nodemix("uncommon"))["mix.uncommon.A.C"] == 100L)
+  expect_true(summary(out_four ~ nodemix("sex", levels2=TRUE))["mix.sex.F.M"] == 100L)
+  expect_true(summary(out_four ~ nodemix("uncommon", levels2=TRUE))["mix.uncommon.A.B"] == 100L)
+  expect_true(summary(out_four ~ nodemix("sex", levels2=TRUE))["mix.sex.M.M"] == 100L)
+  expect_true(summary(out_four ~ nodemix("uncommon", levels2=TRUE))["mix.uncommon.A.C"] == 100L)
   expect_true(network.edgecount(out_four) == 200L)  
 
   ## now to test both initialization code and edge-removal code, start at the empty network and go up and down in 
@@ -264,7 +264,7 @@ test_that("discordBDStratTNT behaves reasonably", {
                        control = control)
 
 ## A-B (M-F) and C-C (M-M) are only ties we should see
-  expect_true(sum(summary(out_five ~ nodemix("uncommon"))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_five))  
+  expect_true(sum(summary(out_five ~ nodemix("uncommon", levels2=TRUE))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_five))  
   expect_true(network.edgecount(out_five) == 15L)  
 
 
@@ -274,7 +274,7 @@ test_that("discordBDStratTNT behaves reasonably", {
                       output = "final",
                       control = control)
 
-  expect_true(sum(summary(out_six ~ nodemix("uncommon"))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_six))  
+  expect_true(sum(summary(out_six ~ nodemix("uncommon", levels2=TRUE))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_six))  
   
   out_seven <- simulate(out_six ~ edges, 
                         coef = c(0), 
@@ -282,7 +282,7 @@ test_that("discordBDStratTNT behaves reasonably", {
                         output = "final",
                         control = control)
 
-  expect_true(sum(summary(out_seven ~ nodemix("uncommon"))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_seven))  
+  expect_true(sum(summary(out_seven ~ nodemix("uncommon", levels2=TRUE))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_seven))  
 
   out_eight <- simulate(out_seven ~ edges, 
                         coef = c(12), 
@@ -290,7 +290,7 @@ test_that("discordBDStratTNT behaves reasonably", {
                         output = "final",
                         control = control)
 
-  expect_true(sum(summary(out_eight ~ nodemix("uncommon"))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_eight))  
+  expect_true(sum(summary(out_eight ~ nodemix("uncommon", levels2=TRUE))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_eight))  
 
   out_nine <- simulate(out_eight ~ edges, 
                        coef = c(0.5), 
@@ -298,7 +298,7 @@ test_that("discordBDStratTNT behaves reasonably", {
                        output = "final",
                        control = control)
 
-  expect_true(sum(summary(out_nine ~ nodemix("uncommon"))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_nine))  
+  expect_true(sum(summary(out_nine ~ nodemix("uncommon", levels2=TRUE))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_nine))  
 
   out_ten <- simulate(out_nine ~ edges, 
                       coef = c(2000), 
@@ -306,7 +306,7 @@ test_that("discordBDStratTNT behaves reasonably", {
                       output = "final",
                       control = control)
 
-  expect_true(sum(summary(out_ten ~ nodemix("uncommon"))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_ten))  
+  expect_true(sum(summary(out_ten ~ nodemix("uncommon", levels2=TRUE))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_ten))  
   expect_true(network.edgecount(out_ten) == 15L)  
 
   out_eleven <- simulate(out_ten ~ edges, 
