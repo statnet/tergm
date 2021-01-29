@@ -31,19 +31,15 @@ test_that("discordStratTNT behaves reasonably", {
   
   pmat <- 1 - matrix(c(1,0,0,0,1,0,0,0,0),3,3)
     
-  control <- control.simulate.network.tergm(MCMC.prop.weights = "discordStratTNT", 
-                                            MCMC.prop.args = list(attr = "vattr",
-                                                                  pmat = pmat))
-  
   nw_sim <- nw
   
   for(i in 1:5) {
     nw_sim <- simulate(nw_sim ~ edges, 
                        coef = c(-3), 
                        time.slices = 5,
+                       constraints = ~Strat(attr = "vattr", pmat = pmat),
                        dynamic = TRUE,
-                       output = "final",
-                       control = control)
+                       output = "final")
     summ_stats <- summary(nw_sim ~ nodemix("vattr", levels2=TRUE))
     expect_true(summ_stats["mix.vattr.A.A"] == 0)
     expect_true(summ_stats["mix.vattr.B.B"] == 0)
@@ -66,21 +62,16 @@ test_that("discordBDTNT behaves reasonably", {
     nw %v% "vattr" <- vattr
     
     fmat <- matrix(c(1,0,0,0,1,0,0,0,0),3,3)
-      
-    control <- control.simulate.network.tergm(MCMC.prop.weights = "discordBDTNT", 
-                                              MCMC.prop.args = list(bound = deg_bound,
-                                                                    attr = "vattr",
-                                                                    fmat = fmat))
-    
+        
     nw_sim <- nw
     
     for(i in 1:5) {
       nw_sim <- simulate(nw_sim ~ edges, 
                          coef = c(0),
                          time.slices = 5,                       
+                         constraints = ~bd(maxout = deg_bound) + blocks(attr = "vattr", fmat = fmat),
                          dynamic = TRUE,
-                         output = "final",
-                         control = control)
+                         output = "final")
       summ_stats <- summary(nw_sim ~ nodemix("vattr", levels2=TRUE) + degrange(deg_bound + 1))
       expect_true(summ_stats[paste0("deg", deg_bound + 1, "+")] == 0)
       expect_true(summ_stats["mix.vattr.A.A"] == 0)
@@ -108,23 +99,16 @@ test_that("discordBDStratTNT behaves reasonably", {
     
     fmat <- matrix(c(1,0,1,0,0,0,1,0,0),3,3)
     pmat <- 1 - matrix(c(1,0,0,0,1,0,0,0,0),3,3)
-      
-    control <- control.simulate.network.tergm(MCMC.prop.weights = "discordBDStratTNT", 
-                                              MCMC.prop.args = list(bound = deg_bound, 
-                                                                    BD_attr = "sex",
-                                                                    fmat = fmat,
-                                                                    Strat_attr = "vattr",
-                                                                    pmat = pmat))
-    
+        
     nw_sim <- nw
     
     for(i in 1:5) {
       nw_sim <- simulate(nw_sim ~ edges, 
                          coef = c(0), 
                          time.slices = 5,
+                         constraints = ~bd(maxout = deg_bound) + blocks(attr = "sex", fmat = fmat) + Strat(attr = "vattr", pmat = pmat),
                          dynamic = TRUE,
-                         output = "final",
-                         control = control)
+                         output = "final")
       summ_stats <- summary(nw_sim ~ nodemix("vattr", levels2=TRUE) + nodemix("sex", levels2=TRUE) + degrange(deg_bound + 1))
       expect_true(summ_stats["mix.vattr.A.A"] == 0)
       expect_true(summ_stats["mix.vattr.B.B"] == 0)
@@ -187,21 +171,19 @@ test_that("discordBDStratTNT behaves reasonably", {
   
   out_one <- simulate(nw ~ edges, 
                       coef = c(2000), 
+                      constraints = ~blocks(attr = "sex", fmat = fmat) + Strat(attr = "uncommon", pmat = pmat),
                       dynamic = TRUE,
-                      output = "final",
-                      control = control)
+                      output = "final")
   
   expect_true(summary(out_one ~ nodemix("sex", levels2=TRUE))["mix.sex.F.M"] == 100L)
   expect_true(summary(out_one ~ nodemix("uncommon", levels2=TRUE))["mix.uncommon.A.B"] == 100L)
   expect_true(network.edgecount(out_one) == 100L)
   
-  control$MCMC.prop.args$bound <- 2
-
   out_two <- simulate(nw ~ edges, 
                       coef = c(2000), 
+                      constraints = ~bd(maxout = 2) + blocks(attr = "sex", fmat = fmat) + Strat(attr = "uncommon", pmat = pmat),
                       dynamic = TRUE,
-                      output = "final",
-                      control = control)
+                      output = "final")
   
   expect_true(summary(out_two ~ nodemix("sex", levels2=TRUE))["mix.sex.F.M"] == network.edgecount(out_two))
   expect_true(summary(out_two ~ nodemix("uncommon", levels2=TRUE))["mix.uncommon.A.B"] == network.edgecount(out_two))
@@ -211,13 +193,11 @@ test_that("discordBDStratTNT behaves reasonably", {
   fmat["O",] <- 0
   fmat[,"O"] <- 0
 
-  control$MCMC.prop.args$fmat <- fmat
-
   out_three <- simulate(nw ~ edges, 
                         coef = c(2000), 
+                        constraints = ~bd(maxout = 2) + blocks(attr = "sex", fmat = fmat) + Strat(attr = "uncommon", pmat = pmat),
                         dynamic = TRUE,
-                        output = "final",
-                        control = control)
+                        output = "final")
   
   expect_true(summary(out_three ~ nodemix("sex", levels2=TRUE))["mix.sex.F.M"] == network.edgecount(out_three))
   expect_true(summary(out_three ~ nodemix("uncommon", levels2=TRUE))["mix.uncommon.A.B"] == network.edgecount(out_three))
@@ -227,14 +207,11 @@ test_that("discordBDStratTNT behaves reasonably", {
   
   fmat["M","M"] <- 0
   
-  control$MCMC.prop.args$bound <- NULL
-  control$MCMC.prop.args$fmat <- fmat
-  
   out_four <- simulate(nw ~ edges, 
                        coef = c(2000), 
+                       constraints = ~blocks(attr = "sex", fmat = fmat) + Strat(attr = "uncommon", pmat = pmat),
                        dynamic = TRUE,
-                       output = "final",
-                       control = control)
+                       output = "final")
   
   expect_true(summary(out_four ~ nodemix("sex", levels2=TRUE))["mix.sex.F.M"] == 100L)
   expect_true(summary(out_four ~ nodemix("uncommon", levels2=TRUE))["mix.uncommon.A.B"] == 100L)
@@ -254,14 +231,11 @@ test_that("discordBDStratTNT behaves reasonably", {
   pmat["B","D"] <- 1
   pmat["D","B"] <- 1
 
-  control$MCMC.prop.args$bound <- 1
-  control$MCMC.prop.args$pmat <- pmat
-  
   out_five <- simulate(nw ~ edges, 
                        coef = c(2000), 
+                       constraints = ~bd(maxout = 1) + blocks(attr = "sex", fmat = fmat) + Strat(attr = "uncommon", pmat = pmat),
                        dynamic = TRUE,
-                       output = "final",
-                       control = control)
+                       output = "final")
 
 ## A-B (M-F) and C-C (M-M) are only ties we should see
   expect_true(sum(summary(out_five ~ nodemix("uncommon", levels2=TRUE))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_five))  
@@ -270,50 +244,50 @@ test_that("discordBDStratTNT behaves reasonably", {
 
   out_six <- simulate(out_five ~ edges, 
                       coef = c(0), 
+                      constraints = ~bd(maxout = 1) + blocks(attr = "sex", fmat = fmat) + Strat(attr = "uncommon", pmat = pmat),
                       dynamic = TRUE,
-                      output = "final",
-                      control = control)
+                      output = "final")
 
   expect_true(sum(summary(out_six ~ nodemix("uncommon", levels2=TRUE))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_six))  
   
   out_seven <- simulate(out_six ~ edges, 
                         coef = c(0), 
+                        constraints = ~bd(maxout = 1) + blocks(attr = "sex", fmat = fmat) + Strat(attr = "uncommon", pmat = pmat),
                         dynamic = TRUE,
-                        output = "final",
-                        control = control)
+                        output = "final")
 
   expect_true(sum(summary(out_seven ~ nodemix("uncommon", levels2=TRUE))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_seven))  
 
   out_eight <- simulate(out_seven ~ edges, 
                         coef = c(12), 
+                        constraints = ~bd(maxout = 1) + blocks(attr = "sex", fmat = fmat) + Strat(attr = "uncommon", pmat = pmat),
                         dynamic = TRUE,
-                        output = "final",
-                        control = control)
+                        output = "final")
 
   expect_true(sum(summary(out_eight ~ nodemix("uncommon", levels2=TRUE))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_eight))  
 
   out_nine <- simulate(out_eight ~ edges, 
                        coef = c(0.5), 
+                       constraints = ~bd(maxout = 1) + blocks(attr = "sex", fmat = fmat) + Strat(attr = "uncommon", pmat = pmat),
                        dynamic = TRUE,
-                       output = "final",
-                       control = control)
+                       output = "final")
 
   expect_true(sum(summary(out_nine ~ nodemix("uncommon", levels2=TRUE))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_nine))  
 
   out_ten <- simulate(out_nine ~ edges, 
                       coef = c(2000), 
+                      constraints = ~bd(maxout = 1) + blocks(attr = "sex", fmat = fmat) + Strat(attr = "uncommon", pmat = pmat),
                       dynamic = TRUE,
-                      output = "final",
-                      control = control)
+                      output = "final")
 
   expect_true(sum(summary(out_ten ~ nodemix("uncommon", levels2=TRUE))[c("mix.uncommon.A.B", "mix.uncommon.C.C")]) == network.edgecount(out_ten))  
   expect_true(network.edgecount(out_ten) == 15L)  
 
   out_eleven <- simulate(out_ten ~ edges, 
                          coef = c(-2000), 
+                         constraints = ~bd(maxout = 1) + blocks(attr = "sex", fmat = fmat) + Strat(attr = "uncommon", pmat = pmat),
                          dynamic = TRUE,
-                         output = "final",
-                         control = control)
+                         output = "final")
 
   expect_true(network.edgecount(out_eleven) == 0L)  
 

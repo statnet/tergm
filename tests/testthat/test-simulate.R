@@ -229,7 +229,7 @@ test_that("simulate.networkDynamic behaves reasonably", {
 
   old_nwD8 <- simulate(old_stats_nwD)
 
-  old_nwD_constr <- simulate(nw, constraints = ~BD(bound=1), formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, time.slices = 10)
+  old_nwD_constr <- simulate(nw, constraints = ~bd(maxout=1), formation = ~edges + concurrent, dissolution = ~edges, coef.form = c(-3, 0.5), coef.diss = 1, time.slices = 10)
   old_nwD_constr2 <- simulate(old_nwD_constr, time.slices=10)
 
   ## obtain what should be the same results with the new interface
@@ -247,7 +247,7 @@ test_that("simulate.networkDynamic behaves reasonably", {
 
   new_nwD8 <- simulate(new_stats_nwD ~ Form(~edges + concurrent) + Diss(~edges), dynamic = TRUE)
   
-  new_nwD_constr <- simulate(nw ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), constraints = ~BD(bound=1), time.slices = 10, dynamic = TRUE)
+  new_nwD_constr <- simulate(nw ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), constraints = ~bd(maxout=1), time.slices = 10, dynamic = TRUE)
   new_nwD_constr2 <- simulate(new_nwD_constr ~ Form(~edges + concurrent) + Diss(~edges), time.slices = 10, dynamic = TRUE)
 
   ## test for equality (attributes will differ)
