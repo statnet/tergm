@@ -22,6 +22,6 @@
   ergm_proposal_table("c", "Bernoulli", "|.dyads&TNT&discord",  1, "discordTNT", "staticDiscordTNT")
   ergm_proposal_table("t", "Bernoulli", "|discord&TNT",  1, "discordTNT", "discordTNT")
   ergm_proposal_table("t", "Bernoulli", "|Strat|discord&TNT",  0, "discordStratTNT", "discordStratTNT")
-  ergm_proposal_table("t", "Bernoulli", "|BD|discord&TNT",  0, "discordBDTNT", "discordBDTNT")
-  ergm_proposal_table("t", "Bernoulli", "|BD|Strat|discord&TNT",  0, "discordBDStratTNT", "discordBDStratTNT")
+  ergm_proposal_table("t", "Bernoulli", "|bdmax|blocks|discord&TNT",  0, "discordBDTNT", "discordBDTNT")
+  ergm_proposal_table("t", "Bernoulli", "|bdmax|blocks|Strat|discord&TNT",  0, "discordBDStratTNT", "discordBDStratTNT")
 }
