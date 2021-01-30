@@ -119,7 +119,7 @@ dynfit<-tergm(g0 ~ Form(~edges + degree(1)) + Diss(~edges),
 par(ask=TRUE)
 mcmc.diagnostics(dynfit)
 summary(dynfit)
-
+}
 # CMLE Example
 data(samplk)
 
@@ -150,7 +150,7 @@ samplk123 <- tergm(list(samplk1, samplk2, samplk3)~
 
 mcmc.diagnostics(samplk123)
 summary(samplk123)
-}
+
 }
 \references{
 \itemize{

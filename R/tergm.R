@@ -113,7 +113,7 @@
 #' par(ask=TRUE)
 #' mcmc.diagnostics(dynfit)
 #' summary(dynfit)
-#' 
+#' }
 #' # CMLE Example
 #' data(samplk)
 #' 
@@ -130,8 +130,6 @@
 #'
 #' samplk12.gof
 #'
-#' summary(samplk12.gof)
-#'
 #' plot(samplk12.gof)
 #'
 #' plot(samplk12.gof, plotlogodds=TRUE)
@@ -144,7 +142,7 @@
 #' 
 #' mcmc.diagnostics(samplk123)
 #' summary(samplk123)
-#' }
+#'
 #' @import network
 #' @import networkDynamic
 #' @importFrom utils packageVersion
