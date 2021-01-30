@@ -150,7 +150,7 @@ InitErgmTerm.Form1 <- function(nw, arglist,  ...){
   c(list(name="on_union_net_Network", pkgname="ergm",
          auxiliaries = ~.union.net((nw%n%".PrevNets")[[1]], implementation="Network"),
          submodel = m),
-    modifyList(wrap.ergm_model(m, nw, function(x) paste0('Form(',x,')')),
+    modifyList(wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Form")),
                list(emptynwstats=summary(m, (nw%n%".PrevNets")[[1]])))
     )
 }
@@ -191,5 +191,5 @@ InitErgmTerm.Diss1 <- function(nw, arglist,  ...){
   c(list(name="on_intersect_net_Network", pkgname="ergm",
          auxiliaries = ~.intersect.net((nw%n%".PrevNets")[[1]], implementation="Network"),
          submodel = m),
-    wrap.ergm_model(m, nw, function(x) paste0('Diss(',x,')')))
+    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Diss")))
 }
