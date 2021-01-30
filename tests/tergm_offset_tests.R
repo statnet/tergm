@@ -8,7 +8,7 @@
 #  Copyright 2008-2020 Statnet Commons
 #######################################################################
 library(statnet.common)
-#opttest({
+opttest({
   library(tergm)
   data(florentine)
   net <- flobusiness
@@ -48,4 +48,4 @@ library(statnet.common)
   for (mod in list(mod1, mod2, mod3, mod4)) {
     print(apply(simulate(mod, monitor=~edges+degree(3), output="stats", time.slices=200), 2, mean))
   }
-#}, testname='target_offset')
+}, testname='target_offset')

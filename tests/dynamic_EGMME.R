@@ -8,7 +8,7 @@
 #  Copyright 2008-2020 Statnet Commons
 #######################################################################
 library(statnet.common)
-#opttest({
+opttest({
 library(tergm)
 n<-40
 do.plot <- TRUE
@@ -41,4 +41,4 @@ print(summary(dynfit2))
 mcmc.diagnostics(dynfit2)
 
 stopifnot(all.equal(c(coef.form,coef.diss),dynfit2$coef,tol=0.01,check.attributes=FALSE))
-#}, "EGMME")
+}, "EGMME")

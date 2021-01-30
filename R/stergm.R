@@ -105,7 +105,7 @@
 #' 
 #' }
 #' @examples
-#' 
+#' \dontrun{
 #' # EGMME Example
 #' par(ask=FALSE)
 #' n<-30
@@ -122,7 +122,7 @@
 #' par(ask=TRUE)
 #' mcmc.diagnostics(dynfit)
 #' summary(dynfit)
-#' 
+#' }
 #' # CMLE Example
 #' data(samplk)
 #' 

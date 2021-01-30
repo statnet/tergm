@@ -136,8 +136,6 @@ samplk12.gof <- gof(samplk12)
 
 samplk12.gof
 
-summary(samplk12.gof)
-
 plot(samplk12.gof)
 
 plot(samplk12.gof, plotlogodds=TRUE)
