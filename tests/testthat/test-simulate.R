@@ -286,6 +286,7 @@ test_that("simulate.networkDynamic behaves reasonably", {
   expect_identical(unname(summary(network.collapse(new_nwD_constr2, at = 20) ~ concurrent)), 0)
 })
 
+statnet.common::opttest({
 test_that("simulate.tergm behaves reasonably", {
   nw <- network.initialize(100, directed = FALSE)
 
@@ -391,3 +392,4 @@ test_that("simulate.tergm behaves reasonably", {
   expect_equal(rv_CMLE_3, rv_C_3_nw)  
   expect_equal(rv_CMLE_4, rv_C_4_nw)  
 })
+}, "simulate.tergm")
