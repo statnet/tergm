@@ -64,7 +64,8 @@
         discordant dyads, and approximately 50\% of proposed toggles are
         TNT proposals from the network.
 
-        Proposal arguments are the same as for \code{\link[ergm:ergm-proposals]{StratTNT}}.
+        Proposal arguments are the same as for \code{\link[ergm:ergm-proposals]{StratTNT}},
+        and should be passed in via the \code{\link[ergm:ergm-hints]{Strat}} hint.
       }
       
       \item{\code{InitErgmProposal.discordBDTNT}} {
@@ -72,11 +73,13 @@
         A temporal version of \code{\link[ergm:ergm-proposals]{BDTNT}}, with approximately
         50\% of proposed toggles being made on the set of discordant dyads,
         and approximately 50\% of proposed toggles being TNT proposals from
-        the network, all subject to the bounded degree constraints, which are
-        imposed on the instantaneous network state (rather than the formation or 
-        dissolution networks).
+        the network, all subject to the bounded degree and mixing type constraints.  The 
+        degree bound constraint is imposed on the instantaneous network state 
+        (rather than the formation or dissolution networks).
 
-        Proposal arguments are the same as for \code{\link[ergm:ergm-proposals]{BDTNT}}.      
+        Proposal arguments are the same as for \code{\link[ergm:ergm-proposals]{BDTNT}},
+        and should be passed in via the \code{\link[ergm:ergm-constraints]{bd}} and
+        \code{\link[ergm:ergm-constraints]{blocks}} constraints.    
       }    
       
       \item{\code{InitErgmProposal.discordBDStratTNT}} {
@@ -85,10 +88,12 @@
         strat mixing type, approximately 50\% of proposed toggles are made on
         discordant dyads, and approximately 50\% of proposed toggles are
         TNT proposals from the network, all subject to the bounded degree
-        constraints, which are imposed on the instantaneous network state 
-        (rather than the formation or dissolution networks).
-
-        Proposal arguments are the same as for \code{\link[ergm:ergm-proposals]{BDStratTNT}}.
+        and mixing type constraints.  The degree bound constraint is imposed 
+        on the instantaneous network state (rather than the formation or dissolution networks).
+        
+        Proposal arguments are the same as for \code{\link[ergm:ergm-proposals]{BDStratTNT}},
+        and should be passed in via the \code{\link[ergm:ergm-constraints]{bd}} and
+        \code{\link[ergm:ergm-constraints]{blocks}} constraints and the \code{\link[ergm:ergm-hints]{Strat}} hint.
       }    
     }  
   }

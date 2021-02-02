@@ -379,7 +379,7 @@ MH_P_FN(MH_discordBDTNT) {
   GET_STORAGE(discordBDTNTStorage, sto);
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
 
-  int nedges = EDGECOUNT(nwp);
+  int nedges = sto->nonDiscordantEdges->nedges + sto->discordantEdges->nedges;
   
   int in_network;
   int in_discord;
@@ -483,8 +483,8 @@ MH_P_FN(MH_discordBDTNT) {
   Network *relevant_net = in_network ? sto->combined_nonBDTDNE : sto->combined_BDTDNE;
   for(int i = 0; i < 2; i++) {
     if(sto->static_sto->maxl[i]) {
-      EXEC_THROUGH_EDGES_EA_NET_DECL(sto->static_sto->nodes[i], ego, alter, edge, nwp, {
-        if(alter != sto->static_sto->nodes[1 - i] && IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound) {
+      EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->static_sto->nodes[i], ego, alter, _tail, _head, edge, nwp, {
+        if(alter != sto->static_sto->nodes[1 - i] && IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound && sto->static_sto->amat[sto->static_sto->vattr[_tail]][sto->static_sto->vattr[_head]]) {
           sto->static_sto->proposedsubmaxledges += delta;
         }
       });
@@ -811,7 +811,7 @@ MH_P_FN(MH_discordBDStratTNT) {
   for(int i = 0; i < 2; i++) {
     if(sto->static_sto->maxl[i]) {
       EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->static_sto->nodes[i], ego, alter, tail, head, edge, nwp, {
-        if(alter != sto->static_sto->nodes[1 - i] && sto->static_sto->indmat[sto->static_sto->strat_vattr[tail]][sto->static_sto->strat_vattr[head]] == strat_i && IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound) {
+        if(alter != sto->static_sto->nodes[1 - i] && sto->static_sto->indmat[sto->static_sto->strat_vattr[tail]][sto->static_sto->strat_vattr[head]] == strat_i && IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound && sto->static_sto->amat[sto->static_sto->bd_vattr[tail]][sto->static_sto->bd_vattr[head]]) {
           proposedsubmaxledgestype += delta;
         }
       });
@@ -889,7 +889,8 @@ MH_U_FN(Mu_discordBDStratTNT) {
       EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->static_sto->nodes[i], ego, alter, _tail, _head, edge, nwp, {
         if(alter != sto->static_sto->nodes[1 - i] && IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound) {
           int stratmixingtype = sto->static_sto->indmat[sto->static_sto->strat_vattr[_tail]][sto->static_sto->strat_vattr[_head]];
-          if(stratmixingtype >= 0) {
+          int allowed = sto->static_sto->amat[sto->static_sto->bd_vattr[_tail]][sto->static_sto->bd_vattr[_head]];
+          if(stratmixingtype >= 0 && allowed) {
             sto->static_sto->currentsubmaxledgestype[stratmixingtype] += delta;
           }
         }
