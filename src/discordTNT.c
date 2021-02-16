@@ -21,6 +21,7 @@
 #include "ergm_BDStrat_proposals.h"
 
 typedef struct {
+  UnsrtEL *nonDiscordantEdges;
   UnsrtEL *discordantEdges;
   UnsrtEL *discordantNonEdges;
   
@@ -34,17 +35,26 @@ MH_I_FN(Mi_discordTNT) {
   MHp->ntoggles = 1;
   
   ALLOC_STORAGE(1, discordTNTStorage, sto);
+  sto->nonDiscordantEdges = UnsrtELInitialize(0, NULL, NULL, FALSE);
   sto->discordantEdges = UnsrtELInitialize(0, NULL, NULL, FALSE);
   sto->discordantNonEdges = UnsrtELInitialize(0, NULL, NULL, FALSE);
 
   sto->discordance_fraction = asReal(getListElement(MHp->R, "discordance_fraction"));  
-  // we ignore discord for this initialization (assuming a TICK will precede any proposals)
+
+  EXEC_THROUGH_NET_EDGES(tail, head, e, {
+    UnsrtELInsert(tail, head, sto->nonDiscordantEdges);
+  });
 }
 
 MH_X_FN(Mx_discordTNT) {
   GET_STORAGE(discordTNTStorage, sto);
   
   if(type == TICK) {
+    // transfer discordant edges to non-discordant edges
+    for(int i = 1; i <= sto->discordantEdges->nedges; i++) {
+      UnsrtELInsert(sto->discordantEdges->tails[i], sto->discordantEdges->heads[i], sto->nonDiscordantEdges);
+    }      
+      
     // "clear" the discordant dyads
     sto->discordantEdges->nedges = 0;
     sto->discordantNonEdges->nedges = 0;
@@ -69,21 +79,30 @@ MH_P_FN(MH_discordTNT) {
       GetRandDyad(Mtail, Mhead, nwp);
       in_network = IS_OUTEDGE(Mtail[0], Mhead[0]);
       in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;
+
+      if(in_discord) {
+        // need to resample to know index
+        if(in_network) {
+          UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges);
+        } else {
+          UnsrtELGetRand(Mtail, Mhead, sto->discordantNonEdges);
+        }
+      } else if(in_network) {
+        UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantEdges);
+      }
     } else {
       // propose toggling off an edge in network
-      GetRandEdge(Mtail, Mhead, nwp);
+      if(unif_rand() < sto->nonDiscordantEdges->nedges/((double) nedges)) {
+        UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantEdges);
+        in_discord = FALSE;      
+      } else {
+        UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges);
+        in_discord = TRUE;
+      }
+      
       in_network = TRUE;
-      in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;      
     }
 
-    if(in_discord) {
-      // need to resample to know index
-      if(in_network) {
-        UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges);
-      } else {
-        UnsrtELGetRand(Mtail, Mhead, sto->discordantNonEdges);
-      }
-    }
   } else {
     // propose from discord
     if(unif_rand() < sto->discordantEdges->nedges/((double) nddyads)) {
@@ -121,6 +140,7 @@ MH_U_FN(Mu_discordTNT) {
   if(sto->in_discord == edgeflag) {
     UnsrtELToggleKnown(tail, head, sto->discordantEdges, edgeflag);
   } else {
+    UnsrtELToggleKnown(tail, head, sto->nonDiscordantEdges, edgeflag);
     UnsrtELToggleKnown(tail, head, sto->discordantNonEdges, !edgeflag);
   }
 }
@@ -128,6 +148,7 @@ MH_U_FN(Mu_discordTNT) {
 MH_F_FN(Mf_discordTNT) {
   GET_STORAGE(discordTNTStorage, sto);
   
+  UnsrtELDestroy(sto->nonDiscordantEdges);
   UnsrtELDestroy(sto->discordantNonEdges);
   UnsrtELDestroy(sto->discordantEdges);
 }
