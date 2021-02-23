@@ -19,6 +19,7 @@
 #include "ergm_Rutil.h"
 #include "ergm_nodelist_dyad_sampler.h"
 #include "ergm_BDStrat_proposals.h"
+#include "ergm_hash_edgelist.h"
 
 typedef struct {
   UnsrtEL *nonDiscordantEdges;
@@ -341,15 +342,17 @@ MH_F_FN(Mf_discordStratTNT) {
 ********************/
 
 typedef struct {
-  UnsrtEL *BDTDNE;
-  UnsrtEL *nonBDTDNE;
+  HashEL *BDTDNE;
 
-  UnsrtEL *nonDiscordantEdges;
-  UnsrtEL *discordantEdges;
+  HashEL *nonDiscordantEdges;
+  HashEL *discordantEdges;
   
   Network *combined_BDTDNE;
   Network *combined_nonBDTDNE;
   UnsrtEL *transferEL;
+
+  Vertex *nodes;
+  int *maxl;
   
   int in_discord;
   
@@ -363,12 +366,14 @@ MH_I_FN(Mi_discordBDTNT) {
   // copy a few things and handle purely temporal aspects
   BDTNTStorage *static_sto = MH_STORAGE;
   ALLOC_STORAGE(1, discordBDTNTStorage, sto);
-  sto->nonDiscordantEdges = static_sto->edgelist;
+  sto->nonDiscordantEdges = static_sto->hash;
   sto->static_sto = static_sto;
 
-  sto->BDTDNE = UnsrtELInitialize(0, NULL, NULL, FALSE);
-  sto->nonBDTDNE = UnsrtELInitialize(0, NULL, NULL, FALSE);
-  sto->discordantEdges = UnsrtELInitialize(0, NULL, NULL, FALSE);
+  sto->nodes = Calloc(2, Vertex);
+  sto->maxl = Calloc(2, int);
+
+  sto->BDTDNE = HashELInitialize(0, NULL, NULL, FALSE, DIRECTED);
+  sto->discordantEdges = HashELInitialize(0, NULL, NULL, FALSE, DIRECTED);
   sto->combined_BDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL);
   sto->combined_nonBDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL);
   sto->transferEL = UnsrtELInitialize(0, NULL, NULL, FALSE);
@@ -379,14 +384,13 @@ MH_X_FN(Mx_discordBDTNT) {
     GET_STORAGE(discordBDTNTStorage, sto);
     
     // transfer discordant edges to nondiscordant edges    
-    for(int i = 1; i <= sto->discordantEdges->nedges; i++) {
-      UnsrtELInsert(sto->discordantEdges->tails[i], sto->discordantEdges->heads[i], sto->nonDiscordantEdges);
+    for(int i = 1; i <= sto->discordantEdges->list->nedges; i++) {
+      HashELInsert(sto->discordantEdges->list->tails[i], sto->discordantEdges->list->heads[i], sto->nonDiscordantEdges);
     }
     
     // clear all the discordance information    
-    sto->BDTDNE->nedges = 0;
-    sto->nonBDTDNE->nedges = 0;
-    sto->discordantEdges->nedges = 0;
+    if(sto->BDTDNE->list->nedges > 0) HashELClear(sto->BDTDNE);
+    if(sto->discordantEdges->list->nedges > 0) HashELClear(sto->discordantEdges);
     
     // for now, destroy and recreate each time step (can we do this more efficiently?)
     NetworkDestroy(sto->combined_BDTDNE);
@@ -400,12 +404,12 @@ MH_P_FN(MH_discordBDTNT) {
   GET_STORAGE(discordBDTNTStorage, sto);
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
 
-  int nedges = sto->nonDiscordantEdges->nedges + sto->discordantEdges->nedges;
+  int nedges = sto->nonDiscordantEdges->list->nedges + sto->discordantEdges->list->nedges;
   
   int in_network;
   int in_discord;
   
-  int nddyads = sto->discordantEdges->nedges + sto->BDTDNE->nedges;
+  int nddyads = sto->discordantEdges->list->nedges + sto->BDTDNE->list->nedges;
   
   if(nddyads == 0 || unif_rand() < 0.5) {
     // propose from network
@@ -416,11 +420,11 @@ MH_P_FN(MH_discordBDTNT) {
     // (assuming the initial network is valid)  
     if((unif_rand() < 0.5 && nedges > 0) || (sto->static_sto->currentdyads == 0)) {
       // select an existing edge at random, and propose toggling it off
-      if(unif_rand() < ((double) sto->nonDiscordantEdges->nedges)/nedges) {
-        UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantEdges);
+      if(unif_rand() < ((double) sto->nonDiscordantEdges->list->nedges)/nedges) {
+        HashELGetRand(Mtail, Mhead, sto->nonDiscordantEdges);
         in_discord = FALSE;
       } else {
-        UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges);
+        HashELGetRand(Mtail, Mhead, sto->discordantEdges);
         in_discord = TRUE;
       }
           
@@ -442,26 +446,14 @@ MH_P_FN(MH_discordBDTNT) {
           
       in_network = IS_OUTEDGE(Mtail[0],Mhead[0]);
       in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;
-
-      if(in_network) {
-        if(unif_rand() < ((double) sto->nonDiscordantEdges->nedges)/nedges) {
-          UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantEdges);
-          in_discord = FALSE;
-        } else {
-          UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges);
-          in_discord = TRUE;
-        }
-      } else if(in_discord) {
-        UnsrtELGetRand(Mtail, Mhead, sto->BDTDNE);
-      }
     }
   } else {
     // propose from discord      
-    if(unif_rand() < ((double) sto->discordantEdges->nedges)/nddyads) {
-      UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges);
+    if(unif_rand() < ((double) sto->discordantEdges->list->nedges)/nddyads) {
+      HashELGetRand(Mtail, Mhead, sto->discordantEdges);
       in_network = TRUE;
     } else {
-      UnsrtELGetRand(Mtail, Mhead, sto->BDTDNE);
+      HashELGetRand(Mtail, Mhead, sto->BDTDNE);
       in_network = FALSE;      
     }
     in_discord = TRUE;
@@ -475,11 +467,11 @@ MH_P_FN(MH_discordBDTNT) {
   sto->static_sto->tailmaxl = IN_DEG[Mtail[0]] + OUT_DEG[Mtail[0]] == sto->static_sto->bound - 1 + in_network;
   sto->static_sto->headmaxl = IN_DEG[Mhead[0]] + OUT_DEG[Mhead[0]] == sto->static_sto->bound - 1 + in_network;   
 
-  sto->static_sto->nodes[0] = *Mtail;  
-  sto->static_sto->nodes[1] = *Mhead;
+  sto->nodes[0] = *Mtail;  
+  sto->nodes[1] = *Mhead;
         
-  sto->static_sto->maxl[0] = sto->static_sto->tailmaxl;  
-  sto->static_sto->maxl[1] = sto->static_sto->headmaxl;
+  sto->maxl[0] = sto->static_sto->tailmaxl;  
+  sto->maxl[1] = sto->static_sto->headmaxl;
 
   // obtain the count of dyads that can be toggled in the "GetRandBDDyad" branch, in the proposed network
   NodeListToggleKnownIf(*Mtail, sto->static_sto->nodesvec[sto->static_sto->tailtype], sto->static_sto->nodepos, sto->static_sto->attrcounts + sto->static_sto->tailtype, !in_network, sto->static_sto->tailmaxl);
@@ -488,40 +480,30 @@ MH_P_FN(MH_discordBDTNT) {
   NodeListToggleKnownIf(*Mtail, sto->static_sto->nodesvec[sto->static_sto->tailtype], sto->static_sto->nodepos, sto->static_sto->attrcounts + sto->static_sto->tailtype, in_network, sto->static_sto->tailmaxl);
   NodeListToggleKnownIf(*Mhead, sto->static_sto->nodesvec[sto->static_sto->headtype], sto->static_sto->nodepos, sto->static_sto->attrcounts + sto->static_sto->headtype, in_network, sto->static_sto->headmaxl);      
   
-  // need to calculate number of submaxl edges and number of BD-toggleable discordant dyads
-  // in the proposed network; this can involve both the proposal dyad itself and other dyads
-  // containing either of the nodes in the proposal dyad
+  // need to calculate number of BD-toggleable discordant dyads in the proposed network; 
+  // this can involve both the proposal dyad itself and other dyads containing either of
+  // the nodes in the proposal dyad
   int delta = in_network ? +1 : -1;
-
-  sto->static_sto->proposedsubmaxledges = sto->static_sto->currentsubmaxledges;  
-  if(!sto->static_sto->tailmaxl && !sto->static_sto->headmaxl) {
-    sto->static_sto->proposedsubmaxledges -= delta;
-  }
     
   int propnddyads = nddyads;  
   propnddyads += in_discord ? -1 : 1;
   
   Network *relevant_net = in_network ? sto->combined_nonBDTDNE : sto->combined_BDTDNE;
   for(int i = 0; i < 2; i++) {
-    if(sto->static_sto->maxl[i]) {
-      EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->static_sto->nodes[i], ego, alter, _tail, _head, edge, nwp, {
-        if(alter != sto->static_sto->nodes[1 - i] && IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound && sto->static_sto->amat[sto->static_sto->vattr[_tail]][sto->static_sto->vattr[_head]]) {
-          sto->static_sto->proposedsubmaxledges += delta;
-        }
-      });
-      EXEC_THROUGH_EDGES_EA_NET_DECL(sto->static_sto->nodes[i], ego, alter, edge, relevant_net, {
-        if(alter != sto->static_sto->nodes[1 - i] && (!in_network || IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound)) {
+    if(sto->maxl[i]) {
+      EXEC_THROUGH_EDGES_EA_NET_DECL(sto->nodes[i], ego, alter, edge, relevant_net, {
+        if(alter != sto->nodes[1 - i] && (!in_network || IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound)) {
           propnddyads += delta;
         }
       });
     }
   } 
   
-  double forward_network = in_network ? (sto->static_sto->currentdyads == 0 ? 1.0/nedges : 0.5/nedges + (0.5/sto->static_sto->currentdyads)*((double)sto->static_sto->currentsubmaxledges/nedges)) : (nedges == 0 ? 1.0/sto->static_sto->currentdyads : 0.5/sto->static_sto->currentdyads);
+  double forward_network = in_network ? (sto->static_sto->currentdyads == 0 ? 1.0/nedges : 0.5/nedges + (sto->static_sto->tailmaxl || sto->static_sto->headmaxl ? 0.0 : 0.5/sto->static_sto->currentdyads)) : (nedges == 0 ? 1.0/sto->static_sto->currentdyads : 0.5/sto->static_sto->currentdyads);
   
   double forward_discord = in_discord ? 1.0/nddyads : 0;
   
-  double backward_network = in_network ? (nedges == 1 ? 1.0/sto->static_sto->proposeddyads : 0.5/sto->static_sto->proposeddyads) : (sto->static_sto->proposeddyads == 0 ? 1.0/(nedges + 1) : 0.5/(nedges + 1) + (0.5/sto->static_sto->proposeddyads)*((double) sto->static_sto->proposedsubmaxledges/(nedges + 1)));
+  double backward_network = in_network ? (nedges == 1 ? 1.0/sto->static_sto->proposeddyads : 0.5/sto->static_sto->proposeddyads) : (sto->static_sto->proposeddyads == 0 ? 1.0/(nedges + 1) : 0.5/(nedges + 1) + (sto->static_sto->tailmaxl || sto->static_sto->headmaxl ? 0.0 : 0.5/sto->static_sto->proposeddyads));
   
   double backward_discord = in_discord ? 0 : 1.0/propnddyads;
   
@@ -540,10 +522,10 @@ MH_U_FN(Mu_discordBDTNT) {
   
   // add or remove the dyad being toggled from the relevant edge set(s)/network
   if(sto->in_discord == edgeflag) {
-    UnsrtELToggleKnown(tail, head, sto->discordantEdges, edgeflag);      
+    HashELToggleKnown(tail, head, sto->discordantEdges, edgeflag);      
   } else {
-    UnsrtELToggleKnown(tail, head, sto->nonDiscordantEdges, edgeflag);
-    UnsrtELToggleKnown(tail, head, sto->BDTDNE, !edgeflag);
+    HashELToggleKnown(tail, head, sto->nonDiscordantEdges, edgeflag);
+    HashELToggleKnown(tail, head, sto->BDTDNE, !edgeflag);
     ToggleKnownEdge(tail, head, sto->combined_BDTDNE, !edgeflag);      
   }
 
@@ -555,11 +537,10 @@ MH_U_FN(Mu_discordBDTNT) {
   Network *relevant_net = edgeflag ? sto->combined_nonBDTDNE : sto->combined_BDTDNE;
   sto->transferEL->nedges = 0; // reset transferEL
   for(int i = 0; i < 2; i++) {
-    if(sto->static_sto->maxl[i]) {
-      EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->static_sto->nodes[i], ego, alter, _tail, _head, edge, relevant_net, {
+    if(sto->maxl[i]) {
+      EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->nodes[i], ego, alter, _tail, _head, edge, relevant_net, {
         if(!edgeflag || IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound) {
-          UnsrtELToggleKnown(_tail, _head, sto->nonBDTDNE, edgeflag);
-          UnsrtELToggleKnown(_tail, _head, sto->BDTDNE, !edgeflag);
+          HashELToggleKnown(_tail, _head, sto->BDTDNE, !edgeflag);
           UnsrtELInsert(_tail, _head, sto->transferEL);
         }
       });
@@ -574,20 +555,18 @@ MH_U_FN(Mu_discordBDTNT) {
 
   // update current dyad count
   sto->static_sto->currentdyads = sto->static_sto->proposeddyads;  
-  
-  // update the current submaximal edge count
-  sto->static_sto->currentsubmaxledges = sto->static_sto->proposedsubmaxledges;    
 }
 
 MH_F_FN(Mf_discordBDTNT) {
   GET_STORAGE(discordBDTNTStorage, sto);
   // free things used only by the dynamic proposal
-  UnsrtELDestroy(sto->BDTDNE);
-  UnsrtELDestroy(sto->nonBDTDNE);
-  UnsrtELDestroy(sto->discordantEdges);  
+  HashELDestroy(sto->BDTDNE);
+  HashELDestroy(sto->discordantEdges);  
   NetworkDestroy(sto->combined_BDTDNE);
   NetworkDestroy(sto->combined_nonBDTDNE);
   UnsrtELDestroy(sto->transferEL);
+  Free(sto->nodes);
+  Free(sto->maxl);
   
   // let BDTNT's F_FN do most of the work
   MH_STORAGE = sto->static_sto;
@@ -609,11 +588,13 @@ typedef struct {
 
   UnsrtEL *transferEL;
 
-  UnsrtEL **BDTDNE;
-  UnsrtEL **nonBDTDNE;
+  HashEL **BDTDNE;
   
-  UnsrtEL **discordantEdges;
-  UnsrtEL **nonDiscordantEdges;
+  HashEL **discordantEdges;
+  HashEL **nonDiscordantEdges;
+  
+  Vertex *nodes;
+  int *maxl;
   
   int in_discord;
     
@@ -627,16 +608,17 @@ MH_I_FN(Mi_discordBDStratTNT) {
   // copy a few things and handle purely temporal aspects
   BDStratTNTStorage *static_sto = MH_STORAGE;
   ALLOC_STORAGE(1, discordBDStratTNTStorage, sto);
-  sto->nonDiscordantEdges = static_sto->els;
+  sto->nonDiscordantEdges = static_sto->hash;
   sto->static_sto = static_sto;
   
-  sto->BDTDNE = Calloc(sto->static_sto->nmixtypes, UnsrtEL *);
-  sto->nonBDTDNE = Calloc(sto->static_sto->nmixtypes, UnsrtEL *);
-  sto->discordantEdges = Calloc(sto->static_sto->nmixtypes, UnsrtEL *);  
+  sto->nodes = Calloc(2, Vertex);
+  sto->maxl = Calloc(2, int);
+  
+  sto->BDTDNE = Calloc(sto->static_sto->nmixtypes, HashEL *);
+  sto->discordantEdges = Calloc(sto->static_sto->nmixtypes, HashEL *);  
   for(int i = 0; i < sto->static_sto->nmixtypes; i++) {
-    sto->BDTDNE[i] = UnsrtELInitialize(0, NULL, NULL, FALSE);
-    sto->nonBDTDNE[i] = UnsrtELInitialize(0, NULL, NULL, FALSE);
-    sto->discordantEdges[i] = UnsrtELInitialize(0, NULL, NULL, FALSE);
+    sto->BDTDNE[i] = HashELInitialize(0, NULL, NULL, FALSE, DIRECTED);
+    sto->discordantEdges[i] = HashELInitialize(0, NULL, NULL, FALSE, DIRECTED);
   }
   sto->combined_BDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL);
   sto->combined_nonBDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL);
@@ -649,14 +631,13 @@ MH_X_FN(Mx_discordBDStratTNT) {
 
     for(int i = 0; i < sto->static_sto->nmixtypes; i++) {
       // transfer discordantEdges to nonDiscordantEdges
-      for(int j = 1; j <= sto->discordantEdges[i]->nedges; j++) {
-        UnsrtELInsert(sto->discordantEdges[i]->tails[j], sto->discordantEdges[i]->heads[j], sto->nonDiscordantEdges[i]);
+      for(int j = 1; j <= sto->discordantEdges[i]->list->nedges; j++) {
+        HashELInsert(sto->discordantEdges[i]->list->tails[j], sto->discordantEdges[i]->list->heads[j], sto->nonDiscordantEdges[i]);
       }
 
       // clear all the discordance information
-      sto->BDTDNE[i]->nedges = 0;
-      sto->nonBDTDNE[i]->nedges = 0;
-      sto->discordantEdges[i]->nedges = 0;      
+      if(sto->BDTDNE[i]->list->nedges > 0) HashELClear(sto->BDTDNE[i]);
+      if(sto->discordantEdges[i]->list->nedges > 0) HashELClear(sto->discordantEdges[i]);      
     }
     
     // for now, destroy and recreate each time step (can we do this more efficiently?)
@@ -682,11 +663,11 @@ MH_P_FN(MH_discordBDStratTNT) {
   int strat_diag = strattailtype == stratheadtype;
   
   // number of edges of this mixing type
-  int nedgestype = sto->nonDiscordantEdges[strat_i]->nedges + sto->discordantEdges[strat_i]->nedges;
+  int nedgestype = sto->nonDiscordantEdges[strat_i]->list->nedges + sto->discordantEdges[strat_i]->list->nedges;
   
   Dyad ndyadstype = NodeListDyadCount(sto->static_sto->attrcounts[strattailtype], sto->static_sto->attrcounts[stratheadtype], sto->static_sto->bd_tails, sto->static_sto->bd_heads, sto->static_sto->bd_mixtypes[strat_diag], strat_diag, DIRECTED);
   
-  int nddyadstype = sto->discordantEdges[strat_i]->nedges + sto->BDTDNE[strat_i]->nedges;
+  int nddyadstype = sto->discordantEdges[strat_i]->list->nedges + sto->BDTDNE[strat_i]->list->nedges;
   
   int in_network;
   int in_discord;
@@ -695,11 +676,11 @@ MH_P_FN(MH_discordBDStratTNT) {
     // propose from network
     if((unif_rand() < 0.5 && nedgestype > 0) || ndyadstype == 0) {
       // propose toggling off an existing edge of strat mixing type strat_i
-      if(unif_rand() < ((double) sto->nonDiscordantEdges[strat_i]->nedges)/nedgestype) {
-        UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantEdges[strat_i]);
+      if(unif_rand() < ((double) sto->nonDiscordantEdges[strat_i]->list->nedges)/nedgestype) {
+        HashELGetRand(Mtail, Mhead, sto->nonDiscordantEdges[strat_i]);
         in_discord = FALSE;
       } else {
-        UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges[strat_i]);
+        HashELGetRand(Mtail, Mhead, sto->discordantEdges[strat_i]);
         in_discord = TRUE;
       }
       in_network = TRUE;
@@ -720,26 +701,14 @@ MH_P_FN(MH_discordBDStratTNT) {
          
       in_network = IS_OUTEDGE(Mtail[0],Mhead[0]);
       in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;
-
-      if(in_network) {
-        if(unif_rand() < ((double) sto->nonDiscordantEdges[strat_i]->nedges/nedgestype)) {
-          UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantEdges[strat_i]);          
-          in_discord = FALSE;          
-        } else {
-          UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges[strat_i]);
-          in_discord = TRUE;
-        }
-      } else if(in_discord) {
-        UnsrtELGetRand(Mtail, Mhead, sto->BDTDNE[strat_i]);          
-      }
     }
   } else {
     // propose from discord
-    if(unif_rand() < ((double) sto->discordantEdges[strat_i]->nedges)/nddyadstype) {
-      UnsrtELGetRand(Mtail, Mhead, sto->discordantEdges[strat_i]);
+    if(unif_rand() < ((double) sto->discordantEdges[strat_i]->list->nedges)/nddyadstype) {
+      HashELGetRand(Mtail, Mhead, sto->discordantEdges[strat_i]);
       in_network = TRUE;
     } else {
-      UnsrtELGetRand(Mtail, Mhead, sto->BDTDNE[strat_i]);
+      HashELGetRand(Mtail, Mhead, sto->BDTDNE[strat_i]);
       in_network = FALSE;
     }
     in_discord = TRUE;
@@ -756,11 +725,11 @@ MH_P_FN(MH_discordBDStratTNT) {
   sto->static_sto->tailmaxl = IN_DEG[Mtail[0]] + OUT_DEG[Mtail[0]] == sto->static_sto->bound - 1 + in_network;
   sto->static_sto->headmaxl = IN_DEG[Mhead[0]] + OUT_DEG[Mhead[0]] == sto->static_sto->bound - 1 + in_network;
 
-  sto->static_sto->nodes[0] = *Mtail;  
-  sto->static_sto->nodes[1] = *Mhead;
+  sto->nodes[0] = *Mtail;  
+  sto->nodes[1] = *Mhead;
         
-  sto->static_sto->maxl[0] = sto->static_sto->tailmaxl;  
-  sto->static_sto->maxl[1] = sto->static_sto->headmaxl;  
+  sto->maxl[0] = sto->static_sto->tailmaxl;  
+  sto->maxl[1] = sto->static_sto->headmaxl;  
 
   // temporarily set tail and head toggleability to what it would be in the proposed network
   NodeListToggleKnownIf(*Mtail, sto->static_sto->nodesvec[sto->static_sto->strattailtype][sto->static_sto->bdtailtype], sto->static_sto->nodepos, sto->static_sto->attrcounts[sto->static_sto->strattailtype] + sto->static_sto->bdtailtype, !in_network, sto->static_sto->tailmaxl);
@@ -796,7 +765,7 @@ MH_P_FN(MH_discordBDStratTNT) {
       int toggle_curr = WtPopGetWt(infl_i, sto->static_sto->wtp) > 0;
       
       // will we be able to toggle this mixing type in the proposed network? 
-      int toggle_prop = sto->nonDiscordantEdges[infl_i]->nedges > 0 || sto->discordantEdges[infl_i]->nedges > 0 || NodeListDyadCountPositive(sto->static_sto->attrcounts[sto->static_sto->strattailtypes[infl_i]], sto->static_sto->attrcounts[sto->static_sto->stratheadtypes[infl_i]], sto->static_sto->bd_tails, sto->static_sto->bd_heads, sto->static_sto->bd_mixtypes[sto->static_sto->strattailtypes[infl_i] == sto->static_sto->stratheadtypes[infl_i]], sto->static_sto->strattailtypes[infl_i] == sto->static_sto->stratheadtypes[infl_i]);
+      int toggle_prop = sto->nonDiscordantEdges[infl_i]->list->nedges > 0 || sto->discordantEdges[infl_i]->list->nedges > 0 || NodeListDyadCountPositive(sto->static_sto->attrcounts[sto->static_sto->strattailtypes[infl_i]], sto->static_sto->attrcounts[sto->static_sto->stratheadtypes[infl_i]], sto->static_sto->bd_tails, sto->static_sto->bd_heads, sto->static_sto->bd_mixtypes[sto->static_sto->strattailtypes[infl_i] == sto->static_sto->stratheadtypes[infl_i]], sto->static_sto->strattailtypes[infl_i] == sto->static_sto->stratheadtypes[infl_i]);
       
       // will there be a change in toggleability status?
       int change = toggle_curr - toggle_prop;
@@ -814,44 +783,33 @@ MH_P_FN(MH_discordBDStratTNT) {
   NodeListToggleKnownIf(*Mtail, sto->static_sto->nodesvec[sto->static_sto->strattailtype][sto->static_sto->bdtailtype], sto->static_sto->nodepos, sto->static_sto->attrcounts[sto->static_sto->strattailtype] + sto->static_sto->bdtailtype, in_network, sto->static_sto->tailmaxl);
   NodeListToggleKnownIf(*Mhead, sto->static_sto->nodesvec[sto->static_sto->stratheadtype][sto->static_sto->bdheadtype], sto->static_sto->nodepos, sto->static_sto->attrcounts[sto->static_sto->stratheadtype] + sto->static_sto->bdheadtype, in_network, sto->static_sto->headmaxl);
 
-
-  // need to calculate number of submaxl edges and number of BD-toggleable discordant dyads
-  // in the proposed network; this can involve both the proposal dyad itself and other dyads
-  // containing either of the nodes in the proposal dyad
+  // need to calculate number of BD-toggleable discordant dyads in the proposed network; 
+  // this can involve both the proposal dyad itself and other dyads containing either of
+  // the nodes in the proposal dyad
   int delta = in_network ? +1 : -1;
 
-  int proposedsubmaxledgestype = sto->static_sto->currentsubmaxledgestype[strat_i];
-  if(!sto->static_sto->tailmaxl && !sto->static_sto->headmaxl) {
-    proposedsubmaxledgestype -= delta;
-  }
-    
   int propnddyadstype = nddyadstype;  
   propnddyadstype += in_discord ? -1 : 1;
   
   Network *relevant_net = in_network ? sto->combined_nonBDTDNE : sto->combined_BDTDNE;
   for(int i = 0; i < 2; i++) {
-    if(sto->static_sto->maxl[i]) {
-      EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->static_sto->nodes[i], ego, alter, tail, head, edge, nwp, {
-        if(alter != sto->static_sto->nodes[1 - i] && sto->static_sto->indmat[sto->static_sto->strat_vattr[tail]][sto->static_sto->strat_vattr[head]] == strat_i && IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound && sto->static_sto->amat[sto->static_sto->bd_vattr[tail]][sto->static_sto->bd_vattr[head]]) {
-          proposedsubmaxledgestype += delta;
-        }
-      });
-      EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->static_sto->nodes[i], ego, alter, tail, head, edge, relevant_net, {
-        if(alter != sto->static_sto->nodes[1 - i] && sto->static_sto->indmat[sto->static_sto->strat_vattr[tail]][sto->static_sto->strat_vattr[head]] == strat_i && (!in_network || IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound)) {
+    if(sto->maxl[i]) {
+      EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->nodes[i], ego, alter, tail, head, edge, relevant_net, {
+        if(alter != sto->nodes[1 - i] && sto->static_sto->indmat[sto->static_sto->strat_vattr[tail]][sto->static_sto->strat_vattr[head]] == strat_i && (!in_network || IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound)) {
           propnddyadstype += delta;
         }
       });
     }
-  } 
+  }
 
   // calculate logratio
   double prob_weight = sto->static_sto->currentcumprob/sto->static_sto->proposedcumprob;
   
-  double forward_network = in_network ? (ndyadstype == 0 ? 1.0/nedgestype : 0.5/nedgestype + (0.5/ndyadstype)*((double)sto->static_sto->currentsubmaxledgestype[strat_i]/nedgestype)) : (nedgestype == 0 ? 1.0/ndyadstype : 0.5/ndyadstype);
+  double forward_network = in_network ? (ndyadstype == 0 ? 1.0/nedgestype : 0.5/nedgestype + (sto->static_sto->tailmaxl || sto->static_sto->headmaxl ? 0.0 : 0.5/ndyadstype)) : (nedgestype == 0 ? 1.0/ndyadstype : 0.5/ndyadstype);
   
   double forward_discord = in_discord ? 1.0/nddyadstype : 0;
   
-  double backward_network = in_network ? (nedgestype == 1 ? 1.0/proposeddyadstype : 0.5/proposeddyadstype) : (proposeddyadstype == 0 ? 1.0/(nedgestype + 1) : 0.5/(nedgestype + 1) + (0.5/proposeddyadstype)*((double) proposedsubmaxledgestype/(nedgestype + 1)));
+  double backward_network = in_network ? (nedgestype == 1 ? 1.0/proposeddyadstype : 0.5/proposeddyadstype) : (proposeddyadstype == 0 ? 1.0/(nedgestype + 1) : 0.5/(nedgestype + 1) + (sto->static_sto->tailmaxl || sto->static_sto->headmaxl ? 0.0 : 0.5/proposeddyadstype));
   
   double backward_discord = in_discord ? 0 : 1.0/propnddyadstype;
   
@@ -870,58 +828,32 @@ MH_U_FN(Mu_discordBDStratTNT) {
   // if any strat mixing types have changed toggleability status, update prob info accordingly
   if(sto->static_sto->nmixtypestoupdate > 0) {
     sto->static_sto->currentcumprob = sto->static_sto->proposedcumprob;
-
-    if(edgeflag) {
-      sto->static_sto->nmixtypes_toggleable += sto->static_sto->nmixtypestoupdate;
-      for(int i = 0; i < sto->static_sto->nmixtypestoupdate; i++) {
-        WtPopSetWt(sto->static_sto->mixtypestoupdate[i], sto->static_sto->originalprobvec[sto->static_sto->mixtypestoupdate[i]], sto->static_sto->wtp);          
-      }
-    } else {
-      sto->static_sto->nmixtypes_toggleable -= sto->static_sto->nmixtypestoupdate;
-      for(int i = 0; i < sto->static_sto->nmixtypestoupdate; i++) {
-        WtPopSetWt(sto->static_sto->mixtypestoupdate[i], 0, sto->static_sto->wtp);          
-      }
+    for(int i = 0; i < sto->static_sto->nmixtypestoupdate; i++) {
+      WtPopSetWt(sto->static_sto->mixtypestoupdate[i], edgeflag ? sto->static_sto->originalprobvec[sto->static_sto->mixtypestoupdate[i]] : 0, sto->static_sto->wtp);          
     }
   }
 
   // add or remove the dyad being toggled from the relevant edge set(s)/network
   if(sto->in_discord == edgeflag) {
-    UnsrtELToggleKnown(tail, head, sto->discordantEdges[sto->static_sto->stratmixingtype], edgeflag);      
+    HashELToggleKnown(tail, head, sto->discordantEdges[sto->static_sto->stratmixingtype], edgeflag);      
   } else {
-    UnsrtELToggleKnown(tail, head, sto->nonDiscordantEdges[sto->static_sto->stratmixingtype], edgeflag);
-    UnsrtELToggleKnown(tail, head, sto->BDTDNE[sto->static_sto->stratmixingtype], !edgeflag);
+    HashELToggleKnown(tail, head, sto->nonDiscordantEdges[sto->static_sto->stratmixingtype], edgeflag);
+    HashELToggleKnown(tail, head, sto->BDTDNE[sto->static_sto->stratmixingtype], !edgeflag);
     ToggleKnownEdge(tail, head, sto->combined_BDTDNE, !edgeflag);      
   }
 
   NodeListToggleKnownIf(tail, sto->static_sto->nodesvec[sto->static_sto->strattailtype][sto->static_sto->bdtailtype], sto->static_sto->nodepos, sto->static_sto->attrcounts[sto->static_sto->strattailtype] + sto->static_sto->bdtailtype, !edgeflag, sto->static_sto->tailmaxl);
   NodeListToggleKnownIf(head, sto->static_sto->nodesvec[sto->static_sto->stratheadtype][sto->static_sto->bdheadtype], sto->static_sto->nodepos, sto->static_sto->attrcounts[sto->static_sto->stratheadtype] + sto->static_sto->bdheadtype, !edgeflag, sto->static_sto->headmaxl);      
   
-  // update submaxl edge counts and dyad toggleability statuses, as appropriate
-  int delta = edgeflag ? +1 : -1;
-  
-  if(!sto->static_sto->tailmaxl && !sto->static_sto->headmaxl) {
-    sto->static_sto->currentsubmaxledgestype[sto->static_sto->stratmixingtype] -= delta;
-  }
-  
+  // update dyad toggleability statuses, as appropriate  
   Network *relevant_net = edgeflag ? sto->combined_nonBDTDNE : sto->combined_BDTDNE;
   sto->transferEL->nedges = 0; // reset transferEL
   for(int i = 0; i < 2; i++) {
-    if(sto->static_sto->maxl[i]) {
-      EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->static_sto->nodes[i], ego, alter, _tail, _head, edge, nwp, {
-        if(alter != sto->static_sto->nodes[1 - i] && IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound) {
-          int stratmixingtype = sto->static_sto->indmat[sto->static_sto->strat_vattr[_tail]][sto->static_sto->strat_vattr[_head]];
-          int allowed = sto->static_sto->amat[sto->static_sto->bd_vattr[_tail]][sto->static_sto->bd_vattr[_head]];
-          if(stratmixingtype >= 0 && allowed) {
-            sto->static_sto->currentsubmaxledgestype[stratmixingtype] += delta;
-          }
-        }
-      });
-      
-      EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->static_sto->nodes[i], ego, alter, _tail, _head, edge, relevant_net, {
+    if(sto->maxl[i]) {
+      EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->nodes[i], ego, alter, _tail, _head, edge, relevant_net, {
         if(!edgeflag || IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound) {
           int stratmixingtype = sto->static_sto->indmat[sto->static_sto->strat_vattr[_tail]][sto->static_sto->strat_vattr[_head]];
-          UnsrtELToggleKnown(_tail, _head, sto->nonBDTDNE[stratmixingtype], edgeflag);
-          UnsrtELToggleKnown(_tail, _head, sto->BDTDNE[stratmixingtype], !edgeflag);
+          HashELToggleKnown(_tail, _head, sto->BDTDNE[stratmixingtype], !edgeflag);
           UnsrtELInsert(_tail, _head, sto->transferEL);
         }
       });
@@ -939,13 +871,14 @@ MH_F_FN(Mf_discordBDStratTNT) {
   GET_STORAGE(discordBDStratTNTStorage, sto);
   // free things used only in the dynamic proposal
   for(int i = 0; i < sto->static_sto->nmixtypes; i++) {
-    UnsrtELDestroy(sto->BDTDNE[i]);
-    UnsrtELDestroy(sto->nonBDTDNE[i]);    
-    UnsrtELDestroy(sto->discordantEdges[i]);
+    HashELDestroy(sto->BDTDNE[i]);
+    HashELDestroy(sto->discordantEdges[i]);
   }
   Free(sto->BDTDNE);
-  Free(sto->nonBDTDNE);
   Free(sto->discordantEdges);
+  
+  Free(sto->nodes);
+  Free(sto->maxl);
   
   NetworkDestroy(sto->combined_BDTDNE);
   NetworkDestroy(sto->combined_nonBDTDNE);
