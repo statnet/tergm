@@ -35,6 +35,7 @@ LinkingTo:
 Suggests:
     lattice (>= 0.20.38),
     parallel,
+    snow,
     rmarkdown (>= 1.12),
     knitr (>= 1.22),
     testthat,
