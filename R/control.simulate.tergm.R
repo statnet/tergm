@@ -97,7 +97,7 @@ control.simulate.network.tergm <- function(MCMC.burnin.min = 1000,
                                            MCMC.burnin.pval = 0.5,
                                            MCMC.burnin.add = 1,
                                            
-                                           MCMC.prop = ~discord + TNT,
+                                           MCMC.prop = ~discord + sparse,
                                            MCMC.prop.weights = "default",
                                            MCMC.prop.args = NULL,
                                            

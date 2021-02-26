@@ -312,7 +312,7 @@ control.tergm<-function(init=NULL,
                          init.method=NULL,
                          force.main = FALSE,                         
 
-                         MCMC.prop = ~discord + TNT,
+                         MCMC.prop = ~discord + sparse,
 
                          MCMC.prop.weights="default",MCMC.prop.args=NULL,
                          MCMC.maxedges=Inf,

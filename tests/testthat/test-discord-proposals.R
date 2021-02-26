@@ -37,7 +37,7 @@ test_that("discordStratTNT behaves reasonably", {
     nw_sim <- simulate(nw_sim ~ edges, 
                        coef = c(-3), 
                        time.slices = 5,
-                       constraints = ~Strat(attr = "vattr", pmat = pmat),
+                       constraints = ~strat(attr = "vattr", pmat = pmat),
                        dynamic = TRUE,
                        output = "final")
     summ_stats <- summary(nw_sim ~ nodemix("vattr", levels2=TRUE))
@@ -109,7 +109,7 @@ test_that("discordBDStratTNT behaves reasonably", {
       nw_sim <- simulate(nw_sim ~ edges, 
                          coef = c(0), 
                          time.slices = 5,
-                         constraints = ~bd(maxout = deg_bound) + blocks(attr = "sex", levels2 = levels2) + Strat(attr = "vattr", pmat = pmat),
+                         constraints = ~bd(maxout = deg_bound) + blocks(attr = "sex", levels2 = levels2) + strat(attr = "vattr", pmat = pmat),
                          dynamic = TRUE,
                          output = "final")
       summ_stats <- summary(nw_sim ~ nodemix("vattr", levels2=TRUE) + nodemix("sex", levels2=TRUE) + degrange(deg_bound + 1))
@@ -174,7 +174,7 @@ test_that("discordBDStratTNT behaves reasonably", {
   
   out_one <- simulate(nw ~ edges, 
                       coef = c(2000), 
-                      constraints = ~blocks(attr = "sex", levels2 = levels2) + Strat(attr = "uncommon", pmat = pmat),
+                      constraints = ~blocks(attr = "sex", levels2 = levels2) + strat(attr = "uncommon", pmat = pmat),
                       dynamic = TRUE,
                       output = "final")
   
@@ -184,7 +184,7 @@ test_that("discordBDStratTNT behaves reasonably", {
   
   out_two <- simulate(nw ~ edges, 
                       coef = c(2000), 
-                      constraints = ~bd(maxout = 2) + blocks(attr = "sex", levels2 = levels2) + Strat(attr = "uncommon", pmat = pmat),
+                      constraints = ~bd(maxout = 2) + blocks(attr = "sex", levels2 = levels2) + strat(attr = "uncommon", pmat = pmat),
                       dynamic = TRUE,
                       output = "final")
   
@@ -198,7 +198,7 @@ test_that("discordBDStratTNT behaves reasonably", {
 
   out_three <- simulate(nw ~ edges, 
                         coef = c(2000), 
-                        constraints = ~bd(maxout = 2) + blocks(attr = "sex", levels2 = levels2) + Strat(attr = "uncommon", pmat = pmat),
+                        constraints = ~bd(maxout = 2) + blocks(attr = "sex", levels2 = levels2) + strat(attr = "uncommon", pmat = pmat),
                         dynamic = TRUE,
                         output = "final")
   
@@ -212,7 +212,7 @@ test_that("discordBDStratTNT behaves reasonably", {
   
   out_four <- simulate(nw ~ edges, 
                        coef = c(2000), 
-                       constraints = ~blocks(attr = "sex", levels2 = levels2) + Strat(attr = "uncommon", pmat = pmat),
+                       constraints = ~blocks(attr = "sex", levels2 = levels2) + strat(attr = "uncommon", pmat = pmat),
                        dynamic = TRUE,
                        output = "final")
   
@@ -236,7 +236,7 @@ test_that("discordBDStratTNT behaves reasonably", {
 
   out_five <- simulate(nw ~ edges, 
                        coef = c(2000), 
-                       constraints = ~bd(maxout = 1) + blocks(attr = "sex", levels2 = levels2) + Strat(attr = "uncommon", pmat = pmat),
+                       constraints = ~bd(maxout = 1) + blocks(attr = "sex", levels2 = levels2) + strat(attr = "uncommon", pmat = pmat),
                        dynamic = TRUE,
                        output = "final")
 
@@ -247,7 +247,7 @@ test_that("discordBDStratTNT behaves reasonably", {
 
   out_six <- simulate(out_five ~ edges, 
                       coef = c(0), 
-                      constraints = ~bd(maxout = 1) + blocks(attr = "sex", levels2 = levels2) + Strat(attr = "uncommon", pmat = pmat),
+                      constraints = ~bd(maxout = 1) + blocks(attr = "sex", levels2 = levels2) + strat(attr = "uncommon", pmat = pmat),
                       dynamic = TRUE,
                       output = "final")
 
@@ -255,7 +255,7 @@ test_that("discordBDStratTNT behaves reasonably", {
   
   out_seven <- simulate(out_six ~ edges, 
                         coef = c(0), 
-                        constraints = ~bd(maxout = 1) + blocks(attr = "sex", levels2 = levels2) + Strat(attr = "uncommon", pmat = pmat),
+                        constraints = ~bd(maxout = 1) + blocks(attr = "sex", levels2 = levels2) + strat(attr = "uncommon", pmat = pmat),
                         dynamic = TRUE,
                         output = "final")
 
@@ -263,7 +263,7 @@ test_that("discordBDStratTNT behaves reasonably", {
 
   out_eight <- simulate(out_seven ~ edges, 
                         coef = c(12), 
-                        constraints = ~bd(maxout = 1) + blocks(attr = "sex", levels2 = levels2) + Strat(attr = "uncommon", pmat = pmat),
+                        constraints = ~bd(maxout = 1) + blocks(attr = "sex", levels2 = levels2) + strat(attr = "uncommon", pmat = pmat),
                         dynamic = TRUE,
                         output = "final")
 
@@ -271,7 +271,7 @@ test_that("discordBDStratTNT behaves reasonably", {
 
   out_nine <- simulate(out_eight ~ edges, 
                        coef = c(0.5), 
-                       constraints = ~bd(maxout = 1) + blocks(attr = "sex", levels2 = levels2) + Strat(attr = "uncommon", pmat = pmat),
+                       constraints = ~bd(maxout = 1) + blocks(attr = "sex", levels2 = levels2) + strat(attr = "uncommon", pmat = pmat),
                        dynamic = TRUE,
                        output = "final")
 
@@ -279,7 +279,7 @@ test_that("discordBDStratTNT behaves reasonably", {
 
   out_ten <- simulate(out_nine ~ edges, 
                       coef = c(2000), 
-                      constraints = ~bd(maxout = 1) + blocks(attr = "sex", levels2 = levels2) + Strat(attr = "uncommon", pmat = pmat),
+                      constraints = ~bd(maxout = 1) + blocks(attr = "sex", levels2 = levels2) + strat(attr = "uncommon", pmat = pmat),
                       dynamic = TRUE,
                       output = "final")
 
@@ -288,7 +288,7 @@ test_that("discordBDStratTNT behaves reasonably", {
 
   out_eleven <- simulate(out_ten ~ edges, 
                          coef = c(-2000), 
-                         constraints = ~bd(maxout = 1) + blocks(attr = "sex", levels2 = levels2) + Strat(attr = "uncommon", pmat = pmat),
+                         constraints = ~bd(maxout = 1) + blocks(attr = "sex", levels2 = levels2) + strat(attr = "uncommon", pmat = pmat),
                          dynamic = TRUE,
                          output = "final")
 

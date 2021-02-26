@@ -24,7 +24,7 @@ control.simulate.network.tergm(
   MCMC.burnin.max = 1e+05,
   MCMC.burnin.pval = 0.5,
   MCMC.burnin.add = 1,
-  MCMC.prop = ~discord + TNT,
+  MCMC.prop = ~discord + sparse,
   MCMC.prop.weights = "default",
   MCMC.prop.args = NULL,
   MCMC.maxedges = Inf,
