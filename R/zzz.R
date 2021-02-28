@@ -8,15 +8,39 @@
 #  Copyright 2008-2020 Statnet Commons
 #######################################################################
 #' @import statnet.common
-.onAttach <- function(lib, pkg){
+.onAttach <- function(libname, pkgname){
   sm <- statnetStartupMessage("tergm", c("statnet"), FALSE)
   if(!is.null(sm)) packageStartupMessage(sm)
 }
 
 #' @import ergm
-.onLoad <- function(lib, pkg){
+.onLoad <- function(libname, pkgname){
+  eval(COLLATE_ALL_MY_CONTROLS_EXPR)
+
   .RegisterProposals()
 }
+
+# TODO: Figure out some automatic way to keep this in sync with statnet.common.
+#' @name snctrl
+#'
+#' @title Statnet Control
+#'
+#' @description A utility to facilitate argument completion of control lists, reexported from `statnet.common`.
+#'
+#' @section Currently recognised control parameters:
+#' This list is updated as packages are loaded and unloaded.
+#'
+#' \Sexpr[results=rd,stage=render]{statnet.common::snctrl_names()}
+#'
+#' @seealso [statnet.common::snctrl()]
+#' @docType import
+NULL
+#' @export
+snctrl <- statnet.common::snctrl
+## BEGIN boilerplate: should be kept in sync with statnet.common.
+
+
+eval(UPDATE_MY_SCTRL_EXPR)
 
 .RegisterProposals <- function(){
   ergm_proposal_table("c", "Bernoulli", "atleast",  0, "random", "formationMLE")
