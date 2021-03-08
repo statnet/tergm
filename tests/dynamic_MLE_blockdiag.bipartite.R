@@ -77,7 +77,7 @@ stopifnot(z.error(diss.mle(y0,y1), fit$coef[2], vcov(fit)[2,2]) <= tolerance)
 # Force CMLE
 for(prop.weight in prop.weights){
 cat("====",prop.weight,"====\n")
-set.seed(543)
+set.seed(5432)
 fit<-tergm(list(y0,y1) ~ Form(~edges) + Diss(~edges), constraints=~blockdiag("a"), estimate="CMLE", control=control.tergm(CMLE.ergm=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 2*1024, MCMC.burnin=10000, MCMC.interval = 1024, force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2))
 
 stopifnot(fit$estimate=="CMLE")
@@ -112,7 +112,7 @@ stopifnot(z.error(diss.mle(y0,y1m), fit$coef[2], vcov(fit)[2,2]) <= tolerance)
 # Force CMLE
 for(prop.weight in prop.weights){
 cat("====",prop.weight,"====\n")
-set.seed(234)
+set.seed(123456)
 fit<-tergm(list(y0,y1m) ~ Form(~edges) + Diss(~edges), constraints=~blockdiag("a"), estimate="CMLE", control=control.tergm(CMLE.ergm=control.ergm(MCMLE.effectiveSize = NULL,  MCMC.samplesize = 2*1024, MCMC.burnin=10000, MCMC.interval = 1024, force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2))
 
 stopifnot(fit$estimate=="CMLE")
