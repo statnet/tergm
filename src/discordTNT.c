@@ -17,7 +17,7 @@
 #include "changestats_lasttoggle.h"
 #include "tergm_model.h"
 #include "ergm_Rutil.h"
-#include "ergm_nodelist_dyad_sampler.h"
+#include "ergm_nodelist.h"
 #include "ergm_BDStrat_proposals.h"
 #include "ergm_hash_edgelist.h"
 
@@ -212,19 +212,16 @@ MH_P_FN(MH_discordStratTNT) {
   GET_STORAGE(discordStratTNTStorage, sto);
         
   // sample a strat mixing type on which to make a proposal
-  int i = WtPopGetRand(sto->static_sto->wtp);
-  
-  // record the mixing type of the toggle, in case it's needed in the U function later
-  sto->static_sto->currentmixingtype = i;    
-      
+  sto->static_sto->currentmixingtype = WtPopGetRand(sto->static_sto->wtp);
+        
   // number of edges of this mixing type
-  int nedgestype = sto->nonDiscordantELs[i]->nedges + sto->discordantELs[i]->nedges;
+  int nedgestype = sto->nonDiscordantELs[sto->static_sto->currentmixingtype]->nedges + sto->discordantELs[sto->static_sto->currentmixingtype]->nedges;
 
   // number of dyads of this mixing type
-  Dyad ndyadstype = sto->static_sto->ndyadstype[i];
+  Dyad ndyadstype = sto->static_sto->ndyadstype[sto->static_sto->currentmixingtype];
   
   // number of discordant dyads of this mixing type
-  int nddyadstype = sto->discordantNonELs[i]->nedges + sto->discordantELs[i]->nedges;
+  int nddyadstype = sto->discordantNonELs[sto->static_sto->currentmixingtype]->nedges + sto->discordantELs[sto->static_sto->currentmixingtype]->nedges;
   
   // flags
   int in_discord;
@@ -234,18 +231,7 @@ MH_P_FN(MH_discordStratTNT) {
     // propose from network
     if(nedgestype == 0 || unif_rand() < 0.5) {
       // propose toggling a random dyad of the specified mixing type
-      GetRandDyadFromLists(Mtail, // tail
-                           Mhead, // head
-                           sto->static_sto->nodesbycode, // tails
-                           sto->static_sto->nodesbycode, // heads
-                           sto->static_sto->tailtypes + i, // tailattrs
-                           sto->static_sto->headtypes + i, // headattrs
-                           sto->static_sto->nodecountsbycode, // tailcounts
-                           sto->static_sto->nodecountsbycode, // headcounts
-                           1, // length; only one allowed pairing since we've already sampled the strat type
-                           ndyadstype, // dyadcount
-                           TRUE, // diagonal; no higher level types here, so always TRUE
-                           DIRECTED); // directed
+      NodeListGetRandWithCount(Mtail, Mhead, sto->static_sto->nodelist, sto->static_sto->currentmixingtype, ndyadstype);
       
       in_network = IS_OUTEDGE(Mtail[0], Mhead[0]);
       in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;
@@ -253,31 +239,31 @@ MH_P_FN(MH_discordStratTNT) {
       // if it resides in any of the edgelists we store, we need to resample
       if(in_network) {
         if(in_discord) {
-          UnsrtELGetRand(Mtail, Mhead, sto->discordantELs[i]);
+          UnsrtELGetRand(Mtail, Mhead, sto->discordantELs[sto->static_sto->currentmixingtype]);
         } else {
-          UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantELs[i]);
+          UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantELs[sto->static_sto->currentmixingtype]);
         }
       } else if(in_discord) {
-        UnsrtELGetRand(Mtail, Mhead, sto->discordantNonELs[i]);
+        UnsrtELGetRand(Mtail, Mhead, sto->discordantNonELs[sto->static_sto->currentmixingtype]);
       }
     } else {
       // propose toggling off an edge of the specified mixing type
-      if(unif_rand() < sto->nonDiscordantELs[i]->nedges/((double) nedgestype)) {
-        UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantELs[i]);
+      if(unif_rand() < sto->nonDiscordantELs[sto->static_sto->currentmixingtype]->nedges/((double) nedgestype)) {
+        UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantELs[sto->static_sto->currentmixingtype]);
         in_discord = FALSE;
       } else {
-        UnsrtELGetRand(Mtail, Mhead, sto->discordantELs[i]);
+        UnsrtELGetRand(Mtail, Mhead, sto->discordantELs[sto->static_sto->currentmixingtype]);
         in_discord = TRUE;
       }
       in_network = TRUE;
     }
   } else {
     // propose from discord
-    if(unif_rand() < sto->discordantELs[i]->nedges/((double) nddyadstype)) {
-      UnsrtELGetRand(Mtail, Mhead, sto->discordantELs[i]);
+    if(unif_rand() < sto->discordantELs[sto->static_sto->currentmixingtype]->nedges/((double) nddyadstype)) {
+      UnsrtELGetRand(Mtail, Mhead, sto->discordantELs[sto->static_sto->currentmixingtype]);
       in_network = TRUE;
     } else {
-      UnsrtELGetRand(Mtail, Mhead, sto->discordantNonELs[i]);
+      UnsrtELGetRand(Mtail, Mhead, sto->discordantNonELs[sto->static_sto->currentmixingtype]);
       in_network = FALSE;
     }
     in_discord = TRUE;
@@ -405,12 +391,11 @@ MH_P_FN(MH_discordBDTNT) {
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
 
   int nedges = sto->nonDiscordantEdges->list->nedges + sto->discordantEdges->list->nedges;
+  int nddyads = sto->discordantEdges->list->nedges + sto->BDTDNE->list->nedges;
   
   int in_network;
   int in_discord;
-  
-  int nddyads = sto->discordantEdges->list->nedges + sto->BDTDNE->list->nedges;
-  
+    
   if(nddyads == 0 || unif_rand() < 0.5) {
     // propose from network
     
@@ -431,18 +416,7 @@ MH_P_FN(MH_discordBDTNT) {
       in_network = TRUE;
     } else {
       // select a BD-toggleable dyad and propose toggling it
-      GetRandDyadFromLists(Mtail, // tail
-                           Mhead, // head
-                           sto->static_sto->nodesvec, // tails
-                           sto->static_sto->nodesvec, // heads
-                           sto->static_sto->tailtypes, // tailattrs
-                           sto->static_sto->headtypes, // headattrs
-                           sto->static_sto->attrcounts, // tailcounts
-                           sto->static_sto->attrcounts, // headcounts
-                           sto->static_sto->nmixtypes, // length
-                           sto->static_sto->currentdyads, // dyadcount
-                           TRUE, // diagonal; no higher level types here, so always TRUE
-                           DIRECTED); // directed; always FALSE in discordBDTNT
+      NodeListGetRandWithCount(Mtail, Mhead, sto->static_sto->nodelist, 0, sto->static_sto->currentdyads);
           
       in_network = IS_OUTEDGE(Mtail[0],Mhead[0]);
       in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;
@@ -460,10 +434,7 @@ MH_P_FN(MH_discordBDTNT) {
   }
   
   sto->in_discord = in_discord;
-  
-  sto->static_sto->tailtype = sto->static_sto->vattr[Mtail[0]];
-  sto->static_sto->headtype = sto->static_sto->vattr[Mhead[0]];    
-  
+    
   sto->static_sto->tailmaxl = IN_DEG[Mtail[0]] + OUT_DEG[Mtail[0]] == sto->static_sto->bound - 1 + in_network;
   sto->static_sto->headmaxl = IN_DEG[Mhead[0]] + OUT_DEG[Mhead[0]] == sto->static_sto->bound - 1 + in_network;   
 
@@ -474,11 +445,7 @@ MH_P_FN(MH_discordBDTNT) {
   sto->maxl[1] = sto->static_sto->headmaxl;
 
   // obtain the count of dyads that can be toggled in the "GetRandBDDyad" branch, in the proposed network
-  NodeListToggleKnownIf(*Mtail, sto->static_sto->nodesvec[sto->static_sto->tailtype], sto->static_sto->nodepos, sto->static_sto->attrcounts + sto->static_sto->tailtype, !in_network, sto->static_sto->tailmaxl);
-  NodeListToggleKnownIf(*Mhead, sto->static_sto->nodesvec[sto->static_sto->headtype], sto->static_sto->nodepos, sto->static_sto->attrcounts + sto->static_sto->headtype, !in_network, sto->static_sto->headmaxl);      
-  sto->static_sto->proposeddyads = NodeListDyadCount(sto->static_sto->attrcounts, sto->static_sto->attrcounts, sto->static_sto->tailtypes, sto->static_sto->headtypes, sto->static_sto->nmixtypes, TRUE, DIRECTED);
-  NodeListToggleKnownIf(*Mtail, sto->static_sto->nodesvec[sto->static_sto->tailtype], sto->static_sto->nodepos, sto->static_sto->attrcounts + sto->static_sto->tailtype, in_network, sto->static_sto->tailmaxl);
-  NodeListToggleKnownIf(*Mhead, sto->static_sto->nodesvec[sto->static_sto->headtype], sto->static_sto->nodepos, sto->static_sto->attrcounts + sto->static_sto->headtype, in_network, sto->static_sto->headmaxl);      
+  sto->static_sto->proposeddyads = NodeListDyadCountOnToggle(*Mtail, *Mhead, sto->static_sto->nodelist, 0, in_network ? 1 : -1, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
   
   // need to calculate number of BD-toggleable discordant dyads in the proposed network; 
   // this can involve both the proposal dyad itself and other dyads containing either of
@@ -530,8 +497,7 @@ MH_U_FN(Mu_discordBDTNT) {
   }
 
   // update node lists as needed
-  NodeListToggleKnownIf(tail, sto->static_sto->nodesvec[sto->static_sto->tailtype], sto->static_sto->nodepos, sto->static_sto->attrcounts + sto->static_sto->tailtype, !edgeflag, sto->static_sto->tailmaxl);
-  NodeListToggleKnownIf(head, sto->static_sto->nodesvec[sto->static_sto->headtype], sto->static_sto->nodepos, sto->static_sto->attrcounts + sto->static_sto->headtype, !edgeflag, sto->static_sto->headmaxl);      
+  NodeListToggleKnownIf(tail, head, sto->static_sto->nodelist, !edgeflag, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);  
   
   // update dyad toggleability statuses as appropriate
   Network *relevant_net = edgeflag ? sto->combined_nonBDTDNE : sto->combined_BDTDNE;
@@ -654,18 +620,12 @@ MH_P_FN(MH_discordBDStratTNT) {
 
   // sample a toggleable strat mixing type on which to make a proposal
   int strat_i = WtPopGetRand(sto->static_sto->wtp);
-  
-  // record the mixing type of the toggle, in case it's needed in the U function later
-  sto->static_sto->stratmixingtype = strat_i;    
-
-  int strattailtype = sto->static_sto->strattailtypes[strat_i];
-  int stratheadtype = sto->static_sto->stratheadtypes[strat_i];
-  int strat_diag = strattailtype == stratheadtype;
+  sto->static_sto->stratmixingtype = strat_i;
   
   // number of edges of this mixing type
   int nedgestype = sto->nonDiscordantEdges[strat_i]->list->nedges + sto->discordantEdges[strat_i]->list->nedges;
   
-  Dyad ndyadstype = NodeListDyadCount(sto->static_sto->attrcounts[strattailtype], sto->static_sto->attrcounts[stratheadtype], sto->static_sto->bd_tails, sto->static_sto->bd_heads, sto->static_sto->bd_mixtypes[strat_diag], strat_diag, DIRECTED);
+  Dyad ndyadstype = NodeListDyadCount(sto->static_sto->nodelist, strat_i);
   
   int nddyadstype = sto->discordantEdges[strat_i]->list->nedges + sto->BDTDNE[strat_i]->list->nedges;
   
@@ -686,18 +646,7 @@ MH_P_FN(MH_discordBDStratTNT) {
       in_network = TRUE;
     } else {
       // select a random BD toggleable dyad of strat mixing type strat_i and propose toggling it
-      GetRandDyadFromLists(Mtail, // tail
-                           Mhead, // head
-                           sto->static_sto->nodesvec[strattailtype], // tails
-                           sto->static_sto->nodesvec[stratheadtype], // heads
-                           sto->static_sto->bd_tails, // tailattrs
-                           sto->static_sto->bd_heads, // headattrs
-                           sto->static_sto->attrcounts[strattailtype], // tailcounts
-                           sto->static_sto->attrcounts[stratheadtype], // headcounts
-                           sto->static_sto->bd_mixtypes[strat_diag], // length
-                           ndyadstype, // dyadcount
-                           strat_diag, // diagonal
-                           DIRECTED); // directed; always FALSE in discordBDStratTNT
+      NodeListGetRandWithCount(Mtail, Mhead, sto->static_sto->nodelist, strat_i, ndyadstype);
          
       in_network = IS_OUTEDGE(Mtail[0],Mhead[0]);
       in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;
@@ -716,12 +665,6 @@ MH_P_FN(MH_discordBDStratTNT) {
 
   sto->in_discord = in_discord;
 
-  sto->static_sto->strattailtype = sto->static_sto->strat_vattr[Mtail[0]];
-  sto->static_sto->stratheadtype = sto->static_sto->strat_vattr[Mhead[0]];
-    
-  sto->static_sto->bdtailtype = sto->static_sto->bd_vattr[Mtail[0]];
-  sto->static_sto->bdheadtype = sto->static_sto->bd_vattr[Mhead[0]];
-
   sto->static_sto->tailmaxl = IN_DEG[Mtail[0]] + OUT_DEG[Mtail[0]] == sto->static_sto->bound - 1 + in_network;
   sto->static_sto->headmaxl = IN_DEG[Mhead[0]] + OUT_DEG[Mhead[0]] == sto->static_sto->bound - 1 + in_network;
 
@@ -731,58 +674,11 @@ MH_P_FN(MH_discordBDStratTNT) {
   sto->maxl[0] = sto->static_sto->tailmaxl;  
   sto->maxl[1] = sto->static_sto->headmaxl;  
 
-  // temporarily set tail and head toggleability to what it would be in the proposed network
-  NodeListToggleKnownIf(*Mtail, sto->static_sto->nodesvec[sto->static_sto->strattailtype][sto->static_sto->bdtailtype], sto->static_sto->nodepos, sto->static_sto->attrcounts[sto->static_sto->strattailtype] + sto->static_sto->bdtailtype, !in_network, sto->static_sto->tailmaxl);
-  NodeListToggleKnownIf(*Mhead, sto->static_sto->nodesvec[sto->static_sto->stratheadtype][sto->static_sto->bdheadtype], sto->static_sto->nodepos, sto->static_sto->attrcounts[sto->static_sto->stratheadtype] + sto->static_sto->bdheadtype, !in_network, sto->static_sto->headmaxl);
-
   // compute proposed dyad count for current mixing type (only)
-  Dyad proposeddyadstype = NodeListDyadCount(sto->static_sto->attrcounts[strattailtype], sto->static_sto->attrcounts[stratheadtype], sto->static_sto->bd_tails, sto->static_sto->bd_heads, sto->static_sto->bd_mixtypes[strat_diag], strat_diag, DIRECTED);
-    
-  // here we compute the proposedcumprob, checking only those
-  // mixing types that can be influenced by toggles made on 
-  // the current mixing type
-  sto->static_sto->proposedcumprob = sto->static_sto->currentcumprob;
-  sto->static_sto->nmixtypestoupdate = 0; // reset counter
-  // avoid these somewhat expensive checks in the typical case
-  // where you have enough submaximal nodes that you cannot
-  // be exhausting any mixing types of toggleable dyads
-  if(sto->static_sto->attrcounts[sto->static_sto->strattailtype][sto->static_sto->bdtailtype] <= 2 || sto->static_sto->attrcounts[sto->static_sto->stratheadtype][sto->static_sto->bdheadtype] <= 2) {
-    
-    // how many strat types do we need to check?
-    int ntocheck = strat_diag ? sto->static_sto->nstratlevels : 2*sto->static_sto->nstratlevels;
+  Dyad proposeddyadstype = NodeListDyadCountOnToggle(*Mtail, *Mhead, sto->static_sto->nodelist, strat_i, in_network ? 1 : -1, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
 
-    for(int i = 0; i < ntocheck; i++) {
-      // find the index of the i'th strat type we need to check, by looking it up in the indmat
-      int infl_i = sto->static_sto->indmat[i < sto->static_sto->nstratlevels ? sto->static_sto->strattailtype : i - sto->static_sto->nstratlevels][i < sto->static_sto->nstratlevels ? i : sto->static_sto->stratheadtype];
-
-      // if this strat type is not included in the proposal, or is the same as the strat type of the proposed toggle,
-      // then it cannot change toggleability status, so skip it
-      if(infl_i < 0 || infl_i == strat_i) {
-        continue;
-      }
-      
-      // can we toggle this mixing type in the current network?
-      int toggle_curr = WtPopGetWt(infl_i, sto->static_sto->wtp) > 0;
-      
-      // will we be able to toggle this mixing type in the proposed network? 
-      int toggle_prop = sto->nonDiscordantEdges[infl_i]->list->nedges > 0 || sto->discordantEdges[infl_i]->list->nedges > 0 || NodeListDyadCountPositive(sto->static_sto->attrcounts[sto->static_sto->strattailtypes[infl_i]], sto->static_sto->attrcounts[sto->static_sto->stratheadtypes[infl_i]], sto->static_sto->bd_tails, sto->static_sto->bd_heads, sto->static_sto->bd_mixtypes[sto->static_sto->strattailtypes[infl_i] == sto->static_sto->stratheadtypes[infl_i]], sto->static_sto->strattailtypes[infl_i] == sto->static_sto->stratheadtypes[infl_i]);
-      
-      // will there be a change in toggleability status?
-      int change = toggle_curr - toggle_prop;
-
-      // if so, take this into account      
-      if(change) {
-        sto->static_sto->proposedcumprob -= change*sto->static_sto->originalprobvec[infl_i];
-        sto->static_sto->mixtypestoupdate[sto->static_sto->nmixtypestoupdate] = infl_i;
-        sto->static_sto->nmixtypestoupdate++;        
-      }
-    }
-  }
+  ComputeChangesToToggleability(Mtail, Mhead, in_network, sto->static_sto);
   
-  // restore tail and head toggleability to their current status
-  NodeListToggleKnownIf(*Mtail, sto->static_sto->nodesvec[sto->static_sto->strattailtype][sto->static_sto->bdtailtype], sto->static_sto->nodepos, sto->static_sto->attrcounts[sto->static_sto->strattailtype] + sto->static_sto->bdtailtype, in_network, sto->static_sto->tailmaxl);
-  NodeListToggleKnownIf(*Mhead, sto->static_sto->nodesvec[sto->static_sto->stratheadtype][sto->static_sto->bdheadtype], sto->static_sto->nodepos, sto->static_sto->attrcounts[sto->static_sto->stratheadtype] + sto->static_sto->bdheadtype, in_network, sto->static_sto->headmaxl);
-
   // need to calculate number of BD-toggleable discordant dyads in the proposed network; 
   // this can involve both the proposal dyad itself and other dyads containing either of
   // the nodes in the proposal dyad
@@ -842,8 +738,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
     ToggleKnownEdge(tail, head, sto->combined_BDTDNE, !edgeflag);      
   }
 
-  NodeListToggleKnownIf(tail, sto->static_sto->nodesvec[sto->static_sto->strattailtype][sto->static_sto->bdtailtype], sto->static_sto->nodepos, sto->static_sto->attrcounts[sto->static_sto->strattailtype] + sto->static_sto->bdtailtype, !edgeflag, sto->static_sto->tailmaxl);
-  NodeListToggleKnownIf(head, sto->static_sto->nodesvec[sto->static_sto->stratheadtype][sto->static_sto->bdheadtype], sto->static_sto->nodepos, sto->static_sto->attrcounts[sto->static_sto->stratheadtype] + sto->static_sto->bdheadtype, !edgeflag, sto->static_sto->headmaxl);      
+  NodeListToggleKnownIf(tail, head, sto->static_sto->nodelist, !edgeflag, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
   
   // update dyad toggleability statuses, as appropriate  
   Network *relevant_net = edgeflag ? sto->combined_nonBDTDNE : sto->combined_BDTDNE;
