@@ -113,7 +113,20 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
                  "wrong number of parameters."))
     }
   }else control$init <- rep(NA, length(model$etamap$offsettheta)) # Set the default value of control$init.
-  if(!is.null(offset.coef)) control$init[model$etamap$offsettheta]<-offset.coef
+  
+  if(!is.null(offset.coef)) {
+    if(length(control$init[model$etamap$offsettheta])!=length(offset.coef)) {
+      stop("Invalid offset parameter vector offset.coef: ",
+           "wrong number of parameters: expected ",
+           length(control$init[model$etamap$offsettheta]),
+           " got ", length(offset.coef), ".")
+    }
+    control$init[model$etamap$offsettheta] <- offset.coef
+  }
+
+  # Make sure any offset elements are given in control$init.
+  if(any(is.na(control$init) & model$etamap$offsettheta)) stop("The model contains offset terms whose parameter values have not been specified:", paste.and(param_names(model)[is.na(control$init)&model$offsettheta]), ".", sep="")
+    
   names(control$init) <- model$coef.names
 
   initialfit <- tergm.EGMME.initialfit(control$init, nw, model, formula, model.mon, targets, control, verbose)
