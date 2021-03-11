@@ -171,7 +171,12 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
     dissolution <- dissolution[c(1,3)] # in a formula f<-y~x, f[1]=~, f[2]=y, and f[3]=x
   }
   
-  control$init <- c(control$init.form, control$init.diss) # may be problem if one specified and the other isn't
+  if((is.null(control$init.form) && !is.null(control$init.diss)) || (!is.null(control$init.form) && is.null(control$init.diss))) {
+    stop("tergm 4.0 requires that both 'init.form' and 'init.diss' are specified when either is.")
+  }
+
+  # would be a problem if one is specified and the other isn't, but we now check for that above
+  control$init <- c(control$init.form, control$init.diss) 
 
   control$MCMC.prop <- control$MCMC.prop.form
   control$MCMC.prop.weights <- control$MCMC.prop.weights.form
