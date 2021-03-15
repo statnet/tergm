@@ -215,7 +215,6 @@
 #'                         dynamic=TRUE)
 #' 
 #' @importFrom stats simulate
-#' @importFrom ergm.multi uncombine_network
 #' @export
 simulate.tergm<-function(object, nsim=1, seed=NULL,
                           coef=object$coef,

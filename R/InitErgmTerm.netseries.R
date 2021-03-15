@@ -7,19 +7,28 @@
 #
 #  Copyright 2008-2020 Statnet Commons
 #######################################################################
-######################################################################
-#
-# stergm CMLE estimation implemented as ergm terms, using auxiliary storage to
-# keep track of the formation and dissolution networks.
-#
-# usage: ergm(y ~ formation(formula_f) + dissolution(formula_d))
-# formula_f is the formation model formula, 
-# formula_d is the dissolution model formula
-# Optional parameter: markov=TRUE for the standard markov conditional tergm model
-#                     markov=FALSE for unconditional sampling 
-#                       (changing panel 2 affects transitions 1->2 and 2->3)
-#
-######################################################################
+
+.same_constraints <- function(nwl, nattr){
+  map(nwl, get.network.attribute, nattr) %>% map(NVL, ~.) %>% map(empty_env) %>% all_identical
+}
+
+join_nets <- function(nwl, blockID, blockName){
+  if(!.same_constraints(nwl, "constraints")) stop("Networks have differing constraint structures. This is not supported at this time.")
+  if(!.same_constraints(nwl, "obs.constraints")) stop("Networks have differing observation processes. This is not supported at this time.")
+
+  nw <- combine_networks(nwl, blockID.vattr=blockID, blockName.vattr=blockName, ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints", "ergm"), subnet.cache=TRUE)
+
+  nw %n% "ergm" <- .combine_ergmlhs(nwl)
+
+  nw %ergmlhs% "constraints" <-
+      if(NVL(nwl[[1]] %ergmlhs% "constraints",base_env(~.))==base_env(~.))
+        base_env(substitute(~blockdiag(blockID), list(blockID=blockID)))
+      else
+        append_rhs.formula(nwl[[1]]%ergmlhs%"constraints", list(call("blockdiag",".NetworkID")), TRUE)
+  if(!is.null(nwl[[1]]%ergmlhs%"obs.constraints")) nw %ergmlhs% "obs.constraints" <- nwl[[1]]%ergmlhs%"obs.constraints"
+
+  nw
+}
 
 #' A network series specification for modelling for conditional modeling.
 #'
@@ -103,10 +112,9 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
   }
   
   # Now, just combine them using the Networks() constructor.
-  #' @importFrom ergm.multi Networks
-  nw <- Networks(nwl)
+  nw <- join_nets(nwl,".NetworkID",".NetworkName")
   # Add previous networks combined.
-  .PrevNet <- Networks(nwl0)
+  .PrevNet <- join_nets(nwl0,".NetworkID",".NetworkName")
   nw %ergmlhs% "constraints" <- nonsimp_update.formula(nw%ergmlhs%"constraints", .~.+discord(.PrevNet), from.new=".PrevNet")
 
   nw
@@ -115,10 +123,10 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
 
 InitErgmTerm.Form <- function(nw, arglist,  ...) {
   a <- check.ErgmTerm(nw, arglist,
-                      varnames = c("formula","lm","subset","weights","contrasts","offset","label"),
-                      vartypes = c("formula","formula","formula,logical,numeric,expression,call","formula,logical,numeric,expression,call","list","formula,logical,numeric,expression,call","character"),
-                      defaultvalues = list(NULL,~1,TRUE,1,NULL,NULL,NULL),
-                      required = c(TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE))
+                      varnames = c("formula"),
+                      vartypes = c("formula"),
+                      defaultvalues = list(NULL),
+                      required = c(TRUE))
 
   if(!is(nw, "combined_networks")) {
     return(InitErgmTerm.FormE(nw = nw, arglist = a["formula"], ...))
@@ -130,7 +138,7 @@ InitErgmTerm.Form <- function(nw, arglist,  ...) {
   a$formula <- f
 
   # Just call N() operator.
-  term <- as.call(c(list(as.name("N")),a))
+  term <- as.call(c(list(as.name("Cross")),a))
   out <- call.ErgmTerm(term, env=environment(f), nw=nw, ...)
   out
   # TODO: Fix coefficient names.
@@ -157,10 +165,10 @@ InitErgmTerm.Form1 <- function(nw, arglist,  ...){
 
 InitErgmTerm.Diss <- function(nw, arglist,  ...) {
   a <- check.ErgmTerm(nw, arglist,
-                      varnames = c("formula","lm","subset","weights","contrasts","offset","label"),
-                      vartypes = c("formula","formula","formula,logical,numeric,expression,call","formula,logical,numeric,expression,call","list","formula,logical,numeric,expression,call","character"),
-                      defaultvalues = list(NULL,~1,TRUE,1,NULL,NULL,NULL),
-                      required = c(TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE))
+                      varnames = c("formula"),
+                      vartypes = c("formula"),
+                      defaultvalues = list(NULL),
+                      required = c(TRUE))
 
   if(!is(nw, "combined_networks")) {
     return(InitErgmTerm.DissE(nw = nw, arglist = a["formula"], ...))
@@ -172,7 +180,7 @@ InitErgmTerm.Diss <- function(nw, arglist,  ...) {
   a$formula <- f
 
   # Just call N() operator.
-  term <- as.call(c(list(as.name("N")),a))
+  term <- as.call(c(list(as.name("Cross")),a))
   out <- call.ErgmTerm(term, env=environment(f), nw=nw, ...)
   out
   # TODO: Fix coefficient names.
@@ -192,4 +200,54 @@ InitErgmTerm.Diss1 <- function(nw, arglist,  ...){
          auxiliaries = ~.intersect.net((nw%n%".PrevNets")[[1]], implementation="Network"),
          submodel = m),
     wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Diss")))
+}
+
+# Auxiliary to extract crossectional networks.
+InitErgmTerm..crossnets <- function(nw, arglist, ...){
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c("attrname"),
+                      vartypes = c("character"),
+                      defaultvalues = list(NULL),
+                      required = c(TRUE))
+
+  list(name="_crossnets", coef.names=c(), iinputs=c(unlist(.block_vertexmap(nw, a$attrname))), dependence=FALSE)
+}
+
+# A term for a cross-sectional model for the network in a series.
+#' @import purrr
+InitErgmTerm.Cross <- function(nw, arglist,...){
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c("formula"),
+                      vartypes = c("formula"),
+                      defaultvalues = list(NULL),
+                      required = c(TRUE))
+
+  auxiliaries <- base_env(~.crossnets(".NetworkID"))
+
+  nwl <- .split_constr_network(nw, ".NetworkID", ".NetworkName")
+  nwnames <- names(nwl)
+  nn <- length(nwl)
+
+  ms <- lapply(nwl, function(nw1){
+    ergm_model(a$formula, nw1, ...)
+  })
+
+  nparams <- ms %>% map_int(nparam, canonical=FALSE)
+  nstats <-  ms %>% map_int(nparam, canonical=TRUE)
+
+  if(!all_identical(nparams) && !all_identical(ms %>% map(param_names, canonical=FALSE))) ergm_Init_abort("The transitions appear to have different sets of parameters. This may be a consequence of a change in network composition. The levels= argument may help.")
+  nparam <- nparams[1]
+
+  wms <- mapply(wrap.ergm_model, ms, nwl, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+
+  gss <- map(wms, "emptynwstats")
+  gs <-
+    if(all(map_lgl(gss, is.null))){ # Linear combination of 0s is 0.
+      NULL
+    }else{ # All numeric or NULL
+      gss %>% map(NVL, 0) %>% Reduce(`+`, .)
+    }
+
+  c(list(name="OnCrossNets", submodels=ms, emptynwstats = gs, auxiliaries = auxiliaries),
+    wms[[1]][c("coef.names","map","gradient","params","dependence","offset")])
 }
