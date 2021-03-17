@@ -49,4 +49,4 @@ Encoding: UTF-8
 Remotes: github::statnet/statnet.common@master,
     github::statnet/network@master,
     github::statnet/networkDynamic@master,
-    github::statnet/ergm-private@dev
+    github::statnet/ergm@master
