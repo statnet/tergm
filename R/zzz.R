@@ -48,6 +48,5 @@ eval(UPDATE_MY_SCTRL_EXPR)
   ergm_proposal_table("c", "Bernoulli", "|.dyads&sparse&discord",  1, "discordTNT", "staticDiscordTNT")
   ergm_proposal_table("t", "Bernoulli", "|discord&sparse",  1, "discordTNT", "discordTNT")
   ergm_proposal_table("t", "Bernoulli", "|strat|discord&sparse",  0, "discordStratTNT", "discordStratTNT")
-  ergm_proposal_table("t", "Bernoulli", "|bdmax|blocks|discord&sparse",  0, "discordBDTNT", "discordBDTNT")
   ergm_proposal_table("t", "Bernoulli", "|bdmax|blocks|strat|discord&sparse",  0, "discordBDStratTNT", "discordBDStratTNT")
 }

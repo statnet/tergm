@@ -32,13 +32,6 @@ InitErgmProposal.discordStratTNT <- function(arguments, nw, model) {
   proposal
 }
 
-InitErgmProposal.discordBDTNT <- function(arguments, nw, model) {
-  proposal <- ergm:::InitErgmProposal.BDTNT(arguments, nw)
-  proposal$name <- "discordBDTNT"
-  proposal$auxiliaries <- ~.lasttoggle
-  proposal
-}
-
 InitErgmProposal.discordBDStratTNT <- function(arguments, nw, model) {
   proposal <- ergm:::InitErgmProposal.BDStratTNT(arguments, nw)
   proposal$name <- "discordBDStratTNT"
