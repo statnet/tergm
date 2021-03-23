@@ -72,7 +72,7 @@ InitErgmConstraint.blockdiag<-function(lhs.nw, attr=NULL, ...){
        free_dyads = {
          n <- network.size(lhs.nw)
          storage.mode(n) <- "integer"
-         a <- ergm_get_vattr(attr, lhs.nw)
+         a <- c(ergm_get_vattr(attr, lhs.nw)) # Strip attributes, which confuse rle().
          if(NVL(lhs.nw%n%"bipartite",0)){
            bip <- lhs.nw %n% "bipartite"
            ea <- a[seq_len(bip)]
