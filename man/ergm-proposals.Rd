@@ -12,7 +12,6 @@
 \alias{InitErgmProposal}
 \alias{InitErgmProposal.staticDiscordTNT}
 \alias{InitErgmProposal.discordTNT}
-\alias{InitErgmProposal.discordStratTNT}
 \alias{InitErgmProposal.discordBDStratTNT}
 
 \docType{methods}
@@ -55,18 +54,7 @@
         the network.  The value of \code{discordance_fraction} can be set by the user as a proposal argument,
         and defaults to \code{0.5}.
       }
-      
-      \item{\code{InitErgmProposal.discordStratTNT}} {
-      
-        A temporal version of \code{\link[ergm:ergm-proposals]{StratTNT}}.  Within each strat
-        mixing type, approximately 50\% of proposed toggles are made on
-        discordant dyads, and approximately 50\% of proposed toggles are
-        TNT proposals from the network.
-
-        Proposal arguments are the same as for \code{\link[ergm:ergm-proposals]{StratTNT}},
-        and should be passed in via the \code{\link[ergm:ergm-hints]{Strat}} hint.
-      }
-            
+                  
       \item{\code{InitErgmProposal.discordBDStratTNT}} {
 
         A temporal version of \code{\link[ergm:ergm-proposals]{BDStratTNT}}.  Within each 

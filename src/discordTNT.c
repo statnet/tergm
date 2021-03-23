@@ -21,6 +21,12 @@
 #include "ergm_BDStrat_proposals.h"
 #include "ergm_hash_edgelist.h"
 
+
+
+/********************
+    MH_discordTNT
+********************/
+
 typedef struct {
   UnsrtEL *nonDiscordantEdges;
   UnsrtEL *discordantEdges;
@@ -157,171 +163,6 @@ MH_F_FN(Mf_discordTNT) {
 
 
 /********************
-   discordStratTNT
-********************/
-
-typedef struct {
-  UnsrtEL **nonDiscordantELs;
-  UnsrtEL **discordantELs;
-  UnsrtEL **discordantNonELs;
-    
-  int in_discord;
-
-  StratTNTStorage *static_sto;
-} discordStratTNTStorage; 
-
-
-MH_I_FN(Mi_discordStratTNT) {
-  // let StratTNT's I_FN do most of the work
-  Mi_StratTNT(MHp, nwp);
-
-  // do a little copying and handle purely temporal aspects
-  StratTNTStorage *static_sto = MH_STORAGE;
-  ALLOC_STORAGE(1, discordStratTNTStorage, sto);
-  sto->static_sto = static_sto;
-  sto->nonDiscordantELs = static_sto->els;
-
-  sto->discordantELs = Calloc(static_sto->nmixtypes, UnsrtEL *);
-  sto->discordantNonELs = Calloc(static_sto->nmixtypes, UnsrtEL *);
-  for(int i = 0; i < static_sto->nmixtypes; i++) {
-    sto->discordantELs[i] = UnsrtELInitialize(0, NULL, NULL, FALSE);
-    sto->discordantNonELs[i] = UnsrtELInitialize(0, NULL, NULL, FALSE);
-  }
-} 
-
-MH_X_FN(Mx_discordStratTNT) {
-  GET_STORAGE(discordStratTNTStorage, sto);
-  
-  if(type == TICK) {
-    // transfer discordant edges to nondiscordant edges
-    // clear discordant edges and discordant nonedges
-    for(int i = 0; i < sto->static_sto->nmixtypes; i++) {
-      // UnsrtELs start at index 1 here
-      for(int j = 1; j <= sto->discordantELs[i]->nedges; j++) {
-        UnsrtELInsert(sto->discordantELs[i]->tails[j], sto->discordantELs[i]->heads[j], sto->nonDiscordantELs[i]);
-      }
-      
-      sto->discordantELs[i]->nedges = 0;
-      sto->discordantNonELs[i]->nedges = 0;      
-    }
-  }
-}
-
-MH_P_FN(MH_discordStratTNT) {
-  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
-  GET_STORAGE(discordStratTNTStorage, sto);
-        
-  // sample a strat mixing type on which to make a proposal
-  sto->static_sto->currentmixingtype = WtPopGetRand(sto->static_sto->wtp);
-        
-  // number of edges of this mixing type
-  int nedgestype = sto->nonDiscordantELs[sto->static_sto->currentmixingtype]->nedges + sto->discordantELs[sto->static_sto->currentmixingtype]->nedges;
-
-  // number of dyads of this mixing type
-  Dyad ndyadstype = sto->static_sto->ndyadstype[sto->static_sto->currentmixingtype];
-  
-  // number of discordant dyads of this mixing type
-  int nddyadstype = sto->discordantNonELs[sto->static_sto->currentmixingtype]->nedges + sto->discordantELs[sto->static_sto->currentmixingtype]->nedges;
-  
-  // flags
-  int in_discord;
-  int in_network;
-  
-  if(nddyadstype == 0 || unif_rand() < 0.5) {
-    // propose from network
-    if(nedgestype == 0 || unif_rand() < 0.5) {
-      // propose toggling a random dyad of the specified mixing type
-      NodeListGetRandWithCount(Mtail, Mhead, sto->static_sto->nodelist, sto->static_sto->currentmixingtype, ndyadstype);
-      
-      in_network = IS_OUTEDGE(Mtail[0], Mhead[0]);
-      in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;
-      
-      // if it resides in any of the edgelists we store, we need to resample
-      if(in_network) {
-        if(in_discord) {
-          UnsrtELGetRand(Mtail, Mhead, sto->discordantELs[sto->static_sto->currentmixingtype]);
-        } else {
-          UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantELs[sto->static_sto->currentmixingtype]);
-        }
-      } else if(in_discord) {
-        UnsrtELGetRand(Mtail, Mhead, sto->discordantNonELs[sto->static_sto->currentmixingtype]);
-      }
-    } else {
-      // propose toggling off an edge of the specified mixing type
-      if(unif_rand() < sto->nonDiscordantELs[sto->static_sto->currentmixingtype]->nedges/((double) nedgestype)) {
-        UnsrtELGetRand(Mtail, Mhead, sto->nonDiscordantELs[sto->static_sto->currentmixingtype]);
-        in_discord = FALSE;
-      } else {
-        UnsrtELGetRand(Mtail, Mhead, sto->discordantELs[sto->static_sto->currentmixingtype]);
-        in_discord = TRUE;
-      }
-      in_network = TRUE;
-    }
-  } else {
-    // propose from discord
-    if(unif_rand() < sto->discordantELs[sto->static_sto->currentmixingtype]->nedges/((double) nddyadstype)) {
-      UnsrtELGetRand(Mtail, Mhead, sto->discordantELs[sto->static_sto->currentmixingtype]);
-      in_network = TRUE;
-    } else {
-      UnsrtELGetRand(Mtail, Mhead, sto->discordantNonELs[sto->static_sto->currentmixingtype]);
-      in_network = FALSE;
-    }
-    in_discord = TRUE;
-  }
-  
-  // compute logratio
-  
-  // these ignore overall factor of 1/2 which cancels out in ratio
-  // and overall factor of prob(mixing type), which also cancels out in ratio
-  double forward_discord = in_discord ? 1.0/nddyadstype : 0;
-  double backward_discord = in_discord ? 0 : 1.0/(1 + nddyadstype);
-  
-  double forward_network = in_network ? (0.5/nedgestype + 0.5/ndyadstype) : (nedgestype == 0 ? 1.0/ndyadstype : 0.5/ndyadstype);
-  double backward_network = in_network ? (nedgestype == 1 ? 1.0/ndyadstype : 0.5/ndyadstype) : (0.5/(nedgestype + 1) + 0.5/ndyadstype);
-  
-  if(nddyadstype == 0) forward_network *= 2;
-  if(nddyadstype == 1 && in_discord) backward_network *= 2;
-  
-  double forward = forward_discord + forward_network;
-  double backward = backward_discord + backward_network;
-
-  MHp->logratio = log(backward/forward);
-
-  sto->in_discord = in_discord;
-}
-
-MH_U_FN(Mu_discordStratTNT) {
-  GET_STORAGE(discordStratTNTStorage, sto);
-
-  // add or remove edge from appropriate edgelist(s)
-  if(sto->in_discord == edgeflag) {
-    UnsrtELToggleKnown(tail, head, sto->discordantELs[sto->static_sto->currentmixingtype], edgeflag);      
-  } else {
-    UnsrtELToggleKnown(tail, head, sto->nonDiscordantELs[sto->static_sto->currentmixingtype], edgeflag);
-    UnsrtELToggleKnown(tail, head, sto->discordantNonELs[sto->static_sto->currentmixingtype], !edgeflag);      
-  }
-}
-
-MH_F_FN(Mf_discordStratTNT) {
-  GET_STORAGE(discordStratTNTStorage, sto);
-  // free things used only in the dynamic proposal
-  for(int i = 0; i < sto->static_sto->nmixtypes; i++) {
-    UnsrtELDestroy(sto->discordantELs[i]);
-    UnsrtELDestroy(sto->discordantNonELs[i]);    
-  }
-
-  Free(sto->discordantELs);
-  Free(sto->discordantNonELs);
-
-  // let StratTNT's F_FN do most of the work
-  MH_STORAGE = sto->static_sto;
-  Mf_StratTNT(MHp, nwp);
-  Free(sto->static_sto);
-  MH_STORAGE = sto;
-  // MHp->storage itself should be Freed by MHProposalDestroy
-}
-
-/********************
     MH_discordBDStratTNT
 ********************/
 
@@ -442,8 +283,8 @@ MH_P_FN(MH_discordBDStratTNT) {
 
   sto->in_discord = in_discord;
 
-  sto->static_sto->tailmaxl = IN_DEG[Mtail[0]] + OUT_DEG[Mtail[0]] == sto->static_sto->bound - 1 + in_network;
-  sto->static_sto->headmaxl = IN_DEG[Mhead[0]] + OUT_DEG[Mhead[0]] == sto->static_sto->bound - 1 + in_network;
+  sto->static_sto->tailmaxl = (DIRECTED ? OUT_DEG[Mtail[0]] : IN_DEG[Mtail[0]] + OUT_DEG[Mtail[0]]) == sto->static_sto->maxout - 1 + in_network;
+  sto->static_sto->headmaxl = (DIRECTED ? IN_DEG[Mhead[0]] : IN_DEG[Mhead[0]] + OUT_DEG[Mhead[0]]) == sto->static_sto->maxin - 1 + in_network;
 
   sto->nodes[0] = *Mtail;  
   sto->nodes[1] = *Mhead;
@@ -468,7 +309,12 @@ MH_P_FN(MH_discordBDStratTNT) {
   for(int i = 0; i < 2; i++) {
     if(sto->maxl[i]) {
       EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->nodes[i], ego, alter, tail, head, edge, relevant_net, {
-        if(alter != sto->nodes[1 - i] && sto->static_sto->indmat[sto->static_sto->strat_vattr[tail]][sto->static_sto->strat_vattr[head]] == strat_i && (!in_network || IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound)) {
+        if(// not the proposal dyad, and
+           (tail != *Mtail || head != *Mhead) &&
+           // same mixing type as the proposal dyad, and
+           sto->static_sto->indmat[sto->static_sto->strat_vattr[tail]][sto->static_sto->strat_vattr[head]] == strat_i && 
+           // will change toggleability status if we accept the proposed toggle
+           (!in_network || (DIRECTED ? (alter == tail ? OUT_DEG[alter] < sto->static_sto->maxout : IN_DEG[alter] < sto->static_sto->maxin) : (IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->maxout)))) {
           propnddyadstype += delta;
         }
       });
@@ -523,7 +369,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
   for(int i = 0; i < 2; i++) {
     if(sto->maxl[i]) {
       EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->nodes[i], ego, alter, _tail, _head, edge, relevant_net, {
-        if(!edgeflag || IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->bound) {
+        if(!edgeflag || (DIRECTED ? (alter == _tail ? OUT_DEG[alter] < sto->static_sto->maxout : IN_DEG[alter] < sto->static_sto->maxin) : (IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->maxout))) {
           int stratmixingtype = sto->static_sto->indmat[sto->static_sto->strat_vattr[_tail]][sto->static_sto->strat_vattr[_head]];
           HashELToggleKnown(_tail, _head, sto->BDTDNE[stratmixingtype], !edgeflag);
           UnsrtELInsert(_tail, _head, sto->transferEL);
