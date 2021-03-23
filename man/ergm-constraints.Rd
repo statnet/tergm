@@ -30,10 +30,10 @@
 
 \section{Constraints implemented in  the \code{\link[=tergm-package]{tergm}} package}{
   \describe{
-    \item{\code{blockdiag(attrname)} (dyad-independent)}{
+    \item{\code{blockdiag(attr)} (dyad-independent)}{
       Force a block-diagonal structure (and its bipartite analogue) on
       the network. Only dyads \eqn{(i,j)} for which
-      \code{attrname(i)==attrname(j)} can have edges.
+      \code{attr(i)==attr(j)} can have edges. See \link[=nodal_attributes]{Specifying Vertex attributes and Levels} (\verb{? nodal_attributes}) for the ways to specify nodal attributes and expressions.
 
       Note that the current implementation requires that blocks be
       contiguous for \dQuote{unipartite} graphs, and for bipartite
@@ -43,7 +43,7 @@
       those that overlap must have the same order.)
 
       If multiple block-diagonal constraints are given, or if
-      \code{attrname} is a vector with multiple attribute names, blocks
+      \code{attr} is a vector with multiple attribute names, blocks
       will be constructed on \emph{all} attributes matching.
     }
   }

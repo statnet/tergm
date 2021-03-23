@@ -65,14 +65,14 @@
 }
 
 #' @import rle
-InitErgmConstraint.blockdiag<-function(lhs.nw, attrname=NULL, ...){
+InitErgmConstraint.blockdiag<-function(lhs.nw, attr=NULL, ...){
   if(length(list(...)))
     stop(paste("Block diagonal constraint takes one argument at this time."), call.=FALSE)
-  list(attrname=attrname,
+  list(attr=attr,
        free_dyads = {
          n <- network.size(lhs.nw)
          storage.mode(n) <- "integer"
-         a <- lhs.nw %v% attrname
+         a <- ergm_get_vattr(attr, lhs.nw)
          if(NVL(lhs.nw%n%"bipartite",0)){
            bip <- lhs.nw %n% "bipartite"
            ea <- a[seq_len(bip)]
