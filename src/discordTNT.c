@@ -17,7 +17,7 @@
 #include "changestats_lasttoggle.h"
 #include "tergm_model.h"
 #include "ergm_Rutil.h"
-#include "ergm_nodelist.h"
+#include "ergm_BDStratBlocks.h"
 #include "ergm_BDStrat_proposals.h"
 #include "ergm_hash_edgelist.h"
 
@@ -243,7 +243,7 @@ MH_P_FN(MH_discordBDStratTNT) {
   // number of edges of this mixing type
   int nedgestype = sto->nonDiscordantEdges[strat_i]->list->nedges + sto->discordantEdges[strat_i]->list->nedges;
   
-  Dyad ndyadstype = NodeListDyadCount(sto->static_sto->nodelist, strat_i);
+  Dyad ndyadstype = BDStratBlocksDyadCount(sto->static_sto->blocks, strat_i);
   
   int nddyadstype = sto->discordantEdges[strat_i]->list->nedges + sto->BDTDNE[strat_i]->list->nedges;
   
@@ -264,7 +264,7 @@ MH_P_FN(MH_discordBDStratTNT) {
       in_network = TRUE;
     } else {
       // select a random BD toggleable dyad of strat mixing type strat_i and propose toggling it
-      NodeListGetRandWithCount(Mtail, Mhead, sto->static_sto->nodelist, strat_i, ndyadstype);
+      BDStratBlocksGetRandWithCount(Mtail, Mhead, sto->static_sto->blocks, strat_i, ndyadstype);
          
       in_network = IS_OUTEDGE(Mtail[0],Mhead[0]);
       in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;
@@ -293,7 +293,7 @@ MH_P_FN(MH_discordBDStratTNT) {
   sto->maxl[1] = sto->static_sto->headmaxl;  
 
   // compute proposed dyad count for current mixing type (only)
-  Dyad proposeddyadstype = NodeListDyadCountOnToggle(*Mtail, *Mhead, sto->static_sto->nodelist, strat_i, in_network ? 1 : -1, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
+  Dyad proposeddyadstype = BDStratBlocksDyadCountOnToggle(*Mtail, *Mhead, sto->static_sto->blocks, strat_i, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
 
   ComputeChangesToToggleability(Mtail, Mhead, in_network, sto->static_sto);
   
@@ -361,7 +361,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
     ToggleKnownEdge(tail, head, sto->combined_BDTDNE, !edgeflag);      
   }
 
-  NodeListToggleKnownIf(tail, head, sto->static_sto->nodelist, !edgeflag, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
+  BDStratBlocksToggleIf(tail, head, sto->static_sto->blocks, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
   
   // update dyad toggleability statuses, as appropriate  
   Network *relevant_net = edgeflag ? sto->combined_nonBDTDNE : sto->combined_BDTDNE;
