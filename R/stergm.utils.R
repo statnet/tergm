@@ -156,6 +156,7 @@ networkDynamic.apply.changes <- function(nwd, changes){
   if(nrow(changes)==0){
     return(nwd)
   }
+  storage.mode(changes) <- "integer"
   
   ## Add edges that were never present in the initial network.
   extant.edges <- as.edgelist(nwd)
