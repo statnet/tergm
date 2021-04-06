@@ -40,7 +40,7 @@ I_CHANGESTAT_FN(i__crossnets){
 
 U_CHANGESTAT_FN(u__crossnets){
   GET_AUX_STORAGE(StoreSubnets, sn);
-  ToggleKnownEdge(MN_IO_TAIL(sn, tail), MN_IO_HEAD(sn, head),sn->onwp[MN_SID_TAIL(sn, tail)], edgeflag);
+  ToggleKnownEdge(MN_IO_TAIL(sn, tail), MN_IO_HEAD(sn, head),sn->onwp[MN_SID_TAIL(sn, tail)], edgestate);
 }
 
 F_CHANGESTAT_FN(f__crossnets){
@@ -74,7 +74,7 @@ C_CHANGESTAT_FN(c_OnCrossNets){
   unsigned int i = MN_SID_TAIL(sn, tail);
   Model *m = ms[i-1];
   Vertex st = MN_IO_TAIL(sn, tail), sh = MN_IO_HEAD(sn, head);
-  ChangeStats1(st, sh, sn->onwp[i], m, edgeflag);
+  ChangeStats1(st, sh, sn->onwp[i], m, edgestate);
   memcpy(CHANGE_STAT, m->workspace, m->n_stats*sizeof(double));
 }
 

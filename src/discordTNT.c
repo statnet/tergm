@@ -144,11 +144,11 @@ MH_U_FN(Mu_discordTNT) {
   GET_STORAGE(discordTNTStorage, sto);
   
   // add or remove the dyad from the appropriate discordance edgelist  
-  if(sto->in_discord == edgeflag) {
-    UnsrtELToggleKnown(tail, head, sto->discordantEdges, edgeflag);
+  if(sto->in_discord == edgestate) {
+    UnsrtELToggleKnown(tail, head, sto->discordantEdges, edgestate);
   } else {
-    UnsrtELToggleKnown(tail, head, sto->nonDiscordantEdges, edgeflag);
-    UnsrtELToggleKnown(tail, head, sto->discordantNonEdges, !edgeflag);
+    UnsrtELToggleKnown(tail, head, sto->nonDiscordantEdges, edgestate);
+    UnsrtELToggleKnown(tail, head, sto->discordantNonEdges, !edgestate);
   }
 }
 
@@ -348,30 +348,30 @@ MH_U_FN(Mu_discordBDStratTNT) {
   if(sto->static_sto->nmixtypestoupdate > 0) {
     sto->static_sto->currentcumprob = sto->static_sto->proposedcumprob;
     for(int i = 0; i < sto->static_sto->nmixtypestoupdate; i++) {
-      WtPopSetWt(sto->static_sto->mixtypestoupdate[i], edgeflag ? sto->static_sto->originalprobvec[sto->static_sto->mixtypestoupdate[i]] : 0, sto->static_sto->wtp);          
+      WtPopSetWt(sto->static_sto->mixtypestoupdate[i], edgestate ? sto->static_sto->originalprobvec[sto->static_sto->mixtypestoupdate[i]] : 0, sto->static_sto->wtp);
     }
   }
 
   // add or remove the dyad being toggled from the relevant edge set(s)/network
-  if(sto->in_discord == edgeflag) {
-    HashELToggleKnown(tail, head, sto->discordantEdges[sto->static_sto->stratmixingtype], edgeflag);      
+  if(sto->in_discord == edgestate) {
+    HashELToggleKnown(tail, head, sto->discordantEdges[sto->static_sto->stratmixingtype], edgestate);
   } else {
-    HashELToggleKnown(tail, head, sto->nonDiscordantEdges[sto->static_sto->stratmixingtype], edgeflag);
-    HashELToggleKnown(tail, head, sto->BDTDNE[sto->static_sto->stratmixingtype], !edgeflag);
-    ToggleKnownEdge(tail, head, sto->combined_BDTDNE, !edgeflag);      
+    HashELToggleKnown(tail, head, sto->nonDiscordantEdges[sto->static_sto->stratmixingtype], edgestate);
+    HashELToggleKnown(tail, head, sto->BDTDNE[sto->static_sto->stratmixingtype], !edgestate);
+    ToggleKnownEdge(tail, head, sto->combined_BDTDNE, !edgestate);
   }
 
   BDStratBlocksToggleIf(tail, head, sto->static_sto->blocks, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
   
   // update dyad toggleability statuses, as appropriate  
-  Network *relevant_net = edgeflag ? sto->combined_nonBDTDNE : sto->combined_BDTDNE;
+  Network *relevant_net = edgestate ? sto->combined_nonBDTDNE : sto->combined_BDTDNE;
   sto->transferEL->nedges = 0; // reset transferEL
   for(int i = 0; i < 2; i++) {
     if(sto->maxl[i]) {
       EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->nodes[i], ego, alter, _tail, _head, edge, relevant_net, {
-        if(!edgeflag || (DIRECTED ? (alter == _tail ? OUT_DEG[alter] < sto->static_sto->maxout : IN_DEG[alter] < sto->static_sto->maxin) : (IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->maxout))) {
+        if(!edgestate || (DIRECTED ? (alter == _tail ? OUT_DEG[alter] < sto->static_sto->maxout : IN_DEG[alter] < sto->static_sto->maxin) : (IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->maxout))) {
           int stratmixingtype = sto->static_sto->indmat[sto->static_sto->strat_vattr[_tail]][sto->static_sto->strat_vattr[_head]];
-          HashELToggleKnown(_tail, _head, sto->BDTDNE[stratmixingtype], !edgeflag);
+          HashELToggleKnown(_tail, _head, sto->BDTDNE[stratmixingtype], !edgestate);
           UnsrtELInsert(_tail, _head, sto->transferEL);
         }
       });
@@ -380,8 +380,8 @@ MH_U_FN(Mu_discordBDStratTNT) {
 
   // apply changes in transferEL to the Network objects
   for(int i = 1; i <= sto->transferEL->nedges; i++) {
-    ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->combined_nonBDTDNE, edgeflag);
-    ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->combined_BDTDNE, !edgeflag);        
+    ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->combined_nonBDTDNE, edgestate);
+    ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->combined_BDTDNE, !edgestate);
   }
 }
 

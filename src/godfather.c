@@ -79,11 +79,11 @@ SEXP godfather_wrapper(SEXP stateR,
 
     while(pos < total_toggles && toggletimes[pos]==t_stat+1){
       Vertex tail = toggletails[pos], head = toggleheads[pos];
-      Rboolean edgeflag = IS_OUTEDGE(tail, head);
-      ChangeStats1(tail, head, nwp, m, edgeflag);  
+      Rboolean edgestate = IS_OUTEDGE(tail, head);
+      ChangeStats1(tail, head, nwp, m, edgestate);
       addonto(changestats, m->workspace, m->n_stats);
     
-      ToggleKnownEdge(tail, head, nwp, edgeflag);
+      ToggleKnownEdge(tail, head, nwp, edgestate);
 
       pos++;
     }

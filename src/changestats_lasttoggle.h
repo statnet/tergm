@@ -75,8 +75,8 @@ static inline int ElapsedTime(Vertex tail, Vertex head, StoreTimeAndLasttoggle *
 
 #define JUST_CHANGED(dur_inf, tail, head) (kh_get(DyadMapInt, (dur_inf)->discord, THKey((dur_inf)->discord,(tail),(head)))!=kh_none)
 
-static inline int ElapsedTimeToggle(Vertex tail, Vertex head, StoreTimeAndLasttoggle *dur_inf, int edgeflag){
-  if(edgeflag) {
+static inline int ElapsedTimeToggle(Vertex tail, Vertex head, StoreTimeAndLasttoggle *dur_inf, int edgestate){
+  if(edgestate) {
     // if we're toggling this dyad *off* then we can safely use ElapsedTime
     return ElapsedTime(tail, head, dur_inf);
   }

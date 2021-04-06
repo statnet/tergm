@@ -47,12 +47,12 @@ X_CHANGESTAT_FN(x_edges_ageinterval_mon){
 C_CHANGESTAT_FN(c_edges_ageinterval_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
 
-  int age = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+  int age = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
   // Only count if the age is in [from,to). ( to=0 ==> to=Inf )
 
   for(unsigned int j=0; j<N_CHANGE_STATS; j++){
     unsigned int from = INPUT_PARAM[j*2], to = INPUT_PARAM[j*2+1];
-    if(edgeflag){ // If already an edge, we are dissolving.
+    if(edgestate){ // If already an edge, we are dissolving.
       if(from<=age+1 && (to==0 || age+1<to)) CHANGE_STAT[j]--; // Statistic only changes if it's in the interval.
     }else{ // If not already an edge, we are forming.
       if(from<=age+1 && (to==0 || age+1<to)) CHANGE_STAT[j]++; // Statistic only changes if it's in the interval.
@@ -92,9 +92,9 @@ X_CHANGESTAT_FN(x_edge_ages_mon){
 C_CHANGESTAT_FN(c_edge_ages_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
-  int age = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+  int age = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
 
-  CHANGE_STAT[0] += edgeflag ? - age - 1 : age + 1;
+  CHANGE_STAT[0] += edgestate ? - age - 1 : age + 1;
 }
 
 S_CHANGESTAT_FN(s_edge_ages_mon){
@@ -144,9 +144,9 @@ C_CHANGESTAT_FN(c_edgecov_ages_mon){
 
   double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];
   if(val!=0){
-    int age = ElapsedTimeToggle(tail, head, dur_inf,edgeflag);
+    int age = ElapsedTimeToggle(tail, head, dur_inf,edgestate);
 
-    CHANGE_STAT[0] += edgeflag ? - age*val - val : age*val + val;
+    CHANGE_STAT[0] += edgestate ? - age*val - val : age*val + val;
   }
 }
 
@@ -225,8 +225,8 @@ C_CHANGESTAT_FN(c_mean_age_mon){
   
   e0 = e1 = N_EDGES;
   
-  int change = edgeflag ? -1 : 1;
-  int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);  
+  int change = edgestate ? -1 : 1;
+  int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
   CSD_TRANSFORM_ET(et);
   s1 += change*ett1;
   e1 += change;
@@ -355,8 +355,8 @@ C_CHANGESTAT_FN(c_nodefactor_mean_age) {
     double s0 = sto->ages[tailindex], s1 = sto->ages[tailindex]; // Sum of age values of initial and final network.
     Edge e0 = sto->edges[tailindex], e1 = sto->edges[tailindex]; // Number of edges in initial and final network.
           
-    int change = edgeflag ? -2 : 2;
-    int et = ElapsedTimeToggle(tail, head, dur_inf, edgeflag);  
+    int change = edgestate ? -2 : 2;
+    int et = ElapsedTimeToggle(tail, head, dur_inf, edgestate);
     
     int transform = sto->log; // Transformation code.      
     CSD_TRANSFORM_ET(et);
@@ -372,8 +372,8 @@ C_CHANGESTAT_FN(c_nodefactor_mean_age) {
       double s0 = sto->ages[tailindex], s1 = sto->ages[tailindex]; // Sum of age values of initial and final network.
       Edge e0 = sto->edges[tailindex], e1 = sto->edges[tailindex]; // Number of edges in initial and final network.
             
-      int change = edgeflag ? -1 : 1;
-      int et = ElapsedTimeToggle(tail, head, dur_inf, edgeflag);  
+      int change = edgestate ? -1 : 1;
+      int et = ElapsedTimeToggle(tail, head, dur_inf, edgestate);
       
       int transform = sto->log; // Transformation code.      
       CSD_TRANSFORM_ET(et);
@@ -389,8 +389,8 @@ C_CHANGESTAT_FN(c_nodefactor_mean_age) {
       double s0 = sto->ages[headindex], s1 = sto->ages[headindex]; // Sum of age values of initial and final network.
       Edge e0 = sto->edges[headindex], e1 = sto->edges[headindex]; // Number of edges in initial and final network.
             
-      int change = edgeflag ? -1 : 1;
-      int et = ElapsedTimeToggle(tail, head, dur_inf, edgeflag);  
+      int change = edgestate ? -1 : 1;
+      int et = ElapsedTimeToggle(tail, head, dur_inf, edgestate);
       
       int transform = sto->log; // Transformation code.      
       CSD_TRANSFORM_ET(et);
@@ -414,12 +414,12 @@ U_CHANGESTAT_FN(u_nodefactor_mean_age) {
   int index = sto->nodecov[tail];
   if(index >= 0) {
     sto->ages[index] = sto->newages[index];
-    sto->edges[index] += edgeflag ? -1 : +1;
+    sto->edges[index] += edgestate ? -1 : +1;
   }
   index = sto->nodecov[head];
   if(index >= 0) {
     sto->ages[index] = sto->newages[index];
-    sto->edges[index] += edgeflag ? -1 : +1;
+    sto->edges[index] += edgestate ? -1 : +1;
   }  
 }
 
@@ -562,8 +562,8 @@ C_CHANGESTAT_FN(c_nodemix_mean_age) {
     double s0 = sto->ages[index], s1 = sto->ages[index]; // Sum of age values of initial and final network.
     Edge e0 = sto->edges[index], e1 = sto->edges[index]; // Number of edges in initial and final network.
           
-    int change = edgeflag ? -1 : 1;
-    int et = ElapsedTimeToggle(tail, head, dur_inf, edgeflag);  
+    int change = edgestate ? -1 : 1;
+    int et = ElapsedTimeToggle(tail, head, dur_inf, edgestate);
     
     int transform = sto->log; // Transformation code.      
     CSD_TRANSFORM_ET(et);
@@ -583,7 +583,7 @@ U_CHANGESTAT_FN(u_nodemix_mean_age) {
   int index = sto->indmat[sto->nodecov[tail]][sto->nodecov[head]];
   if(index >= 0) {
     sto->ages[index] = sto->newages[index];
-    sto->edges[index] += edgeflag ? -1 : +1;
+    sto->edges[index] += edgestate ? -1 : +1;
   }
 }
 
@@ -723,13 +723,13 @@ C_CHANGESTAT_FN(c_edgecov_mean_age_mon){
   
   double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];   
   if(val!=0){
-    if(edgeflag){
-      int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+    if(edgestate){
+      int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
       CSD_TRANSFORM_ET(et);
       s1 -= ett1*val;
       e1 -= val;
     }else{
-      int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+      int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
       CSD_TRANSFORM_ET(et);
       s1 += ett1*val;
       e1 += val;
@@ -896,7 +896,7 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
 
     Vertex deg = INPUT_PARAM[j+2];
     
-    int change = edgeflag ? -1 : +1;
+    int change = edgestate ? -1 : +1;
     int taildiff = (od[tail]+id[tail] + change == deg)-(od[tail]+id[tail] == deg);
     int headdiff = (od[head]+id[head] + change == deg)-(od[head]+id[head] == deg);
 
@@ -937,12 +937,12 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
         }
         // Here, we need to handle the focus dyad:
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -984,12 +984,12 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
         }
         // Here, we need to handle the focus dyad:
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -1195,7 +1195,7 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
       continue; 
     }
 
-    int change = edgeflag ? -1 : +1;
+    int change = edgestate ? -1 : +1;
     int taildiff = (od[tail]+id[tail] + change == deg)-(od[tail]+id[tail] == deg);
     int headdiff = (od[head]+id[head] + change == deg)-(od[head]+id[head] == deg);
 
@@ -1236,12 +1236,12 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
         }
         // Here, we need to handle the focus dyad:
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -1283,12 +1283,12 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
         }
         // Here, we need to handle the focus dyad:
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -1484,7 +1484,7 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
 
     Vertex from = INPUT_PARAM[j*2+2], to = INPUT_PARAM[j*2+3];
 
-    int change = edgeflag ? -1 : +1;
+    int change = edgestate ? -1 : +1;
     // In the degree range case, it's possible to gain or lose a tie without entering or exiting a given degree range.
     unsigned int tailin1 = FROM_TO(od[tail]+id[tail] + change, from, to),
       tailin0 = FROM_TO(od[tail]+id[tail], from, to),
@@ -1525,24 +1525,24 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
       }
       // Here, we need to handle the focus dyad:
       if(change==+1){// if it's formed, add to s1
-        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
         CSD_TRANSFORM_ET(et);
         s1 += ett1;
         e1++;
       }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
         CSD_TRANSFORM_ET(et);
         s1 -= ett1;
         e1--;
       }
     }else if(tailin0 && tailin1){ // tail was counted both times, but we need to handle the focus dyad
       if(change==+1){// if it's formed, add to s1
-        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
         CSD_TRANSFORM_ET(et);
         s1 += ett1;
         e1++;
       }else{// if it's dissolved, it must be subtracted from s1
-        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
         CSD_TRANSFORM_ET(et);
         s1 -= ett1;
         e1--;
@@ -1581,24 +1581,24 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
       }
       // Here, we need to handle the focus dyad:
       if(change==+1){// if it's formed, add to s1
-        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
         CSD_TRANSFORM_ET(et);
         s1 += ett1;
         e1++;
       }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
         CSD_TRANSFORM_ET(et);
         s1 -= ett1;
         e1--;
       }
     }else if(headin0 && headin1){ // tail was counted both times, but we need to handle the focus dyad
       if(change==+1){// if it's formed, add to s1
-        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
         CSD_TRANSFORM_ET(et);
         s1 += ett1;
         e1++;
       }else{// if it's dissolved, it must be subtracted from s1
-        int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+        int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
         CSD_TRANSFORM_ET(et);
         s1 -= ett1;
         e1--;
@@ -1807,7 +1807,7 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
       continue; 
     }
 
-    int change = edgeflag ? -1 : +1;
+    int change = edgestate ? -1 : +1;
     // In the degree range case, it's possible to gain or lose a tie without entering or exiting a given degree range.
     unsigned int tailin1 = FROM_TO(od[tail]+id[tail] + change, from, to),
       tailin0 = FROM_TO(od[tail]+id[tail], from, to),
@@ -1849,24 +1849,24 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
         }
         // Here, we need to handle the focus dyad:
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
         }
       }else if(tailin0 && tailin1){ // tail was counted both times, but we need to handle the focus dyad
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it must be subtracted from s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
@@ -1907,24 +1907,24 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
         }
         // Here, we need to handle the focus dyad:
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it had been counted in the previous two loops, and it should be subtracted
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;
         }
       }else if(headin0 && headin1){ // tail was counted both times, but we need to handle the focus dyad
         if(change==+1){// if it's formed, add to s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 += ett1;
           e1++;
         }else{// if it's dissolved, it must be subtracted from s1
-          int et = ElapsedTimeToggle(tail,head,dur_inf,edgeflag);
+          int et = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
           CSD_TRANSFORM_ET(et);
           s1 -= ett1;
           e1--;

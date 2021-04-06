@@ -22,7 +22,7 @@ C_CHANGESTAT_FN(c_on_union_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
 
   Vertex tails[map_toggle_maxtoggles__union_lt_net_Network], heads[map_toggle_maxtoggles__union_lt_net_Network];
-  MAP_TOGGLE_THEN(_union_lt_net_Network, tail, head, edgeflag, auxnet, tails, heads){
+  MAP_TOGGLE_THEN(_union_lt_net_Network, tail, head, edgestate, auxnet, tails, heads){
     double *tmp = m->workspace;
     m->workspace = CHANGE_STAT;
     ChangeStats1(*tails, *heads, auxnet->onwp, m, IS_OUTEDGE(*tails, *heads, auxnet->onwp));
@@ -93,7 +93,7 @@ C_CHANGESTAT_FN(c_on_intersect_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
 
   Vertex tails[map_toggle_maxtoggles__intersect_lt_net_Network], heads[map_toggle_maxtoggles__intersect_lt_net_Network];
-  MAP_TOGGLE_THEN(_intersect_lt_net_Network, tail, head, edgeflag, auxnet, tails, heads){
+  MAP_TOGGLE_THEN(_intersect_lt_net_Network, tail, head, edgestate, auxnet, tails, heads){
     double *tmp = m->workspace;
     m->workspace = CHANGE_STAT;
     ChangeStats1(*tails, *heads, auxnet->onwp, m, IS_OUTEDGE(*tails, *heads, auxnet->onwp));
