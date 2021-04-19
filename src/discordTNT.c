@@ -283,8 +283,11 @@ MH_P_FN(MH_discordBDStratTNT) {
 
   sto->in_discord = in_discord;
 
-  sto->static_sto->tailmaxl = (DIRECTED ? OUT_DEG[Mtail[0]] : IN_DEG[Mtail[0]] + OUT_DEG[Mtail[0]]) == sto->static_sto->maxout - 1 + in_network;
-  sto->static_sto->headmaxl = (DIRECTED ? IN_DEG[Mhead[0]] : IN_DEG[Mhead[0]] + OUT_DEG[Mhead[0]]) == sto->static_sto->maxin - 1 + in_network;
+  int tailattr = sto->static_sto->bd_vattr[*Mtail];
+  int headattr = sto->static_sto->bd_vattr[*Mhead];
+  
+  sto->static_sto->tailmaxl = (DIRECTED ? sto->static_sto->outdegree[headattr][*Mtail] : sto->static_sto->indegree[headattr][*Mtail] + sto->static_sto->outdegree[headattr][*Mtail]) == sto->static_sto->maxout[headattr][*Mtail] - 1 + in_network;
+  sto->static_sto->headmaxl = (DIRECTED ? sto->static_sto->indegree[tailattr][*Mhead] : sto->static_sto->indegree[tailattr][*Mhead] + sto->static_sto->outdegree[tailattr][*Mhead]) == sto->static_sto->maxin[tailattr][*Mhead] - 1 + in_network;
 
   sto->nodes[0] = *Mtail;  
   sto->nodes[1] = *Mhead;
@@ -292,10 +295,12 @@ MH_P_FN(MH_discordBDStratTNT) {
   sto->maxl[0] = sto->static_sto->tailmaxl;  
   sto->maxl[1] = sto->static_sto->headmaxl;  
 
-  // compute proposed dyad count for current mixing type (only)
-  Dyad proposeddyadstype = BDStratBlocksDyadCountOnToggle(*Mtail, *Mhead, sto->static_sto->blocks, strat_i, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
+  BDStratBlocksSetLast(*Mtail, *Mhead, in_network, sto->static_sto->blocks);
 
-  ComputeChangesToToggleability(Mtail, Mhead, in_network, sto->static_sto);
+  // compute proposed dyad count for current mixing type (only)
+  Dyad proposeddyadstype = BDStratBlocksDyadCountOnToggle(*Mtail, *Mhead, sto->static_sto->blocks, strat_i, in_network ? +1 : -1, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
+
+  ComputeChangesToToggleability(Mtail, Mhead, sto->static_sto);
   
   // need to calculate number of BD-toggleable discordant dyads in the proposed network; 
   // this can involve both the proposal dyad itself and other dyads containing either of
@@ -311,10 +316,17 @@ MH_P_FN(MH_discordBDStratTNT) {
       EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->nodes[i], ego, alter, tail, head, edge, relevant_net, {
         if(// not the proposal dyad, and
            (tail != *Mtail || head != *Mhead) &&
-           // same mixing type as the proposal dyad, and
+           // same strat mixing type as the proposal dyad, and
            sto->static_sto->indmat[sto->static_sto->strat_vattr[tail]][sto->static_sto->strat_vattr[head]] == strat_i && 
+           // same bd mixing type as the proposal dyad, and
+           ((tailattr == sto->static_sto->bd_vattr[tail] && headattr == sto->static_sto->bd_vattr[head]) || 
+            (!DIRECTED && tailattr == sto->static_sto->bd_vattr[head] && headattr == sto->static_sto->bd_vattr[tail])) &&
+           // respects directedness, and
+           (!DIRECTED || tail == *Mtail || head == *Mhead) &&
            // will change toggleability status if we accept the proposed toggle
-           (!in_network || (DIRECTED ? (alter == tail ? OUT_DEG[alter] < sto->static_sto->maxout : IN_DEG[alter] < sto->static_sto->maxin) : (IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->maxout)))) {
+           (!in_network || (DIRECTED ? (alter == tail ? sto->static_sto->outdegree[sto->static_sto->bd_vattr[ego]][alter] < sto->static_sto->maxout[sto->static_sto->bd_vattr[ego]][alter] 
+                                                      : sto->static_sto->indegree[sto->static_sto->bd_vattr[ego]][alter] < sto->static_sto->maxin[sto->static_sto->bd_vattr[ego]][alter]) 
+                                     : (sto->static_sto->indegree[sto->static_sto->bd_vattr[ego]][alter] + sto->static_sto->outdegree[sto->static_sto->bd_vattr[ego]][alter] < sto->static_sto->maxout[sto->static_sto->bd_vattr[ego]][alter])))) {
           propnddyadstype += delta;
         }
       });
@@ -348,20 +360,23 @@ MH_U_FN(Mu_discordBDStratTNT) {
   if(sto->static_sto->nmixtypestoupdate > 0) {
     sto->static_sto->currentcumprob = sto->static_sto->proposedcumprob;
     for(int i = 0; i < sto->static_sto->nmixtypestoupdate; i++) {
-      WtPopSetWt(sto->static_sto->mixtypestoupdate[i], edgestate ? sto->static_sto->originalprobvec[sto->static_sto->mixtypestoupdate[i]] : 0, sto->static_sto->wtp);
+      WtPopSetWt(sto->static_sto->mixtypestoupdate[i], edgestate ? sto->static_sto->originalprobvec[sto->static_sto->mixtypestoupdate[i]] : 0, sto->static_sto->wtp);          
     }
   }
 
   // add or remove the dyad being toggled from the relevant edge set(s)/network
   if(sto->in_discord == edgestate) {
-    HashELToggleKnown(tail, head, sto->discordantEdges[sto->static_sto->stratmixingtype], edgestate);
+    HashELToggleKnown(tail, head, sto->discordantEdges[sto->static_sto->stratmixingtype], edgestate);      
   } else {
     HashELToggleKnown(tail, head, sto->nonDiscordantEdges[sto->static_sto->stratmixingtype], edgestate);
     HashELToggleKnown(tail, head, sto->BDTDNE[sto->static_sto->stratmixingtype], !edgestate);
-    ToggleKnownEdge(tail, head, sto->combined_BDTDNE, !edgestate);
+    ToggleKnownEdge(tail, head, sto->combined_BDTDNE, !edgestate);      
   }
 
   BDStratBlocksToggleIf(tail, head, sto->static_sto->blocks, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
+
+  int tailattr = sto->static_sto->bd_vattr[tail];
+  int headattr = sto->static_sto->bd_vattr[head];
   
   // update dyad toggleability statuses, as appropriate  
   Network *relevant_net = edgestate ? sto->combined_nonBDTDNE : sto->combined_BDTDNE;
@@ -369,7 +384,15 @@ MH_U_FN(Mu_discordBDStratTNT) {
   for(int i = 0; i < 2; i++) {
     if(sto->maxl[i]) {
       EXEC_THROUGH_EDGES_EATH_NET_DECL(sto->nodes[i], ego, alter, _tail, _head, edge, relevant_net, {
-        if(!edgestate || (DIRECTED ? (alter == _tail ? OUT_DEG[alter] < sto->static_sto->maxout : IN_DEG[alter] < sto->static_sto->maxin) : (IN_DEG[alter] + OUT_DEG[alter] < sto->static_sto->maxout))) {
+        if(// same bd mixing type as the proposal dyad, and
+           ((tailattr == sto->static_sto->bd_vattr[_tail] && headattr == sto->static_sto->bd_vattr[_head]) || 
+            (!DIRECTED && tailattr == sto->static_sto->bd_vattr[_head] && headattr == sto->static_sto->bd_vattr[_tail])) &&
+           // respects directedness, and
+           (!DIRECTED || _tail == tail || _head == head) &&            
+           // will change toggleability status if we accept the proposed toggle
+           (!edgestate || (DIRECTED ? (alter == _tail ? sto->static_sto->outdegree[sto->static_sto->bd_vattr[ego]][alter] < sto->static_sto->maxout[sto->static_sto->bd_vattr[ego]][alter] 
+                                                     : sto->static_sto->indegree[sto->static_sto->bd_vattr[ego]][alter] < sto->static_sto->maxin[sto->static_sto->bd_vattr[ego]][alter]) 
+                                   : (sto->static_sto->indegree[sto->static_sto->bd_vattr[ego]][alter] + sto->static_sto->outdegree[sto->static_sto->bd_vattr[ego]][alter] < sto->static_sto->maxout[sto->static_sto->bd_vattr[ego]][alter])))) {
           int stratmixingtype = sto->static_sto->indmat[sto->static_sto->strat_vattr[_tail]][sto->static_sto->strat_vattr[_head]];
           HashELToggleKnown(_tail, _head, sto->BDTDNE[stratmixingtype], !edgestate);
           UnsrtELInsert(_tail, _head, sto->transferEL);
@@ -381,8 +404,11 @@ MH_U_FN(Mu_discordBDStratTNT) {
   // apply changes in transferEL to the Network objects
   for(int i = 1; i <= sto->transferEL->nedges; i++) {
     ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->combined_nonBDTDNE, edgestate);
-    ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->combined_BDTDNE, !edgestate);
+    ToggleKnownEdge(sto->transferEL->tails[i], sto->transferEL->heads[i], sto->combined_BDTDNE, !edgestate);        
   }
+
+  sto->static_sto->indegree[tailattr][head] += edgestate ? -1 : 1;
+  sto->static_sto->outdegree[headattr][tail] += edgestate ? -1 : 1;  
 }
 
 MH_F_FN(Mf_discordBDStratTNT) {
