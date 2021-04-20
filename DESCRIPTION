@@ -37,7 +37,8 @@ Suggests:
     snow,
     rmarkdown (>= 1.12),
     knitr (>= 1.22),
-    testthat
+    testthat,
+    covr
 BugReports: https://github.com/statnet/tergm/issues
 Description: An integrated set of extensions to the 'ergm' package to analyze and simulate network evolution based on exponential-family random graph models (ERGM). 'tergm' is a part of the 'statnet' suite of packages for network analysis.
 License: GPL-3 + file LICENSE
