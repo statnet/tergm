@@ -2,6 +2,7 @@
 
 [![rstudio mirror downloads](https://cranlogs.r-pkg.org/badges/tergm?color=2ED968)](https://cranlogs.r-pkg.org/)
 [![cran version](https://www.r-pkg.org/badges/version/tergm)](https://cran.r-project.org/package=tergm)
+[![Coverage status](https://codecov.io/gh/statnet/tergm/branch/master/graph/badge.svg)](https://codecov.io/github/statnet/tergm?branch=master)
 [![R build status](https://github.com/statnet/tergm/workflows/R-CMD-check/badge.svg)](https://github.com/statnet/tergm/actions)
 
 An integrated set of extensions to the 'ergm' package to analyze and simulate network evolution based on exponential-family random graph models (ERGM). 'tergm' is a part of the 'statnet' suite of packages for network analysis.
