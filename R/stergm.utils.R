@@ -268,80 +268,98 @@ unset.offset.call <- function(object){
   x <- list_rhs.formula(formula)
   
   form <- ~.
-  attributes(form)$.Environment <- attributes(formula)$.Environment
   diss <- ~.
-  attributes(diss)$.Environment <- attributes(formula)$.Environment
   nonsep <- ~.
-  attributes(nonsep)$.Environment <- attributes(formula)$.Environment
+  all <- ~.
+  
+  ## these will be updated below as needed
+  environment(form) <- environment(formula)
+  environment(diss) <- environment(formula)
+  environment(nonsep) <- environment(formula)
+  environment(all) <- environment(formula)
   
   for(i in seq_along(x)) {
     term <- x[[i]]
     sign <- attr(x, "sign")[i]
-
+    
     if(!is.call(term)) {
       nonsep <- append_rhs.formula(nonsep, structure(list(term), sign=sign))
       next
     }
-    
-    formbit <- FALSE
-    dissbit <- FALSE
-    
-    offset <- FALSE
-    
-    subterm <- term
-    
-    if(grepl("^offset", deparse(term[[1]]))) {
-      subterm <- term[[2]]
-      if(!is.call(subterm)) {
-        nonsep <- append_rhs.formula(nonsep, structure(list(term), sign=sign))
-        next
+
+    if(grepl("^Form", term[[1]])) {
+      form_arg <- eval(term[[2]], environment(formula))
+
+      form_arg_list <- list_rhs.formula(form_arg)
+      attr(form_arg_list, "sign") <- sign*attr(form_arg_list, "sign")
+
+      if(length(form) == 2) {
+        formula_addition <- append_rhs.formula(~., form_arg_list, keep.onesided = FALSE)
+        environment(formula_addition) <- environment(form_arg)
+
+        form <- formula_addition
+      } else {                    
+        formula_addition <- append_rhs.formula(.~., form_arg_list, keep.onesided = FALSE)
+        environment(formula_addition) <- environment(form_arg)
+      
+        form <- nonsimp_update.formula(form, formula_addition, from.new = TRUE)
       }
-      offset <- TRUE
-    }
+    } else if (grepl("^Diss", term[[1]])) {
+      diss_arg <- eval(term[[2]], environment(formula))
+
+      diss_arg_list <- list_rhs.formula(diss_arg)
+      attr(diss_arg_list, "sign") <- sign*attr(diss_arg_list, "sign")
+
+      if(length(diss) == 2) {          
+        formula_addition <- append_rhs.formula(~., diss_arg_list, keep.onesided = FALSE)
+        environment(formula_addition) <- environment(diss_arg)
+
+        diss <- formula_addition
+      } else {
+        formula_addition <- append_rhs.formula(.~., diss_arg_list, keep.onesided = FALSE)
+        environment(formula_addition) <- environment(diss_arg)
     
-    if(grepl("^Form", deparse(subterm[[1]]))) formbit <- TRUE
-    else if(grepl("^Diss", deparse(subterm[[1]]))) dissbit <- TRUE
-    else {
+        diss <- nonsimp_update.formula(diss, formula_addition, from.new = TRUE)
+      }
+    } else {
       nonsep <- append_rhs.formula(nonsep, structure(list(term), sign=sign))
-      next      
     }
-    
-    formula_arg_list <- list_rhs.formula(eval(subterm[[2]], envir=attributes(formula)$.Environment))
-    attr(formula_arg_list, "sign") <- attr(formula_arg_list, "sign")*sign # propagate overall sign
-    
-    if(offset) { # stick `offset()` on each term that doesn't already have it
-      for(j in seq_along(formula_arg_list)) {
-        if(!grepl("^offset", deparse(formula_arg_list[[j]]))) {
-          formula_arg_list[[j]] <- str2lang(paste0("offset(", deparse(formula_arg_list[[j]]), ")"))
-        }
-      }
-    }
-    
-    if(formbit) form <- append_rhs.formula(form, formula_arg_list)
-    else diss <- append_rhs.formula(diss, formula_arg_list)
   }
   
-  all <- ~.
-  attributes(all)$.Environment <- attributes(formula)$.Environment
-
   if(length(form) == 3) {
-    all <- append_rhs.formula(all, list_rhs.formula(form))
     form <- form[c(1,3)]
+
+    all <- form
   }
 
   if(length(diss) == 3) {
-    all <- append_rhs.formula(all, list_rhs.formula(diss))
     diss <- diss[c(1,3)]
+
+    if(all != ~.) {
+      formula_addition <- append_rhs.formula(~., diss, keep.onesided = TRUE)
+      environment(formula_addition) <- environment(diss)
+      
+      all <- nonsimp_update.formula(all, formula_addition, from.new = TRUE)  
+    } else {
+      all <- diss
+    }
   }
 
   if(length(nonsep) == 3) {
-    all <- append_rhs.formula(all, list_rhs.formula(nonsep))
     nonsep <- nonsep[c(1,3)]
-  }
 
-  if(length(all) == 3) {
-    all <- all[c(1,3)]
+    if(all != ~.) {
+      formula_addition <- append_rhs.formula(~., nonsep, keep.onesided = TRUE)
+      environment(formula_addition) <- environment(nonsep)
+      
+      all <- nonsimp_update.formula(all, formula_addition, from.new = TRUE)  
+    } else {
+      all <- nonsep
+    }
   }
-  
-  list(form=form, diss=diss, nonsep=nonsep, all=all)
+    
+  list(form = form, 
+       diss = diss, 
+       nonsep = nonsep, 
+       all = all)
 }
