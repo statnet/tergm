@@ -121,7 +121,7 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
 }
 
 
-InitErgmTerm.Form <- function(nw, arglist,  ...) {
+InitErgmTerm.Form <- function(nw, arglist,  ..., env=baseenv()) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
@@ -133,13 +133,13 @@ InitErgmTerm.Form <- function(nw, arglist,  ...) {
   }
 
   f <- a$formula
-  ult(f) <- call("Form1",call("~",ult(f))) # e.g., a~b -> a~Form1(~b)
+  ult(f) <- call("Form1",as.formula(call("~",ult(f)), env=env)) # e.g., a~b -> a~Form1(~b)
   environment(f) <- environment(a$formula)
   a$formula <- f
 
   # Just call N() operator.
   term <- as.call(c(list(as.name("Cross")),a))
-  out <- call.ErgmTerm(term, env=environment(f), nw=nw, ...)
+  out <- call.ErgmTerm(term, env=env, nw=nw, ...)
   out
   # TODO: Fix coefficient names.
 }
@@ -163,7 +163,7 @@ InitErgmTerm.Form1 <- function(nw, arglist,  ...){
     )
 }
 
-InitErgmTerm.Diss <- function(nw, arglist,  ...) {
+InitErgmTerm.Diss <- function(nw, arglist,  ..., env=baseenv()) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
@@ -175,13 +175,13 @@ InitErgmTerm.Diss <- function(nw, arglist,  ...) {
   }
 
   f <- a$formula
-  ult(f) <- call("Diss1",call("~",ult(f))) # e.g., a~b -> a~Form1(~b)
+  ult(f) <- call("Diss1",as.formula(call("~",ult(f)), env=env)) # e.g., a~b -> a~Form1(~b)
   environment(f) <- environment(a$formula)
   a$formula <- f
 
   # Just call N() operator.
   term <- as.call(c(list(as.name("Cross")),a))
-  out <- call.ErgmTerm(term, env=environment(f), nw=nw, ...)
+  out <- call.ErgmTerm(term, env=env, nw=nw, ...)
   out
   # TODO: Fix coefficient names.
 }
