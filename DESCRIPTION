@@ -37,6 +37,7 @@ Suggests:
     snow,
     rmarkdown (>= 1.12),
     knitr (>= 1.22),
+    tibble,
     testthat,
     covr
 BugReports: https://github.com/statnet/tergm/issues
