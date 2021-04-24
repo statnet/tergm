@@ -294,12 +294,9 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
   if(!dynamic) {
     if(missing(dynamic)) warning("For dynamic simulation in ", sQuote("tergm"), " you must pass ", sQuote("dynamic=TRUE"), ".  Attempting ", sQuote("ergm"), " simulation instead...")  
     
-    args <- as.list(match.call())[-1]
-    for(name in names(args)) args[[name]] <- eval.parent(args[[name]])
-    
-    fcn <- ergm:::.simulate_formula.network
-
-    return(do.call(fcn, args))
+    mc <- match.call()
+    mc[[1]] <- quote(ergm:::.simulate_formula.network)
+    return(eval.parent(mc))
   }
 
   # reassign names for consistency with existing code
@@ -518,12 +515,9 @@ simulate_formula.networkDynamic <- function(object, nsim=1, seed=NULL,
   if(!dynamic) {
     if(missing(dynamic)) warning("For dynamic simulation in ", sQuote("tergm"), " you must pass ", sQuote("dynamic=TRUE"), ".  Attempting ", sQuote("ergm"), " simulation instead...")  
     
-    args <- as.list(match.call())[-1]
-    for(name in names(args)) args[[name]] <- eval.parent(args[[name]])
-    
-    fcn <- ergm:::.simulate_formula.network
-
-    return(do.call(fcn, args))
+    mc <- match.call()
+    mc[[1]] <- quote(ergm:::.simulate_formula.network)
+    return(eval.parent(mc))
   }
   
   # reassign names for consistency with existing code  
