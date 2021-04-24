@@ -14,7 +14,7 @@ opttest({
   net <- flobusiness
   set.seed(1)
   
-  mod1 <- tergm(flobusiness ~ Form(~edges + degree(3)) + offset(Diss(~edges)),
+  mod1 <- tergm(flobusiness ~ Form(~edges + degree(3)) + Diss(~offset(edges)),
                  offset.coef=log(9),
                  targets="formation",
                  estimate="EGMME",
@@ -28,7 +28,7 @@ opttest({
   net <- flobusiness
   set.seed(1)
   
-  mod1 <- tergm(flobusiness ~ Form(~edges + degree(3)) + offset(Diss(~edges)),
+  mod1 <- tergm(flobusiness ~ Form(~edges + degree(3)) + Diss(~offset(edges)),
                  offset.coef=log(9),
                  targets="formation",
                  estimate="EGMME",

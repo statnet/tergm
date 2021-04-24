@@ -301,7 +301,7 @@ coef.form <- fit$coef
 coef.form[1] <- coef.form[1] - log(40-1)
 
 fit.sim <- simulate(fit, dynamic=FALSE)
-diag.sim <- simulate(fit.sim ~ Form(~ edges + offset(nodemix("loc", levels2=-c(1, 3)))) + offset(Diss(~edges)),
+diag.sim <- simulate(fit.sim ~ Form(~ edges + offset(nodemix("loc", levels2=-c(1, 3)))) + Diss(~offset(edges)),
                      coef=c(coef.form,log(40-1)),
                      time.slices = 10,
                      monitor = "formation",
