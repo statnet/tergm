@@ -11,3 +11,4 @@ Rplots.pdf
 ^vignettes/.*.tex$
 ^.github$
 ^codecov\.yml$
+^revdep$
