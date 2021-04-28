@@ -48,7 +48,7 @@ tergm.EGMME.GD <- function(theta0, nw, model, model.mon,
                            fit <- if(control$SA.robust) lmrob(y~x,model=FALSE)
                                   else lm(y~x,model=FALSE)
                            
-                           list(coef=coef(fit), resid=resid(fit), tvals=summary(fit)$coefficients[,3])},
+                           list(coef=coef(fit), resid=resid(fit), tvals=coef(summary(fit))[,3])},
                                               silent=TRUE))
                          
                        })
@@ -62,7 +62,7 @@ tergm.EGMME.GD <- function(theta0, nw, model, model.mon,
                    fit <- if(control$SA.robust) lmrob(y~x,model=FALSE)
                           else lm(y~x,model=FALSE)
                    
-                   list(coef=coef(fit), resid=resid(fit), tvals=summary(fit)$coefficients[,3])},
+                   list(coef=coef(fit), resid=resid(fit), tvals=coef(summary(fit))[,3])},
                                       silent=TRUE))
                })
       }

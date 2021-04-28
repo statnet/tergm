@@ -11,7 +11,7 @@ Random Graph Model}
   object,
   nsim = 1,
   seed = NULL,
-  coef = object$coef,
+  coef = coefficients(object),
   constraints = object$constraints,
   monitor = object$targets,
   time.slices = 1,
@@ -283,14 +283,14 @@ sim1 <- simulate(samplk12, nw.start="last")
 # must pass dynamic=TRUE for tergm simulation
 sim2 <- simulate(samplk2 ~ Form(~edges+mutual+transitiveties+cyclicalties) +
                            Diss(~edges+mutual+transitiveties+cyclicalties),
-                           coef = samplk12$coef,
+                           coef = coef(samplk12),
                            dynamic=TRUE)
 
 # the default simulate output is a networkDynamic, and we can simulate
 # with a networkDynamic LHS as well
 sim3 <- simulate(sim2 ~ Form(~edges+mutual+transitiveties+cyclicalties) +
                         Diss(~edges+mutual+transitiveties+cyclicalties),
-                        coef = samplk12$coef,
+                        coef = coef(samplk12),
                         dynamic=TRUE)
 
 }
