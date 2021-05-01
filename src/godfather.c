@@ -102,7 +102,7 @@ SEXP godfather_wrapper(SEXP stateR,
   /* record new generated network to pass back to R */
   if(asInteger(status) == MCMCDyn_OK){
     s->stats = REAL(changestatsRV) + (end_time - start_time)*m->n_stats;
-    SET_VECTOR_ELT(outl, 2, ErgmStateRSave(stateR, s));
+    SET_VECTOR_ELT(outl, 2, ErgmStateRSave(s));
   }
 
   // save state for output as in MCMCDyn

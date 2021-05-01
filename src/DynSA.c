@@ -80,7 +80,7 @@ SEXP MCMCDynSArun_wrapper(SEXP stateR,
   
   /* record new generated network to pass back to R */
   if(asInteger(status) == MCMCDyn_OK){
-    SET_VECTOR_ELT(outl, 2, ErgmStateRSave(stateR, s));
+    SET_VECTOR_ELT(outl, 2, ErgmStateRSave(s));
   }
   
   SET_VECTOR_ELT(outl, 3, eta);
