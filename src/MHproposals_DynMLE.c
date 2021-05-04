@@ -8,34 +8,41 @@
  *  Copyright 2008-2020 Statnet Commons
  */
 #include "ergm_MHproposal.h"
+#include "ergm_MHproposal_bd.h"
 #include "ergm_MHstorage.h"
 #include "ergm_changestat.h"
 #include "ergm_Rutil.h"
 #include "ergm_dyadgen.h"
 
+typedef struct{
+  DyadGen *gen[2];
+  DegreeBound *bd;
+} Store2DyadGenAndDegreeBound;
+
 MH_I_FN(Mi_staticDiscordTNT){
   MHp->ntoggles = 1;
 
-  ALLOC_STORAGE(2, DyadGen *, storage);
-  storage[0] = DyadGenInitializeR(getListElement(MHp->R, "formable"), nwp, TRUE);
-  storage[1] = DyadGenInitializeR(getListElement(MHp->R, "dissolvable"), nwp, TRUE);
+  ALLOC_STORAGE(1, Store2DyadGenAndDegreeBound, storage);
+  storage->gen[0] = DyadGenInitializeR(getListElement(MHp->R, "formable"), nwp, TRUE);
+  storage->gen[1] = DyadGenInitializeR(getListElement(MHp->R, "dissolvable"), nwp, TRUE);
+  storage->bd = DegreeBoundInitializeR(MHp->R, nwp);
 
-  if(storage[0]->ndyads==0 && storage[1]->ndyads==0) error("At least one of the dyad sets has to have toggleable dyads.");
+  if(storage->gen[0]->ndyads==0 && storage->gen[1]->ndyads==0) error("At least one of the dyad sets has to have toggleable dyads.");
 }
 
 
 MH_P_FN(MH_staticDiscordTNT) {
-  GET_STORAGE(DyadGen *, storage);
+  GET_STORAGE(Store2DyadGenAndDegreeBound, storage);
   double logratio = 0;
 
   DyadGen *activegen, *inactivegen;
 
-  if(storage[1]->ndyads==0 || (storage[0]->ndyads!=0 && unif_rand()<MH_INPUTS[0])){ // Propose from the formables.
-    activegen = storage[0];
-    inactivegen = storage[1];
+  if(storage->gen[1]->ndyads==0 || (storage->gen[0]->ndyads!=0 && unif_rand()<MH_INPUTS[0])){ // Propose from the formables.
+    activegen = storage->gen[0];
+    inactivegen = storage->gen[1];
   }else{ // Propose from the dissolvables.
-    activegen = storage[1];
-    inactivegen = storage[0];
+    activegen = storage->gen[1];
+    inactivegen = storage->gen[0];
   }
 
   DyadGenWake(activegen);
@@ -45,7 +52,7 @@ MH_P_FN(MH_staticDiscordTNT) {
   double DP = P*activegen->ndyads, DO = DP/Q;
   Edge nedges = DyadGenEdgecount(activegen);
 
-  BD_LOOP({
+  BD_LOOP(storage->bd, {
       if(unif_rand() < P && nedges > 0){ /* Select a tie at random from the network of eligibles */
         DyadGenRandEdge(Mtail, Mhead, activegen);
         logratio = TNT_LR_E(nedges, Q, DP, DO);
@@ -65,8 +72,9 @@ MH_P_FN(MH_staticDiscordTNT) {
 
 
 MH_F_FN(Mf_staticDiscordTNT) {
-  GET_STORAGE(DyadGen *, storage);
+  GET_STORAGE(Store2DyadGenAndDegreeBound, storage);
 
-  DyadGenDestroy(storage[0]);
-  DyadGenDestroy(storage[1]);
+  DyadGenDestroy(storage->gen[0]);
+  DyadGenDestroy(storage->gen[1]);
+  DegreeBoundDestroy(storage->bd);
 }
