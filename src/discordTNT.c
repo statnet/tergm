@@ -32,10 +32,7 @@ typedef struct {
   UnsrtEL *discordantEdges;
   UnsrtEL *discordantNonEdges;
   
-  double discordance_fraction;
-  
-  int in_discord;
-  
+  double discordance_fraction;  
 } discordTNTStorage; 
 
 MH_I_FN(Mi_discordTNT) {
@@ -109,7 +106,6 @@ MH_P_FN(MH_discordTNT) {
       
       in_network = TRUE;
     }
-
   } else {
     // propose from discord
     if(unif_rand() < sto->discordantEdges->nedges/((double) nddyads)) {
@@ -119,6 +115,7 @@ MH_P_FN(MH_discordTNT) {
       UnsrtELGetRand(Mtail, Mhead, sto->discordantNonEdges);
       in_network = FALSE;
     }
+    
     in_discord = TRUE;
   }
   
@@ -136,15 +133,15 @@ MH_P_FN(MH_discordTNT) {
   double backward = (nddyads == 1 && in_discord) ? backward_network : (sto->discordance_fraction*backward_discord + (1 - sto->discordance_fraction)*backward_network);
 
   MHp->logratio = log(backward/forward);
-
-  sto->in_discord = in_discord;
 }
 
 MH_U_FN(Mu_discordTNT) {  
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   GET_STORAGE(discordTNTStorage, sto);
+  int in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, tail, head)) != kh_none;
   
   // add or remove the dyad from the appropriate discordance edgelist  
-  if(sto->in_discord == edgestate) {
+  if(in_discord == edgestate) {
     UnsrtELToggleKnown(tail, head, sto->discordantEdges, edgestate);
   } else {
     UnsrtELToggleKnown(tail, head, sto->nonDiscordantEdges, edgestate);
