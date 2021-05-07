@@ -262,7 +262,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
 
   output <- match.arg(output)
 
-  rv <- simulate(object ~ Form(formation) + Diss(dissolution), nsim=nsim, seed=seed, coef = c(coef.form, coef.diss), constraints=constraints,
+  rv <- simulate_formula.networkDynamic(trim_env(~Form(formation) + Diss(dissolution), keep = c("formation", "dissolution")), basis=object, nsim=nsim, seed=seed, coef = c(coef.form, coef.diss), constraints=constraints,
                  monitor=monitor, time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval, time.offset=time.offset, control=control, output=output, stats = stats.form || stats.diss, verbose=verbose, dynamic=TRUE, ...)
 
   if(output != "stats") {
