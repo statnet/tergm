@@ -1110,8 +1110,11 @@ S_CHANGESTAT_FN(s_degree_mean_age){
 
  *****************/
 
+typedef degree_mean_age_storage degree_by_attr_mean_age_storage;
+
+
 I_CHANGESTAT_FN(i_degree_by_attr_mean_age){
-  ALLOC_STORAGE(1, degree_mean_age_storage, sto);
+  ALLOC_STORAGE(1, degree_by_attr_mean_age_storage, sto);
   
   sto->ages = Calloc(N_CHANGE_STATS, double);
   sto->counts = Calloc(N_CHANGE_STATS, int);
@@ -1157,7 +1160,7 @@ X_CHANGESTAT_FN(x_degree_by_attr_mean_age){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
-    GET_STORAGE(degree_mean_age_storage, sto);
+    GET_STORAGE(degree_by_attr_mean_age_storage, sto);
        
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
@@ -1208,7 +1211,7 @@ X_CHANGESTAT_FN(x_degree_by_attr_mean_age){
 void process_toggle_degree_by_attr_mean_age(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, Rboolean edgestate, Rboolean write_changestats) {
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
 
-  GET_STORAGE(degree_mean_age_storage, sto);
+  GET_STORAGE(degree_by_attr_mean_age_storage, sto);
       
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
@@ -1348,14 +1351,14 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age){
 U_CHANGESTAT_FN(u_degree_by_attr_mean_age){
   process_toggle_degree_by_attr_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
 
-  GET_STORAGE(degree_mean_age_storage, sto);
+  GET_STORAGE(degree_by_attr_mean_age_storage, sto);
   
   memcpy(sto->ages, sto->prop_ages, N_CHANGE_STATS*sizeof(double));
   memcpy(sto->counts, sto->prop_counts, N_CHANGE_STATS*sizeof(int));
 }
 
 F_CHANGESTAT_FN(f_degree_by_attr_mean_age){
-  GET_STORAGE(degree_mean_age_storage, sto);
+  GET_STORAGE(degree_by_attr_mean_age_storage, sto);
 
   Free(sto->ages);
   Free(sto->counts);
@@ -1414,8 +1417,10 @@ S_CHANGESTAT_FN(s_degree_by_attr_mean_age){
 // A macro indicating whether x is in [from,to)
 #define FROM_TO(x, from, to) ((x)>=(from) && (x)<(to))
 
+typedef degree_mean_age_storage degrange_mean_age_storage;
+
 I_CHANGESTAT_FN(i_degrange_mean_age){
-  ALLOC_STORAGE(1, degree_mean_age_storage, sto);
+  ALLOC_STORAGE(1, degrange_mean_age_storage, sto);
   
   sto->ages = Calloc(N_CHANGE_STATS, double);
   sto->counts = Calloc(N_CHANGE_STATS, int);
@@ -1454,7 +1459,7 @@ X_CHANGESTAT_FN(x_degrange_mean_age){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
-    GET_STORAGE(degree_mean_age_storage, sto);
+    GET_STORAGE(degrange_mean_age_storage, sto);
        
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
@@ -1502,7 +1507,7 @@ void process_toggle_degrange_mean_age(Vertex tail, Vertex head, ModelTerm *mtp, 
   double zeroval = INPUT_PARAM[0];
   int transform = INPUT_PARAM[1]; // Transformation code.
   
-  GET_STORAGE(degree_mean_age_storage, sto);  
+  GET_STORAGE(degrange_mean_age_storage, sto);  
   
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
     double s0 = sto->ages[j], s1 = sto->ages[j];
@@ -1648,14 +1653,14 @@ C_CHANGESTAT_FN(c_degrange_mean_age) {
 U_CHANGESTAT_FN(u_degrange_mean_age){
   process_toggle_degrange_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
 
-  GET_STORAGE(degree_mean_age_storage, sto);
+  GET_STORAGE(degrange_mean_age_storage, sto);
 
   memcpy(sto->ages, sto->prop_ages, N_CHANGE_STATS*sizeof(double));
   memcpy(sto->counts, sto->prop_counts, N_CHANGE_STATS*sizeof(int));
 }
 
 F_CHANGESTAT_FN(f_degrange_mean_age){
-  GET_STORAGE(degree_mean_age_storage, sto);
+  GET_STORAGE(degrange_mean_age_storage, sto);
 
   Free(sto->ages);
   Free(sto->counts);
@@ -1702,8 +1707,10 @@ S_CHANGESTAT_FN(s_degrange_mean_age){
 
  *****************/
 
+typedef degree_mean_age_storage degrange_by_attr_mean_age_storage;
+
 I_CHANGESTAT_FN(i_degrange_by_attr_mean_age){
-  ALLOC_STORAGE(1, degree_mean_age_storage, sto);
+  ALLOC_STORAGE(1, degrange_by_attr_mean_age_storage, sto);
   
   sto->ages = Calloc(N_CHANGE_STATS, double);
   sto->counts = Calloc(N_CHANGE_STATS, int);
@@ -1750,7 +1757,7 @@ X_CHANGESTAT_FN(x_degrange_by_attr_mean_age){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
-    GET_STORAGE(degree_mean_age_storage, sto);
+    GET_STORAGE(degrange_by_attr_mean_age_storage, sto);
        
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
@@ -1805,7 +1812,7 @@ void process_toggle_degrange_by_attr_mean_age(Vertex tail, Vertex head, ModelTer
   double zeroval = INPUT_PARAM[0];
   int transform = INPUT_PARAM[1]; // Transformation code.
   
-  GET_STORAGE(degree_mean_age_storage, sto);
+  GET_STORAGE(degrange_by_attr_mean_age_storage, sto);
     
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
     double s0 = sto->ages[j], s1 = sto->ages[j];
@@ -1967,14 +1974,14 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age){
 U_CHANGESTAT_FN(u_degrange_by_attr_mean_age){
   process_toggle_degrange_by_attr_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
 
-  GET_STORAGE(degree_mean_age_storage, sto);
+  GET_STORAGE(degrange_by_attr_mean_age_storage, sto);
 
   memcpy(sto->ages, sto->prop_ages, N_CHANGE_STATS*sizeof(double));
   memcpy(sto->counts, sto->prop_counts, N_CHANGE_STATS*sizeof(int));
 }
 
 F_CHANGESTAT_FN(f_degrange_by_attr_mean_age){
-  GET_STORAGE(degree_mean_age_storage, sto);
+  GET_STORAGE(degrange_by_attr_mean_age_storage, sto);
 
   Free(sto->ages);
   Free(sto->counts);
