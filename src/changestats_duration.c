@@ -177,15 +177,20 @@ S_CHANGESTAT_FN(s_edgecov_ages_mon){
 
  *****************/
 
+typedef struct {
+  double age; // sum of edge ages in current network
+  double prop_age; // sum of edge ages in proposed network
+} mean_age_storage;
+
 I_CHANGESTAT_FN(i_mean_age_mon){
-  ALLOC_STORAGE(2, double, sto);
+  ALLOC_STORAGE(1, mean_age_storage, sto);
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
   int transform = INPUT_PARAM[1];
   
   EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
     int et = ElapsedTime(tail,head,dur_inf);
     CSD_TRANSFORM_ET(et);
-    sto[0] += ett1;
+    sto->age += ett1;
   });
 }
 
@@ -196,29 +201,29 @@ X_CHANGESTAT_FN(x_mean_age_mon){
   int transform = INPUT_PARAM[1];
   
   if(type == TICK) {
-    GET_STORAGE(double, sto);
+    GET_STORAGE(mean_age_storage, sto);
     
     if(transform == 0) {
-      sto[0] += N_EDGES;
+      sto->age += N_EDGES;
       CHANGE_STAT[0] = N_EDGES ? 1 : 0;
     } else {
-      double oldval = sto[0];
-      sto[0] = 0;
+      double oldval = sto->age;
+      sto->age = 0;
       EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
         int et = ElapsedTime(tail,head,dur_inf) + 1;
         CSD_TRANSFORM_ET(et);
-        sto[0] += ett1;
+        sto->age += ett1;
       });
-      CHANGE_STAT[0] = N_EDGES ? (sto[0] - oldval)/N_EDGES : 0;
+      CHANGE_STAT[0] = N_EDGES ? (sto->age - oldval)/N_EDGES : 0;
     }
   }
 }
 
 C_CHANGESTAT_FN(c_mean_age_mon){
-  GET_STORAGE(double, sto);
+  GET_STORAGE(mean_age_storage, sto);
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
-  double s0 = sto[0], s1 = sto[0]; // Sum of age values of initial and final network.
+  double s0 = sto->age, s1 = sto->age; // Sum of age values of initial and final network.
   double zeroval = INPUT_PARAM[0]; // Empty network value.
   int transform = INPUT_PARAM[1]; // Transformation code.
   Edge e0, e1; // Number of edges in initial and final network.
@@ -230,14 +235,14 @@ C_CHANGESTAT_FN(c_mean_age_mon){
   CSD_TRANSFORM_ET(et);
   s1 += change*ett1;
   e1 += change;
-  sto[1] = s1;
+  sto->prop_age = s1;
 
   CHANGE_STAT[0]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
 }
 
 U_CHANGESTAT_FN(u_mean_age_mon){
-  GET_STORAGE(double, sto);
-  sto[0] = sto[1];
+  GET_STORAGE(mean_age_storage, sto);
+  sto->age = sto->prop_age;
 }
 
 S_CHANGESTAT_FN(s_mean_age_mon){
@@ -644,8 +649,16 @@ S_CHANGESTAT_FN(s_nodemix_mean_age) {
  The edgecov_mean_ages of an empty network is defined to be emptyval.
 
  *****************/
+ 
+typedef struct {
+  double agewts; // sum of age*wt over edges in current network
+  double wts; // sum of wt over edges in current network
+  double prop_agewts; // sum of age*wt over edges in proposed network
+  double prop_wts; // sum of wt over edges in proposed network
+} edgecov_mean_age_storage;
+
 I_CHANGESTAT_FN(i_edgecov_mean_age_mon) {
-  ALLOC_STORAGE(4, double, sto);
+  ALLOC_STORAGE(1, edgecov_mean_age_storage, sto);
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
   int transform = INPUT_PARAM[1];
   
@@ -661,8 +674,8 @@ I_CHANGESTAT_FN(i_edgecov_mean_age_mon) {
     if(val!=0){   
       int et = ElapsedTime(tail,head,dur_inf);
       CSD_TRANSFORM_ET(et);
-      sto[0] += ett1*val;
-      sto[1] += val;
+      sto->agewts += ett1*val;
+      sto->wts += val;
     }
   });
 }
@@ -681,24 +694,24 @@ X_CHANGESTAT_FN(x_edgecov_mean_age_mon) {
   
     int transform = INPUT_PARAM[1];
     
-    GET_STORAGE(double, sto);
+    GET_STORAGE(edgecov_mean_age_storage, sto);
     
-    if(sto[1] != 0) {
+    if(sto->wts != 0) {
       if(transform == 0) {
-        sto[0] += sto[1];
+        sto->agewts += sto->wts;
         CHANGE_STAT[0] = 1;
       } else {
-        double oldval = sto[0];
-        sto[0] = 0;
+        double oldval = sto->agewts;
+        sto->agewts = 0;
         EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
           double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];   
           if(val!=0) {
             int et = ElapsedTime(tail,head,dur_inf) + 1;
             CSD_TRANSFORM_ET(et);
-            sto[0] += ett1*val;
+            sto->agewts += ett1*val;
           }
         });
-        CHANGE_STAT[0] = (sto[0] - oldval)/sto[1];
+        CHANGE_STAT[0] = (sto->agewts - oldval)/sto->wts;
       }
     }
   }
@@ -714,12 +727,12 @@ C_CHANGESTAT_FN(c_edgecov_mean_age_mon){
     nrow = INPUT_PARAM[2];
   }
 
-  GET_STORAGE(double, sto);
+  GET_STORAGE(edgecov_mean_age_storage, sto);
 
-  double s0 = sto[0], s1 = sto[0]; // Sum of age values of initial and final network.
+  double s0 = sto->agewts, s1 = sto->agewts; // Sum of age values times weights in initial and final network.
   double zeroval = INPUT_PARAM[0]; // Empty network value.
   int transform = INPUT_PARAM[1]; // Transformation code.
-  double e0 = sto[1], e1 = sto[1]; // Sum of edge weights in initial and final network.
+  double e0 = sto->wts, e1 = sto->wts; // Sum of edge weights in initial and final network.
   
   double val = INPUT_ATTRIB[(head - 1 - noffset) * nrow + (tail - 1)];   
   if(val!=0){
@@ -738,14 +751,14 @@ C_CHANGESTAT_FN(c_edgecov_mean_age_mon){
   
   CHANGE_STAT[0]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
   
-  sto[2] = s1;
-  sto[3] = e1;
+  sto->prop_agewts = s1;
+  sto->prop_wts = e1;
 }
 
 U_CHANGESTAT_FN(u_edgecov_mean_age_mon){
-  GET_STORAGE(double, sto);
-  sto[0] = sto[2];
-  sto[1] = sto[3];
+  GET_STORAGE(edgecov_mean_age_storage, sto);
+  sto->agewts = sto->prop_agewts;
+  sto->wts = sto->prop_wts;
 }
 
 S_CHANGESTAT_FN(s_edgecov_mean_age_mon){
@@ -786,18 +799,23 @@ S_CHANGESTAT_FN(s_edgecov_mean_age_mon){
  The degree_mean_age of a network with no actors with degree of interest is defined to be emptyval.
 
  *****************/
-I_CHANGESTAT_FN(i_degree_mean_age_mon){
-  ALLOC_STORAGE(4, void *, sto);
-  
-  sto[0] = Calloc(N_CHANGE_STATS, double);
-  sto[1] = Calloc(N_CHANGE_STATS, int);
-  
-  sto[2] = Calloc(N_CHANGE_STATS, double);
-  sto[3] = Calloc(N_CHANGE_STATS, int);
-  
-  double *age = (double *)sto[0];
-  int *count = (int *)sto[1];
 
+typedef struct {
+  double *ages;
+  int *counts;
+  double *prop_ages;
+  int *prop_counts;
+} degree_mean_age_storage;
+
+I_CHANGESTAT_FN(i_degree_mean_age_mon){
+  ALLOC_STORAGE(1, degree_mean_age_storage, sto);
+  
+  sto->ages = Calloc(N_CHANGE_STATS, double);
+  sto->counts = Calloc(N_CHANGE_STATS, int);
+  
+  sto->prop_ages = Calloc(N_CHANGE_STATS, double);
+  sto->prop_counts = Calloc(N_CHANGE_STATS, int);
+  
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
   Vertex *id=IN_DEG, *od=OUT_DEG;
@@ -820,8 +838,8 @@ I_CHANGESTAT_FN(i_degree_mean_age_mon){
       }
     });
     
-    age[j] = s0;
-    count[j] = e0;
+    sto->ages[j] = s0;
+    sto->counts[j] = e0;
   }
 }
  
@@ -829,11 +847,8 @@ X_CHANGESTAT_FN(x_degree_mean_age_mon){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
-    GET_STORAGE(void *, sto);
-    
-    double *age = (double *)sto[0];
-    int *count = (int *)sto[1];
-   
+    GET_STORAGE(degree_mean_age_storage, sto);
+       
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
     int transform = INPUT_PARAM[1]; // Transformation code.
@@ -842,8 +857,8 @@ X_CHANGESTAT_FN(x_degree_mean_age_mon){
       double s0, s1;
       int e0;
       if(transform == 0) { // do it the fast way
-        s0 = age[j];
-        e0 = count[j];
+        s0 = sto->ages[j];
+        e0 = sto->counts[j];
         
         s1 = s0 + e0;
       } else { // transform == 1 and we need to do it the old way
@@ -868,7 +883,7 @@ X_CHANGESTAT_FN(x_degree_mean_age_mon){
       
       CHANGE_STAT[j]=(e0==0?zeroval:s1/e0)-(e0==0?zeroval:s0/e0);
       
-      age[j] = s1;      
+      sto->ages[j] = s1;      
     }
   }
 }
@@ -881,18 +896,11 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
   double zeroval = INPUT_PARAM[0];
   int transform = INPUT_PARAM[1]; // Transformation code.
   
-  GET_STORAGE(void *, sto);
+  GET_STORAGE(degree_mean_age_storage, sto);
     
-  double *age = (double *)sto[0];
-  int *count = (int *)sto[1];
-  double *newage = (double *)sto[2];
-  int *newcount = (int *)sto[3];
-
-  
-  
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
-    double s0 = age[j], s1 = age[j];
-    Edge e0 = count[j], e1 = count[j];
+    double s0 = sto->ages[j], s1 = sto->ages[j];
+    Edge e0 = sto->counts[j], e1 = sto->counts[j];
 
     Vertex deg = INPUT_PARAM[j+2];
     
@@ -997,8 +1005,8 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
         break;
     }
   
-    newage[j] = s1;
-    newcount[j] = e1;
+    sto->prop_ages[j] = s1;
+    sto->prop_counts[j] = e1;
   
     CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
   }
@@ -1006,24 +1014,19 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
 
 U_CHANGESTAT_FN(u_degree_mean_age_mon){
   // FIXME: Do not assume that the dyad in this u_ call is the same as that in the last c_ call.
-  GET_STORAGE(void *, sto);
-    
-  double *age = (double *)sto[0];
-  int *count = (int *)sto[1];
-  double *newage = (double *)sto[2];
-  int *newcount = (int *)sto[3];
-
-  memcpy(age, newage, N_CHANGE_STATS*sizeof(double));
-  memcpy(count, newcount, N_CHANGE_STATS*sizeof(int));
+  GET_STORAGE(degree_mean_age_storage, sto);
+  
+  memcpy(sto->ages, sto->prop_ages, N_CHANGE_STATS*sizeof(double));
+  memcpy(sto->counts, sto->prop_counts, N_CHANGE_STATS*sizeof(int));
 }
 
 F_CHANGESTAT_FN(f_degree_mean_age_mon){
-  GET_STORAGE(void *, sto);
+  GET_STORAGE(degree_mean_age_storage, sto);
 
-  Free(sto[3]);
-  Free(sto[2]);
-  Free(sto[1]);
-  Free(sto[0]);  
+  Free(sto->ages);
+  Free(sto->counts);
+  Free(sto->prop_ages);
+  Free(sto->prop_counts);  
 }
 
 S_CHANGESTAT_FN(s_degree_mean_age_mon){
@@ -1063,18 +1066,16 @@ S_CHANGESTAT_FN(s_degree_mean_age_mon){
  The degree_by_attr_mean_age of a network with no actors with degree of interest is defined to be emptyval.
 
  *****************/
-I_CHANGESTAT_FN(i_degree_by_attr_mean_age_mon){
-  ALLOC_STORAGE(4, void *, sto);
-  
-  sto[0] = Calloc(N_CHANGE_STATS, double);
-  sto[1] = Calloc(N_CHANGE_STATS, int);
-  
-  sto[2] = Calloc(N_CHANGE_STATS, double);
-  sto[3] = Calloc(N_CHANGE_STATS, int);
-  
-  double *age = (double *)sto[0];
-  int *count = (int *)sto[1];
 
+I_CHANGESTAT_FN(i_degree_by_attr_mean_age_mon){
+  ALLOC_STORAGE(1, degree_mean_age_storage, sto);
+  
+  sto->ages = Calloc(N_CHANGE_STATS, double);
+  sto->counts = Calloc(N_CHANGE_STATS, int);
+  
+  sto->prop_ages = Calloc(N_CHANGE_STATS, double);
+  sto->prop_counts = Calloc(N_CHANGE_STATS, int);
+  
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
   Vertex *id=IN_DEG, *od=OUT_DEG;
@@ -1104,8 +1105,8 @@ I_CHANGESTAT_FN(i_degree_by_attr_mean_age_mon){
       }
     });
     
-    age[j] = s0;
-    count[j] = e0;
+    sto->ages[j] = s0;
+    sto->counts[j] = e0;
   }
 }
 
@@ -1113,11 +1114,8 @@ X_CHANGESTAT_FN(x_degree_by_attr_mean_age_mon){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
-    GET_STORAGE(void *, sto);
-    
-    double *age = (double *)sto[0];
-    int *count = (int *)sto[1];
-   
+    GET_STORAGE(degree_mean_age_storage, sto);
+       
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
     int transform = INPUT_PARAM[1]; // Transformation code.
@@ -1126,8 +1124,8 @@ X_CHANGESTAT_FN(x_degree_by_attr_mean_age_mon){
       double s0, s1;
       int e0;
       if(transform == 0) { // do it the fast way
-        s0 = age[j];
-        e0 = count[j];
+        s0 = sto->ages[j];
+        e0 = sto->counts[j];
         
         s1 = s0 + e0;
       } else { // transform == 1 and we need to do it the old way
@@ -1159,7 +1157,7 @@ X_CHANGESTAT_FN(x_degree_by_attr_mean_age_mon){
       
       CHANGE_STAT[j]=(e0==0?zeroval:s1/e0)-(e0==0?zeroval:s0/e0);
       
-      age[j] = s1;      
+      sto->ages[j] = s1;      
     }
   }
 }
@@ -1167,20 +1165,15 @@ X_CHANGESTAT_FN(x_degree_by_attr_mean_age_mon){
 C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
 
-  GET_STORAGE(void *, sto);
-    
-  double *age = (double *)sto[0];
-  int *count = (int *)sto[1];
-  double *newage = (double *)sto[2];
-  int *newcount = (int *)sto[3];
-    
+  GET_STORAGE(degree_mean_age_storage, sto);
+      
   Vertex *id=IN_DEG, *od=OUT_DEG;
   double zeroval = INPUT_PARAM[0];
   int transform = INPUT_PARAM[1]; // Transformation code.
   
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
-    double s0 = age[j], s1 = age[j];
-    Edge e0 = count[j], e1 = count[j];
+    double s0 = sto->ages[j], s1 = sto->ages[j];
+    Edge e0 = sto->counts[j], e1 = sto->counts[j];
 
     Vertex deg = INPUT_PARAM[2*j+2];
     int testattr = INPUT_PARAM[2*j+3];
@@ -1190,8 +1183,8 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
 
     // If neither attribute matches, this toggle has no effect on the statistic.
     if(tailattr!=testattr && headattr!=testattr){
-      newage[j] = age[j];
-      newcount[j] = count[j];
+      sto->prop_ages[j] = sto->ages[j];
+      sto->prop_counts[j] = sto->counts[j];
       continue; 
     }
 
@@ -1298,31 +1291,26 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
   
     CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
     
-    newcount[j] = e1;
-    newage[j] = s1;
+    sto->prop_counts[j] = e1;
+    sto->prop_ages[j] = s1;
   }
 }
 
 U_CHANGESTAT_FN(u_degree_by_attr_mean_age_mon){
   // FIXME: Do not assume that the dyad in this u_ call is the same as that in the last c_ call.
-  GET_STORAGE(void *, sto);
-    
-  double *age = (double *)sto[0];
-  int *count = (int *)sto[1];
-  double *newage = (double *)sto[2];
-  int *newcount = (int *)sto[3];
-
-  memcpy(age, newage, N_CHANGE_STATS*sizeof(double));
-  memcpy(count, newcount, N_CHANGE_STATS*sizeof(int));
+  GET_STORAGE(degree_mean_age_storage, sto);
+  
+  memcpy(sto->ages, sto->prop_ages, N_CHANGE_STATS*sizeof(double));
+  memcpy(sto->counts, sto->prop_counts, N_CHANGE_STATS*sizeof(int));
 }
 
 F_CHANGESTAT_FN(f_degree_by_attr_mean_age_mon){
-  GET_STORAGE(void *, sto);
+  GET_STORAGE(degree_mean_age_storage, sto);
 
-  Free(sto[3]);
-  Free(sto[2]);
-  Free(sto[1]);
-  Free(sto[0]);  
+  Free(sto->ages);
+  Free(sto->counts);
+  Free(sto->prop_ages);
+  Free(sto->prop_counts);  
 }
 
 
@@ -1377,17 +1365,14 @@ S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon){
 #define FROM_TO(x, from, to) ((x)>=(from) && (x)<(to))
 
 I_CHANGESTAT_FN(i_degrange_mean_age_mon){
-  ALLOC_STORAGE(4, void *, sto);
+  ALLOC_STORAGE(1, degree_mean_age_storage, sto);
   
-  sto[0] = Calloc(N_CHANGE_STATS, double);
-  sto[1] = Calloc(N_CHANGE_STATS, int);
+  sto->ages = Calloc(N_CHANGE_STATS, double);
+  sto->counts = Calloc(N_CHANGE_STATS, int);
   
-  sto[2] = Calloc(N_CHANGE_STATS, double);
-  sto[3] = Calloc(N_CHANGE_STATS, int);
+  sto->prop_ages = Calloc(N_CHANGE_STATS, double);
+  sto->prop_counts = Calloc(N_CHANGE_STATS, int);
   
-  double *age = (double *)sto[0];
-  int *count = (int *)sto[1];
-
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
   Vertex *id=IN_DEG, *od=OUT_DEG;
@@ -1410,8 +1395,8 @@ I_CHANGESTAT_FN(i_degrange_mean_age_mon){
       }
     });
     
-    age[j] = s0;
-    count[j] = e0;
+    sto->ages[j] = s0;
+    sto->counts[j] = e0;
   }
 }
 
@@ -1419,11 +1404,8 @@ X_CHANGESTAT_FN(x_degrange_mean_age_mon){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
-    GET_STORAGE(void *, sto);
-    
-    double *age = (double *)sto[0];
-    int *count = (int *)sto[1];
-   
+    GET_STORAGE(degree_mean_age_storage, sto);
+       
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
     int transform = INPUT_PARAM[1]; // Transformation code.
@@ -1432,8 +1414,8 @@ X_CHANGESTAT_FN(x_degrange_mean_age_mon){
       double s0, s1;
       int e0;
       if(transform == 0) { // do it the fast way
-        s0 = age[j];
-        e0 = count[j];
+        s0 = sto->ages[j];
+        e0 = sto->counts[j];
         
         s1 = s0 + e0;
       } else { // transform == 1 and we need to do it the old way
@@ -1458,7 +1440,7 @@ X_CHANGESTAT_FN(x_degrange_mean_age_mon){
       
       CHANGE_STAT[j]=(e0==0?zeroval:s1/e0)-(e0==0?zeroval:s0/e0);
       
-      age[j] = s1;      
+      sto->ages[j] = s1;      
     }
   }
 }
@@ -1470,17 +1452,11 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
   double zeroval = INPUT_PARAM[0];
   int transform = INPUT_PARAM[1]; // Transformation code.
   
-  GET_STORAGE(void *, sto);
-    
-  double *age = (double *)sto[0];
-  int *count = (int *)sto[1];
-  double *newage = (double *)sto[2];
-  int *newcount = (int *)sto[3];
-  
+  GET_STORAGE(degree_mean_age_storage, sto);  
   
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
-    double s0 = age[j], s1 = age[j];
-    Edge e0 = count[j], e1 = count[j];
+    double s0 = sto->ages[j], s1 = sto->ages[j];
+    Edge e0 = sto->counts[j], e1 = sto->counts[j];
 
     Vertex from = INPUT_PARAM[j*2+2], to = INPUT_PARAM[j*2+3];
 
@@ -1608,31 +1584,26 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
   
     CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
     
-    newage[j] = s1;
-    newcount[j] = e1;
+    sto->prop_ages[j] = s1;
+    sto->prop_counts[j] = e1;
   }
 }
 
 U_CHANGESTAT_FN(u_degrange_mean_age_mon){
   // FIXME: Do not assume that the dyad in this u_ call is the same as that in the last c_ call.
-  GET_STORAGE(void *, sto);
-    
-  double *age = (double *)sto[0];
-  int *count = (int *)sto[1];
-  double *newage = (double *)sto[2];
-  int *newcount = (int *)sto[3];
+  GET_STORAGE(degree_mean_age_storage, sto);
 
-  memcpy(age, newage, N_CHANGE_STATS*sizeof(double));
-  memcpy(count, newcount, N_CHANGE_STATS*sizeof(int));
+  memcpy(sto->ages, sto->prop_ages, N_CHANGE_STATS*sizeof(double));
+  memcpy(sto->counts, sto->prop_counts, N_CHANGE_STATS*sizeof(int));
 }
 
 F_CHANGESTAT_FN(f_degrange_mean_age_mon){
-  GET_STORAGE(void *, sto);
+  GET_STORAGE(degree_mean_age_storage, sto);
 
-  Free(sto[3]);
-  Free(sto[2]);
-  Free(sto[1]);
-  Free(sto[0]);  
+  Free(sto->ages);
+  Free(sto->counts);
+  Free(sto->prop_ages);
+  Free(sto->prop_counts);  
 }
 
 
@@ -1675,17 +1646,14 @@ S_CHANGESTAT_FN(s_degrange_mean_age_mon){
  *****************/
 
 I_CHANGESTAT_FN(i_degrange_by_attr_mean_age_mon){
-  ALLOC_STORAGE(4, void *, sto);
+  ALLOC_STORAGE(1, degree_mean_age_storage, sto);
   
-  sto[0] = Calloc(N_CHANGE_STATS, double);
-  sto[1] = Calloc(N_CHANGE_STATS, int);
+  sto->ages = Calloc(N_CHANGE_STATS, double);
+  sto->counts = Calloc(N_CHANGE_STATS, int);
   
-  sto[2] = Calloc(N_CHANGE_STATS, double);
-  sto[3] = Calloc(N_CHANGE_STATS, int);
+  sto->prop_ages = Calloc(N_CHANGE_STATS, double);
+  sto->prop_counts = Calloc(N_CHANGE_STATS, int);
   
-  double *age = (double *)sto[0];
-  int *count = (int *)sto[1];
-
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
   Vertex *id=IN_DEG, *od=OUT_DEG;
@@ -1716,8 +1684,8 @@ I_CHANGESTAT_FN(i_degrange_by_attr_mean_age_mon){
       }
     });
     
-    age[j] = s0;
-    count[j] = e0;
+    sto->ages[j] = s0;
+    sto->counts[j] = e0;
   }
 }
 
@@ -1725,11 +1693,8 @@ X_CHANGESTAT_FN(x_degrange_by_attr_mean_age_mon){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
-    GET_STORAGE(void *, sto);
-    
-    double *age = (double *)sto[0];
-    int *count = (int *)sto[1];
-   
+    GET_STORAGE(degree_mean_age_storage, sto);
+       
     Vertex *id=IN_DEG, *od=OUT_DEG;
     double zeroval = INPUT_PARAM[0];
     int transform = INPUT_PARAM[1]; // Transformation code.
@@ -1738,8 +1703,8 @@ X_CHANGESTAT_FN(x_degrange_by_attr_mean_age_mon){
       double s0, s1;
       int e0;
       if(transform == 0) { // do it the fast way
-        s0 = age[j];
-        e0 = count[j];
+        s0 = sto->ages[j];
+        e0 = sto->counts[j];
         
         s1 = s0 + e0;
       } else { // transform == 1 and we need to do it the old way
@@ -1771,7 +1736,7 @@ X_CHANGESTAT_FN(x_degrange_by_attr_mean_age_mon){
       
       CHANGE_STAT[j]=(e0==0?zeroval:s1/e0)-(e0==0?zeroval:s0/e0);
       
-      age[j] = s1;      
+      sto->ages[j] = s1;      
     }
   }
 }
@@ -1783,16 +1748,11 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
   double zeroval = INPUT_PARAM[0];
   int transform = INPUT_PARAM[1]; // Transformation code.
   
-  GET_STORAGE(void *, sto);
+  GET_STORAGE(degree_mean_age_storage, sto);
     
-  double *age = (double *)sto[0];
-  int *count = (int *)sto[1];
-  double *newage = (double *)sto[2];
-  int *newcount = (int *)sto[3];
-  
   for(unsigned int j = 0; j < N_CHANGE_STATS; j++){
-    double s0 = age[j], s1 = age[j];
-    Edge e0 = count[j], e1 = count[j];
+    double s0 = sto->ages[j], s1 = sto->ages[j];
+    Edge e0 = sto->counts[j], e1 = sto->counts[j];
 
     Vertex from = INPUT_PARAM[3*j+2], to = INPUT_PARAM[3*j+3];
     int testattr = INPUT_PARAM[3*j+4];
@@ -1802,8 +1762,8 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
 
     // If neither attribute matches, this toggle has no effect on the statistic.
     if(tailattr!=testattr && headattr!=testattr){
-      newage[j] = age[j];
-      newcount[j] = count[j];
+      sto->prop_ages[j] = sto->ages[j];
+      sto->prop_counts[j] = sto->counts[j];
       continue; 
     }
 
@@ -1935,31 +1895,26 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
   
     CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
     
-    newage[j] = s1;
-    newcount[j] = e1;
+    sto->prop_ages[j] = s1;
+    sto->prop_counts[j] = e1;
   }
 }
 
 U_CHANGESTAT_FN(u_degrange_by_attr_mean_age_mon){
   // FIXME: Do not assume that the dyad in this u_ call is the same as that in the last c_ call.
-  GET_STORAGE(void *, sto);
-    
-  double *age = (double *)sto[0];
-  int *count = (int *)sto[1];
-  double *newage = (double *)sto[2];
-  int *newcount = (int *)sto[3];
+  GET_STORAGE(degree_mean_age_storage, sto);
 
-  memcpy(age, newage, N_CHANGE_STATS*sizeof(double));
-  memcpy(count, newcount, N_CHANGE_STATS*sizeof(int));
+  memcpy(sto->ages, sto->prop_ages, N_CHANGE_STATS*sizeof(double));
+  memcpy(sto->counts, sto->prop_counts, N_CHANGE_STATS*sizeof(int));
 }
 
 F_CHANGESTAT_FN(f_degrange_by_attr_mean_age_mon){
-  GET_STORAGE(void *, sto);
+  GET_STORAGE(degree_mean_age_storage, sto);
 
-  Free(sto[3]);
-  Free(sto[2]);
-  Free(sto[1]);
-  Free(sto[0]);  
+  Free(sto->ages);
+  Free(sto->counts);
+  Free(sto->prop_ages);
+  Free(sto->prop_counts);  
 }
 
 
