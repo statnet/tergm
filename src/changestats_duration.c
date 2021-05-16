@@ -219,7 +219,7 @@ X_CHANGESTAT_FN(x_mean_age_mon){
   }
 }
 
-C_CHANGESTAT_FN(c_mean_age_mon){
+void process_toggle_mean_age(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, Rboolean edgestate, Rboolean write_changestats) {
   GET_STORAGE(mean_age_storage, sto);
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
@@ -237,10 +237,18 @@ C_CHANGESTAT_FN(c_mean_age_mon){
   e1 += change;
   sto->prop_age = s1;
 
-  CHANGE_STAT[0]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+  if(write_changestats) {
+    CHANGE_STAT[0]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+  }
+}
+
+C_CHANGESTAT_FN(c_mean_age_mon){
+  process_toggle_mean_age(tail, head, mtp, nwp, edgestate, TRUE);
 }
 
 U_CHANGESTAT_FN(u_mean_age_mon){
+  process_toggle_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
+
   GET_STORAGE(mean_age_storage, sto);
   sto->age = sto->prop_age;
 }
@@ -347,8 +355,8 @@ X_CHANGESTAT_FN(x_nodefactor_mean_age) {
     }
   }  
 }
-
-C_CHANGESTAT_FN(c_nodefactor_mean_age) {
+    
+void process_toggle_nodefactor_mean_age(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, Rboolean edgestate, Rboolean write_changestats) {
   GET_STORAGE(nodefactor_mean_age_storage, sto);
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
@@ -370,8 +378,10 @@ C_CHANGESTAT_FN(c_nodefactor_mean_age) {
     e1 += change;
     
     sto->newages[tailindex] = s1;
-  
-    CHANGE_STAT[tailindex] = (e1 == 0 ? sto->emptyvals[tailindex] : s1/e1) - (e0 == 0 ? sto->emptyvals[tailindex] : s0/e0);      
+    
+    if(write_changestats) {
+      CHANGE_STAT[tailindex] = (e1 == 0 ? sto->emptyvals[tailindex] : s1/e1) - (e0 == 0 ? sto->emptyvals[tailindex] : s0/e0);      
+    }
   } else {
     if(tailindex >= 0) {
       double s0 = sto->ages[tailindex], s1 = sto->ages[tailindex]; // Sum of age values of initial and final network.
@@ -388,7 +398,9 @@ C_CHANGESTAT_FN(c_nodefactor_mean_age) {
       
       sto->newages[tailindex] = s1;
     
-      CHANGE_STAT[tailindex] = (e1 == 0 ? sto->emptyvals[tailindex] : s1/e1) - (e0 == 0 ? sto->emptyvals[tailindex] : s0/e0);
+      if(write_changestats) {
+        CHANGE_STAT[tailindex] = (e1 == 0 ? sto->emptyvals[tailindex] : s1/e1) - (e0 == 0 ? sto->emptyvals[tailindex] : s0/e0);
+      }
     }
     if(headindex >= 0) {
       double s0 = sto->ages[headindex], s1 = sto->ages[headindex]; // Sum of age values of initial and final network.
@@ -405,12 +417,21 @@ C_CHANGESTAT_FN(c_nodefactor_mean_age) {
       
       sto->newages[headindex] = s1;
     
-      CHANGE_STAT[headindex] = (e1 == 0 ? sto->emptyvals[headindex] : s1/e1) - (e0 == 0 ? sto->emptyvals[headindex] : s0/e0);      
+      if(write_changestats) {
+        CHANGE_STAT[headindex] = (e1 == 0 ? sto->emptyvals[headindex] : s1/e1) - (e0 == 0 ? sto->emptyvals[headindex] : s0/e0);      
+      }
     }
   }
 }
 
+C_CHANGESTAT_FN(c_nodefactor_mean_age) {
+  process_toggle_nodefactor_mean_age(tail, head, mtp, nwp, edgestate, TRUE);
+}
+
+
 U_CHANGESTAT_FN(u_nodefactor_mean_age) {
+  process_toggle_nodefactor_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
+
   GET_STORAGE(nodefactor_mean_age_storage, sto);
 
   // note the following is fine even if tailindex == headindex,
@@ -557,8 +578,8 @@ X_CHANGESTAT_FN(x_nodemix_mean_age) {
     }
   }  
 }
-
-C_CHANGESTAT_FN(c_nodemix_mean_age) {
+    
+void process_toggle_nodemix_mean_age(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, Rboolean edgestate, Rboolean write_changestats) {
   GET_STORAGE(nodemix_mean_age_storage, sto);
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
@@ -578,11 +599,19 @@ C_CHANGESTAT_FN(c_nodemix_mean_age) {
     
     sto->newages[index] = s1;
   
-    CHANGE_STAT[index] = (e1 == 0 ? sto->emptyvals[index] : s1/e1) - (e0 == 0 ? sto->emptyvals[index] : s0/e0);
+    if(write_changestats) {
+      CHANGE_STAT[index] = (e1 == 0 ? sto->emptyvals[index] : s1/e1) - (e0 == 0 ? sto->emptyvals[index] : s0/e0);
+    }
   }  
 }
 
+C_CHANGESTAT_FN(c_nodemix_mean_age) {
+  process_toggle_nodemix_mean_age(tail, head, mtp, nwp, edgestate, TRUE);
+}
+
 U_CHANGESTAT_FN(u_nodemix_mean_age) {
+  process_toggle_nodemix_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
+
   GET_STORAGE(nodemix_mean_age_storage, sto);
 
   int index = sto->indmat[sto->nodecov[tail]][sto->nodecov[head]];
@@ -716,8 +745,8 @@ X_CHANGESTAT_FN(x_edgecov_mean_age_mon) {
     }
   }
 }
-  
-C_CHANGESTAT_FN(c_edgecov_mean_age_mon){
+
+void process_toggle_edgecov_mean_age(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, Rboolean edgestate, Rboolean write_changestats) {
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   int noffset = BIPARTITE, nrow;
@@ -749,13 +778,21 @@ C_CHANGESTAT_FN(c_edgecov_mean_age_mon){
     }
   }
   
-  CHANGE_STAT[0]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+  if(write_changestats) {
+    CHANGE_STAT[0]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+  }
   
   sto->prop_agewts = s1;
   sto->prop_wts = e1;
 }
 
+C_CHANGESTAT_FN(c_edgecov_mean_age_mon) {
+  process_toggle_edgecov_mean_age(tail, head, mtp, nwp, edgestate, TRUE);
+}
+
 U_CHANGESTAT_FN(u_edgecov_mean_age_mon){
+  process_toggle_edgecov_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
+
   GET_STORAGE(edgecov_mean_age_storage, sto);
   sto->agewts = sto->prop_agewts;
   sto->wts = sto->prop_wts;
@@ -888,8 +925,7 @@ X_CHANGESTAT_FN(x_degree_mean_age_mon){
   }
 }
 
-
-C_CHANGESTAT_FN(c_degree_mean_age_mon){
+void process_toggle_degree_mean_age(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, Rboolean edgestate, Rboolean write_changestats) {
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
@@ -1008,12 +1044,19 @@ C_CHANGESTAT_FN(c_degree_mean_age_mon){
     sto->prop_ages[j] = s1;
     sto->prop_counts[j] = e1;
   
-    CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+    if(write_changestats) {
+      CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+    }
   }
 }
 
+C_CHANGESTAT_FN(c_degree_mean_age_mon) {
+  process_toggle_degree_mean_age(tail, head, mtp, nwp, edgestate, TRUE);
+}
+
 U_CHANGESTAT_FN(u_degree_mean_age_mon){
-  // FIXME: Do not assume that the dyad in this u_ call is the same as that in the last c_ call.
+  process_toggle_degree_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
+
   GET_STORAGE(degree_mean_age_storage, sto);
   
   memcpy(sto->ages, sto->prop_ages, N_CHANGE_STATS*sizeof(double));
@@ -1162,7 +1205,7 @@ X_CHANGESTAT_FN(x_degree_by_attr_mean_age_mon){
   }
 }
 
-C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
+void process_toggle_degree_by_attr_mean_age(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, Rboolean edgestate, Rboolean write_changestats) {
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
 
   GET_STORAGE(degree_mean_age_storage, sto);
@@ -1289,15 +1332,22 @@ C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
         break;
     }
   
-    CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+    if(write_changestats) {
+      CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+    }
     
     sto->prop_counts[j] = e1;
     sto->prop_ages[j] = s1;
   }
 }
 
+C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
+  process_toggle_degree_by_attr_mean_age(tail, head, mtp, nwp, edgestate, TRUE);
+}
+
 U_CHANGESTAT_FN(u_degree_by_attr_mean_age_mon){
-  // FIXME: Do not assume that the dyad in this u_ call is the same as that in the last c_ call.
+  process_toggle_degree_by_attr_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
+
   GET_STORAGE(degree_mean_age_storage, sto);
   
   memcpy(sto->ages, sto->prop_ages, N_CHANGE_STATS*sizeof(double));
@@ -1445,7 +1495,7 @@ X_CHANGESTAT_FN(x_degrange_mean_age_mon){
   }
 }
 
-C_CHANGESTAT_FN(c_degrange_mean_age_mon){
+void process_toggle_degrange_mean_age(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, Rboolean edgestate, Rboolean write_changestats) {
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
@@ -1581,16 +1631,23 @@ C_CHANGESTAT_FN(c_degrange_mean_age_mon){
       }
     }
     // If !headin0 && !headin1, then it made no difference.
-  
-    CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+    
+    if(write_changestats) {
+      CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+    }
     
     sto->prop_ages[j] = s1;
     sto->prop_counts[j] = e1;
   }
 }
 
+C_CHANGESTAT_FN(c_degrange_mean_age_mon) {
+  process_toggle_degrange_mean_age(tail, head, mtp, nwp, edgestate, TRUE);
+}
+
 U_CHANGESTAT_FN(u_degrange_mean_age_mon){
-  // FIXME: Do not assume that the dyad in this u_ call is the same as that in the last c_ call.
+  process_toggle_degrange_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
+
   GET_STORAGE(degree_mean_age_storage, sto);
 
   memcpy(sto->ages, sto->prop_ages, N_CHANGE_STATS*sizeof(double));
@@ -1741,7 +1798,7 @@ X_CHANGESTAT_FN(x_degrange_by_attr_mean_age_mon){
   }
 }
 
-C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
+void process_toggle_degrange_by_attr_mean_age(Vertex tail, Vertex head, ModelTerm *mtp, Network *nwp, Rboolean edgestate, Rboolean write_changestats) {
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
@@ -1893,15 +1950,23 @@ C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
       // If !headin0 && !headin1, then it made no difference.
     }
   
-    CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+    if(write_changestats) {
+      CHANGE_STAT[j]=(e1==0?zeroval:s1/e1)-(e0==0?zeroval:s0/e0);
+    }
     
     sto->prop_ages[j] = s1;
     sto->prop_counts[j] = e1;
   }
 }
 
+C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
+  process_toggle_degrange_by_attr_mean_age(tail, head, mtp, nwp, edgestate, TRUE);
+}
+
+
 U_CHANGESTAT_FN(u_degrange_by_attr_mean_age_mon){
-  // FIXME: Do not assume that the dyad in this u_ call is the same as that in the last c_ call.
+  process_toggle_degrange_by_attr_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
+
   GET_STORAGE(degree_mean_age_storage, sto);
 
   memcpy(sto->ages, sto->prop_ages, N_CHANGE_STATS*sizeof(double));
