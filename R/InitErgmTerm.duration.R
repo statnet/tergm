@@ -25,7 +25,7 @@ InitErgmTerm.edges.ageinterval<-function(nw, arglist, ...) {
 else if(any(from>=to)) stop("Term edges.ageinterval must have from<to.")
 
   if(any(from<1)) stop("An extant edge cannot have an \"age\" of less than 1.")
-  list(name="edges_ageinterval_mon",
+  list(name="edges_ageinterval",
        coef.names = paste("edges.age",from,"to",to,sep=""),
        inputs=c(rbind(from, ifelse(to==Inf, 0, to))),
        duration=TRUE,
@@ -36,7 +36,7 @@ else if(any(from>=to)) stop("Term edges.ageinterval must have from<to.")
 InitErgmTerm.edge.ages<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist)
   
-  list(name="edge_ages_mon",
+  list(name="edge_ages",
        coef.names = "edge.ages",
        duration=TRUE,
        dependence=FALSE,
@@ -51,7 +51,7 @@ InitErgmTerm.mean.age<-function(nw, arglist, ...) {
                       required = c(FALSE,FALSE))
   
   
-  list(name="mean_age_mon",
+  list(name="mean_age",
        coef.names = if(a$log) "mean.log.age" else "mean.age",
        inputs = c(a$emptyval,if(a$log) 1 else 0),
        emptynwstats = a$emptyval,
@@ -250,7 +250,7 @@ InitErgmTerm.edgecov.mean.age<-function(nw, arglist, ...) {
   }
   inputs <- c(a$emptyval, if(a$log) 1 else 0, NCOL(xm), as.double(xm))
   attr(inputs, "ParamsBeforeCov") <- 3
-  list(name="edgecov_mean_age_mon", coef.names = cn, inputs = inputs, duration=TRUE, dependence=FALSE, emptynwstats = a$emptyval, auxiliaries = ~.lasttoggle)
+  list(name="edgecov_mean_age", coef.names = cn, inputs = inputs, duration=TRUE, dependence=FALSE, emptynwstats = a$emptyval, auxiliaries = ~.lasttoggle)
 }
 
 InitErgmTerm.edgecov.ages<-function(nw, arglist, ...) {
@@ -280,7 +280,7 @@ InitErgmTerm.edgecov.ages<-function(nw, arglist, ...) {
   }
   inputs <- c(NCOL(xm), as.double(xm))
   attr(inputs, "ParamsBeforeCov") <- 1
-  list(name="edgecov_ages_mon", coef.names = cn, inputs = inputs, duration=TRUE, dependence=FALSE, auxiliaries = ~.lasttoggle)
+  list(name="edgecov_ages", coef.names = cn, inputs = inputs, duration=TRUE, dependence=FALSE, auxiliaries = ~.lasttoggle)
 }
 
 ################################################################################
@@ -311,14 +311,14 @@ InitErgmTerm.degree.mean.age<-function(nw, arglist, ...) {
   if(is.null(byarg)) {
     if(length(d)==0){return(NULL)}
     coef.names <- paste("degree",d,".mean",if(a$log) ".log" else "", ".age",sep="")
-    name <- "degree_mean_age_mon"
+    name <- "degree_mean_age"
     inputs <- c(d)
   } else {
     if(ncol(du)==0) {return(NULL)}
     #  No covariates here, so "ParamsBeforeCov" unnecessary
     # See comment in d_degree_by_attr function
     coef.names <- paste("deg", du[1,], ".", byarg,u[du[2,]],".mean",if(a$log) ".log" else "", ".age", sep="")
-    name <- "degree_by_attr_mean_age_mon"
+    name <- "degree_by_attr_mean_age"
     inputs <- c(as.vector(du), nodecov)
   }
   list(name=name,coef.names=coef.names, inputs=c(a$emptyval, if(a$log) 1 else 0, inputs),
@@ -362,7 +362,7 @@ InitErgmTerm.degrange.mean.age<-function(nw, arglist, ...) {
     coef.names <- ifelse(to>=network.size(nw)+1,
                          paste("deg",from,"+",".mean",if(a$log) ".log" else "", ".age",sep=""),
                          paste("deg",from,"to",to,".mean",if(a$log) ".log" else "", ".age",sep=""))
-    name <- "degrange_mean_age_mon"
+    name <- "degrange_mean_age"
     inputs <- c(rbind(from,to))
   } else {
     if(ncol(du)==0) {return(NULL)}
@@ -371,7 +371,7 @@ InitErgmTerm.degrange.mean.age<-function(nw, arglist, ...) {
     coef.names <- ifelse(du[2,]==network.size(nw)+1,
                          paste("deg", du[1,], "+.", byarg, u[du[3,]],".mean",if(a$log) ".log" else "", ".age", sep=""),
                          paste("deg", du[1,], "to", du[2,], ".", byarg, u[du[3,]],".mean",if(a$log) ".log" else "", ".age", sep=""))
-    name <- "degrange_by_attr_mean_age_mon"
+    name <- "degrange_by_attr_mean_age"
     inputs <- c(as.vector(du), nodecov)
   }
   list(name=name,coef.names=coef.names, inputs=c(a$emptyval, if(a$log) 1 else 0, inputs),
