@@ -15,23 +15,23 @@
 #include "tergm_model.h"
 #include "ergm_Rutil.h"
 
-X_CHANGESTAT_FN(x_edges_ageinterval_mon);
-C_CHANGESTAT_FN(c_edges_ageinterval_mon);
-S_CHANGESTAT_FN(s_edges_ageinterval_mon);
+X_CHANGESTAT_FN(x_edges_ageinterval);
+C_CHANGESTAT_FN(c_edges_ageinterval);
+S_CHANGESTAT_FN(s_edges_ageinterval);
 
-X_CHANGESTAT_FN(x_edge_ages_mon);
-C_CHANGESTAT_FN(c_edge_ages_mon);
-S_CHANGESTAT_FN(s_edge_ages_mon);
+X_CHANGESTAT_FN(x_edge_ages);
+C_CHANGESTAT_FN(c_edge_ages);
+S_CHANGESTAT_FN(s_edge_ages);
 
-X_CHANGESTAT_FN(x_edgecov_ages_mon);
-C_CHANGESTAT_FN(c_edgecov_ages_mon);
-S_CHANGESTAT_FN(s_edgecov_ages_mon);
+X_CHANGESTAT_FN(x_edgecov_ages);
+C_CHANGESTAT_FN(c_edgecov_ages);
+S_CHANGESTAT_FN(s_edgecov_ages);
 
-I_CHANGESTAT_FN(i_mean_age_mon);
-X_CHANGESTAT_FN(x_mean_age_mon);
-C_CHANGESTAT_FN(c_mean_age_mon);
-U_CHANGESTAT_FN(u_mean_age_mon);
-S_CHANGESTAT_FN(s_mean_age_mon);
+I_CHANGESTAT_FN(i_mean_age);
+X_CHANGESTAT_FN(x_mean_age);
+C_CHANGESTAT_FN(c_mean_age);
+U_CHANGESTAT_FN(u_mean_age);
+S_CHANGESTAT_FN(s_mean_age);
 
 I_CHANGESTAT_FN(i_nodefactor_mean_age);
 X_CHANGESTAT_FN(x_nodefactor_mean_age);
@@ -47,39 +47,39 @@ U_CHANGESTAT_FN(u_nodemix_mean_age);
 F_CHANGESTAT_FN(f_nodemix_mean_age);
 S_CHANGESTAT_FN(s_nodemix_mean_age);
 
-I_CHANGESTAT_FN(i_edgecov_mean_age_mon);
-X_CHANGESTAT_FN(x_edgecov_mean_age_mon);
-C_CHANGESTAT_FN(c_edgecov_mean_age_mon);
-U_CHANGESTAT_FN(u_edgecov_mean_age_mon);
-S_CHANGESTAT_FN(s_edgecov_mean_age_mon);
+I_CHANGESTAT_FN(i_edgecov_mean_age);
+X_CHANGESTAT_FN(x_edgecov_mean_age);
+C_CHANGESTAT_FN(c_edgecov_mean_age);
+U_CHANGESTAT_FN(u_edgecov_mean_age);
+S_CHANGESTAT_FN(s_edgecov_mean_age);
 
-I_CHANGESTAT_FN(i_degree_mean_age_mon);
-X_CHANGESTAT_FN(x_degree_mean_age_mon);
-C_CHANGESTAT_FN(c_degree_mean_age_mon);
-U_CHANGESTAT_FN(u_degree_mean_age_mon);
-S_CHANGESTAT_FN(s_degree_mean_age_mon);
-F_CHANGESTAT_FN(f_degree_mean_age_mon);
+I_CHANGESTAT_FN(i_degree_mean_age);
+X_CHANGESTAT_FN(x_degree_mean_age);
+C_CHANGESTAT_FN(c_degree_mean_age);
+U_CHANGESTAT_FN(u_degree_mean_age);
+S_CHANGESTAT_FN(s_degree_mean_age);
+F_CHANGESTAT_FN(f_degree_mean_age);
 
-I_CHANGESTAT_FN(i_degree_by_attr_mean_age_mon);
-X_CHANGESTAT_FN(x_degree_by_attr_mean_age_mon);
-C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon);
-U_CHANGESTAT_FN(u_degree_by_attr_mean_age_mon);
-S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon);
-F_CHANGESTAT_FN(f_degree_by_attr_mean_age_mon);
+I_CHANGESTAT_FN(i_degree_by_attr_mean_age);
+X_CHANGESTAT_FN(x_degree_by_attr_mean_age);
+C_CHANGESTAT_FN(c_degree_by_attr_mean_age);
+U_CHANGESTAT_FN(u_degree_by_attr_mean_age);
+S_CHANGESTAT_FN(s_degree_by_attr_mean_age);
+F_CHANGESTAT_FN(f_degree_by_attr_mean_age);
 
-I_CHANGESTAT_FN(i_degrange_mean_age_mon);
-X_CHANGESTAT_FN(x_degrange_mean_age_mon);
-C_CHANGESTAT_FN(c_degrange_mean_age_mon);
-U_CHANGESTAT_FN(u_degrange_mean_age_mon);
-S_CHANGESTAT_FN(s_degrange_mean_age_mon);
-F_CHANGESTAT_FN(f_degrange_mean_age_mon);
+I_CHANGESTAT_FN(i_degrange_mean_age);
+X_CHANGESTAT_FN(x_degrange_mean_age);
+C_CHANGESTAT_FN(c_degrange_mean_age);
+U_CHANGESTAT_FN(u_degrange_mean_age);
+S_CHANGESTAT_FN(s_degrange_mean_age);
+F_CHANGESTAT_FN(f_degrange_mean_age);
 
-I_CHANGESTAT_FN(i_degrange_by_attr_mean_age_mon);
-X_CHANGESTAT_FN(x_degrange_by_attr_mean_age_mon);
-C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon);
-U_CHANGESTAT_FN(u_degrange_by_attr_mean_age_mon);
-S_CHANGESTAT_FN(s_degrange_by_attr_mean_age_mon);
-F_CHANGESTAT_FN(f_degrange_by_attr_mean_age_mon);
+I_CHANGESTAT_FN(i_degrange_by_attr_mean_age);
+X_CHANGESTAT_FN(x_degrange_by_attr_mean_age);
+C_CHANGESTAT_FN(c_degrange_by_attr_mean_age);
+U_CHANGESTAT_FN(u_degrange_by_attr_mean_age);
+S_CHANGESTAT_FN(s_degrange_by_attr_mean_age);
+F_CHANGESTAT_FN(f_degrange_by_attr_mean_age);
 
 #endif
 

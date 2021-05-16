@@ -26,7 +26,7 @@
  (time steps spent in the current state) in the interval [inputparams0,inputparams1).
 *****************/
 
-X_CHANGESTAT_FN(x_edges_ageinterval_mon){
+X_CHANGESTAT_FN(x_edges_ageinterval){
   ZERO_ALL_CHANGESTATS();
 
   if(type == TICK) {
@@ -44,7 +44,7 @@ X_CHANGESTAT_FN(x_edges_ageinterval_mon){
   }
 }
 
-C_CHANGESTAT_FN(c_edges_ageinterval_mon){
+C_CHANGESTAT_FN(c_edges_ageinterval){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
 
   int age = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
@@ -60,7 +60,7 @@ C_CHANGESTAT_FN(c_edges_ageinterval_mon){
   }
 }
 
-S_CHANGESTAT_FN(s_edges_ageinterval_mon){
+S_CHANGESTAT_FN(s_edges_ageinterval){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   ZERO_ALL_CHANGESTATS(i);
@@ -81,7 +81,7 @@ S_CHANGESTAT_FN(s_edges_ageinterval_mon){
 
 *****************/
 
-X_CHANGESTAT_FN(x_edge_ages_mon){ 
+X_CHANGESTAT_FN(x_edge_ages){ 
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     CHANGE_STAT[0] = N_EDGES;
@@ -89,7 +89,7 @@ X_CHANGESTAT_FN(x_edge_ages_mon){
 }
 
 
-C_CHANGESTAT_FN(c_edge_ages_mon){
+C_CHANGESTAT_FN(c_edge_ages){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   int age = ElapsedTimeToggle(tail,head,dur_inf,edgestate);
@@ -97,7 +97,7 @@ C_CHANGESTAT_FN(c_edge_ages_mon){
   CHANGE_STAT[0] += edgestate ? - age - 1 : age + 1;
 }
 
-S_CHANGESTAT_FN(s_edge_ages_mon){
+S_CHANGESTAT_FN(s_edge_ages){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   CHANGE_STAT[0] = 0;
@@ -114,7 +114,7 @@ S_CHANGESTAT_FN(s_edge_ages_mon){
 
 *****************/
 
-X_CHANGESTAT_FN(x_edgecov_ages_mon){ 
+X_CHANGESTAT_FN(x_edgecov_ages){ 
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     int noffset = BIPARTITE, nrow;
@@ -132,7 +132,7 @@ X_CHANGESTAT_FN(x_edgecov_ages_mon){
   }
 }
 
-C_CHANGESTAT_FN(c_edgecov_ages_mon){
+C_CHANGESTAT_FN(c_edgecov_ages){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   int noffset = BIPARTITE, nrow;
@@ -150,7 +150,7 @@ C_CHANGESTAT_FN(c_edgecov_ages_mon){
   }
 }
 
-S_CHANGESTAT_FN(s_edgecov_ages_mon){
+S_CHANGESTAT_FN(s_edgecov_ages){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   int noffset = BIPARTITE, nrow;
@@ -182,7 +182,7 @@ typedef struct {
   double prop_age; // sum of edge ages in proposed network
 } mean_age_storage;
 
-I_CHANGESTAT_FN(i_mean_age_mon){
+I_CHANGESTAT_FN(i_mean_age){
   ALLOC_STORAGE(1, mean_age_storage, sto);
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
   int transform = INPUT_PARAM[1];
@@ -194,7 +194,7 @@ I_CHANGESTAT_FN(i_mean_age_mon){
   });
 }
 
-X_CHANGESTAT_FN(x_mean_age_mon){
+X_CHANGESTAT_FN(x_mean_age){
   ZERO_ALL_CHANGESTATS();
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
   
@@ -242,18 +242,18 @@ void process_toggle_mean_age(Vertex tail, Vertex head, ModelTerm *mtp, Network *
   }
 }
 
-C_CHANGESTAT_FN(c_mean_age_mon){
+C_CHANGESTAT_FN(c_mean_age){
   process_toggle_mean_age(tail, head, mtp, nwp, edgestate, TRUE);
 }
 
-U_CHANGESTAT_FN(u_mean_age_mon){
+U_CHANGESTAT_FN(u_mean_age){
   process_toggle_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
 
   GET_STORAGE(mean_age_storage, sto);
   sto->age = sto->prop_age;
 }
 
-S_CHANGESTAT_FN(s_mean_age_mon){
+S_CHANGESTAT_FN(s_mean_age){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   CHANGE_STAT[0] = 0;
@@ -686,7 +686,7 @@ typedef struct {
   double prop_wts; // sum of wt over edges in proposed network
 } edgecov_mean_age_storage;
 
-I_CHANGESTAT_FN(i_edgecov_mean_age_mon) {
+I_CHANGESTAT_FN(i_edgecov_mean_age) {
   ALLOC_STORAGE(1, edgecov_mean_age_storage, sto);
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
   int transform = INPUT_PARAM[1];
@@ -709,7 +709,7 @@ I_CHANGESTAT_FN(i_edgecov_mean_age_mon) {
   });
 }
 
-X_CHANGESTAT_FN(x_edgecov_mean_age_mon) {
+X_CHANGESTAT_FN(x_edgecov_mean_age) {
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
@@ -786,11 +786,11 @@ void process_toggle_edgecov_mean_age(Vertex tail, Vertex head, ModelTerm *mtp, N
   sto->prop_wts = e1;
 }
 
-C_CHANGESTAT_FN(c_edgecov_mean_age_mon) {
+C_CHANGESTAT_FN(c_edgecov_mean_age) {
   process_toggle_edgecov_mean_age(tail, head, mtp, nwp, edgestate, TRUE);
 }
 
-U_CHANGESTAT_FN(u_edgecov_mean_age_mon){
+U_CHANGESTAT_FN(u_edgecov_mean_age){
   process_toggle_edgecov_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
 
   GET_STORAGE(edgecov_mean_age_storage, sto);
@@ -798,7 +798,7 @@ U_CHANGESTAT_FN(u_edgecov_mean_age_mon){
   sto->wts = sto->prop_wts;
 }
 
-S_CHANGESTAT_FN(s_edgecov_mean_age_mon){
+S_CHANGESTAT_FN(s_edgecov_mean_age){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   CHANGE_STAT[0] = 0;
@@ -844,7 +844,7 @@ typedef struct {
   int *prop_counts;
 } degree_mean_age_storage;
 
-I_CHANGESTAT_FN(i_degree_mean_age_mon){
+I_CHANGESTAT_FN(i_degree_mean_age){
   ALLOC_STORAGE(1, degree_mean_age_storage, sto);
   
   sto->ages = Calloc(N_CHANGE_STATS, double);
@@ -880,7 +880,7 @@ I_CHANGESTAT_FN(i_degree_mean_age_mon){
   }
 }
  
-X_CHANGESTAT_FN(x_degree_mean_age_mon){
+X_CHANGESTAT_FN(x_degree_mean_age){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
@@ -1050,11 +1050,11 @@ void process_toggle_degree_mean_age(Vertex tail, Vertex head, ModelTerm *mtp, Ne
   }
 }
 
-C_CHANGESTAT_FN(c_degree_mean_age_mon) {
+C_CHANGESTAT_FN(c_degree_mean_age) {
   process_toggle_degree_mean_age(tail, head, mtp, nwp, edgestate, TRUE);
 }
 
-U_CHANGESTAT_FN(u_degree_mean_age_mon){
+U_CHANGESTAT_FN(u_degree_mean_age){
   process_toggle_degree_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
 
   GET_STORAGE(degree_mean_age_storage, sto);
@@ -1063,7 +1063,7 @@ U_CHANGESTAT_FN(u_degree_mean_age_mon){
   memcpy(sto->counts, sto->prop_counts, N_CHANGE_STATS*sizeof(int));
 }
 
-F_CHANGESTAT_FN(f_degree_mean_age_mon){
+F_CHANGESTAT_FN(f_degree_mean_age){
   GET_STORAGE(degree_mean_age_storage, sto);
 
   Free(sto->ages);
@@ -1072,7 +1072,7 @@ F_CHANGESTAT_FN(f_degree_mean_age_mon){
   Free(sto->prop_counts);  
 }
 
-S_CHANGESTAT_FN(s_degree_mean_age_mon){
+S_CHANGESTAT_FN(s_degree_mean_age){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
@@ -1110,7 +1110,7 @@ S_CHANGESTAT_FN(s_degree_mean_age_mon){
 
  *****************/
 
-I_CHANGESTAT_FN(i_degree_by_attr_mean_age_mon){
+I_CHANGESTAT_FN(i_degree_by_attr_mean_age){
   ALLOC_STORAGE(1, degree_mean_age_storage, sto);
   
   sto->ages = Calloc(N_CHANGE_STATS, double);
@@ -1153,7 +1153,7 @@ I_CHANGESTAT_FN(i_degree_by_attr_mean_age_mon){
   }
 }
 
-X_CHANGESTAT_FN(x_degree_by_attr_mean_age_mon){
+X_CHANGESTAT_FN(x_degree_by_attr_mean_age){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
@@ -1341,11 +1341,11 @@ void process_toggle_degree_by_attr_mean_age(Vertex tail, Vertex head, ModelTerm 
   }
 }
 
-C_CHANGESTAT_FN(c_degree_by_attr_mean_age_mon){
+C_CHANGESTAT_FN(c_degree_by_attr_mean_age){
   process_toggle_degree_by_attr_mean_age(tail, head, mtp, nwp, edgestate, TRUE);
 }
 
-U_CHANGESTAT_FN(u_degree_by_attr_mean_age_mon){
+U_CHANGESTAT_FN(u_degree_by_attr_mean_age){
   process_toggle_degree_by_attr_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
 
   GET_STORAGE(degree_mean_age_storage, sto);
@@ -1354,7 +1354,7 @@ U_CHANGESTAT_FN(u_degree_by_attr_mean_age_mon){
   memcpy(sto->counts, sto->prop_counts, N_CHANGE_STATS*sizeof(int));
 }
 
-F_CHANGESTAT_FN(f_degree_by_attr_mean_age_mon){
+F_CHANGESTAT_FN(f_degree_by_attr_mean_age){
   GET_STORAGE(degree_mean_age_storage, sto);
 
   Free(sto->ages);
@@ -1364,7 +1364,7 @@ F_CHANGESTAT_FN(f_degree_by_attr_mean_age_mon){
 }
 
 
-S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon){
+S_CHANGESTAT_FN(s_degree_by_attr_mean_age){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
@@ -1414,7 +1414,7 @@ S_CHANGESTAT_FN(s_degree_by_attr_mean_age_mon){
 // A macro indicating whether x is in [from,to)
 #define FROM_TO(x, from, to) ((x)>=(from) && (x)<(to))
 
-I_CHANGESTAT_FN(i_degrange_mean_age_mon){
+I_CHANGESTAT_FN(i_degrange_mean_age){
   ALLOC_STORAGE(1, degree_mean_age_storage, sto);
   
   sto->ages = Calloc(N_CHANGE_STATS, double);
@@ -1450,7 +1450,7 @@ I_CHANGESTAT_FN(i_degrange_mean_age_mon){
   }
 }
 
-X_CHANGESTAT_FN(x_degrange_mean_age_mon){
+X_CHANGESTAT_FN(x_degrange_mean_age){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
@@ -1641,11 +1641,11 @@ void process_toggle_degrange_mean_age(Vertex tail, Vertex head, ModelTerm *mtp, 
   }
 }
 
-C_CHANGESTAT_FN(c_degrange_mean_age_mon) {
+C_CHANGESTAT_FN(c_degrange_mean_age) {
   process_toggle_degrange_mean_age(tail, head, mtp, nwp, edgestate, TRUE);
 }
 
-U_CHANGESTAT_FN(u_degrange_mean_age_mon){
+U_CHANGESTAT_FN(u_degrange_mean_age){
   process_toggle_degrange_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
 
   GET_STORAGE(degree_mean_age_storage, sto);
@@ -1654,7 +1654,7 @@ U_CHANGESTAT_FN(u_degrange_mean_age_mon){
   memcpy(sto->counts, sto->prop_counts, N_CHANGE_STATS*sizeof(int));
 }
 
-F_CHANGESTAT_FN(f_degrange_mean_age_mon){
+F_CHANGESTAT_FN(f_degrange_mean_age){
   GET_STORAGE(degree_mean_age_storage, sto);
 
   Free(sto->ages);
@@ -1664,7 +1664,7 @@ F_CHANGESTAT_FN(f_degrange_mean_age_mon){
 }
 
 
-S_CHANGESTAT_FN(s_degrange_mean_age_mon){
+S_CHANGESTAT_FN(s_degrange_mean_age){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
@@ -1702,7 +1702,7 @@ S_CHANGESTAT_FN(s_degrange_mean_age_mon){
 
  *****************/
 
-I_CHANGESTAT_FN(i_degrange_by_attr_mean_age_mon){
+I_CHANGESTAT_FN(i_degrange_by_attr_mean_age){
   ALLOC_STORAGE(1, degree_mean_age_storage, sto);
   
   sto->ages = Calloc(N_CHANGE_STATS, double);
@@ -1746,7 +1746,7 @@ I_CHANGESTAT_FN(i_degrange_by_attr_mean_age_mon){
   }
 }
 
-X_CHANGESTAT_FN(x_degrange_by_attr_mean_age_mon){
+X_CHANGESTAT_FN(x_degrange_by_attr_mean_age){
   ZERO_ALL_CHANGESTATS();
   if(type == TICK) {
     GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
@@ -1959,12 +1959,12 @@ void process_toggle_degrange_by_attr_mean_age(Vertex tail, Vertex head, ModelTer
   }
 }
 
-C_CHANGESTAT_FN(c_degrange_by_attr_mean_age_mon){
+C_CHANGESTAT_FN(c_degrange_by_attr_mean_age){
   process_toggle_degrange_by_attr_mean_age(tail, head, mtp, nwp, edgestate, TRUE);
 }
 
 
-U_CHANGESTAT_FN(u_degrange_by_attr_mean_age_mon){
+U_CHANGESTAT_FN(u_degrange_by_attr_mean_age){
   process_toggle_degrange_by_attr_mean_age(tail, head, mtp, nwp, edgestate, FALSE);
 
   GET_STORAGE(degree_mean_age_storage, sto);
@@ -1973,7 +1973,7 @@ U_CHANGESTAT_FN(u_degrange_by_attr_mean_age_mon){
   memcpy(sto->counts, sto->prop_counts, N_CHANGE_STATS*sizeof(int));
 }
 
-F_CHANGESTAT_FN(f_degrange_by_attr_mean_age_mon){
+F_CHANGESTAT_FN(f_degrange_by_attr_mean_age){
   GET_STORAGE(degree_mean_age_storage, sto);
 
   Free(sto->ages);
@@ -1983,7 +1983,7 @@ F_CHANGESTAT_FN(f_degrange_by_attr_mean_age_mon){
 }
 
 
-S_CHANGESTAT_FN(s_degrange_by_attr_mean_age_mon){
+S_CHANGESTAT_FN(s_degrange_by_attr_mean_age){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   
   Vertex *id=IN_DEG, *od=OUT_DEG;
