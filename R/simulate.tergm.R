@@ -336,7 +336,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
     monitor <- switch(monitor,
                       formation = formula_pieces$form,
                       dissolution = formula_pieces$diss,
-                      all = append_rhs.formula(~nw, unique(lapply(list_rhs.formula(formula_pieces$all), unset.offset.call)))
+                      all = { ff <- append_rhs.formula(~., unique(lapply(list_rhs.formula(formula_pieces$all), unset.offset.call))); environment(ff) <- environment(formula_pieces$all); ff }
                       )
   }
     
