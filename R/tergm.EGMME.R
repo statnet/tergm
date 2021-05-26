@@ -36,10 +36,18 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
   formula <- nonsimp_update.formula(formula,nw~., from.new="nw")
   SAN.formula <- targets # including any offsets
 
-  if (any(ergm_model(targets, nw)$etamap$offset)) {
-    message("Targets contains offset terms;
-                they will only be used during the SAN run.")
+  target_model <- ergm_model(targets, nw)
+  if(any(target_model$etamap$offsetmap) || any(target_model$etamap$offsettheta)) {
+    message("Targets contains offset terms; they will only be used during the SAN run, and removal of the offsets will be attempted for the EGMME targets.")
+
     targets <- statnet.common::filter_rhs.formula(targets, function(x) !inherits(x, "call") || !(x[[1]] == "offset"))
+    
+    updated_target_model <- ergm_model(targets, nw)
+    if(any(updated_target_model$etamap$offsetmap) || 
+       any(updated_target_model$etamap$offsettheta) || 
+       sum(!target_model$etamap$offsetmap) != nparam(updated_target_model, canonical = TRUE)) {
+         stop("Failed to remove offsets from targets formula; please specify targets formula without offsets.")
+    }
   }
 
   control.transfer <- list(EGMME.MCMC.burnin.min="MCMC.burnin.min",
@@ -78,14 +86,23 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
     ## If target.stats are given, overwrite the given network and targets
     ## with SAN-ed network and targets.
     
-    nw <- TARGET_STATS <-
-        san(model.SAN, basis=nw, target.stats=target.stats,
-            constraints=proposal.SAN,
-            control=control$SAN,
-            only.last=TRUE,
-            verbose=verbose,
-            offset.coef=SAN.offsets)
-
+    if(control$SAN$SAN.maxit > 0) {
+      if(sum(model.SAN$etamap$offsettheta) != length(SAN.offsets)) {
+        stop("Incorrect number of offset coefficients specified for SAN: expected ", sum(model.SAN$etamap$offsettheta), "; got ", length(SAN.offsets), ".");
+      }
+      
+      nw <- san(model.SAN, 
+                basis = nw, 
+                target.stats = target.stats,
+                constraints = proposal.SAN,
+                control = control$SAN,
+                only.last = TRUE,
+                verbose = verbose,
+                offset.coef = SAN.offsets)
+    }
+    
+    TARGET_STATS <- nw
+    
     targets<-nonsimp_update.formula(targets,TARGET_STATS~., from.new="TARGET_STATS")
     formula <- nonsimp_update.formula(formula,TARGET_STATS~., from.new="TARGET_STATS")
     nw.stats <- summary(model.mon, nw)
