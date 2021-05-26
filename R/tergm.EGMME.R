@@ -36,13 +36,14 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
   formula <- nonsimp_update.formula(formula,nw~., from.new="nw")
   SAN.formula <- targets # including any offsets
 
-  target_model <- ergm_model(targets, nw)
+  target_model <- ergm_model(targets, nw, term.options = control$term.options)
   if(any(target_model$etamap$offsetmap) || any(target_model$etamap$offsettheta)) {
     message("Targets contains offset terms; they will only be used during the SAN run, and removal of the offsets will be attempted for the EGMME targets.")
 
+    # this can fail to behave appropriately in 4.0, so check the result and error if something looks wrong
     targets <- statnet.common::filter_rhs.formula(targets, function(x) !inherits(x, "call") || !(x[[1]] == "offset"))
     
-    updated_target_model <- ergm_model(targets, nw)
+    updated_target_model <- ergm_model(targets, nw, term.options = control$term.options)
     if(any(updated_target_model$etamap$offsetmap) || 
        any(updated_target_model$etamap$offsettheta) || 
        sum(!target_model$etamap$offsetmap) != nparam(updated_target_model, canonical = TRUE)) {
