@@ -8,7 +8,7 @@
 #  Copyright 2008-2020 Statnet Commons
 #######################################################################
 
-test_that("EGMME errors on offsets when it should", {
+test_that("EGMME errors when it should", {
   nw <- network.initialize(100, directed = FALSE)
   nw %v% "attr" <- rep(1:4, length.out = 100)
   nw <- simulate(nw ~ Form(~edges) + Diss(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final", time.slices = 10)
@@ -35,4 +35,14 @@ test_that("EGMME errors on offsets when it should", {
                      target.stats = c(120.9842), 
                      estimate = "EGMME"), "Failed to remove")
 
+  expect_error(tergm(nw ~ Form(~edges) + Diss(~edges) + triangle, 
+                     targets = ~edges + triangle + mean.age, 
+                     target.stats = c(120.9842, 500, 100), 
+                     estimate = "EGMME"), "No initial parameter method")
+
+  expect_error(tergm(nw ~ Form(~edges) + Diss(~edges) + offset(triangle), 
+                     targets = ~edges + mean.age, 
+                     target.stats = c(120.9842, 100), 
+                     offset.coef = c(1),
+                     estimate = "EGMME"), "No initial parameter method")
 })
