@@ -385,12 +385,9 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                nwd <- to.networkDynamic.lasttoggle(nw)
                nwd <- networkDynamic.apply.changes(nwd,changes)
                attributes(nwd) <- c(attributes(nwd), # Don't clobber existing attributes!
-                                    list(formula = formula,
-                                         stats.gen = stats.gen,
-                                         monitor = monitor,
+                                    list(stats.gen = stats.gen,
                                          stats = stats.mon,
                                          coef = coef,
-                                         constraints=constraints,
                                          changes = changes))
                nwd <- .add.net.obs.period.spell(nwd, start-1+time.offset, time.slices)
                nwd
@@ -402,10 +399,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                # assume that simulate.stergm has added +1 to all the time values, so subtract 1 for an offset of 0
                changes[,1]<-changes[,1]-1+time.offset
                attributes(changes) <- c(attributes(changes), # Don't clobber existing attributes!
-                                        list(formula = formula,
-                                             stats.gen = stats.gen,
-                                             monitor = monitor,
-                                             constraints = constraints,
+                                        list(stats.gen = stats.gen,
                                              stats = stats.mon,
                                              coef = coef,
                                              start = nw%n%"time" + 0,
@@ -424,12 +418,9 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                newnw <- as.network(z$newnetwork)
                newnw <- .add.net.obs.period.spell(newnw, start-1+time.offset, time.slices)
                attributes(newnw) <- c(attributes(newnw), # Don't clobber existing attributes!
-                                      list(formula = formula,
-                                           stats.gen = stats.gen,
-                                           monitor = monitor,
+                                      list(stats.gen = stats.gen,
                                            stats = stats.mon,
                                            coef = coef,
-                                           constraints=constraints,
                                            start = nw%n%"time" + 0,
                                            end = nw%n%"time" + time.slices,
                                            changes = changes))
@@ -443,12 +434,9 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                changes[,1]<-changes[,1]-1+time.offset
                newnw <- z$newnetwork
                attributes(newnw) <- c(attributes(newnw), # Don't clobber existing attributes!
-                                      list(formula = formula,
-                                           stats.gen = stats.gen,
-                                           monitor = monitor,
+                                      list(stats.gen = stats.gen,
                                            stats = stats.mon,
                                            coef = coef,
-                                           constraints=constraints,
                                            start = nw%n%"time" + 0,
                                            end = nw%n%"time" + time.slices,
                                            changes = changes))
@@ -504,8 +492,8 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
 #' @export
 simulate_formula.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     coef = attr(basis, "coef"),
-                                    constraints = NVL(attr(basis, "constraints"),~.),
-                                    monitor = attr(basis, "monitor"),
+                                    constraints = ~.,
+                                    monitor = NULL,
                                     time.slices = 1, time.start=NULL, time.burnin=0, time.interval=1, time.offset=1,
                                     control=control.simulate.network.tergm(),
                                     output=c("networkDynamic", "stats", "changes", "final", "ergm_state"),
@@ -580,12 +568,9 @@ simulate_formula.networkDynamic <- function(object, nsim=1, seed=NULL,
   }
   
   attributes(object) <- c(attributes(object), # Don't clobber existing attributes!
-                          list(formula = nonsimp_update.formula(formula,nw~., from.new="nw"),
-                               stats.gen = rbind(if(isTRUE(attr(sim,"formula")==attr(object,"formula"))) attr(object,"stats.gen"),attr(sim,"stats.gen")),
-                               monitor = attr(sim,"monitor"),
-                               stats = rbind(if(isTRUE(attr(sim,"monitor")==attr(object,"monitor"))) attr(object,"stats"),attr(sim,"stats")),
+                          list(stats.gen = attr(sim, "stats.gen"),
+                               stats = attr(sim, "stats"),
                                coef = coef,
-                               constraints=constraints,
                                changes = rbind(attr(object,"changes"),matrix(c(sim), nrow=nrow(sim),ncol=ncol(sim),dimnames=list(rownames(sim),colnames(sim))))
                                ))
   object

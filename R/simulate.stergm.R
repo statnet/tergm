@@ -187,14 +187,14 @@
 #'                  time.slices=S,verbose=TRUE)
 #' 
 #' # "Resume" the simulation.
-#' dynsim2<-simulate(dynsim,time.slices=S,verbose=TRUE)
+#' dynsim2<-simulate(dynsim,formation=~edges,dissolution=~edges,time.slices=S,verbose=TRUE)
 
 
 #' @rdname simulate.stergm
 #' @export
 simulate.network <- function(object, nsim=1, seed=NULL,
                              formation, dissolution,
-                             coef.form,coef.diss,
+                             coef.form, coef.diss,
                              constraints = ~.,
                              monitor = NULL,
                              time.slices = 1, time.start=NULL, time.burnin=0, time.interval=1, time.offset=1,
@@ -220,7 +220,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
                  monitor=monitor, time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval, time.offset=time.offset, control=control, output=output, stats = stats.form || stats.diss, verbose=verbose, dynamic=TRUE, ...)
          
   if(output != "stats") {
-    attributes(rv) <- c(attributes(rv), list(formation = formation, dissolution = dissolution, coef.form = coef.form, coef.diss = coef.diss))
+    attributes(rv) <- c(attributes(rv), list(coef.form = coef.form, coef.diss = coef.diss))
     stats.gen <- attr(rv, "stats.gen")
     if(NCOL(stats.gen) > 0) {
       attr(rv, "stats.form") <- stats.gen[,grepl("Form", colnames(stats.gen)),drop=FALSE]
@@ -239,10 +239,10 @@ simulate.network <- function(object, nsim=1, seed=NULL,
 #' @rdname simulate.stergm
 #' @export
 simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
-                                    formation = attr(object, "formation"), dissolution = attr(object, "dissolution"),
+                                    formation, dissolution,
                                     coef.form = attr(object, "coef.form"), coef.diss = attr(object, "coef.diss"),
-                                    constraints = NVL(attr(object, "constraints"),~.),
-                                    monitor = attr(object, "monitor"),
+                                    constraints = ~.,
+                                    monitor = NULL,
                                     time.slices = 1, time.start=NULL, time.burnin=0, time.interval=1, time.offset=1,
                                     control=control.simulate.network(),
                                     output=c("networkDynamic", "stats", "changes", "final", "ergm_state"),
@@ -266,7 +266,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
                  monitor=monitor, time.slices=time.slices, time.start=time.start, time.burnin=time.burnin, time.interval=time.interval, time.offset=time.offset, control=control, output=output, stats = stats.form || stats.diss, verbose=verbose, dynamic=TRUE, ...)
 
   if(output != "stats") {
-    attributes(rv) <- c(attributes(rv), list(formation = formation, dissolution = dissolution, coef.form = coef.form, coef.diss = coef.diss))
+    attributes(rv) <- c(attributes(rv), list(coef.form = coef.form, coef.diss = coef.diss))
     stats.gen <- attr(rv, "stats.gen")
     if(NCOL(stats.gen) > 0) {
       attr(rv, "stats.form") <- stats.gen[,grepl("Form", colnames(stats.gen)),drop=FALSE]

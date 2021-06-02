@@ -33,12 +33,12 @@
   object,
   nsim = 1,
   seed = NULL,
-  formation = attr(object, "formation"),
-  dissolution = attr(object, "dissolution"),
+  formation,
+  dissolution,
   coef.form = attr(object, "coef.form"),
   coef.diss = attr(object, "coef.diss"),
-  constraints = NVL(attr(object, "constraints"), ~.),
-  monitor = attr(object, "monitor"),
+  constraints = ~.,
+  monitor = NULL,
   time.slices = 1,
   time.start = NULL,
   time.burnin = 0,
@@ -178,5 +178,5 @@ dynsim<-simulate(g1,formation=~edges,dissolution=~edges,
                  time.slices=S,verbose=TRUE)
 
 # "Resume" the simulation.
-dynsim2<-simulate(dynsim,time.slices=S,verbose=TRUE)
+dynsim2<-simulate(dynsim,formation=~edges,dissolution=~edges,time.slices=S,verbose=TRUE)
 }
