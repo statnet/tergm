@@ -21,9 +21,16 @@ tergm.EGMME.initialfit<-function(init, nw, model, formula, model.mon, formula.mo
     
     form <- fd.formulae$form
     diss <- fd.formulae$diss
+    nonsep <- fd.formulae$nonsep
     
     model.form <- ergm_model(form, nw=nw, term.options=control$term.options)
     model.diss <- ergm_model(diss, nw=nw, term.options=control$term.options)
+    model.nonsep <- ergm_model(nonsep, nw=nw, term.options=control$term.options)
+    
+    ## non-separable terms are not currently allowed in the EDA
+    if(nparam(model.nonsep, canonical = FALSE) > 0) {
+      stop("No initial parameter method for specified model and targets combination is implemented. Specify via control$init.")    
+    }
     
     wf <- which(grepl("Form\\(.+\\)", model$coef.names))
     wd <- which(grepl("Diss\\(.+\\)", model$coef.names))
