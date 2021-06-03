@@ -104,4 +104,33 @@ test_that(".extract.fd.formulae behaves reasonably", {
   expect_equal(~edges+triangle-gwesp(0,fixed=TRUE), R10$diss)
   expect_equal(~., R10$nonsep)
   expect_equal(~edges-triangle-gwesp(0,fixed=TRUE)+edges+triangle-gwesp(0,fixed=TRUE), R10$all)
+  
+  F11 <- ~Form(~edges) + Diss(~edges) + edges
+  environment(F11) <- new.env()
+  
+  R11 <- .extract.fd.formulae(F11)
+  
+  expect_identical(environment(F11), environment(R11$form))
+  expect_identical(environment(F11), environment(R11$diss))
+  expect_identical(environment(F11), environment(R11$nonsep))
+  expect_error(expect_identical(environment(F11), environment(R11$all)))
+  
+  a <- ~edges
+  b <- ~triangle
+  environment(a) <- new.env()
+  environment(b) <- new.env()
+  
+  F12 <- ~Form(a) + Diss(b) + edges
+  environment(F12) <- new.env()
+  environment(F12)$a <- a
+  environment(F12)$b <- b
+  
+  R12 <- .extract.fd.formulae(F12)
+  
+  expect_error(expect_identical(environment(F12), environment(R12$form)))
+  expect_error(expect_identical(environment(F12), environment(R12$diss)))
+  expect_identical(environment(F12), environment(R12$nonsep))
+  expect_error(expect_identical(environment(F12), environment(R12$all)))
+  expect_identical(environment(a), environment(R12$form))
+  expect_identical(environment(b), environment(R12$diss))
 })
