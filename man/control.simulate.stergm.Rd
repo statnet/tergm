@@ -16,8 +16,8 @@ control.simulate.network(
   MCMC.prop.weights.diss = "default",
   MCMC.prop.args.form = NULL,
   MCMC.prop.args.diss = NULL,
-  MCMC.init.maxedges = Inf,
-  MCMC.init.maxchanges = 1e+06,
+  MCMC.maxedges = Inf,
+  MCMC.maxchanges = 1e+06,
   term.options = NULL,
   MCMC.packagenames = c()
 )
@@ -33,8 +33,8 @@ control.simulate.stergm(
   MCMC.prop.weights.diss = NULL,
   MCMC.prop.args.form = NULL,
   MCMC.prop.args.diss = NULL,
-  MCMC.init.maxedges = NULL,
-  MCMC.init.maxchanges = NULL,
+  MCMC.maxedges = NULL,
+  MCMC.maxchanges = NULL,
   term.options = NULL,
   MCMC.packagenames = NULL
 )
@@ -68,10 +68,9 @@ functions only; they have no effect on \code{simulate} behavior.}
 \item{MCMC.prop.args.form}{An alternative,
 direct way of specifying additional arguments to proposals.}
 
-\item{MCMC.init.maxedges}{Maximum number of edges expected in
-network.}
+\item{MCMC.maxedges}{Maximum number of edges expected in network.}
 
-\item{MCMC.init.maxchanges}{Maximum number of changes for
+\item{MCMC.maxchanges}{Maximum number of changes for
 which to allocate space.}
 
 \item{term.options}{A list of additional arguments to be passed to term initializers.

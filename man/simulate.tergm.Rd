@@ -124,9 +124,7 @@ by assigning:
 \itemize{
 \item \code{MCMC.prop.form} to \code{MCMC.prop},
 \item \code{MCMC.prop.args.form} to \code{MCMC.prop.args},
-\item \code{MCMC.prop.weights.form} to \code{MCMC.prop.weights},
-\item \code{MCMC.init.maxedges} to \code{MCMC.maxedges}, and
-\item \code{MCMC.init.maxchanges} to \code{MCMC.maxchanges}.
+\item \code{MCMC.prop.weights.form} to \code{MCMC.prop.weights}.
 }}
 
 \item{output}{A character vector specifying output type: one of

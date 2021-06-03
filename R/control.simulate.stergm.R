@@ -57,8 +57,8 @@ control.simulate.network <- function(MCMC.burnin.min = 1000,
                                      MCMC.prop.args.form = NULL,
                                      MCMC.prop.args.diss = NULL,                                  
                                    
-                                     MCMC.init.maxedges = Inf,
-                                     MCMC.init.maxchanges = 1000000,
+                                     MCMC.maxedges = Inf,
+                                     MCMC.maxchanges = 1000000,
 
                                      term.options = NULL,
                                      
@@ -120,7 +120,7 @@ control.simulate.network <- function(MCMC.burnin.min = 1000,
 #'        for backwards compatibility of calls to \code{control}
 #'        functions only; they have no effect on \code{simulate} behavior.
 #'
-#' @param MCMC.init.maxchanges Maximum number of changes for
+#' @param MCMC.maxchanges Maximum number of changes for
 #'   which to allocate space.
 #' 
 #' @param MCMC.packagenames Names of packages in which to look for
@@ -131,8 +131,7 @@ control.simulate.network <- function(MCMC.burnin.min = 1000,
 #' @param term.options A list of additional arguments to be passed to term initializers. 
 #'   It can also be set globally via \code{options(ergm.term=list(...))}.
 #' 
-#' @param MCMC.init.maxedges Maximum number of edges expected in
-#'   network.
+#' @param MCMC.maxedges Maximum number of edges expected in network.
 #' 
 #' @return A list with arguments as components.
 #' 
@@ -157,8 +156,8 @@ control.simulate.stergm <- function(MCMC.burnin.min = NULL,
                                     MCMC.prop.args.form = NULL,                                    
                                     MCMC.prop.args.diss = NULL,                                  
                                     
-                                    MCMC.init.maxedges = NULL,
-                                    MCMC.init.maxchanges = NULL,
+                                    MCMC.maxedges = NULL,
+                                    MCMC.maxchanges = NULL,
                                     
                                     term.options = NULL,
                                     

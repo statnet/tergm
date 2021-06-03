@@ -135,10 +135,8 @@
 #' to \code{\link{control.simulate.network.tergm}} controls by assigning:
 #' \itemize{
 #'   \item \code{MCMC.prop.form} to \code{MCMC.prop},
-#'   \item \code{MCMC.prop.args.form} to \code{MCMC.prop.args},
-#'   \item \code{MCMC.prop.weights.form} to \code{MCMC.prop.weights},
-#'   \item \code{MCMC.init.maxedges} to \code{MCMC.maxedges}, and
-#'   \item \code{MCMC.init.maxchanges} to \code{MCMC.maxchanges}.
+#'   \item \code{MCMC.prop.args.form} to \code{MCMC.prop.args}, and
+#'   \item \code{MCMC.prop.weights.form} to \code{MCMC.prop.weights}.
 #' }
 #' @param output A character vector specifying output type: one of
 #' \code{"networkDynamic"} (the default), \code{"stats"}, \code{"changes"},
@@ -208,10 +206,7 @@ simulate.network <- function(object, nsim=1, seed=NULL,
   control$MCMC.prop <- control$MCMC.prop.form
   control$MCMC.prop.args <- control$MCMC.prop.args.form
   control$MCMC.prop.weights <- control$MCMC.prop.weights.form
-  
-  control$MCMC.maxedges <- control$MCMC.init.maxedges
-  control$MCMC.maxchanges <- control$MCMC.init.maxchanges
-  
+    
   control <- set.control.class("control.simulate.network.tergm")
 
   output <- match.arg(output)
@@ -254,10 +249,7 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
   control$MCMC.prop <- control$MCMC.prop.form
   control$MCMC.prop.args <- control$MCMC.prop.args.form
   control$MCMC.prop.weights <- control$MCMC.prop.weights.form
-  
-  control$MCMC.maxedges <- control$MCMC.init.maxedges
-  control$MCMC.maxchanges <- control$MCMC.init.maxchanges
-  
+    
   control <- set.control.class("control.simulate.network.tergm")
 
   output <- match.arg(output)

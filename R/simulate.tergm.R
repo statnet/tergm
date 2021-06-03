@@ -89,9 +89,7 @@
 #' \itemize{
 #'   \item \code{MCMC.prop.form} to \code{MCMC.prop},
 #'   \item \code{MCMC.prop.args.form} to \code{MCMC.prop.args},
-#'   \item \code{MCMC.prop.weights.form} to \code{MCMC.prop.weights},
-#'   \item \code{MCMC.init.maxedges} to \code{MCMC.maxedges}, and
-#'   \item \code{MCMC.init.maxchanges} to \code{MCMC.maxchanges}.
+#'   \item \code{MCMC.prop.weights.form} to \code{MCMC.prop.weights}.
 #' }
 #' @param output A character vector specifying output type: one of
 #' `"networkDynamic"` (the default), `"stats"`, `"changes"`, `"final"`, and
@@ -230,8 +228,6 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
     control$MCMC.prop <- control$MCMC.prop.form
     control$MCMC.prop.weights <- control$MCMC.prop.weights.form
     control$MCMC.prop.args <- control$MCMC.prop.args.form
-    control$maxedges <- control$MCMC.init.maxedges
-    control$maxchanges <- control$MCMC.init.maxchanges
     control <- set.control.class("control.simulate.tergm")
   }  
   
