@@ -137,7 +137,7 @@ InitErgmTerm.Form <- function(nw, arglist,  ..., env=baseenv()) {
   environment(f) <- environment(a$formula)
   a$formula <- f
 
-  # Just call N() operator.
+  # Just call Cross() operator.
   term <- as.call(c(list(as.name("Cross")),a))
   out <- call.ErgmTerm(term, env=env, nw=nw, ...)
   out
@@ -179,7 +179,7 @@ InitErgmTerm.Diss <- function(nw, arglist,  ..., env=baseenv()) {
   environment(f) <- environment(a$formula)
   a$formula <- f
 
-  # Just call N() operator.
+  # Just call Cross() operator.
   term <- as.call(c(list(as.name("Cross")),a))
   out <- call.ErgmTerm(term, env=env, nw=nw, ...)
   out
@@ -221,6 +221,12 @@ InitErgmTerm.Cross <- function(nw, arglist,...){
                       vartypes = c("formula"),
                       defaultvalues = list(NULL),
                       required = c(TRUE))
+
+  if (!is(nw, "combined_networks")) {
+    # Just call Passthrough() operator.
+    term <- as.call(c(list(as.name("Passthrough")), a))
+    return(call.ErgmTerm(term, env = env, nw = nw, ...))
+  }
 
   auxiliaries <- base_env(~.crossnets(".NetworkID"))
 

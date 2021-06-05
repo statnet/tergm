@@ -51,19 +51,24 @@
   All terms listed here are binary.
 }
 
-\section{Formation and Dissolution Operator Terms included in the
+\section{Operator Terms included in the
   \code{\link[=tergm-package]{tergm}} package}{
   \describe{
-    \item{\code{Form(formula,lm=~1,subset=TRUE,weights=1,contrasts,offset,label)}}{
+    \item{\code{Form(formula)}}{
       \emph{The Formation Operator Term:} This term accepts a model formula
-      \code{formula} and produces the corresponding formation model.  Arguments other 
-      than \code{formula} are only applied in the CMLE setting.
+      \code{formula} and produces the corresponding formation model.
     }
     
-    \item{\code{Diss(formula,lm=~1,subset=TRUE,weights=1,contrasts,offset,label)}}{
+    \item{\code{Diss(formula)}}{
       \emph{The Dissolution Operator Term:} This term accepts a model formula
-      \code{formula} and produces the corresponding dissolution model.  Arguments other 
-      than \code{formula} are only applied in the CMLE setting.
+      \code{formula} and produces the corresponding dissolution model.
+    }
+
+    \item{\code{Cross(formula)}}{
+      \emph{The Crossection Operator Term:} This term accepts a model formula
+      \code{formula} and produces the corresponding model for the cross-sectional
+      network. It is mainly useful for CMLE estimation, and has no effect (i.e.,
+      \code{Cross(~TERM) == ~TERM}) for EGMME and dynamic simulation.
     }
   }
 }
