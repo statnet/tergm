@@ -39,9 +39,6 @@
 NULL
 #' @export
 snctrl <- statnet.common::snctrl
-## BEGIN boilerplate: should be kept in sync with statnet.common.
-
-
 eval(UPDATE_MY_SCTRL_EXPR)
 
 .RegisterProposals <- function(){
