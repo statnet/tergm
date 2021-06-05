@@ -202,6 +202,46 @@ InitErgmTerm.Diss1 <- function(nw, arglist,  ...){
     wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Diss")))
 }
 
+
+InitErgmTerm.Change <- function(nw, arglist,  ..., env=baseenv()) {
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c("formula"),
+                      vartypes = c("formula"),
+                      defaultvalues = list(NULL),
+                      required = c(TRUE))
+
+  if(!is(nw, "combined_networks")) {
+    return(InitErgmTerm.ChangeE(nw = nw, arglist = a["formula"], ...))
+  }
+
+  f <- a$formula
+  ult(f) <- call("Change1",as.formula(call("~",ult(f)), env=env)) # e.g., a~b -> a~Form1(~b)
+  environment(f) <- environment(a$formula)
+  a$formula <- f
+
+  # Just call Cross() operator.
+  term <- as.call(c(list(as.name("Cross")),a))
+  out <- call.ErgmTerm(term, env=env, nw=nw, ...)
+  out
+  # TODO: Fix coefficient names.
+}
+
+# One difference transition
+InitErgmTerm.Change1 <- function(nw, arglist,  ...){
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c("formula"),
+                      vartypes = c("formula"),
+                      defaultvalues = list(NULL),
+                      required = c(TRUE))
+
+  m <- ergm_model(a$formula, nw,...)
+  
+  c(list(name="on_discord_net_Network", pkgname="ergm",
+         auxiliaries = ~.discord.net((nw%n%".PrevNets")[[1]], implementation="Network"),
+         submodel = m),
+    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Change")))
+}
+
 # Auxiliary to extract crossectional networks.
 InitErgmTerm..crossnets <- function(nw, arglist, ...){
   a <- check.ErgmTerm(nw, arglist,

@@ -13,6 +13,57 @@
 #include "ergm_dyad_hashmap_utils.h"
 #include "tergm_model.h"
 
+// Initialize aux network to an empty network. Then, loop through the changes
+// from last time step and any changed edges. The storage
+// auxnet->onwp should be initialized as y0 xor y1 at the end.
+I_CHANGESTAT_FN(i__discord_lt_net_Network){
+  I_AUXNET(NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL));
+  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  TailHead dyad;
+  kh_foreach_key(dur_inf->discord, dyad, {
+      AddEdgeToTrees(dyad.tail,dyad.head, auxnet->onwp);
+    });
+}
+
+U_CHANGESTAT_FN(u__discord_lt_net_Network){
+  GET_AUX_STORAGE(StoreAuxnet, auxnet);
+  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  if(dur_inf->ticktock){
+      ToggleKnownEdge(tail, head, auxnet->onwp, edgestate);
+  } // In fiat mode, discord never changes.
+}
+
+X_CHANGESTAT_FN(x__discord_lt_net_Network){
+  switch(type){
+  case TICK:
+    {
+      GET_AUX_STORAGE(StoreAuxnet, auxnet);
+      // There are two ways to do this. One is to drop the old network
+      // and make a copy of the new one. The other is to make
+      // incremental changes. TODO: Benchmark.
+
+      /* NetworkDestroy(auxnet->onwp); */
+      /* auxnet->onwp = NetworkCopy(nwp); */
+
+      GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+      TailHead dyad;
+      // Here, we need to toggle all edges that were toggled in the current
+      // (soon to be previous) time step.
+      kh_foreach_key(dur_inf->discord, dyad, {
+          ToggleEdge(dyad.tail, dyad.head, auxnet->onwp);
+        });
+    }
+    break;
+  default: break;
+  }
+}
+
+F_CHANGESTAT_FN(f__discord_lt_net_Network){
+  GET_AUX_STORAGE(StoreAuxnet, auxnet);
+  NetworkDestroy(auxnet->onwp);
+}
+
+
 // Initialize aux network equal to y0. Then, loop through the changes
 // from last time step and toggle any changed edges off. The storage
 // auxnet->onwp should be initialized as y0&y1 at the end.

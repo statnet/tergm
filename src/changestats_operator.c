@@ -147,3 +147,71 @@ F_CHANGESTAT_FN(f_on_intersect_lt_net_Network){
   ModelDestroy(auxnet->onwp, m);
   STORAGE = NULL;
 }
+
+
+
+
+
+I_CHANGESTAT_FN(i_on_discord_lt_net_Network){
+  GET_STORAGE(Model, m);
+  GET_AUX_STORAGE(StoreAuxnet, auxnet);
+  STORAGE = m = ModelInitialize(getListElement(mtp->R, "submodel"),  NULL, auxnet->onwp, FALSE);
+  DELETE_IF_UNUSED_IN_SUBMODEL(u_func, m);
+}
+
+C_CHANGESTAT_FN(c_on_discord_lt_net_Network){
+  GET_STORAGE(Model, m);
+  GET_AUX_STORAGE(StoreAuxnet, auxnet);
+
+  Vertex tails[map_toggle_maxtoggles__discord_lt_net_Network], heads[map_toggle_maxtoggles__discord_lt_net_Network];
+  MAP_TOGGLE_THEN(_discord_lt_net_Network, tail, head, edgestate, auxnet, tails, heads){
+    double *tmp = m->workspace;
+    m->workspace = CHANGE_STAT;
+    ChangeStats1(*tails, *heads, auxnet->onwp, m, IS_OUTEDGE(*tails, *heads, auxnet->onwp));
+    m->workspace = tmp;
+  }
+}
+
+X_CHANGESTAT_FN(x_on_discord_lt_net_Network){
+  switch(type){
+  case TICK:
+    {
+      GET_STORAGE(Model, m);
+      GET_AUX_STORAGE(StoreAuxnet, auxnet);
+      GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+      TailHead dyad;
+      // TODO: Optimize.
+      unsigned int nt=kh_size(dur_inf->discord), pos=0;
+      Vertex *tails = Calloc(nt, Vertex);
+      Vertex *heads = Calloc(nt, Vertex);
+      kh_foreach_key(dur_inf->discord, dyad, {
+          tails[pos] = dyad.tail;
+          heads[pos] = dyad.head;
+          pos++;
+        });
+
+      ChangeStats(pos, tails, heads, auxnet->onwp, m);
+      memcpy(CHANGE_STAT, m->workspace, m->n_stats*sizeof(double));
+      Free(tails); Free(heads);
+    }
+    break;
+  default: break;
+  }
+}
+
+Z_CHANGESTAT_FN(z_on_discord_lt_net_Network){
+  GET_STORAGE(Model, m);
+  GET_AUX_STORAGE(StoreAuxnet, auxnet);
+
+  double *tmp = m->workspace;
+  m->workspace = CHANGE_STAT;
+  ZStats(auxnet->onwp, m, FALSE);
+  m->workspace = tmp;
+}
+
+F_CHANGESTAT_FN(f_on_discord_lt_net_Network){
+  GET_STORAGE(Model, m);
+  GET_AUX_STORAGE(StoreAuxnet, auxnet);
+  ModelDestroy(auxnet->onwp, m);
+  STORAGE = NULL;
+}

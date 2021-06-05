@@ -69,6 +69,38 @@ InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
 }
 
 
+InitErgmTerm.ChangeE <- function(nw, arglist,  ...) {
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c("formula"),
+                      vartypes = c("formula"),
+                      defaultvalues = list(NULL),
+                      required = c(TRUE))
+
+  m <- ergm_model(a$formula, nw,...)
+
+  c(list(name="on_discord_lt_net_Network",
+         auxiliaries = ~.discord.lt.net() + .lasttoggle,
+         submodel = m,
+         duration=TRUE),
+    wrap.ergm_model(m, nw, function(x) paste0('Change(',x,')')))
+}
+
+
+InitErgmTerm..discord.lt.net<-function(nw, arglist, ...) {
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c(),
+                      vartypes = c(),
+                      defaultvalues = list(),
+                      required = c())
+
+  list(name="_discord_lt_net_Network",
+       coef.names=c(),
+       auxiliaries = ~ .lasttoggle,
+       duration=TRUE,
+       dependence=FALSE)
+}
+
+
 InitErgmTerm..previous.lt.net<-function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c(),
