@@ -79,7 +79,7 @@ InitErgmTerm.ChangeE <- function(nw, arglist,  ...) {
   m <- ergm_model(a$formula, nw,...)
 
   c(list(name="on_discord_lt_net_Network",
-         auxiliaries = ~.discord.lt.net() + .lasttoggle,
+         auxiliaries = ~.discord.lt.net() + .lasttoggle + .previous.lt.net,
          submodel = m,
          duration=TRUE),
     wrap.ergm_model(m, nw, function(x) paste0('Change(',x,')')))

@@ -239,7 +239,9 @@ InitErgmTerm.Change1 <- function(nw, arglist,  ...){
   c(list(name="on_discord_net_Network", pkgname="ergm",
          auxiliaries = ~.discord.net((nw%n%".PrevNets")[[1]], implementation="Network"),
          submodel = m),
-    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Change")))
+    modifyList(wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Change")),
+               list(emptynwstats=summary(m, (nw%n%".PrevNets")[[1]])))
+    )
 }
 
 # Auxiliary to extract crossectional networks.

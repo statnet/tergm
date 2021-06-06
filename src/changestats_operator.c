@@ -201,11 +201,11 @@ X_CHANGESTAT_FN(x_on_discord_lt_net_Network){
 
 Z_CHANGESTAT_FN(z_on_discord_lt_net_Network){
   GET_STORAGE(Model, m);
-  GET_AUX_STORAGE(StoreAuxnet, auxnet);
+  GET_AUX_STORAGE_NUM(StoreAuxnet, prevnet, 2);
 
   double *tmp = m->workspace;
   m->workspace = CHANGE_STAT;
-  ZStats(auxnet->onwp, m, FALSE);
+  SummStats(0, NULL, NULL, prevnet->onwp, m);
   m->workspace = tmp;
 }
 
