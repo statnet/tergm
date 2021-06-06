@@ -14,6 +14,8 @@
 \alias{terms.ergm}
 \alias{Form}
 \alias{Diss}
+\alias{Cross}
+\alias{Chnage}
 \alias{edge.ages}
 \alias{mean.age}
 \alias{nodefactor.mean.age}
@@ -25,6 +27,8 @@
 \alias{degrange.mean.age}
 \alias{InitErgmTerm.Form}
 \alias{InitErgmTerm.Diss}
+\alias{InitErgmTerm.Cross}
+\alias{InitErgmTerm.Change}
 \alias{InitErgmTerm.edge.ages}
 \alias{InitErgmTerm.edgecov}
 \alias{InitErgmTerm.edgecov.ages}
@@ -69,6 +73,12 @@
       \code{formula} and produces the corresponding model for the cross-sectional
       network. It is mainly useful for CMLE estimation, and has no effect (i.e.,
       \code{Cross(~TERM) == ~TERM}) for EGMME and dynamic simulation.
+    }
+
+    \item{\code{Change(formula)}}{
+      \emph{The Change Operator Term:} This term accepts a model formula
+      \code{formula} and produces the corresponding model for a network constructed
+      by taking the dyads that have changed between time steps.
     }
   }
 }
