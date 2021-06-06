@@ -215,7 +215,7 @@ InitErgmTerm..crossnets <- function(nw, arglist, ...){
 
 # A term for a cross-sectional model for the network in a series.
 #' @import purrr
-InitErgmTerm.Cross <- function(nw, arglist,...){
+InitErgmTerm.Cross <- function(nw, arglist, ..., env=baseenv()) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
