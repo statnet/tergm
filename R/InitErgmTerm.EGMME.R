@@ -20,7 +20,7 @@ InitErgmTerm.FormE <- function(nw, arglist,  ...) {
          auxiliaries = ~.union.lt.net + .lasttoggle + .previous.lt.net,
          submodel = m,
          duration=TRUE),
-    wrap.ergm_model(m, nw, function(x) paste0('Form(',x,')')))
+    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Form")))
 }
 
 InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
@@ -51,7 +51,7 @@ InitErgmTerm.DissE <- function(nw, arglist,  ...) {
          auxiliaries = ~.intersect.lt.net() + .lasttoggle,
          submodel = m,
          duration=TRUE),
-    wrap.ergm_model(m, nw, function(x) paste0('Diss(',x,')')))
+    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Diss")))
 }
 
 InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
@@ -82,7 +82,7 @@ InitErgmTerm.ChangeE <- function(nw, arglist,  ...) {
          auxiliaries = ~.discord.lt.net() + .lasttoggle + .previous.lt.net,
          submodel = m,
          duration=TRUE),
-    wrap.ergm_model(m, nw, function(x) paste0('Change(',x,')')))
+    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Change")))
 }
 
 
