@@ -106,7 +106,7 @@ the spell that should be recorded for the newly simulated network state.}
 
 \item{control}{A list of control parameters for algorithm tuning,
 constructed using \code{\link{control.simulate.network}}.  These are mapped
-to \code{\link{control.simulate.network.tergm}} controls by assigning:
+to \code{\link{control.simulate.formula.tergm}} controls by assigning:
 \itemize{
 \item \code{MCMC.prop.form} to \code{MCMC.prop},
 \item \code{MCMC.prop.args.form} to \code{MCMC.prop.args}, and

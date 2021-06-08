@@ -94,7 +94,7 @@ details.
 
 These functions are included for backwards compatibility, and users are
 encouraged to use \code{control.simulate.tergm} or
-\code{control.simulate.network.tergm} with the \code{\link{simulate.tergm}}
+\code{control.simulate.formula.tergm} with the \code{\link{simulate.tergm}}
 family of functions instead.  When a
 \code{control.simulate.stergm} or \code{control.simulate.network} object
 is passed to one of the \code{\link{simulate.stergm}} functions,

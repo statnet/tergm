@@ -149,7 +149,7 @@ To convert from simulating based on a starting network in `tergm` 3.x to simulat
 
 - Combine the `coef.form` and `coef.diss` arguments into a single `coef` argument, as when simulating from a fitted `tergm` (with coefficients specified).
 
-- The control argument (if passed), previously of class `control.simulate.network`, should be replaced by one of class `control.simulate.network.tergm`.  This can be accomplished by replacing `control.simulate.network()` with `control.simulate.network.tergm()`, `snctrl()`, or `list()`, and updating arguments as when simulating from a fitted `tergm`.
+- The control argument (if passed), previously of class `control.simulate.network`, should be replaced by one of class `control.simulate.formula.tergm`.  This can be accomplished by replacing `control.simulate.network()` with `control.simulate.formula.tergm()`, `snctrl()`, or `list()`, and updating arguments as when simulating from a fitted `tergm`.
 
 - Combine the `stats.form` and `stats.diss` arguments (if passed) into a single `stats` argument.
 

@@ -38,7 +38,7 @@ Random Graph Model}
   time.burnin = 0,
   time.interval = 1,
   time.offset = 1,
-  control = control.simulate.network.tergm(),
+  control = control.simulate.formula.tergm(),
   output = c("networkDynamic", "stats", "changes", "final", "ergm_state"),
   stats = FALSE,
   verbose = FALSE,
@@ -59,7 +59,7 @@ Random Graph Model}
   time.burnin = 0,
   time.interval = 1,
   time.offset = 1,
-  control = control.simulate.network.tergm(),
+  control = control.simulate.formula.tergm(),
   output = c("networkDynamic", "stats", "changes", "final", "ergm_state"),
   stats = FALSE,
   verbose = FALSE,
@@ -116,7 +116,7 @@ network statistics.}
 
 \item{control}{A list of control parameters for algorithm tuning.
 Constructed using \code{\link{control.simulate.tergm}} or
-\code{\link{control.simulate.network.tergm}}.  For backwards compatibility,
+\code{\link{control.simulate.formula.tergm}}.  For backwards compatibility,
 control lists from \code{\link{control.simulate.stergm}} and
 \code{\link{control.simulate.network}} are allowed in calls to
 \code{simulate.tergm}; they are mapped to \code{control.simulate.tergm}

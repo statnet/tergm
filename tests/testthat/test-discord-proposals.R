@@ -166,7 +166,7 @@ test_that("discordBDStratTNT behaves reasonably", {
   pmat["A","C"] <- 1
   pmat["C","A"] <- 1
   
-  control <- control.simulate.network.tergm(MCMC.prop.weights = "discordBDStratTNT", 
+  control <- control.simulate.formula.tergm(MCMC.prop.weights = "discordBDStratTNT", 
                                             MCMC.prop.args = list(BD_attr = "sex",
                                                                   levels2 = levels2,
                                                                   Strat_attr = "uncommon",

@@ -2,7 +2,7 @@
 % Please edit documentation in R/control.simulate.tergm.R
 \name{control.simulate.tergm}
 \alias{control.simulate.tergm}
-\alias{control.simulate.network.tergm}
+\alias{control.simulate.formula.tergm}
 \title{Auxiliary for Controlling Temporal ERGM Simulation}
 \usage{
 control.simulate.tergm(
@@ -19,7 +19,7 @@ control.simulate.tergm(
   MCMC.packagenames = NULL
 )
 
-control.simulate.network.tergm(
+control.simulate.formula.tergm(
   MCMC.burnin.min = 1000,
   MCMC.burnin.max = 1e+05,
   MCMC.burnin.pval = 0.5,

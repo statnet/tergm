@@ -91,8 +91,8 @@ control.simulate.tergm <- function(MCMC.burnin.min = NULL,
 
 
 #' @rdname control.simulate.tergm
-#' @export control.simulate.network.tergm
-control.simulate.network.tergm <- function(MCMC.burnin.min = 1000,
+#' @export control.simulate.formula.tergm
+control.simulate.formula.tergm <- function(MCMC.burnin.min = 1000,
                                            MCMC.burnin.max = 100000,
                                            MCMC.burnin.pval = 0.5,
                                            MCMC.burnin.add = 1,
@@ -112,5 +112,5 @@ control.simulate.network.tergm <- function(MCMC.burnin.min = 1000,
   for(arg in names(formals(sys.function())))
     control[arg] <- list(get(arg))
 
-  set.control.class("control.simulate.network.tergm")
+  set.control.class("control.simulate.formula.tergm")
 }

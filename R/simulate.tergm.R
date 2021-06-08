@@ -81,7 +81,7 @@
 #' the spell that should be recorded for the newly simulated network state.
 #' @param control A list of control parameters for algorithm tuning.
 #' Constructed using \code{\link{control.simulate.tergm}} or
-#' \code{\link{control.simulate.network.tergm}}.  For backwards compatibility,
+#' \code{\link{control.simulate.formula.tergm}}.  For backwards compatibility,
 #' control lists from \code{\link{control.simulate.stergm}} and
 #' \code{\link{control.simulate.network}} are allowed in calls to
 #' \code{simulate.tergm}; they are mapped to \code{control.simulate.tergm}
@@ -247,7 +247,7 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
     if(is.null(control[[control.transfer[[arg]]]]))
       control[control.transfer[[arg]]] <- list(object$control[[arg]])
 
-  control <- set.control.class("control.simulate.network.tergm")
+  control <- set.control.class("control.simulate.formula.tergm")
 
   nw <- object$network
   if(is.null(nw.start)){
@@ -281,7 +281,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                              constraints = ~.,
                              monitor = NULL,
                              time.slices = 1, time.start=NULL, time.burnin=0, time.interval=1, time.offset=1,
-                             control=control.simulate.network.tergm(),
+                             control=control.simulate.formula.tergm(),
                              output=c("networkDynamic", "stats", "changes", "final", "ergm_state"),
                              stats = FALSE,
                              verbose=FALSE,
@@ -491,7 +491,7 @@ simulate_formula.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     constraints = ~.,
                                     monitor = NULL,
                                     time.slices = 1, time.start=NULL, time.burnin=0, time.interval=1, time.offset=1,
-                                    control=control.simulate.network.tergm(),
+                                    control=control.simulate.formula.tergm(),
                                     output=c("networkDynamic", "stats", "changes", "final", "ergm_state"),
                                     stats = FALSE,
                                     verbose=FALSE, ..., basis=eval_lhs.formula(object), dynamic=FALSE){
