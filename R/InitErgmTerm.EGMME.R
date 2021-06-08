@@ -14,7 +14,7 @@ InitErgmTerm.FormE <- function(nw, arglist,  ...) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  m <- ergm_model(a$formula, nw,...)
+  m <- ergm_model(a$formula, nw, ..., offset.decorate=FALSE)
 
   c(list(name="on_union_lt_net_Network",
          auxiliaries = ~.union.lt.net + .lasttoggle + .previous.lt.net,
@@ -45,7 +45,7 @@ InitErgmTerm.DissE <- function(nw, arglist,  ...) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  m <- ergm_model(a$formula, nw,...)
+  m <- ergm_model(a$formula, nw, ..., offset.decorate=FALSE)
 
   c(list(name="on_intersect_lt_net_Network",
          auxiliaries = ~.intersect.lt.net() + .lasttoggle,
@@ -76,7 +76,7 @@ InitErgmTerm.ChangeE <- function(nw, arglist,  ...) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  m <- ergm_model(a$formula, nw,...)
+  m <- ergm_model(a$formula, nw, ..., offset.decorate=FALSE)
 
   c(list(name="on_discord_lt_net_Network",
          auxiliaries = ~.discord.lt.net() + .lasttoggle + .previous.lt.net,

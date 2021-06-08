@@ -153,7 +153,7 @@ InitErgmTerm.Form1 <- function(nw, arglist,  ...){
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  m <- ergm_model(a$formula, nw,...)
+  m <- ergm_model(a$formula, nw, ..., offset.decorate=FALSE)
   
   c(list(name="on_union_net_Network", pkgname="ergm",
          auxiliaries = ~.union.net((nw%n%".PrevNets")[[1]], implementation="Network"),
@@ -194,7 +194,7 @@ InitErgmTerm.Diss1 <- function(nw, arglist,  ...){
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  m <- ergm_model(a$formula, nw,...)
+  m <- ergm_model(a$formula, nw, ..., offset.decorate=FALSE)
   
   c(list(name="on_intersect_net_Network", pkgname="ergm",
          auxiliaries = ~.intersect.net((nw%n%".PrevNets")[[1]], implementation="Network"),
@@ -234,7 +234,7 @@ InitErgmTerm.Change1 <- function(nw, arglist,  ...){
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  m <- ergm_model(a$formula, nw,...)
+  m <- ergm_model(a$formula, nw, ..., offset.decorate=FALSE)
   
   c(list(name="on_discord_net_Network", pkgname="ergm",
          auxiliaries = ~.discord.net((nw%n%".PrevNets")[[1]], implementation="Network"),
@@ -277,7 +277,7 @@ InitErgmTerm.Cross <- function(nw, arglist, ..., env=baseenv()) {
   nn <- length(nwl)
 
   ms <- lapply(nwl, function(nw1){
-    ergm_model(a$formula, nw1, ...)
+    ergm_model(a$formula, nw1, ..., offset.decorate=FALSE)
   })
 
   nparams <- ms %>% map_int(nparam, canonical=FALSE)
