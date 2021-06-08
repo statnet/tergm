@@ -231,7 +231,7 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
     control <- set.control.class("control.simulate.tergm")
   }  
   
-  check.control.class(c("simulate.tergm","simulate.network.tergm"), "simulate.tergm")
+  check.control.class(c("simulate.tergm","simulate.formula.tergm"), "simulate.tergm")
   
   control.transfer <- list(MCMC.prop.weights="MCMC.prop.weights",
                            MCMC.prop.args="MCMC.prop.args",
@@ -300,7 +300,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
   object <- NVL(basis, eval_lhs.formula(formula))
 
   if(length(list(...))) stop("Unknown arguments: ",names(list(...)))
-  check.control.class("simulate.network.tergm", "TERGM simulate_formula.network")
+  check.control.class("simulate.formula.tergm", "TERGM simulate_formula.network")
 
   output <- match.arg(output)
   
