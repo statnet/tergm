@@ -32,8 +32,8 @@ tergm.EGMME.initialfit<-function(init, nw, model, formula, model.mon, formula.mo
       stop("No initial parameter method for specified model and targets combination is implemented. Specify via control$init.")    
     }
     
-    wf <- which(grepl("Form\\(.+\\)", model$coef.names))
-    wd <- which(grepl("Diss\\(.+\\)", model$coef.names))
+    wf <- which(grepl("Form", model$coef.names))
+    wd <- which(grepl("Diss", model$coef.names))
     
     init.form <- init[wf]
     init.diss <- init[wd]

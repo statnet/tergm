@@ -57,7 +57,7 @@ test_that("simulate_formula.network behaves reasonably", {
   ## obtain also stats, changes, and ergm_state starting from rv
   rv_stats <- simulate(rv ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), time.slices = 5, output = "stats", stats = TRUE, dynamic = TRUE)
   expect_true(NROW(rv_stats) == 5 && NCOL(rv_stats) == 2)
-  expect_identical(colnames(rv_stats), c("Form(edges)", "Diss(edges)"))
+  expect_identical(colnames(rv_stats), c("Form~edges", "Diss~edges"))
   expect_true(all(rv_stats[,1] > rv_stats[,2]))
 
   rv_stats_mon <- simulate(rv ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), output = "stats", monitor = ~edges, dynamic = TRUE)
