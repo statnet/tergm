@@ -28,8 +28,8 @@ I_CHANGESTAT_FN(i__lasttoggle){
     Vertex tail=lt[i], head=lt[i+nlt];
     int ltt = lt[i+nlt+nlt];
     /* Note: we can't use helper macros here, since those treat 0 as deletion. */
-    kh_set(DyadMapInt,dur_inf->lasttoggle,THKey(dur_inf->lasttoggle,tail,head), ltt);
-    if(dur_inf->time == ltt) kh_set(DyadMapInt,dur_inf->discord,THKey(dur_inf->lasttoggle,tail,head), ltt);
+    kh_set(DyadMapInt,dur_inf->lasttoggle,TH(tail,head), ltt);
+    if(dur_inf->time == ltt) kh_set(DyadMapInt,dur_inf->discord,TH(tail,head), ltt);
   }
 }
 
@@ -61,7 +61,7 @@ U_CHANGESTAT_FN(u__lasttoggle){
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   if(!dur_inf->ticktock) return; // If the network is being modified outside of time, do not update lasttoggle or discord.
 
-  TailHead dyad = THKey(dur_inf->discord,tail, head);
+  TailHead dyad = TH(tail, head);
   khint_t i = kh_get(DyadMapInt,dur_inf->discord,dyad);
   if(i == kh_none){
     // If the dyad has *not* been toggled in this time step, then save its last toggle info (if any) and make a provisional change in lasttoggle.

@@ -82,7 +82,7 @@ MH_P_FN(MH_discordTNT) {
       // propose toggling a random dyad
       GetRandDyad(Mtail, Mhead, nwp);
       in_network = IS_OUTEDGE(Mtail[0], Mhead[0]);
-      in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;
+      in_discord = kh_get(DyadMapInt, dur_inf->discord, TH(Mtail[0], Mhead[0])) != kh_none;
 
       if(in_discord) {
         // need to resample to know index
@@ -138,7 +138,7 @@ MH_P_FN(MH_discordTNT) {
 MH_U_FN(Mu_discordTNT) {  
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
   GET_STORAGE(discordTNTStorage, sto);
-  int in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, tail, head)) != kh_none;
+  int in_discord = kh_get(DyadMapInt, dur_inf->discord, TH(tail, head)) != kh_none;
   
   // add or remove the dyad from the appropriate discordance edgelist  
   if(in_discord == edgestate) {
@@ -264,7 +264,7 @@ MH_P_FN(MH_discordBDStratTNT) {
       BDStratBlocksGetRandWithCount(Mtail, Mhead, sto->static_sto->blocks, strat_i, ndyadstype);
          
       in_network = IS_OUTEDGE(Mtail[0],Mhead[0]);
-      in_discord = kh_get(DyadMapInt, dur_inf->discord, THKey(dur_inf->discord, Mtail[0], Mhead[0])) != kh_none;
+      in_discord = kh_get(DyadMapInt, dur_inf->discord, TH(Mtail[0], Mhead[0])) != kh_none;
     }
   } else {
     // propose from discord

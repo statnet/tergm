@@ -68,12 +68,12 @@ void ExpireTimestamps(StoreTimeAndLasttoggle *dur_inf, unsigned int edges, unsig
 /* *** don't forget tail->head, so this function now accepts tail before head */
 
 static inline int ElapsedTime(Vertex tail, Vertex head, StoreTimeAndLasttoggle *dur_inf){
-  khint_t i = kh_get(DyadMapInt, dur_inf->lasttoggle, THKey(dur_inf->lasttoggle,tail,head));
+  khint_t i = kh_get(DyadMapInt, dur_inf->lasttoggle, TH(tail,head));
   if(i==kh_none) return dur_inf->time + INT_MAX/2;
   return dur_inf->time - kh_value(dur_inf->lasttoggle, i); // Possible int overflow here.
 }
 
-#define JUST_CHANGED(dur_inf, tail, head) (kh_get(DyadMapInt, (dur_inf)->discord, THKey((dur_inf)->discord,(tail),(head)))!=kh_none)
+#define JUST_CHANGED(dur_inf, tail, head) (kh_get(DyadMapInt, (dur_inf)->discord, TH((tail),(head)))!=kh_none)
 
 static inline int ElapsedTimeToggle(Vertex tail, Vertex head, StoreTimeAndLasttoggle *dur_inf, int edgestate){
   if(edgestate) {
@@ -82,7 +82,7 @@ static inline int ElapsedTimeToggle(Vertex tail, Vertex head, StoreTimeAndLastto
   }
   
   // otherwise we're toggling this dyad *on*
-  TailHead dyad = THKey(dur_inf->discord,tail, head);
+  TailHead dyad = TH(tail, head);
   khint_t i = kh_get(DyadMapInt,dur_inf->discord,dyad);
   if(i == kh_none){
     // not in discord -> odd number of toggles this timestep (including the current toggle)
