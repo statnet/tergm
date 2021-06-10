@@ -14,8 +14,9 @@
 \alias{terms.ergm}
 \alias{Form}
 \alias{Diss}
+\alias{Persist}
 \alias{Cross}
-\alias{Chnage}
+\alias{Change}
 \alias{edge.ages}
 \alias{mean.age}
 \alias{nodefactor.mean.age}
@@ -46,11 +47,12 @@
   the elapsed time since each dyad in the network was last toggled.  As currently 
   implemented, such "durational" terms may not be used in the formation
   or dissolution models (whether specified separably with \code{formation} and 
-  \code{dissolution} arguments in the old style, or inside \code{Form} and 
-  \code{Diss} operator terms in the new style), but may be used as targets, monitors,
+  \code{dissolution} arguments in the old style, or inside one of the new style temporal
+  operator terms (\code{Form}, \code{Persist}, \code{Diss}, \code{Cross} or 
+  \code{Change}).  But the durational terms may be used as targets, monitors,
   or summary statistics, and may also appear as non-separable effects 
   in the generative model (necessarily specified in the new style).  The ability to 
-  use these terms in the formation and dissolution models may be added in the future.
+  use these terms in the temporal operators may be added in the future.
 
   All terms listed here are binary.
 }
@@ -65,7 +67,17 @@
     
     \item{\code{Diss(formula)}}{
       \emph{The Dissolution Operator Term:} This term accepts a model formula
-      \code{formula} and produces the corresponding dissolution model.
+      \code{formula} and produces the corresponding dissolution model.  Note, this
+      not the equivalent of the old style \code{dissolution} model because the signs of
+      the coefficients are reversed.
+    }
+    
+    \item{\code{Persist(formula)}}{
+      \emph{The Dissolution Operator Term:} This term accepts a model formula
+      \code{formula} and produces the corresponding dissolution model.  Note, this
+      is the equivalent of the old style \code{dissolution} model, and it will produce
+      the same results as the \code{Diss} operator, except the signs of the 
+      coefficients are reversed.
     }
 
     \item{\code{Cross(formula)}}{
