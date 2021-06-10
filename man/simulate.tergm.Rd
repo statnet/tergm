@@ -43,7 +43,7 @@ Random Graph Model}
   stats = FALSE,
   verbose = FALSE,
   ...,
-  basis = eval_lhs.formula(object),
+  basis = ergm.getnetwork(object),
   dynamic = FALSE
 )
 

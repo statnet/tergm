@@ -129,7 +129,7 @@ InitErgmTerm.Form <- function(nw, arglist,  ..., env=baseenv()) {
                       required = c(TRUE))
 
   if(!is(nw, "combined_networks")) {
-    return(InitErgmTerm.FormE(nw = nw, arglist = a["formula"], ...))
+    return(`InitErgmTerm.Form (dynamic)`(nw = nw, arglist = a["formula"], ...))
   }
 
   f <- a$formula
@@ -171,7 +171,7 @@ InitErgmTerm.Diss <- function(nw, arglist,  ..., env=baseenv()) {
                       required = c(TRUE))
 
   if(!is(nw, "combined_networks")) {
-    return(InitErgmTerm.DissE(nw = nw, arglist = a["formula"], ...))
+    return(`InitErgmTerm.Diss (dynamic)`(nw = nw, arglist = a["formula"], ...))
   }
 
   f <- a$formula
@@ -211,7 +211,7 @@ InitErgmTerm.Change <- function(nw, arglist,  ..., env=baseenv()) {
                       required = c(TRUE))
 
   if(!is(nw, "combined_networks")) {
-    return(InitErgmTerm.ChangeE(nw = nw, arglist = a["formula"], ...))
+    return(`InitErgmTerm.Change (dynamic)`(nw = nw, arglist = a["formula"], ...))
   }
 
   f <- a$formula

@@ -23,9 +23,9 @@ tergm.EGMME.initialfit<-function(init, nw, model, formula, model.mon, formula.mo
     diss <- fd.formulae$diss
     nonsep <- fd.formulae$nonsep
     
-    model.form <- ergm_model(form, nw=nw, term.options=control$term.options)
-    model.diss <- ergm_model(diss, nw=nw, term.options=control$term.options)
-    model.nonsep <- ergm_model(nonsep, nw=nw, term.options=control$term.options)
+    model.form <- ergm_model(form, nw=nw, dynamic=TRUE, term.options=control$term.options)
+    model.diss <- ergm_model(diss, nw=nw, dynamic=TRUE, term.options=control$term.options)
+    model.nonsep <- ergm_model(nonsep, nw=nw, dynamic=TRUE, term.options=control$term.options)
     
     ## non-separable terms are not currently allowed in the EDA
     if(nparam(model.nonsep, canonical = FALSE) > 0) {

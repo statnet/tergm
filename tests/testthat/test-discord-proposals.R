@@ -17,8 +17,6 @@
 #  Copyright 2003-2020 Statnet Commons
 #######################################################################
 
-context("test-discord-proposals.R")
-
 test_that("discordStratTNT behaves reasonably", {
 
   net_size <- 500L

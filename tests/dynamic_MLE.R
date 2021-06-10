@@ -57,8 +57,8 @@ set.seed(543)
 fit<-tergm(list(y0,y1) ~ Form(~edges) + Diss(~edges), estimate="CMPLE", times=c(1,2), eval.loglik=FALSE)
 
 stopifnot(fit$estimate=="CMPLE")
-stopifnot(z.error(form.mle(y0,y1), fit$coef[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
-stopifnot(z.error(diss.mle(y0,y1), fit$coef[2], vcov(fit, sources="estimation")[2,2]) <= tolerance)
+stopifnot(z.error(form.mle(y0,y1), coef(fit)[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
+stopifnot(z.error(diss.mle(y0,y1), coef(fit)[2], vcov(fit, sources="estimation")[2,2]) <= tolerance)
 
 fit<-tergm(list(y0,y1) ~ edges, estimate="CMPLE", times=c(1,2), eval.loglik=FALSE)
 stopifnot(fit$estimate=="CMPLE")
@@ -77,8 +77,8 @@ set.seed(543)
 fit<-tergm(list(y0,y1) ~ Form(~edges) + Diss(~edges), estimate="CMLE", times=c(1,2), eval.loglik=FALSE)
 
 stopifnot(fit$estimate=="CMLE")
-stopifnot(z.error(form.mle(y0,y1), fit$coef[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
-stopifnot(z.error(diss.mle(y0,y1), fit$coef[2], vcov(fit, sources="estimation")[2,2]) <= tolerance)
+stopifnot(z.error(form.mle(y0,y1), coef(fit)[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
+stopifnot(z.error(diss.mle(y0,y1), coef(fit)[2], vcov(fit, sources="estimation")[2,2]) <= tolerance)
 
 fit<-tergm(list(y0,y1) ~ edges, estimate="CMLE", times=c(1,2), eval.loglik=FALSE)
 stopifnot(fit$estimate=="CMLE")
@@ -102,8 +102,8 @@ set.seed(543)
 fit<-tergm(list(y0,y1) ~ Form(~edges) + Diss(~edges), estimate="CMLE", control=ctrl, times=c(1,2), eval.loglik=FALSE)
 
 stopifnot(fit$estimate=="CMLE")
-stopifnot(z.error(form.mle(y0,y1), fit$coef[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
-stopifnot(z.error(diss.mle(y0,y1), fit$coef[2], vcov(fit, sources="estimation")[2,2]) <= tolerance)
+stopifnot(z.error(form.mle(y0,y1), coef(fit)[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
+stopifnot(z.error(diss.mle(y0,y1), coef(fit)[2], vcov(fit, sources="estimation")[2,2]) <= tolerance)
 
 fit<-tergm(list(y0,y1) ~ edges, estimate="CMLE", control=ctrl, times=c(1,2), eval.loglik=FALSE)
 stopifnot(fit$estimate=="CMLE")
@@ -131,8 +131,8 @@ set.seed(765)
 fit<-tergm(list(y0,y1m) ~ Form(~edges) + Diss(~edges), estimate="CMPLE", times=c(1,2), eval.loglik=FALSE)
 
 stopifnot(fit$estimate=="CMPLE")
-stopifnot(z.error(form.mle(y0,y1m), fit$coef[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
-stopifnot(z.error(diss.mle(y0,y1m), fit$coef[2], vcov(fit, sources="estimation")[2,2]) <= tolerance)
+stopifnot(z.error(form.mle(y0,y1m), coef(fit)[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
+stopifnot(z.error(diss.mle(y0,y1m), coef(fit)[2], vcov(fit, sources="estimation")[2,2]) <= tolerance)
 
 fit<-tergm(list(y0,y1m) ~ edges, estimate="CMPLE", times=c(1,2), eval.loglik=FALSE)
 stopifnot(fit$estimate=="CMPLE")
@@ -151,8 +151,8 @@ set.seed(765)
 fit<-tergm(list(y0,y1m) ~ Form(~edges) + Diss(~edges), estimate="CMLE", times=c(1,2), eval.loglik=FALSE)
 
 stopifnot(fit$estimate=="CMLE")
-stopifnot(z.error(form.mle(y0,y1m), fit$coef[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
-stopifnot(z.error(diss.mle(y0,y1m), fit$coef[2], vcov(fit, sources="estimation")[2,2]) <= tolerance)
+stopifnot(z.error(form.mle(y0,y1m), coef(fit)[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
+stopifnot(z.error(diss.mle(y0,y1m), coef(fit)[2], vcov(fit, sources="estimation")[2,2]) <= tolerance)
 
 fit<-tergm(list(y0,y1m) ~ edges, estimate="CMLE", times=c(1,2), eval.loglik=FALSE)
 stopifnot(fit$estimate=="CMLE")
@@ -176,8 +176,8 @@ set.seed(234)
 fit<-tergm(list(y0,y1m) ~ Form(~edges) + Diss(~edges), estimate="CMLE", control=ctrl, times=c(1,2), eval.loglik=FALSE)
 
 stopifnot(fit$estimate=="CMLE")
-stopifnot(z.error(form.mle(y0,y1m), fit$coef[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
-stopifnot(z.error(diss.mle(y0,y1m), fit$coef[2], vcov(fit, sources="estimation")[2,2]) <= tolerance)
+stopifnot(z.error(form.mle(y0,y1m), coef(fit)[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
+stopifnot(z.error(diss.mle(y0,y1m), coef(fit)[2], vcov(fit, sources="estimation")[2,2]) <= tolerance)
 
 
 fit<-tergm(list(y0,y1m) ~ edges, estimate="CMLE", control=ctrl, times=c(1,2), eval.loglik=FALSE)

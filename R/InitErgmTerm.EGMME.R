@@ -7,7 +7,14 @@
 #
 #  Copyright 2008-2020 Statnet Commons
 #######################################################################
-InitErgmTerm.FormE <- function(nw, arglist,  ...) {
+
+stopifnot_dynamic <- function(nw,...,dynamic=FALSE){
+  if(!dynamic && ! "lasttoggle" %in% list.network.attributes(nw))
+    ergm_Init_abort(paste0("This term requires either last-toggle data or dynamic mode, e.g., from ", sQuote("simulate(..., dynamic=TRUE)"), "."))
+}
+
+`InitErgmTerm.Form (dynamic)` <- function(nw, arglist,  ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
@@ -24,6 +31,7 @@ InitErgmTerm.FormE <- function(nw, arglist,  ...) {
 }
 
 InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c(),
                       vartypes = c(),
@@ -38,7 +46,8 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
 }
 
 
-InitErgmTerm.DissE <- function(nw, arglist,  ...) {
+`InitErgmTerm.Diss (dynamic)` <- function(nw, arglist,  ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
@@ -55,6 +64,7 @@ InitErgmTerm.DissE <- function(nw, arglist,  ...) {
 }
 
 InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c(),
                       vartypes = c(),
@@ -69,7 +79,8 @@ InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
 }
 
 
-InitErgmTerm.ChangeE <- function(nw, arglist,  ...) {
+`InitErgmTerm.Change (dynamic)` <- function(nw, arglist,  ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
@@ -87,6 +98,7 @@ InitErgmTerm.ChangeE <- function(nw, arglist,  ...) {
 
 
 InitErgmTerm..discord.lt.net<-function(nw, arglist, ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c(),
                       vartypes = c(),
@@ -102,6 +114,7 @@ InitErgmTerm..discord.lt.net<-function(nw, arglist, ...) {
 
 
 InitErgmTerm..previous.lt.net<-function(nw, arglist, ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c(),
                       vartypes = c(),
@@ -116,6 +129,7 @@ InitErgmTerm..previous.lt.net<-function(nw, arglist, ...) {
 }
 
 InitErgmTerm..lasttoggle <- function(nw, arglist, ...){
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c(),
                       vartypes = c(),

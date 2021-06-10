@@ -56,6 +56,6 @@ is.durational.formula<-function(object,response=NULL,basis=ergm.getnetwork(objec
   
   nw <- basis
   ergm_preprocess_response(nw,response)
-  m<-ergm_model(object, nw, ...)
+  m<-ergm_model(object, nw, dynamic=TRUE, ...)
   is.durational(m)
 }

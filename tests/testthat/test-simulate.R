@@ -12,18 +12,14 @@ test_that("simulate_formula.network behaves reasonably", {
   nw <- network.initialize(100, directed = FALSE)
 
   ## if we don't specify 'dynamic=TRUE' we should go to ergm simulation by default
-  expect_warning(rv <- simulate(nw ~ edges, coef = c(-3)), paste0("Attempting ", sQuote("ergm"), " simulation instead..."))
+  expect_warning(rv <- simulate(nw ~ edges, coef = c(-3)), NA)
   expect_identical(class(rv), "network")
   ## should be no time or lasttoggle since the model isn't durational and we did ergm simulation
   expect_false("time" %in% list.network.attributes(rv))
   expect_false("lasttoggle" %in% list.network.attributes(rv))
   
-  ## if we don't specify 'dynamic=TRUE' we should go to ergm simulation by default
-  expect_warning(rv <- simulate(nw ~ Form(~edges) + Diss(~edges), coef = c(-3, 1)), paste0("Attempting ", sQuote("ergm"), " simulation instead..."))
-  expect_identical(class(rv), "network")
-  ## should have time and lasttoggle since the model is durational, but they are basically junk values in this case
-  expect_true("time" %in% list.network.attributes(rv))
-  expect_true("lasttoggle" %in% list.network.attributes(rv))
+  ## if we don't specify 'dynamic=TRUE' we should trigger an error
+  expect_error(rv <- simulate(nw ~ Form(~edges) + Diss(~edges), coef = c(-3, 1)), ".*This term requires either last-toggle data or dynamic mode.*")
 
   ## if we do specify 'dynamic=TRUE' we should go to tergm simulation
   expect_warning(rv <- simulate(nw ~ edges, coef = c(-3), output = "final", dynamic = TRUE), NA)
@@ -337,27 +333,27 @@ test_that("simulate.tergm behaves reasonably", {
   expect_error(simulate(CMLE, nw.start = 5, output = "final"))
 
   set.seed(0)
-  rv_E_nw <- simulate(EGMME$network ~ Form(~edges) + Diss(~edges), coef = EGMME$coef, monitor = EGMME$targets, output = "final", dynamic = TRUE)
+  rv_E_nw <- simulate(EGMME$network ~ Form(~edges) + Diss(~edges), coef = coef(EGMME), monitor = EGMME$targets, output = "final", dynamic = TRUE)
 
   set.seed(0)
-  rv_E_x_nw <- simulate(nwx ~ Form(~edges) + Diss(~edges), coef = EGMME$coef, monitor = EGMME$targets, output = "final", dynamic = TRUE)
+  rv_E_x_nw <- simulate(nwx ~ Form(~edges) + Diss(~edges), coef = coef(EGMME), monitor = EGMME$targets, output = "final", dynamic = TRUE)
 
   set.seed(0)
-  rv_C_first_nw <- simulate(nw1 ~ Form(~edges) + Diss(~edges), coef = CMLE$coef, output = "final", dynamic = TRUE)  
+  rv_C_first_nw <- simulate(nw1 ~ Form(~edges) + Diss(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)  
   set.seed(0)
-  rv_C_last_nw <- simulate(nw4 ~ Form(~edges) + Diss(~edges), coef = CMLE$coef, output = "final", dynamic = TRUE)  
+  rv_C_last_nw <- simulate(nw4 ~ Form(~edges) + Diss(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)  
 
   set.seed(0)
-  rv_C_x_nw <- simulate(nwx ~ Form(~edges) + Diss(~edges), coef = CMLE$coef, output = "final", dynamic = TRUE)  
+  rv_C_x_nw <- simulate(nwx ~ Form(~edges) + Diss(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)  
 
   set.seed(0)
-  rv_C_1_nw <- simulate(nw1 ~ Form(~edges) + Diss(~edges), coef = CMLE$coef, output = "final", dynamic = TRUE)    
+  rv_C_1_nw <- simulate(nw1 ~ Form(~edges) + Diss(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)    
   set.seed(0)
-  rv_C_2_nw <- simulate(nw2 ~ Form(~edges) + Diss(~edges), coef = CMLE$coef, output = "final", dynamic = TRUE)    
+  rv_C_2_nw <- simulate(nw2 ~ Form(~edges) + Diss(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)    
   set.seed(0)
-  rv_C_3_nw <- simulate(nw3 ~ Form(~edges) + Diss(~edges), coef = CMLE$coef, output = "final", dynamic = TRUE)    
+  rv_C_3_nw <- simulate(nw3 ~ Form(~edges) + Diss(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)    
   set.seed(0)
-  rv_C_4_nw <- simulate(nw4 ~ Form(~edges) + Diss(~edges), coef = CMLE$coef, output = "final", dynamic = TRUE)    
+  rv_C_4_nw <- simulate(nw4 ~ Form(~edges) + Diss(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)    
 
   ## subset network attributes to those present in direct simulations of the original networks to avoid
   ## considering unrelated attributes introduced during the CMLE fit

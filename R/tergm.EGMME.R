@@ -36,14 +36,14 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
   formula <- nonsimp_update.formula(formula,nw~., from.new="nw")
   SAN.formula <- targets # including any offsets
 
-  target_model <- ergm_model(targets, nw, term.options = control$term.options)
+  target_model <- ergm_model(targets, nw, dynamic=TRUE, term.options = control$term.options)
   if(any(target_model$etamap$offsetmap) || any(target_model$etamap$offsettheta)) {
     message("Targets contains offset terms; they will only be used during the SAN run, and removal of the offsets will be attempted for the EGMME targets.")
 
     # this can fail to behave appropriately in 4.0, so check the result and error if something looks wrong
     targets <- statnet.common::filter_rhs.formula(targets, function(x) !inherits(x, "call") || !(x[[1]] == "offset"))
     
-    updated_target_model <- ergm_model(targets, nw, term.options = control$term.options)
+    updated_target_model <- ergm_model(targets, nw, dynamic=TRUE, term.options = control$term.options)
     if(any(updated_target_model$etamap$offsetmap) || 
        any(updated_target_model$etamap$offsettheta) || 
        sum(!target_model$etamap$offsetmap) != nparam(updated_target_model, canonical = TRUE)) {
@@ -63,13 +63,13 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
   proposal <- ergm_proposal(constraints, weights = control$MCMC.prop.weights, arguments = control$MCMC.prop.args, nw = nw, hints = control$MCMC.prop, class="t")
   proposal.SAN <- ergm_proposal(constraints, weights = control$SAN$SAN.prop.weights, arguments = control$SAN$SAN.prop.args, nw = nw, hints = control$SAN$SAN.prop, class="c")
   
-  model <- ergm_model(formula, nw, term.options=control$term.options, extra.aux=list(proposal=proposal$auxiliaries, system=~.lasttoggle))
-  model.SAN <- ergm_model(SAN.formula, nw, term.options=control$SAN$term.options, extra.aux=list(proposal=proposal.SAN$auxiliaries))  
+  model <- ergm_model(formula, nw, dynamic=TRUE, term.options=control$term.options, extra.aux=list(proposal=proposal$auxiliaries, system=~.lasttoggle))
+  model.SAN <- ergm_model(SAN.formula, nw, dynamic=TRUE, term.options=control$SAN$term.options, extra.aux=list(proposal=proposal.SAN$auxiliaries))  
   
   proposal$aux.slots <- model$slots.extra.aux$proposal
   proposal.SAN$aux.slots <- model.SAN$slots.extra.aux$proposal
   
-  model.mon <- ergm_model(targets, nw, term.options=control$term.options)
+  model.mon <- ergm_model(targets, nw, dynamic=TRUE, term.options=control$term.options)
 
   if(any(model$etamap$canonical==0) || any(model.mon$etamap$canonical==0) || any(model.SAN$etamap$canonical==0)) stop("Equilibrium GMME for models based on curved ERGMs is not supported at this time.")
 
@@ -78,7 +78,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
   q<-length(model.mon$etamap$offsettheta)
   if(p.free>q) stop("Fitting ",p.free," free parameters on ",q," target statistics. The specification is underidentified.")
 
-  nw.stats<-summary(model.mon, nw=nw)
+  nw.stats<-summary(model.mon, nw=nw, dynamic=TRUE)
   if(!is.null(target.stats)){
     if(length(nw.stats)!=length(target.stats))
       stop("Incorrect length of the target.stats vector: should be ", length(nw.stats), " but is ",length(target.stats),".")
@@ -106,7 +106,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
     
     targets<-nonsimp_update.formula(targets,TARGET_STATS~., from.new="TARGET_STATS")
     formula <- nonsimp_update.formula(formula,TARGET_STATS~., from.new="TARGET_STATS")
-    nw.stats <- summary(model.mon, nw)
+    nw.stats <- summary(model.mon, nw, dynamic=TRUE)
 
     if(verbose){
       message("SAN summary statistics:")
@@ -178,6 +178,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
                 etamap = model$etamap,
                 offset = model$etamap$offsettheta,
                 mle.lik = NA,
+                MPLE_is_MLE = FALSE,
                 ergm_version = packageVersion("ergm")))
 
   class(out) <- c("tergm_EGMME", "tergm", "ergm")
