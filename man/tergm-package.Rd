@@ -35,23 +35,31 @@ Exponential-Family Random Graph Models
   \code{\link[=ergm-package]{ergm}} package implements a suite of tools
   for modeling single networks using ERGMs.
 
-  More recently, there has been a number of extensions of ERGMs to model
+  There have been a number of extensions of ERGMs for modeling the
   evolution of networks, including the temporal ERGM (TERGM) of Hanneke
   et al. (2010) and the separable termporal ERGM (STERGM) of Krivitsky
   and Handcock (2013). The latter model allows familiar ERGM terms and
   statistics to be reused in a dynamic context, interpreted in terms of
-  formation and dissolution of ties. Krivitsky (2012) suggested a method
-  for fitting dynamic models when only a cross-sectional network is
-  available, provided some temporal information for it is available as
+  formation and dissolution (persistence) of ties. Krivitsky (2012) 
+  suggested a method for fitting dynamic models when only a cross-sectional 
+  network is available, provided some temporal information for it is available as
   well.
 
   This package aims to implement these and other ERGM-based models for
   network evoluation. At this time, it implements, via the
-  \code{\link{tergm}} function, the (S)TERGMs, both a conditional MLE
-  (CMLE) fitting to a series of networks and an Equilibrium Generalized
+  \code{\link{tergm}} function, a general framework for modeling tie dynamics
+  in temporal networks with flexible model specification (including (S)TERGMs). 
+  Estimation options include a conditional MLE
+  (CMLE) approach for fitting to a series of networks and an Equilibrium Generalized
   Method of Moments Estimation (EGMME) for fitting to a single network
   with temporal information. For further development, see the referenced
   papers.
+  
+  If you previously used the \code{stergm} function in this package, please note that
+  \code{stergm} has been superceded by the new \{tergm} function, and is likely to be
+  deprecated in future releases.  The \code{dissolution} formula in \code{stergm} 
+  maps to the new \code{Persist()} operator in the \code{tergm} function, 
+  NOT the \code{Diss()} operator.
   
   For detailed information on how to download and install the software,
   go to the Statnet project website:

@@ -25,14 +25,14 @@
 #   object       : either a stergm or a formation formula of the form
 #                  'nw ~ term(s)'
 #   dissolution  : for a formula 'object', this is the corresponding
-#                  dissolution formula
+#                  dissolution (persistence) formula 
 #   nsim         : the number of networks to draw; default=1
 #   seed         : an integer at which to set the random generator;
 #                  default=NULL
 #   theta.form   : the initial theta formation coefficients;
 #                  default='object'$coef.form for stergm objects and
 #                  default= a vector of 0's for formula objects
-#   theta.diss   : the initial theta dissolution coefficients;
+#   theta.diss   : the initial theta dissolution (persistence) coefficients;
 #                  default='object'$coef.diss for stergm objects and
 #                  default= a vector of 0's for formula objects
 #   time.burnin  : the number of MCMC steps to disregard before any MCMC
@@ -59,13 +59,13 @@
 #   otherwise
 #     outlist: a network.list object as a list containing:
 #        formation  : the formation formula
-#        dissolution: the dissolution formula
+#        dissolution: the dissolution (persistence) formula
 #        coef.form  : the passed in or defaulted 'coef.form'
-#        coef.diss  : the passed in or defaulted 'coef.diss'
+#        coef.diss  : the passed in or defaulted 'coef.diss', these are persistence coefficients
 #        networks   : the list of simulated networks
 #        constraints: the constraints formula
 #        stats.form : the matrix of sampled statistics for 'model.form'
-#        stats.diss : the matrix of sampled statistics for 'model.form'
+#        stats.diss : the matrix of sampled statistics for 'model.diss'
 #        changed    : a toggle matrix, where the first column is
 #                     the timestamp of the toggle and the 2nd and 3rd
 #                     columns are the head & tail of the toggle; this
@@ -90,17 +90,26 @@
 #'
 #' Note that return values may be structured differently than in past versions.
 #' 
+#' Remember that in \code{stergm}, the dissolution formula is parameterized in
+#' terms of tie persistence: negative coefficients imply lower rates of persistence
+#' and postive coefficients imply higher rates.  The dissolution effects are simply the
+#' negation of these coefficients.
+#' 
+#' Because the old \code{dissolution} formula in \code{stergm} represents
+#' tie persistence, it maps to the new \code{Persist()} operator
+#' in the \code{tergm} function, NOT the \code{Diss()} operator
+#' 
 #' @aliases simulate.stergm simulate.network simulate.networkDynamic
 #'
 #' @param object an object of type \code{\link{network}} or \code{\link{networkDynamic}}
 #' @param formation,dissolution One-sided \code{\link{ergm}}-style formulas for
-#' the formation and dissolution models, respectively.
+#' the formation and dissolution models, respectively.  The dissolution model is parameterized in terms of tie persistence.
 #' @param nsim Number of replications (separate chains of networks) of the
 #' process to run and return. The \code{\link{networkDynamic}} method only
 #' supports \code{nsim=1}.
 #' @param seed Random number integer seed.  See \code{\link[base]{set.seed}}.
 #' @param coef.form Parameters for the formation model.
-#' @param coef.diss Parameters for the dissolution model.
+#' @param coef.diss Parameters for the dissolution (persistence) model.
 #' @param constraints A one-sided formula specifying one or more constraints on
 #' the support of the distribution of the networks being modeled, using syntax
 #' similar to the \code{formula} argument. Multiple constraints may be given,

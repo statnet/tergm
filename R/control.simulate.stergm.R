@@ -90,6 +90,10 @@ control.simulate.network <- function(MCMC.burnin.min = 1000,
 #' and uses the formation proposal control arguments, ignoring the 
 #' dissolution proposal control arguments.
 #' 
+#' Note:  The old \code{dissolution} formula in \code{stergm} represents
+#' tie persistence.  As a result it maps to the new \code{Persist()} operator
+#' in \code{tergm}, NOT the \code{Diss()} operator
+#' 
 #' @param
 #'   MCMC.burnin.min,MCMC.burnin.max,MCMC.burnin.pval,MCMC.burnin.add
 #'   Number of Metropolis-Hastings steps per time step used in simulation. By default, this
