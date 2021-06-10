@@ -209,7 +209,7 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
   
   control <- set.control.class("control.tergm")
   
-  formula <- nw ~ Form(formation) + Diss(dissolution)
+  formula <- nw ~ Form(formation) + Persist(dissolution)
   
   tergm(formula=formula, constraints=constraints, estimate=estimate, times=times, offset.coef=c(offset.coef.form, offset.coef.diss), targets=targets, target.stats=target.stats, eval.loglik=eval.loglik, control=control, verbose=verbose, SAN.offsets = SAN.offsets, ...)
 }
