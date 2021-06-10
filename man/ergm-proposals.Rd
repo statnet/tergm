@@ -62,11 +62,13 @@
         discordant dyads, and approximately 50\% of proposed toggles are
         TNT proposals from the network, all subject to the bounded degree
         and mixing type constraints.  The degree bound constraint is imposed 
-        on the instantaneous network state (rather than the formation or dissolution networks).
+        on the instantaneous network state 
+        (rather than the formation or dissolution networks).
         
         Proposal arguments are the same as for \code{\link[ergm:ergm-proposals]{BDStratTNT}},
         and should be passed in via the \code{\link[ergm:ergm-constraints]{bd}} and
-        \code{\link[ergm:ergm-constraints]{blocks}} constraints and the \code{\link[ergm:ergm-hints]{Strat}} hint.
+        \code{\link[ergm:ergm-constraints]{blocks}} constraints and 
+        the \code{\link[ergm:ergm-hints]{Strat}} hint.
       }    
     }  
   }
