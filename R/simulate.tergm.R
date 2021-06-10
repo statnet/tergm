@@ -65,7 +65,10 @@
 #' 
 #' Note that not all possible combinations of constraints are supported.
 #' @param monitor A one-sided formula specifying one or more terms whose
-#' value is to be monitored.
+#' value is to be monitored.  If \code{monitor} is specified as a character
+#' (one of \code{"formation"}, \code{"dissolution"}, and \code{"all"}) then
+#' the function \code{\link{.extract.fd.formulae}} is used to determine the
+#' corresponding formula; the user should be aware of its behavior and limitations.
 #' @param time.slices Number of time slices (or statistics) to return from each
 #' replication of the dynamic process. See below for return types. Defaults to
 #' 1, which, if \code{time.burnin==0} and \code{time.interval==1} (the
@@ -332,7 +335,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
     monitor <- switch(monitor,
                       formation = formula_pieces$form,
                       dissolution = formula_pieces$diss,
-                      all = { ff <- append_rhs.formula(~., unique(lapply(list_rhs.formula(formula_pieces$all), unset.offset.call))); environment(ff) <- environment(formula_pieces$all); ff }
+                      all = formula_pieces$all
                       )
   }
     
