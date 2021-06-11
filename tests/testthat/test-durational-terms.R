@@ -683,3 +683,40 @@ test_that("durational terms behave correctly with summary and godfather", {
     }
   }
 })
+
+
+test_that("edges.ageinterval behaves correctly inside a dissolution operator", {
+  local_edition(3)
+  set.seed(0)
+
+  logit <- function(p) log(p/(1-p))
+  expit <- function(x) 1/(1+exp(-x))
+
+  T <- 1000
+
+  nw <- network(16, directed=FALSE)
+  ndyads <- network.dyadcount(nw)
+
+  nwd <- simulate(nw~Form(~edges)+Diss(~edges+edges.ageinterval(3,7)), dynamic=TRUE, output="networkDynamic", coef=c(-2,2,-1/2), time.slices=T)
+  spells <- as.data.frame(nwd)
+
+  # Test dissolution hazards
+  freq <- tabulate(spells$duration)
+  surv <- rev(cumsum(rev(freq)))
+
+  haz <- freq/surv
+
+  basehaz <- weighted.mean(haz[-(3:6)], surv[-(3:6)])
+  addhaz <- weighted.mean(haz[3:3], surv[3:3])
+
+  expect_equal(basehaz, 1-expit(2), tolerance=0.05)
+  expect_equal(addhaz, 1-expit(2-1/2), tolerance=0.15)
+
+  pform <- sapply(1:T, function(t){
+    eid0 <- spells$edge.id[spells$onset<=t-1 & t-1<spells$terminus]
+    eid1 <- spells$edge.id[spells$onset<=t & t<spells$terminus]
+    sum(! eid1%in%eid0)/(ndyads-length(eid0))
+  })
+
+  expect_equal(mean(pform), expit(-2), tolerance=.05)
+})
