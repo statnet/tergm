@@ -141,7 +141,6 @@ InitErgmTerm.Form <- function(nw, arglist,  ..., env=baseenv()) {
   term <- as.call(c(list(as.name("Cross")),a))
   out <- call.ErgmTerm(term, env=env, nw=nw, ...)
   out
-  # TODO: Fix coefficient names.
 }
 
 #' @importFrom utils modifyList
@@ -154,7 +153,8 @@ InitErgmTerm.Form1 <- function(nw, arglist,  ...){
                       required = c(TRUE))
 
   m <- ergm_model(a$formula, nw, ..., offset.decorate=FALSE)
-  
+  ergm_no_ext.encode(m)
+
   c(list(name="on_union_net_Network", pkgname="ergm",
          auxiliaries = ~.union.net((nw%n%".PrevNets")[[1]], implementation="Network"),
          submodel = m),
@@ -183,7 +183,6 @@ InitErgmTerm.Diss <- function(nw, arglist,  ..., env=baseenv()) {
   term <- as.call(c(list(as.name("Cross")),a))
   out <- call.ErgmTerm(term, env=env, nw=nw, ...)
   out
-  # TODO: Fix coefficient names.
 }
 
 # One dissolution transition
@@ -195,7 +194,8 @@ InitErgmTerm.Diss1 <- function(nw, arglist,  ...){
                       required = c(TRUE))
 
   m <- ergm_model(a$formula, nw, ..., offset.decorate=FALSE)
-  
+  ergm_no_ext.encode(m)
+
   c(list(name="on_intersect_net_Network", pkgname="ergm",
          auxiliaries = ~.intersect.net((nw%n%".PrevNets")[[1]], implementation="Network"),
          submodel = m),
@@ -223,7 +223,6 @@ InitErgmTerm.Change <- function(nw, arglist,  ..., env=baseenv()) {
   term <- as.call(c(list(as.name("Cross")),a))
   out <- call.ErgmTerm(term, env=env, nw=nw, ...)
   out
-  # TODO: Fix coefficient names.
 }
 
 # One difference transition
@@ -235,7 +234,8 @@ InitErgmTerm.Change1 <- function(nw, arglist,  ...){
                       required = c(TRUE))
 
   m <- ergm_model(a$formula, nw, ..., offset.decorate=FALSE)
-  
+  ergm_no_ext.encode(m)
+
   c(list(name="on_discord_net_Network", pkgname="ergm",
          auxiliaries = ~.discord.net((nw%n%".PrevNets")[[1]], implementation="Network"),
          submodel = m),
@@ -279,6 +279,7 @@ InitErgmTerm.Cross <- function(nw, arglist, ..., env=baseenv()) {
   ms <- lapply(nwl, function(nw1){
     ergm_model(a$formula, nw1, ..., offset.decorate=FALSE)
   })
+  lapply(ms, ergm_no_ext.encode)
 
   nparams <- ms %>% map_int(nparam, canonical=FALSE)
   nstats <-  ms %>% map_int(nparam, canonical=TRUE)

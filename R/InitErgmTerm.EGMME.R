@@ -26,11 +26,8 @@ stopifnot_dynamic <- function(nw,...,dynamic=FALSE){
   c(list(name="on_union_lt_net_Network",
          auxiliaries = ~.union.lt.net + .lasttoggle + .previous.lt.net,
          submodel = m,
-         duration=TRUE,
-         ext.encode = function(el, nw0)
-           lapply(m$terms, function(trm){
-             if(!is.null(trm$ext.encode)) trm$ext.encode(el=el, nw0=nw0)
-           })),
+         duration=TRUE),
+    ergm_propagate_ext.encode(m),
     wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Form")))
 }
 
@@ -63,11 +60,8 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
   c(list(name="on_intersect_lt_net_Network",
          auxiliaries = ~.intersect.lt.net() + .lasttoggle,
          submodel = m,
-         duration=TRUE,
-         ext.encode = function(el, nw0)
-           lapply(m$terms, function(trm){
-             if(!is.null(trm$ext.encode)) trm$ext.encode(el=el, nw0=nw0)
-           })),
+         duration=TRUE),
+    ergm_propagate_ext.encode(m),
     wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Diss")))
 }
 
@@ -100,11 +94,8 @@ InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
   c(list(name="on_discord_lt_net_Network",
          auxiliaries = ~.discord.lt.net() + .lasttoggle + .previous.lt.net,
          submodel = m,
-         duration=TRUE,
-         ext.encode = function(el, nw0)
-           lapply(m$terms, function(trm){
-             if(!is.null(trm$ext.encode)) trm$ext.encode(el=el, nw0=nw0)
-           })),
+         duration=TRUE),
+    ergm_propagate_ext.encode(m),
     wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Change")))
 }
 
