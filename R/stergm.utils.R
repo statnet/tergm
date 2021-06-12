@@ -303,10 +303,11 @@ unset.offset.call <- function(object){
   signs <- attr(x, "sign")
   
   form_flags <- logical(length(x))
+  pers_flags <- logical(length(x))
   diss_flags <- logical(length(x))
     
   form <- ~.
-  diss <- ~.
+  pers <- ~.
   nonsep <- ~.
   all <- ~.
   
@@ -324,9 +325,13 @@ unset.offset.call <- function(object){
       form_flags[i] <- TRUE
       form <- append_rhs.formula(form, structure(list(quote(Sum(,label=I))), sign=sign))
       all <- append_rhs.formula(all, structure(list(quote(Sum(,label=I))), sign=sign))
+    } else if (grepl("^Persist", term[[1]])) {
+      pers_flags[i] <- TRUE
+      pers <- append_rhs.formula(pers, structure(list(quote(Sum(,label=I))), sign=sign))
+      all <- append_rhs.formula(all, structure(list(quote(Sum(,label=I))), sign=sign))
     } else if (grepl("^Diss", term[[1]])) {
       diss_flags[i] <- TRUE
-      diss <- append_rhs.formula(diss, structure(list(quote(Sum(,label=I))), sign=sign))
+      pers <- append_rhs.formula(pers, structure(list(quote(Sum(,label=I))), sign=sign))
       all <- append_rhs.formula(all, structure(list(quote(Sum(,label=I))), sign=sign))
     } else {
       nonsep <- append_rhs.formula(nonsep, structure(list(term), sign=sign))
@@ -337,28 +342,44 @@ unset.offset.call <- function(object){
   if(any(form_flags)) {
     leading_form_sign <- signs[which(form_flags)[1]]
   }
-  if(any(diss_flags)) {
-    leading_diss_sign <- signs[which(diss_flags)[1]]  
+  if(any(pers_flags | diss_flags)) {
+    leading_pers_sign <- signs[which(pers_flags | diss_flags)[1]]  
   }
   leading_sign <- signs[1]
     
   for(i in seq_along(x)) {
     if(form_flags[i]) {
+      arg <- eval(x[[i]][[2]], env = environment(formula))
+      
       pos <- sum(form_flags) - sum(form_flags[seq_len(i)])
       ind <- c(3, rep(2, pos), if(pos < sum(form_flags) - 1) 3 else if (leading_form_sign == -1) 2, 2)
-      form[[ind]] <- x[[i]][[2]]
+      form[[ind]] <- arg
       
       pos <- length(x) - i
       ind <- c(3, rep(2, pos), if(pos < length(x) - 1) 3 else if (leading_sign == -1) 2, 2)
-      all[[ind]] <- x[[i]][[2]]
+      all[[ind]] <- arg
+    } else if(pers_flags[i]) {
+      arg <- eval(x[[i]][[2]], env = environment(formula))
+
+      pos <- sum(pers_flags | diss_flags) - sum((pers_flags | diss_flags)[seq_len(i)])
+      ind <- c(3, rep(2, pos), if(pos < sum(pers_flags | diss_flags) - 1) 3 else if (leading_pers_sign == -1) 2, 2)
+      pers[[ind]] <- arg
+      
+      pos <- length(x) - i
+      ind <- c(3, rep(2, pos), if(pos < length(x) - 1) 3 else if (leading_sign == -1) 2, 2)
+      all[[ind]] <- arg
     } else if(diss_flags[i]) {
-      pos <- sum(diss_flags) - sum(diss_flags[seq_len(i)])
-      ind <- c(3, rep(2, pos), if(pos < sum(diss_flags) - 1) 3 else if (leading_diss_sign == -1) 2, 2)
-      diss[[ind]] <- x[[i]][[2]]
+      arg <- eval(x[[i]][[2]], env = environment(formula))
+      arg1 <- append_rhs.formula(~-1, arg)
+      environment(arg1) <- environment(arg)
+      
+      pos <- sum(pers_flags | diss_flags) - sum((pers_flags | diss_flags)[seq_len(i)])
+      ind <- c(3, rep(2, pos), if(pos < sum(pers_flags | diss_flags) - 1) 3 else if (leading_pers_sign == -1) 2, 2)
+      pers[[ind]] <- arg1
       
       pos <- length(x) - i
       ind <- c(3, rep(2, pos), if(pos < length(x) - 1) 3 else if (leading_sign == -1) 2, 2)
-      all[[ind]] <- x[[i]][[2]]
+      all[[ind]] <- arg1
     }
   }
   
@@ -366,8 +387,8 @@ unset.offset.call <- function(object){
     form <- form[c(1,3)]
   }
 
-  if(length(diss) == 3) {
-    diss <- diss[c(1,3)]
+  if(length(pers) == 3) {
+    pers <- pers[c(1,3)]
   }
 
   if(length(nonsep) == 3) {
@@ -379,12 +400,12 @@ unset.offset.call <- function(object){
   }
   
   environment(form) <- environment(formula)
-  environment(diss) <- environment(formula)
+  environment(pers) <- environment(formula)
   environment(nonsep) <- environment(formula)
   environment(all) <- environment(formula)
       
   list(form = form, 
-       diss = diss, 
+       pers = pers, 
        nonsep = nonsep, 
        all = all)
 }
