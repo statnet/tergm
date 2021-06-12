@@ -101,6 +101,10 @@ is passed to one of the \code{\link{simulate.stergm}} functions,
 the corresponding \code{\link{simulate.tergm}} function is invoked,
 and uses the formation proposal control arguments, ignoring the
 dissolution proposal control arguments.
+
+Note:  The old \code{dissolution} formula in \code{stergm} represents
+tie persistence.  As a result it maps to the new \code{Persist()} operator
+in \code{tergm}, NOT the \code{Diss()} operator
 }
 \seealso{
 \code{\link{simulate.stergm}},

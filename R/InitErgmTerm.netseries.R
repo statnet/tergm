@@ -60,10 +60,12 @@ join_nets <- function(nwl, blockID, blockName){
 #' # Method 1: list of networks
 #' monks <- NetSeries(list(samplk1,samplk2,samplk3))
 #' ergm(monks ~ Form(~edges)+Diss(~edges))
+#' ergm(monks ~ Form(~edges)+Persist(~edges))
 #'
 #' # Method 2: networks as arguments
 #' monks <- NetSeries(samplk1,samplk2,samplk3)
 #' ergm(monks ~ Form(~edges)+Diss(~edges))
+#' ergm(monks ~ Form(~edges)+Persist(~edges))
 #'
 #' # Method 3: networkDynamic and time points:
 #' ## TODO
@@ -163,7 +165,7 @@ InitErgmTerm.Form1 <- function(nw, arglist,  ...){
     )
 }
 
-InitErgmTerm.Diss <- function(nw, arglist,  ..., env=baseenv()) {
+InitErgmTerm.Persist <- function(nw, arglist,  ..., env=baseenv()) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
@@ -171,11 +173,11 @@ InitErgmTerm.Diss <- function(nw, arglist,  ..., env=baseenv()) {
                       required = c(TRUE))
 
   if(!is(nw, "combined_networks")) {
-    return(`InitErgmTerm.Diss (dynamic)`(nw = nw, arglist = a["formula"], ...))
+    return(`InitErgmTerm.Persist (dynamic)`(nw = nw, arglist = a["formula"], ...))
   }
 
   f <- a$formula
-  ult(f) <- call("Diss1",as.formula(call("~",ult(f)), env=env)) # e.g., a~b -> a~Form1(~b)
+  ult(f) <- call("Persist1",as.formula(call("~",ult(f)), env=env)) # e.g., a~b -> a~Form1(~b)
   environment(f) <- environment(a$formula)
   a$formula <- f
 
@@ -186,7 +188,7 @@ InitErgmTerm.Diss <- function(nw, arglist,  ..., env=baseenv()) {
 }
 
 # One dissolution transition
-InitErgmTerm.Diss1 <- function(nw, arglist,  ...){
+InitErgmTerm.Persist1 <- function(nw, arglist,  ...){
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
@@ -199,9 +201,20 @@ InitErgmTerm.Diss1 <- function(nw, arglist,  ...){
   c(list(name="on_intersect_net_Network", pkgname="ergm",
          auxiliaries = ~.intersect.net((nw%n%".PrevNets")[[1]], implementation="Network"),
          submodel = m),
-    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Diss")))
+    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Persist")))
 }
 
+InitErgmTerm.Diss <- function(nw, arglist,  ..., env=baseenv()) {
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c("formula"),
+                      vartypes = c("formula"),
+                      defaultvalues = list(NULL),
+                      required = c(TRUE))
+
+  renamer <- function(x) I(sub("^Persist~", "Diss~", x))
+  term <- call("Sum", substitute(-1~Persist(formula), list(formula=a$formula)), renamer)
+  call.ErgmTerm(term, env=env, nw=nw, ...)
+}
 
 InitErgmTerm.Change <- function(nw, arglist,  ..., env=baseenv()) {
   a <- check.ErgmTerm(nw, arglist,

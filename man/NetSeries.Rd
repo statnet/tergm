@@ -34,10 +34,12 @@ data(samplk)
 # Method 1: list of networks
 monks <- NetSeries(list(samplk1,samplk2,samplk3))
 ergm(monks ~ Form(~edges)+Diss(~edges))
+ergm(monks ~ Form(~edges)+Persist(~edges))
 
 # Method 2: networks as arguments
 monks <- NetSeries(samplk1,samplk2,samplk3)
 ergm(monks ~ Form(~edges)+Diss(~edges))
+ergm(monks ~ Form(~edges)+Persist(~edges))
 
 # Method 3: networkDynamic and time points:
 ## TODO

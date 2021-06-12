@@ -31,7 +31,11 @@ networks (for CMLE and CMPLE).
 \code{stergm} understands the \code{\link{lasttoggle}} "API".}
 
 \item{formation, dissolution}{One-sided \code{\link{ergm}}-style formulas for
-the formation and dissolution models, respectively.}
+the formation and dissolution models, respectively.  In \code{stergm},
+the dissolution formula is parameterized in
+terms of tie persistence: negative coefficients imply lower rates of persistence
+and postive coefficients imply higher rates.  The dissolution effects are simply the
+negation of these coefficients.}
 
 \item{constraints}{A one-sided formula specifying one or more constraints on
 the support of the distribution of the networks being modeled, using syntax
@@ -112,6 +116,21 @@ Conditional MLE (CMLE) (Krivitsky and Handcock, 2010) and Equilibrium
 Generalized Method of Moments Estimator (EGMME) (Krivitsky, 2009).
 }
 \details{
+This function is included for backwards compatibility, and users are
+encouraged to use the new \code{tergm} family of functions instead.
+
+The \code{stergm} function uses a pair of formulas, \code{formation} and
+\code{dissolution} to model tie-dynamics.  The dissolution formula, however, is
+parameterized in terms of tie persistence: negative coefficients imply lower
+rates of persistence and postive coefficients imply higher rates.
+The dissolution effects are simply the negation of these coefficients, but
+the discrepancy between the terminology and interpretation has always been
+unfortunate, and we have fixed this in the new \code{tergm} function.
+
+If you are making the transition from old \code{stergm} to new \code{tergm}, note that
+the \code{dissolution} formula in \code{stergm} maps to the new \code{Persist()}
+operator in the \code{tergm} function, NOT the \code{Diss()} operator.
+
 \strong{Model Terms} See \code{\link{ergm}} and \code{\link{ergm-terms}} for
 details. At this time, only linear ERGM terms are allowed.  \itemize{
 \item For a brief demonstration, please see the tergm package vignette:

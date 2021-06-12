@@ -20,7 +20,7 @@ impute missing dyads. Currenly implemented methods are as
 follows: \describe{ \item{\code{next}}{Impute the state of the same
 dyad in the next network in the list (or later, if that one is
 also missing).  This imputation method is likely to lead to an
-underestimation of the formation and dissolution rates. The last
+underestimation of the tie-change rates. The last
 network in the list cannot be imputed this way.}
 \item{\code{previous}}{Impute the state of the same dyad in
 the previous network in the list (or earlier, if that one is also

@@ -62,11 +62,11 @@ supports \code{nsim=1}.}
 \item{seed}{Random number integer seed.  See \code{\link[base]{set.seed}}.}
 
 \item{formation, dissolution}{One-sided \code{\link{ergm}}-style formulas for
-the formation and dissolution models, respectively.}
+the formation and dissolution models, respectively.  The dissolution model is parameterized in terms of tie persistence.}
 
 \item{coef.form}{Parameters for the formation model.}
 
-\item{coef.diss}{Parameters for the dissolution model.}
+\item{coef.diss}{Parameters for the dissolution (persistence) model.}
 
 \item{constraints}{A one-sided formula specifying one or more constraints on
 the support of the distribution of the networks being modeled, using syntax
@@ -147,6 +147,15 @@ code make use of the \code{simulate_formula.network} and
 }
 \details{
 Note that return values may be structured differently than in past versions.
+
+Remember that in \code{stergm}, the dissolution formula is parameterized in
+terms of tie persistence: negative coefficients imply lower rates of persistence
+and postive coefficients imply higher rates.  The dissolution effects are simply the
+negation of these coefficients.
+
+Because the old \code{dissolution} formula in \code{stergm} represents
+tie persistence, it maps to the new \code{Persist()} operator
+in the \code{tergm} function, NOT the \code{Diss()} operator
 }
 \examples{
 logit<-function(p)log(p/(1-p))

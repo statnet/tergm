@@ -47,7 +47,7 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
 }
 
 
-`InitErgmTerm.Diss (dynamic)` <- function(nw, arglist,  ...) {
+`InitErgmTerm.Persist (dynamic)` <- function(nw, arglist,  ...) {
   stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
@@ -62,7 +62,7 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
          submodel = m,
          duration=TRUE),
     ergm_propagate_ext.encode(m),
-    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Diss")))
+    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Persist")))
 }
 
 InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
