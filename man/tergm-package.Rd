@@ -56,7 +56,7 @@ Exponential-Family Random Graph Models
   papers.
   
   If you previously used the \code{stergm} function in this package, please note that
-  \code{stergm} has been superceded by the new \{tergm} function, and is likely to be
+  \code{stergm} has been superceded by the new \code{\link{tergm}} function, and is likely to be
   deprecated in future releases.  The \code{dissolution} formula in \code{stergm} 
   maps to the new \code{Persist()} operator in the \code{tergm} function, 
   NOT the \code{Diss()} operator.
