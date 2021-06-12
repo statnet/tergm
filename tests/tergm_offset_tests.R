@@ -18,20 +18,20 @@ opttest({
   # default initialization
   mod1 <- tergm(flobusiness ~ Form(~edges) + Form(~offset(degree(3))) + Persist(~offset(edges)),
                  offset.coef=c(0.8,log(9)), 
-                 targets="formation",
+                 targets=~edges,
                  estimate="EGMME"
   )
   
   # init.method set to zeros works
   mod2 <- tergm(flobusiness ~ Form(~edges + offset(degree(3))) + Persist(~offset(edges)),
                  offset.coef=c(0.8,log(9)), 
-                 targets="formation",
+                 targets=~edges,
                  estimate="EGMME",control=control.tergm(init.method='zeros'))
   
   # this works, auto defaulting SAN coefs if they are different from stergm init.form
   mod3 <- tergm(flobusiness ~ Form(~edges) + Form(~offset(degree(3))) + Persist(~offset(edges)),
                  offset.coef=c(0.8,log(9)), 
-                 targets="formation", estimate="EGMME",   
+                 targets=~edges, estimate="EGMME",   
                  control=control.tergm(init=c(-3,0.8,log(9)))
   )
   
