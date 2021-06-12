@@ -230,14 +230,14 @@ simulate.network <- function(object, nsim=1, seed=NULL,
     attributes(rv) <- c(attributes(rv), list(coef.form = coef.form, coef.diss = coef.diss))
     stats.gen <- attr(rv, "stats.gen")
     if(NCOL(stats.gen) > 0) {
-      attr(rv, "stats.form") <- stats.gen[,grepl("Form", colnames(stats.gen)),drop=FALSE]
-      attr(rv, "stats.diss") <- stats.gen[,grepl("Diss", colnames(stats.gen)),drop=FALSE]    
+      attr(rv, "stats.form") <- stats.gen[,grepl("^Form~", colnames(stats.gen)) | grepl("^offset\\(Form~", colnames(stats.gen)),drop=FALSE]
+      attr(rv, "stats.diss") <- stats.gen[,grepl("^Persist~", colnames(stats.gen)) | grepl("^offset\\(Persist~", colnames(stats.gen)) | grepl("^Diss~", colnames(stats.gen)) | grepl("^offset\\(Diss~", colnames(stats.gen)),drop=FALSE]    
     }
   } else {
     stats.gen <- rv$stats.gen
     if(NCOL(stats.gen) > 0) {
-      rv$stats.form <- stats.gen[,grepl("Form", colnames(stats.gen)),drop=FALSE]
-      rv$stats.diss <- stats.gen[,grepl("Diss", colnames(stats.gen)),drop=FALSE]
+      rv$stats.form <- stats.gen[,grepl("^Form~", colnames(stats.gen)) | grepl("^offset\\(Form~", colnames(stats.gen)),drop=FALSE]
+      rv$stats.diss <- stats.gen[,grepl("^Persist~", colnames(stats.gen)) | grepl("^offset\\(Persist~", colnames(stats.gen)),drop=FALSE]    
     }
   }
   
@@ -273,14 +273,14 @@ simulate.networkDynamic <- function(object, nsim=1, seed=NULL,
     attributes(rv) <- c(attributes(rv), list(coef.form = coef.form, coef.diss = coef.diss))
     stats.gen <- attr(rv, "stats.gen")
     if(NCOL(stats.gen) > 0) {
-      attr(rv, "stats.form") <- stats.gen[,grepl("Form", colnames(stats.gen)),drop=FALSE]
-      attr(rv, "stats.diss") <- stats.gen[,grepl("Diss", colnames(stats.gen)),drop=FALSE]    
+      attr(rv, "stats.form") <- stats.gen[,grepl("^Form~", colnames(stats.gen)) | grepl("^offset\\(Form~", colnames(stats.gen)),drop=FALSE]
+      attr(rv, "stats.diss") <- stats.gen[,grepl("^Persist~", colnames(stats.gen)) | grepl("^offset\\(Persist~", colnames(stats.gen)),drop=FALSE]    
     }
   } else {
     stats.gen <- rv$stats.gen
     if(NCOL(stats.gen) > 0) {
-      rv$stats.form <- stats.gen[,grepl("Form", colnames(stats.gen)),drop=FALSE]
-      rv$stats.diss <- stats.gen[,grepl("Diss", colnames(stats.gen)),drop=FALSE]
+      rv$stats.form <- stats.gen[,grepl("^Form~", colnames(stats.gen)) | grepl("^offset\\(Form~", colnames(stats.gen)),drop=FALSE]
+      rv$stats.diss <- stats.gen[,grepl("^Persist~", colnames(stats.gen)) | grepl("^offset\\(Persist~", colnames(stats.gen)),drop=FALSE]    
     }
   }
   

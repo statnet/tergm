@@ -326,7 +326,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
     
     monitor <- switch(monitor,
                       formation = formula_pieces$form,
-                      dissolution = formula_pieces$diss,
+                      dissolution = formula_pieces$pers,
                       all = formula_pieces$all
                       )
   }

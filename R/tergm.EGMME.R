@@ -24,7 +24,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
   if(is.character(targets)) {    
     targets <- switch(targets,
                       formation = .extract.fd.formulae(formula)$form,
-                      dissolution = .extract.fd.formulae(formula)$diss)
+                      dissolution = .extract.fd.formulae(formula)$pers)
   }
   
   if(length(targets)==3) {

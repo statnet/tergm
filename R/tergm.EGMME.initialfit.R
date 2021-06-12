@@ -20,7 +20,7 @@ tergm.EGMME.initialfit<-function(init, nw, model, formula, model.mon, formula.mo
     fd.formulae <- .extract.fd.formulae(formula)
     
     form <- fd.formulae$form
-    diss <- fd.formulae$diss
+    diss <- fd.formulae$pers
     nonsep <- fd.formulae$nonsep
     
     model.form <- ergm_model(form, nw=nw, dynamic=TRUE, term.options=control$term.options)
@@ -32,8 +32,8 @@ tergm.EGMME.initialfit<-function(init, nw, model, formula, model.mon, formula.mo
       stop("No initial parameter method for specified model and targets combination is implemented. Specify via control$init.")    
     }
     
-    wf <- which(grepl("Form", model$coef.names))
-    wd <- which(grepl("Diss", model$coef.names))
+    wf <- which(grepl("^Form~", model$coef.names) | grepl("^offset\\(Form~", model$coef.names))
+    wd <- which(grepl("^Persist~", model$coef.names) | grepl("^offset\\(Persist~", model$coef.names) | grepl("^Diss~", model$coef.names) | grepl("^offset\\(Diss~", model$coef.names))
     
     init.form <- init[wf]
     init.diss <- init[wd]
