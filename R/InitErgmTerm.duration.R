@@ -10,6 +10,7 @@
 
 
 InitErgmTerm.edges.ageinterval<-function(nw, arglist, ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("from","to"),
                       vartypes = c("numeric","numeric"),
@@ -34,6 +35,7 @@ else if(any(from>=to)) stop("Term edges.ageinterval must have from<to.")
 }
 
 InitErgmTerm.edge.ages<-function(nw, arglist, ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist)
   
   list(name="edge_ages",
@@ -44,6 +46,7 @@ InitErgmTerm.edge.ages<-function(nw, arglist, ...) {
 }
 
 InitErgmTerm.mean.age<-function(nw, arglist, ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("emptyval","log"),
                       vartypes = c("numeric","logical"),
@@ -61,6 +64,7 @@ InitErgmTerm.mean.age<-function(nw, arglist, ...) {
 }
 
 InitErgmTerm.nodefactor.mean.age <- function(nw, arglist, ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("attr", "levels", "emptyval", "log"),
                       vartypes = c(ERGM_VATTR_SPEC, ERGM_LEVELS_SPEC, "numeric", "logical"),
@@ -105,6 +109,7 @@ InitErgmTerm.nodefactor.mean.age <- function(nw, arglist, ...) {
 }
 
 InitErgmTerm.nodemix.mean.age <- function(nw, arglist, ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("attr", "b1levels", "b2levels", "levels", "levels2", "emptyval", "log"),
                       vartypes = c(ERGM_VATTR_SPEC, ERGM_LEVELS_SPEC, ERGM_LEVELS_SPEC, ERGM_LEVELS_SPEC, ERGM_LEVELS_SPEC, "numeric", "logical"),
@@ -224,6 +229,7 @@ InitErgmTerm.nodemix.mean.age <- function(nw, arglist, ...) {
 
 
 InitErgmTerm.edgecov.mean.age<-function(nw, arglist, ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist, 
                       varnames = c("x", "attrname", "emptyval", "log"),
                       vartypes = c("matrix,network,character", "character", "numeric", "logical"),
@@ -254,6 +260,7 @@ InitErgmTerm.edgecov.mean.age<-function(nw, arglist, ...) {
 }
 
 InitErgmTerm.edgecov.ages<-function(nw, arglist, ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist, 
                       varnames = c("x", "attrname"),
                       vartypes = c("matrix,network,character", "character"),
@@ -285,6 +292,7 @@ InitErgmTerm.edgecov.ages<-function(nw, arglist, ...) {
 
 ################################################################################
 InitErgmTerm.degree.mean.age<-function(nw, arglist, ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist, directed=FALSE,
                       varnames = c("d", "byarg", "emptyval", "log"),
                       vartypes = c("numeric", ERGM_VATTR_SPEC, "numeric", "logical"),
@@ -327,6 +335,7 @@ InitErgmTerm.degree.mean.age<-function(nw, arglist, ...) {
 
 ################################################################################
 InitErgmTerm.degrange.mean.age<-function(nw, arglist, ...) {
+  stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist, directed=FALSE,
                       varnames = c("from", "to", "byarg", "emptyval", "log"),
                       vartypes = c("numeric", "numeric", ERGM_VATTR_SPEC, "numeric", "logical"),

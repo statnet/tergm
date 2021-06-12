@@ -8,8 +8,6 @@
 #  Copyright 2008-2020 Statnet Commons
 #######################################################################
 
-context("test-durational-terms.R")
-
 test_that("durational terms behave correctly with summary and godfather", {
   # nwtype = 1 is undirected unipartite
   # nwtype = 2 is undirected bipartite
@@ -234,25 +232,25 @@ test_that("durational terms behave correctly with summary and godfather", {
       elb[,2] <- elb[,2] - bipsize
     }
   
-    expect_equal(unname(summary(nw0 ~ mean.age(emptyval=4321.4))), 4321.4)  
+    expect_equal(unname(summary(dynamic=TRUE, nw0 ~ mean.age(emptyval=4321.4))), 4321.4)  
     expect_equal(unname(summary(nw ~ mean.age)), mean(init_time - init.lasttoggle.times + 1))
     
-    expect_equal(unname(summary(nw0 ~ edge.ages)), 0)  
+    expect_equal(unname(summary(dynamic=TRUE, nw0 ~ edge.ages)), 0)  
     expect_equal(unname(summary(nw ~ edge.ages)), sum(init_time - init.lasttoggle.times + 1))
     
-    expect_equal(unname(summary(nw0 ~ edgecov.ages("edgewts"))), 0)  
+    expect_equal(unname(summary(dynamic=TRUE, nw0 ~ edgecov.ages("edgewts"))), 0)  
     expect_equal(unname(summary(nw ~ edgecov.ages("edgewts"))), sum(wts[elb]*(init_time - init.lasttoggle.times + 1)))
     
-    expect_equal(unname(summary(nw0 ~ edgecov.mean.age("edgewts", emptyval=pi^4/25))), pi^4/25)  
+    expect_equal(unname(summary(dynamic=TRUE, nw0 ~ edgecov.mean.age("edgewts", emptyval=pi^4/25))), pi^4/25)  
     expect_equal(unname(summary(nw ~ edgecov.mean.age("edgewts"))), sum(wts[elb]*(init_time - init.lasttoggle.times + 1))/sum(wts[elb]))
       
-    expect_equal(unname(summary(nw0 ~ mean.age(emptyval=pi^3/83, log=TRUE))), pi^3/83)    
+    expect_equal(unname(summary(dynamic=TRUE, nw0 ~ mean.age(emptyval=pi^3/83, log=TRUE))), pi^3/83)    
     expect_equal(unname(summary(nw ~ mean.age(log=TRUE))), mean(log(init_time - init.lasttoggle.times + 1)))
   
-    expect_equal(unname(summary(nw0 ~ edgecov.mean.age("edgewts", emptyval=pi^4/25, log=TRUE))), pi^4/25)  
+    expect_equal(unname(summary(dynamic=TRUE, nw0 ~ edgecov.mean.age("edgewts", emptyval=pi^4/25, log=TRUE))), pi^4/25)  
     expect_equal(unname(summary(nw ~ edgecov.mean.age("edgewts", log=TRUE))), sum(wts[elb]*log(init_time - init.lasttoggle.times + 1))/sum(wts[elb]))
       
-    expect_equal(unname(summary(nw0 ~ edges.ageinterval(from=ages_from, to=ages_to))), integer(length(ages_from)))  
+    expect_equal(unname(summary(dynamic=TRUE, nw0 ~ edges.ageinterval(from=ages_from, to=ages_to))), integer(length(ages_from)))  
     expect_equal(unname(summary(nw ~ edges.ageinterval(from=ages_from, to=ages_to))), init_age_counts)  
 
     ## nodefactor/nodemix mean age tests
@@ -313,10 +311,10 @@ test_that("durational terms behave correctly with summary and godfather", {
     
     ## will need to get extraction of correct values as below; ellt is named lt and constructed already above
     
-    expect_equal(unname(summary(nw0 ~ nodefactor.mean.age("mean_age_attr"))), rep(0, n_nodefactor_stats))
-    expect_equal(unname(summary(nw0 ~ nodefactor.mean.age("mean_age_attr", levels=nodefactor_ma_lev))), rep(0, length(nodefactor_ma_lev)))
-    expect_equal(unname(summary(nw0 ~ nodefactor.mean.age("mean_age_attr", levels=nodefactor_ma_lev, emptyval=nodefactor_emptyvals))), nodefactor_emptyvals)
-    expect_equal(unname(summary(nw0 ~ nodefactor.mean.age("mean_age_attr", levels=nodefactor_ma_lev, emptyval=nodefactor_emptyvals, log=TRUE))), nodefactor_emptyvals)
+    expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodefactor.mean.age("mean_age_attr"))), rep(0, n_nodefactor_stats))
+    expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodefactor.mean.age("mean_age_attr", levels=nodefactor_ma_lev))), rep(0, length(nodefactor_ma_lev)))
+    expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodefactor.mean.age("mean_age_attr", levels=nodefactor_ma_lev, emptyval=nodefactor_emptyvals))), nodefactor_emptyvals)
+    expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodefactor.mean.age("mean_age_attr", levels=nodefactor_ma_lev, emptyval=nodefactor_emptyvals, log=TRUE))), nodefactor_emptyvals)
 
     expect_equal(unname(summary(nw ~ nodefactor.mean.age("mean_age_attr"))), nodefactor_vals)
     expect_equal(unname(summary(nw ~ nodefactor.mean.age("mean_age_attr", levels=nodefactor_ma_lev))), nodefactor_vals[nodefactor_ma_lev])
@@ -329,13 +327,13 @@ test_that("durational terms behave correctly with summary and godfather", {
     expect_equal(unname(summary(nw ~ nodefactor.mean.age("mean_age_attr", levels=nodefactor_ma_lev, emptyval=nodefactor_emptyvals, log=TRUE))), nodefactor_log_vals[nodefactor_ma_lev])
  
     if(nwtype == 2) {
-      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr"))), rep(0, n_nodemix_stats))
-      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev))), rep(0, length(nodemix_indices_1)))
-      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", levels2=nodemix_ma_lev2))), rep(0, length(nodemix_ma_lev2)))
-      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, log=TRUE))), rep(0, length(nodemix_indices_1)))
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodemix.mean.age("mean_age_attr"))), rep(0, n_nodemix_stats))
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev))), rep(0, length(nodemix_indices_1)))
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodemix.mean.age("mean_age_attr", levels2=nodemix_ma_lev2))), rep(0, length(nodemix_ma_lev2)))
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, log=TRUE))), rep(0, length(nodemix_indices_1)))
    
-      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, log=TRUE, emptyval=nodemix_emptyvals))), nodemix_emptyvals)
-      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, levels2=nodemix_ma_lev2, log=TRUE, emptyval=nodemix_emptyvals[nodemix_ma_lev2]))), nodemix_emptyvals[nodemix_ma_lev2])
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, log=TRUE, emptyval=nodemix_emptyvals))), nodemix_emptyvals)
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, levels2=nodemix_ma_lev2, log=TRUE, emptyval=nodemix_emptyvals[nodemix_ma_lev2]))), nodemix_emptyvals[nodemix_ma_lev2])
    
       expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr"))), nodemix_vals)
       expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev))), nodemix_vals[nodemix_indices_1])
@@ -349,13 +347,13 @@ test_that("durational terms behave correctly with summary and godfather", {
       expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, log=TRUE, emptyval=nodemix_emptyvals))), nodemix_log_vals[nodemix_indices_1])
       expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr", b1levels=nodemix_ma_b1lev, b2levels=nodemix_ma_b2lev, levels2=nodemix_ma_lev2, log=TRUE, emptyval=nodemix_emptyvals[nodemix_ma_lev2]))), nodemix_log_vals[nodemix_indices_2])
     } else {    
-      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr"))), rep(0, n_nodemix_stats))
-      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev))), rep(0, length(nodemix_indices_1)))
-      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", levels2=nodemix_ma_lev2))), rep(0, length(nodemix_ma_lev2)))
-      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev, log=TRUE))), rep(0, length(nodemix_indices_1)))
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodemix.mean.age("mean_age_attr"))), rep(0, n_nodemix_stats))
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev))), rep(0, length(nodemix_indices_1)))
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodemix.mean.age("mean_age_attr", levels2=nodemix_ma_lev2))), rep(0, length(nodemix_ma_lev2)))
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev, log=TRUE))), rep(0, length(nodemix_indices_1)))
    
-      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev, log=TRUE, emptyval=nodemix_emptyvals))), nodemix_emptyvals)
-      expect_equal(unname(summary(nw0 ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev, levels2=nodemix_ma_lev2, log=TRUE, emptyval=nodemix_emptyvals[nodemix_ma_lev2]))), nodemix_emptyvals[nodemix_ma_lev2])
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev, log=TRUE, emptyval=nodemix_emptyvals))), nodemix_emptyvals)
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev, levels2=nodemix_ma_lev2, log=TRUE, emptyval=nodemix_emptyvals[nodemix_ma_lev2]))), nodemix_emptyvals[nodemix_ma_lev2])
    
       expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr"))), nodemix_vals)
       expect_equal(unname(summary(nw ~ nodemix.mean.age("mean_age_attr", levels=nodemix_ma_lev))), nodemix_vals[nodemix_indices_1])
@@ -371,28 +369,28 @@ test_that("durational terms behave correctly with summary and godfather", {
     }
   
     if(nwtype < 3) {
-      expect_equal(unname(summary(nw0 ~ degree.mean.age(degree_vec, emptyval=0345.4))), rep(0345.4, length(degree_vec)))  
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ degree.mean.age(degree_vec, emptyval=0345.4))), rep(0345.4, length(degree_vec)))  
       expect_equal(unname(summary(nw ~ degree.mean.age(degree_vec))), drma_from_el_lt(degree_vec, degree_vec + 1, lt, init_time, 0))
     
-      expect_equal(unname(summary(nw0 ~ degrange.mean.age(degrange_from, degrange_to, emptyval=1345.4))), rep(1345.4, length(degrange_from)))  
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ degrange.mean.age(degrange_from, degrange_to, emptyval=1345.4))), rep(1345.4, length(degrange_from)))  
       expect_equal(unname(summary(nw ~ degrange.mean.age(degrange_from, degrange_to))), drma_from_el_lt(degrange_from, degrange_to, lt, init_time, 0))
     
-      expect_equal(unname(summary(nw0 ~ degree.mean.age(degree_vec, attrname, emptyval=2345.4))), rep(2345.4, length(degree_vec)*length(levels)))  
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ degree.mean.age(degree_vec, attrname, emptyval=2345.4))), rep(2345.4, length(degree_vec)*length(levels)))  
       expect_equal(unname(summary(nw ~ degree.mean.age(degree_vec, attrname))), drma_from_el_lt(degree_vec, degree_vec + 1, lt, init_time, 0, attr))
     
-      expect_equal(unname(summary(nw0 ~ degrange.mean.age(degrange_from, degrange_to, attrname, emptyval=3345.4))), rep(3345.4, length(degrange_from)*length(levels)))  
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ degrange.mean.age(degrange_from, degrange_to, attrname, emptyval=3345.4))), rep(3345.4, length(degrange_from)*length(levels)))  
       expect_equal(unname(summary(nw ~ degrange.mean.age(degrange_from, degrange_to, attrname))), drma_from_el_lt(degrange_from, degrange_to, lt, init_time, 0, attr))
     
-      expect_equal(unname(summary(nw0 ~ degree.mean.age(degree_vec, emptyval=4345.4, log=TRUE))), rep(4345.4, length(degree_vec)))  
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ degree.mean.age(degree_vec, emptyval=4345.4, log=TRUE))), rep(4345.4, length(degree_vec)))  
       expect_equal(unname(summary(nw ~ degree.mean.age(degree_vec, log=TRUE))), drma_from_el_lt(degree_vec, degree_vec + 1, lt, init_time, 0, log=TRUE))
     
-      expect_equal(unname(summary(nw0 ~ degrange.mean.age(degrange_from, degrange_to, emptyval=5345.4, log=TRUE))), rep(5345.4, length(degrange_from)))  
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ degrange.mean.age(degrange_from, degrange_to, emptyval=5345.4, log=TRUE))), rep(5345.4, length(degrange_from)))  
       expect_equal(unname(summary(nw ~ degrange.mean.age(degrange_from, degrange_to, log=TRUE))), drma_from_el_lt(degrange_from, degrange_to, lt, init_time, 0, log=TRUE))
     
-      expect_equal(unname(summary(nw0 ~ degree.mean.age(degree_vec, attrname, emptyval=6345.4, log=TRUE))), rep(6345.4, length(degree_vec)*length(levels)))  
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ degree.mean.age(degree_vec, attrname, emptyval=6345.4, log=TRUE))), rep(6345.4, length(degree_vec)*length(levels)))  
       expect_equal(unname(summary(nw ~ degree.mean.age(degree_vec, attrname, log=TRUE))), drma_from_el_lt(degree_vec, degree_vec + 1, lt, init_time, 0, attr, log=TRUE))
     
-      expect_equal(unname(summary(nw0 ~ degrange.mean.age(degrange_from, degrange_to, attrname, emptyval=7345.4, log=TRUE))), rep(7345.4, length(degrange_from)*length(levels)))  
+      expect_equal(unname(summary(dynamic=TRUE, nw0 ~ degrange.mean.age(degrange_from, degrange_to, attrname, emptyval=7345.4, log=TRUE))), rep(7345.4, length(degrange_from)*length(levels)))  
       expect_equal(unname(summary(nw ~ degrange.mean.age(degrange_from, degrange_to, attrname, log=TRUE))), drma_from_el_lt(degrange_from, degrange_to, lt, init_time, 0, attr, log=TRUE))
     }
   
@@ -684,4 +682,41 @@ test_that("durational terms behave correctly with summary and godfather", {
       expect_equal(rep(7345.4, length(degrange_from)*length(levels)), unname(rv[toggle_tmax + 1 - init_time, (last_index + 1):(last_index + length(degrange_from)*length(levels))]))
     }
   }
+})
+
+
+test_that("edges.ageinterval behaves correctly inside a dissolution operator", {
+  local_edition(3)
+  set.seed(0)
+
+  logit <- function(p) log(p/(1-p))
+  expit <- function(x) 1/(1+exp(-x))
+
+  T <- 1000
+
+  nw <- network(16, directed=FALSE)
+  ndyads <- network.dyadcount(nw)
+
+  nwd <- simulate(nw~Form(~edges)+Diss(~edges+edges.ageinterval(3,7)), dynamic=TRUE, output="networkDynamic", coef=c(-2,2,-1/2), time.slices=T)
+  spells <- as.data.frame(nwd)
+
+  # Test dissolution hazards
+  freq <- tabulate(spells$duration)
+  surv <- rev(cumsum(rev(freq)))
+
+  haz <- freq/surv
+
+  basehaz <- weighted.mean(haz[-(3:6)], surv[-(3:6)])
+  addhaz <- weighted.mean(haz[3:3], surv[3:3])
+
+  expect_equal(basehaz, 1-expit(2), tolerance=0.05)
+  expect_equal(addhaz, 1-expit(2-1/2), tolerance=0.15)
+
+  pform <- sapply(1:T, function(t){
+    eid0 <- spells$edge.id[spells$onset<=t-1 & t-1<spells$terminus]
+    eid1 <- spells$edge.id[spells$onset<=t & t<spells$terminus]
+    sum(! eid1%in%eid0)/(ndyads-length(eid0))
+  })
+
+  expect_equal(mean(pform), expit(-2), tolerance=.05)
 })

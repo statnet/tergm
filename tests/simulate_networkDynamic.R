@@ -63,7 +63,7 @@ coef.diss <- log(mean.rel.dur-1)
 formation.with.stnet <- update.formula(formation,msm.startnet~.)
 msm.startnet <- network.collapse(msm.sim,at=0)
 msm.est <- ergm(formation.with.stnet,target.stats=target.stats)
-coef.form <- msm.est$coef
+coef.form <- coef(msm.est)
 coef.form[1] <- coef.form[1] - coef.diss
 msm.edgelist <- as.edgelist(simulate(msm.est,dynamic=FALSE))
 add.edges(msm.sim,msm.edgelist[,1],msm.edgelist[,2])
@@ -105,7 +105,7 @@ formation.with.stnet <- update.formula(formation,msm.startnet~.)
 # simulate a set of edges to use as the starting point for the network
 msm.startnet <- network.collapse(msm.sim,at=0)
 msm.est <- ergm(formation.with.stnet,target.stats=target.stats)
-coef.form <- msm.est$coef
+coef.form <- coef(msm.est)
 coef.form[1] <- coef.form[1] - coef.diss
 msm.edgelist <- as.edgelist(simulate(msm.est,dynamic=FALSE))
 add.edges(msm.sim,msm.edgelist[,1],msm.edgelist[,2])
@@ -201,7 +201,7 @@ formation.with.stnet <- update.formula(formation,msm.startnet~.)
 # simulate a set of edges to use as the starting point for the network
 msm.startnet <- network.collapse(msm.sim,at=0)
 msm.est <- ergm(formation.with.stnet,target.stats=target.stats)
-coef.form <- msm.est$coef
+coef.form <- coef(msm.est)
 coef.form[1] <- coef.form[1] - coef.diss
 msm.edgelist <- as.edgelist(simulate(msm.est,dynamic=FALSE))
 add.edges(msm.sim,msm.edgelist[,1],msm.edgelist[,2])
@@ -297,7 +297,7 @@ nw <- set.vertex.attribute(nw, "loc", rep(0:1, each = n/2))
 fit <- ergm(nw ~ edges + offset(nodemix("loc", levels2=-c(1, 3))),
             target.stats = 3,
             offset.coef = -Inf)
-coef.form <- fit$coef
+coef.form <- coef(fit)
 coef.form[1] <- coef.form[1] - log(40-1)
 
 fit.sim <- simulate(fit, dynamic=FALSE)

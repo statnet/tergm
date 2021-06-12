@@ -7,14 +7,14 @@
  *
  *  Copyright 2008-2020 Statnet Commons
  */
+#include "ergm_util.h"
 #include "tergm_model.h"
 #include "tergm_changestats_auxnet.h"
 
 I_CHANGESTAT_FN(i_on_union_lt_net_Network){
   GET_STORAGE(Model, m);
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
-  STORAGE = m = ModelInitialize(getListElement(mtp->R, "submodel"),  NULL, auxnet->onwp, FALSE);
-  DELETE_IF_UNUSED_IN_SUBMODEL(u_func, m);
+  STORAGE = m = ModelInitialize(getListElement(mtp->R, "submodel"), isNULL(mtp->ext_state) ? NULL : mtp->ext_state, auxnet->onwp, FALSE);
 }
 
 C_CHANGESTAT_FN(c_on_union_lt_net_Network){
@@ -31,11 +31,12 @@ C_CHANGESTAT_FN(c_on_union_lt_net_Network){
 }
 
 X_CHANGESTAT_FN(x_on_union_lt_net_Network){
+  GET_STORAGE(Model, m);
+  GET_AUX_STORAGE(StoreAuxnet, auxnet);
+
   switch(type){
   case TICK:
     {
-      GET_STORAGE(Model, m);
-      GET_AUX_STORAGE(StoreAuxnet, auxnet);
       GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
       TailHead dyad;
       // Here, we want (y0|y1) / y1: edges in y0 but not in y1.
@@ -58,6 +59,8 @@ X_CHANGESTAT_FN(x_on_union_lt_net_Network){
     break;
   default: break;
   }
+
+  PROPAGATE_X_SIGNAL_ADDONTO(auxnet->onwp, m, CHANGE_STAT);
 }
 
 Z_CHANGESTAT_FN(z_on_union_lt_net_Network){
@@ -84,8 +87,7 @@ F_CHANGESTAT_FN(f_on_union_lt_net_Network){
 I_CHANGESTAT_FN(i_on_intersect_lt_net_Network){
   GET_STORAGE(Model, m);
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
-  STORAGE = m = ModelInitialize(getListElement(mtp->R, "submodel"),  NULL, auxnet->onwp, FALSE);
-  DELETE_IF_UNUSED_IN_SUBMODEL(u_func, m);
+  STORAGE = m = ModelInitialize(getListElement(mtp->R, "submodel"), isNULL(mtp->ext_state) ? NULL : mtp->ext_state, auxnet->onwp, FALSE);
 }
 
 C_CHANGESTAT_FN(c_on_intersect_lt_net_Network){
@@ -102,11 +104,12 @@ C_CHANGESTAT_FN(c_on_intersect_lt_net_Network){
 }
 
 X_CHANGESTAT_FN(x_on_intersect_lt_net_Network){
+  GET_STORAGE(Model, m);
+  GET_AUX_STORAGE(StoreAuxnet, auxnet);
+
   switch(type){
   case TICK:
     {
-      GET_STORAGE(Model, m);
-      GET_AUX_STORAGE(StoreAuxnet, auxnet);
       GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
       TailHead dyad;
       // Here, we want (y0&y1) / y0: edges in y1 but not in y0.
@@ -129,6 +132,8 @@ X_CHANGESTAT_FN(x_on_intersect_lt_net_Network){
     break;
   default: break;
   }
+
+  PROPAGATE_X_SIGNAL_ADDONTO(auxnet->onwp, m, CHANGE_STAT);
 }
 
 Z_CHANGESTAT_FN(z_on_intersect_lt_net_Network){
@@ -155,8 +160,7 @@ F_CHANGESTAT_FN(f_on_intersect_lt_net_Network){
 I_CHANGESTAT_FN(i_on_discord_lt_net_Network){
   GET_STORAGE(Model, m);
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
-  STORAGE = m = ModelInitialize(getListElement(mtp->R, "submodel"),  NULL, auxnet->onwp, FALSE);
-  DELETE_IF_UNUSED_IN_SUBMODEL(u_func, m);
+  STORAGE = m = ModelInitialize(getListElement(mtp->R, "submodel"), isNULL(mtp->ext_state) ? NULL : mtp->ext_state, auxnet->onwp, FALSE);
 }
 
 C_CHANGESTAT_FN(c_on_discord_lt_net_Network){
@@ -173,11 +177,12 @@ C_CHANGESTAT_FN(c_on_discord_lt_net_Network){
 }
 
 X_CHANGESTAT_FN(x_on_discord_lt_net_Network){
+  GET_STORAGE(Model, m);
+  GET_AUX_STORAGE(StoreAuxnet, auxnet);
+
   switch(type){
   case TICK:
     {
-      GET_STORAGE(Model, m);
-      GET_AUX_STORAGE(StoreAuxnet, auxnet);
       GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
       TailHead dyad;
       // TODO: Optimize.
@@ -197,6 +202,8 @@ X_CHANGESTAT_FN(x_on_discord_lt_net_Network){
     break;
   default: break;
   }
+
+  PROPAGATE_X_SIGNAL_ADDONTO(auxnet->onwp, m, CHANGE_STAT);
 }
 
 Z_CHANGESTAT_FN(z_on_discord_lt_net_Network){

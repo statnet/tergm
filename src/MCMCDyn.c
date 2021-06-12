@@ -212,8 +212,6 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
 
  */
 
-// TODO: Provide a way for these to access discord. (Use extra.aux to request the auxiliary.)
-
 /*********************
  void MCMCDyn1Step
 

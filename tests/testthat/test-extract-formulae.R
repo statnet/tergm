@@ -17,8 +17,6 @@
 #  Copyright 2003-2020 Statnet Commons
 #######################################################################
 
-context("test-extract-formulae.R")
-
 test_that(".extract.fd.formulae behaves reasonably", {
   
   F1 <- ~Form(~edges) + Diss(~edges)

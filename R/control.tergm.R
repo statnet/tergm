@@ -45,8 +45,10 @@
 #' @param init.method Estimation method used to acquire initial values
 #'   for estimation. If \code{NULL} (the default), the initial values
 #'   are computed using the edges dissolution approximation (Carnegie
-#'   et al.) when appropriate.  If set to "zeros", the initial values
-#'   are set to zeros.
+#'   et al.) when appropriate; note that this relies on \code{\link{.extract.fd.formulae}}
+#'   to identify the formation and dissolution parts of the formula; the user should
+#'   be aware of its behavior and limitations.
+#'   If \code{init.method} is set to "zeros", the initial values are set to zeros.
 #' @param force.main Logical: If TRUE, then force MCMC-based
 #'   estimation method, even if the exact MLE can be computed via
 #'   maximum pseudolikelihood estimation.

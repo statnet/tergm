@@ -38,12 +38,8 @@ X_CHANGESTAT_FN(x__discord_lt_net_Network){
   case TICK:
     {
       GET_AUX_STORAGE(StoreAuxnet, auxnet);
-      // There are two ways to do this. One is to drop the old network
-      // and make a copy of the new one. The other is to make
-      // incremental changes. TODO: Benchmark.
-
-      /* NetworkDestroy(auxnet->onwp); */
-      /* auxnet->onwp = NetworkCopy(nwp); */
+      // NB: Dropping and reconstructing the network here might be
+      // faster, but may break the u_functions that depend on it.
 
       GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
       TailHead dyad;
@@ -101,12 +97,8 @@ X_CHANGESTAT_FN(x__intersect_lt_net_Network){
   case TICK:
     {
       GET_AUX_STORAGE(StoreAuxnet, auxnet);
-      // There are two ways to do this. One is to drop the old network
-      // and make a copy of the new one. The other is to make
-      // incremental changes. TODO: Benchmark.
-
-      /* NetworkDestroy(auxnet->onwp); */
-      /* auxnet->onwp = NetworkCopy(nwp); */
+      // NB: Dropping and reconstructing the network here might be
+      // faster, but may break the u_functions that depend on it.
 
       GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
       TailHead dyad;
@@ -168,12 +160,8 @@ X_CHANGESTAT_FN(x__union_lt_net_Network){
   case TICK:
     {
       GET_AUX_STORAGE(StoreAuxnet, auxnet);
-      // There are two ways to do this. One is to drop the old network
-      // and make a copy of the new one. The other is to make
-      // incremental changes. TODO: Benchmark.
-
-      /* NetworkDestroy(auxnet->onwp); */
-      /* auxnet->onwp = NetworkCopy(nwp); */
+      // NB: Dropping and reconstructing the network here might be
+      // faster, but may break the u_functions that depend on it.
 
       GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
       TailHead dyad;
@@ -223,12 +211,8 @@ X_CHANGESTAT_FN(x__previous_lt_net_Network){
   case TICK: // We are about to increment the clock. This means that the current network is about to become the previous network.
     {
       GET_AUX_STORAGE(StoreAuxnet, auxnet);
-      // There are two ways to do this. One is to drop the old network
-      // and make a copy of the new one. The other is to make
-      // incremental changes. TODO: Benchmark.
-
-      /* NetworkDestroy(auxnet->onwp); */
-      /* auxnet->onwp = NetworkCopy(nwp); */
+      // NB: Dropping and reconstructing the network here might be
+      // faster, but may break the u_functions that depend on it.
 
       GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
       TailHead dyad;

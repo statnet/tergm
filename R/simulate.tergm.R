@@ -65,7 +65,10 @@
 #' 
 #' Note that not all possible combinations of constraints are supported.
 #' @param monitor A one-sided formula specifying one or more terms whose
-#' value is to be monitored.
+#' value is to be monitored.  If \code{monitor} is specified as a character
+#' (one of \code{"formation"}, \code{"dissolution"}, and \code{"all"}) then
+#' the function \code{\link{.extract.fd.formulae}} is used to determine the
+#' corresponding formula; the user should be aware of its behavior and limitations.
 #' @param time.slices Number of time slices (or statistics) to return from each
 #' replication of the dynamic process. See below for return types. Defaults to
 #' 1, which, if \code{time.burnin==0} and \code{time.interval==1} (the
@@ -285,11 +288,11 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                              output=c("networkDynamic", "stats", "changes", "final", "ergm_state"),
                              stats = FALSE,
                              verbose=FALSE,
-                             ..., basis=eval_lhs.formula(object), dynamic=FALSE) {
+                             ..., basis=ergm.getnetwork(object), dynamic=FALSE) {
                              
   if(!dynamic) {
-    if(missing(dynamic)) warning("For dynamic simulation in ", sQuote("tergm"), " you must pass ", sQuote("dynamic=TRUE"), ".  Attempting ", sQuote("ergm"), " simulation instead...")  
-    
+    if(missing(dynamic) && "lasttoggle" %in% list.network.attributes(basis)) warning("For dynamic simulation in ", sQuote("tergm"), " you must pass ", sQuote("dynamic=TRUE"), ".  Attempting ", sQuote("ergm"), " simulation instead...")
+
     mc <- match.call()
     mc[[1]] <- ergm_simulate_formula_network
     return(eval.parent(mc))
@@ -297,7 +300,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
 
   # reassign names for consistency with existing code
   formula <- object
-  object <- NVL(basis, eval_lhs.formula(formula))
+  nw <- basis
 
   if(length(list(...))) stop("Unknown arguments: ",names(list(...)))
   check.control.class("simulate.formula.tergm", "TERGM simulate_formula.network")
@@ -318,35 +321,25 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
     warning("Requesting a statistics matrix as output, but there are no statistics to return (monitor is NULL, and stats is FALSE). Output will be empty.")
   }
 
-  
-  nw <- as.network(object)
-  if(!is.network(nw)){
-    stop("A network object must be given")
-  }
-
-  formula<-nonsimp_update.formula(formula,nw~., from.new="nw")
-
   if(is.character(monitor)) {
     formula_pieces <- .extract.fd.formulae(formula)
     
     monitor <- switch(monitor,
                       formation = formula_pieces$form,
                       dissolution = formula_pieces$diss,
-                      all = { ff <- append_rhs.formula(~., unique(lapply(list_rhs.formula(formula_pieces$all), unset.offset.call))); environment(ff) <- environment(formula_pieces$all); ff }
+                      all = formula_pieces$all
                       )
   }
-    
-  if(!is.null(monitor)) monitor <- nonsimp_update.formula(monitor, nw~., from.new="nw")
-  
+
   proposal <- ergm_proposal(constraints, arguments = control$MCMC.prop.args, nw = nw,
                             weights = control$MCMC.prop.weights, hints = control$MCMC.prop, class="t")
 
-  model <- ergm_model(formula, nw, term.options=control$term.options, extra.aux=list(proposal=proposal$auxiliaries, system=~.lasttoggle))
+  model <- ergm_model(formula, nw, dynamic=TRUE, term.options=control$term.options, extra.aux=list(proposal=proposal$auxiliaries, system=~.lasttoggle))
   proposal$aux.slots <- model$slots.extra.aux$proposal
 
   if(!missing(coef) && nparam(model)!=length(coef)) stop("coef has ", length(coef), " elements, while the model requires ",nparam(model)," parameters.")
 
-  model.mon <- if(!is.null(monitor)) ergm_model(monitor, nw, term.options=control$term.options) else NULL
+  model.mon <- if(!is.null(monitor)) ergm_model(monitor, nw, dynamic=TRUE, term.options=control$term.options) else NULL
   
   if(missing(coef)) {
     coef <- rep(0,nparam(model, canonical=TRUE))
@@ -367,8 +360,8 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                               proposal,
                               eta, control=control, verbose=verbose)
     
-    stats.gen <- if(control$collect) mcmc(sweep(z$statsmatrix.gen,2,summary(formula),"+"),start=time.burnin+1,thin=time.interval)
-    stats.mon <- if(!is.null(model.mon)) mcmc(sweep(z$statsmatrix.mon,2,summary(monitor),"+"),start=time.burnin+1,thin=time.interval)
+    stats.gen <- if(control$collect) mcmc(sweep(z$statsmatrix.gen,2,summary(formula, basis=nw, dynamic=TRUE),"+"),start=time.burnin+1,thin=time.interval)
+    stats.mon <- if(!is.null(model.mon)) mcmc(sweep(z$statsmatrix.mon,2,summary(monitor, basis=nw, dynamic=TRUE),"+"),start=time.burnin+1,thin=time.interval)
 
     out <-
       switch(output,
@@ -497,13 +490,13 @@ simulate_formula.networkDynamic <- function(object, nsim=1, seed=NULL,
                                     verbose=FALSE, ..., basis=eval_lhs.formula(object), dynamic=FALSE){
 
   if(!dynamic) {
-    if(missing(dynamic)) warning("For dynamic simulation in ", sQuote("tergm"), " you must pass ", sQuote("dynamic=TRUE"), ".  Attempting ", sQuote("ergm"), " simulation instead...")  
-    
+    if(missing(dynamic)) warning("For dynamic simulation in ", sQuote("tergm"), " you must pass ", sQuote("dynamic=TRUE"), ".  Attempting ", sQuote("ergm"), " simulation instead...")
+
     mc <- match.call()
     mc[[1]] <- ergm_simulate_formula_network
     return(eval.parent(mc))
   }
-  
+
   # reassign names for consistency with existing code  
   formula <- object
   object <- basis

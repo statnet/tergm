@@ -75,9 +75,12 @@ parameters.}
 \item{targets}{One-sided \code{\link{ergm}}-style formula specifying
 statistics whose moments are used for the EGMME. Unused for CMLE and CMPLE.
 Targets is required for EGMME estimation. It may contain any valid ergm
-terms. If specified as "formation" or "dissolution", it copies the formula
-from the respective model. Any offset terms are used only during the
-preliminary SAN run; they are removed automatically for the EGMME proper.}
+terms.  Any offset terms are used only during the
+preliminary SAN run; they are removed automatically for the EGMME proper.
+If \code{targets} is specified as a character
+(one of \code{"formation"} and \code{"dissolution"}) then
+the function \code{\link{.extract.fd.formulae}} is used to determine the
+corresponding formula; the user should be aware of its behavior and limitations.}
 
 \item{target.stats}{A vector specifying the values of the \code{targets}
 statistics that EGMME will try to match.  Defaults to the statistics of

@@ -17,8 +17,6 @@
 #  Copyright 2003-2020 Statnet Commons
 #######################################################################
 
-context("test-nwelt.R")
-
 test_that("network.extract.with.lasttoggle behaves reasonably", {
 
   base_net <- network.initialize(10, dir = FALSE)
