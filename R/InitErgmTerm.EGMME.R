@@ -72,6 +72,24 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
     wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Persist")))
 }
 
+`InitErgmTerm.Diss (dynamic)` <- function(nw, arglist,  ...) {
+  stopifnot_dynamic(nw, .netseries.OK=TRUE, ...)
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c("formula"),
+                      vartypes = c("formula"),
+                      defaultvalues = list(NULL),
+                      required = c(TRUE))
+
+  m <- ergm_model(a$formula, nw, ..., offset.decorate=FALSE)
+
+  c(list(name="negate_on_intersect_lt_net_Network",
+         auxiliaries = ~.intersect.lt.net() + .lasttoggle,
+         submodel = m,
+         duration=TRUE),
+    ergm_propagate_ext.encode(m),
+    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Diss")))
+}
+
 InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
   stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,

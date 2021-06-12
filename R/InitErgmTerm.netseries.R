@@ -211,9 +211,19 @@ InitErgmTerm.Diss <- function(nw, arglist,  ..., env=baseenv()) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
+  if(!is(nw, "combined_networks")) {
+    return(`InitErgmTerm.Diss (dynamic)`(nw = nw, arglist = a["formula"], ...))
+  }
+  
   renamer <- function(x) I(sub("^Persist~", "Diss~", x))
-  term <- call("Sum", substitute(-1~Persist(formula), list(formula=a$formula)), renamer)
-  call.ErgmTerm(term, env=env, nw=nw, ...)
+  formula <- a$formula
+  formula[2:3] <- c(-1, formula[[2]])
+
+  term <- call("Persist", substitute(~Sum(formula, I), list(formula=formula)))
+  out <- call.ErgmTerm(term, env=env, nw=nw, ...)
+  out$coef.names <- renamer(out$coef.names)
+  if(!is.null(out$param)) names(out$param) <- renamer(names(out$param))
+  out
 }
 
 InitErgmTerm.Change <- function(nw, arglist,  ..., env=baseenv()) {

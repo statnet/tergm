@@ -697,7 +697,7 @@ test_that("edges.ageinterval behaves correctly inside a dissolution operator", {
   nw <- network(16, directed=FALSE)
   ndyads <- network.dyadcount(nw)
 
-  nwd <- simulate(nw~Form(~edges)+Persist(~edges+edges.ageinterval(3,7)), dynamic=TRUE, output="networkDynamic", coef=c(-2,2,-1/2), time.slices=T)
+  nwd <- simulate(nw~Form(~edges)+Persist(~edges+edges.ageinterval(3,7)), dynamic=TRUE, output="networkDynamic", coef=c(-2,2,-1/2), time.slices=T, seed=0)
   spells <- as.data.frame(nwd)
 
   # Test dissolution hazards
@@ -719,4 +719,7 @@ test_that("edges.ageinterval behaves correctly inside a dissolution operator", {
   })
 
   expect_equal(mean(pform), expit(-2), tolerance=.05)
+
+  nwd.diss <- simulate(nw~Form(~edges)+Diss(~edges+edges.ageinterval(3,7)), dynamic=TRUE, output="networkDynamic", coef=c(-2,-2,+1/2), time.slices=T, seed=0)
+  expect_equal(nwd, nwd.diss, ignore_attr=TRUE)
 })
