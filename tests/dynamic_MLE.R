@@ -54,7 +54,7 @@ y1<-simulate(y0~edges, coef=theta, control=control.simulate(MCMC.burnin=n^2*2), 
 
 # Force CMPLE
 set.seed(543)
-fit<-tergm(list(y0,y1) ~ Form(~edges) + Diss(~edges), estimate="CMPLE", times=c(1,2), eval.loglik=FALSE)
+fit<-tergm(list(y0,y1) ~ Form(~edges) + Persist(~edges), estimate="CMPLE", times=c(1,2), eval.loglik=FALSE)
 
 stopifnot(fit$estimate=="CMPLE")
 stopifnot(z.error(form.mle(y0,y1), coef(fit)[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
@@ -74,7 +74,7 @@ stopifnot(z.error(change.mle(y0,y1), coef(fit)[1], vcov(fit, sources="estimation
 
 # Autodetected CMPLE
 set.seed(543)
-fit<-tergm(list(y0,y1) ~ Form(~edges) + Diss(~edges), estimate="CMLE", times=c(1,2), eval.loglik=FALSE)
+fit<-tergm(list(y0,y1) ~ Form(~edges) + Persist(~edges), estimate="CMLE", times=c(1,2), eval.loglik=FALSE)
 
 stopifnot(fit$estimate=="CMLE")
 stopifnot(z.error(form.mle(y0,y1), coef(fit)[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
@@ -99,7 +99,7 @@ cat("====",prop.weight,"====\n")
 ctrl <- control.tergm(CMLE.ergm=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 2*1024, MCMC.burnin=10000, MCMC.interval = 1024, force.main=TRUE, MCMC.prop.weights=prop.weight))
 
 set.seed(543)
-fit<-tergm(list(y0,y1) ~ Form(~edges) + Diss(~edges), estimate="CMLE", control=ctrl, times=c(1,2), eval.loglik=FALSE)
+fit<-tergm(list(y0,y1) ~ Form(~edges) + Persist(~edges), estimate="CMLE", control=ctrl, times=c(1,2), eval.loglik=FALSE)
 
 stopifnot(fit$estimate=="CMLE")
 stopifnot(z.error(form.mle(y0,y1), coef(fit)[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
@@ -128,7 +128,7 @@ y1m[1,m+1] <- NA
 
 # Force CMPLE
 set.seed(765)
-fit<-tergm(list(y0,y1m) ~ Form(~edges) + Diss(~edges), estimate="CMPLE", times=c(1,2), eval.loglik=FALSE)
+fit<-tergm(list(y0,y1m) ~ Form(~edges) + Persist(~edges), estimate="CMPLE", times=c(1,2), eval.loglik=FALSE)
 
 stopifnot(fit$estimate=="CMPLE")
 stopifnot(z.error(form.mle(y0,y1m), coef(fit)[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
@@ -148,7 +148,7 @@ stopifnot(z.error(change.mle(y0,y1m), coef(fit)[1], vcov(fit, sources="estimatio
 
 # Autodetected CMPLE
 set.seed(765)
-fit<-tergm(list(y0,y1m) ~ Form(~edges) + Diss(~edges), estimate="CMLE", times=c(1,2), eval.loglik=FALSE)
+fit<-tergm(list(y0,y1m) ~ Form(~edges) + Persist(~edges), estimate="CMLE", times=c(1,2), eval.loglik=FALSE)
 
 stopifnot(fit$estimate=="CMLE")
 stopifnot(z.error(form.mle(y0,y1m), coef(fit)[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)
@@ -173,7 +173,7 @@ cat("====",prop.weight,"====\n")
 ctrl <- control.tergm(CMLE.ergm=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 2*1024, MCMC.burnin=10000, MCMC.interval = 1024, force.main=TRUE, MCMC.prop.weights=prop.weight))
 
 set.seed(234)
-fit<-tergm(list(y0,y1m) ~ Form(~edges) + Diss(~edges), estimate="CMLE", control=ctrl, times=c(1,2), eval.loglik=FALSE)
+fit<-tergm(list(y0,y1m) ~ Form(~edges) + Persist(~edges), estimate="CMLE", control=ctrl, times=c(1,2), eval.loglik=FALSE)
 
 stopifnot(fit$estimate=="CMLE")
 stopifnot(z.error(form.mle(y0,y1m), coef(fit)[1], vcov(fit, sources="estimation")[1,1]) <= tolerance)

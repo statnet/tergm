@@ -334,7 +334,7 @@ test_that("discordBDStratTNT simulates reasonably with heterogeneous degree boun
     maxout[maxout < 0] <- 0
     
     for(i in 1:5) {    
-      nw_sim <- simulate(nw_sim ~ Form(~edges) + Diss(~edges), 
+      nw_sim <- simulate(nw_sim ~ Form(~edges) + Persist(~edges),
                          coef = c(0,0),
                          dynamic = TRUE,
                          time.slices = 3,                         
@@ -396,7 +396,7 @@ test_that("discordBDStratTNT simulates reasonably with bipartite heterogeneous d
     maxout[maxout < 0] <- 0
     
     for(i in 1:5) {    
-      nw_sim <- simulate(nw_sim ~ Form(~edges) + Diss(~edges), 
+      nw_sim <- simulate(nw_sim ~ Form(~edges) + Persist(~edges),
                          coef = c(0,0),
                          dynamic = TRUE,
                          time.slices = 3,                         
@@ -460,7 +460,7 @@ test_that("discordBDStratTNT simulates reasonably with directed heterogeneous de
     maxin[maxin < 0] <- 0
     
     for(i in 1:5) {      
-      nw_sim <- simulate(nw_sim ~ Form(~edges) + Diss(~edges), 
+      nw_sim <- simulate(nw_sim ~ Form(~edges) + Persist(~edges),
                          coef = c(0,0),
                          dynamic = TRUE,
                          time.slices = 3,                         

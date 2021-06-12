@@ -34,7 +34,7 @@ coef.form<-coef.form.f(coef.diss,density)
 
 
 # Simulate a networkDynamic for five steps
-dynsim<-simulate(g1 ~ Form(~edges) + Diss(~edges),coef=c(coef.form,coef.diss),time.slices=S,dynamic=TRUE)
+dynsim<-simulate(g1 ~ Form(~edges) + Persist(~edges),coef=c(coef.form,coef.diss),time.slices=S,dynamic=TRUE)
 
 # ----- check net.obs.period encoding ----
 
@@ -44,7 +44,7 @@ if (!all(unlist((dynsim%n%'net.obs.period')$observations)==c(0,1,1,11))){
 }
 
 # "Resume" the simulation for five steps
-dynsim2<-simulate(dynsim ~ Form(~edges) + Diss(~edges),time.slices=S,dynamic=TRUE)
+dynsim2<-simulate(dynsim ~ Form(~edges) + Persist(~edges),time.slices=S,dynamic=TRUE)
 
 if (!all(unlist((dynsim2%n%'net.obs.period')$observations)==c(0,1,1,11,11,21))){
   stop("simulate.networkDynamic did not encode net.obs.period$observation correctly")
@@ -70,7 +70,7 @@ add.edges(msm.sim,msm.edgelist[,1],msm.edgelist[,2])
 activate.edges(msm.sim, -Inf, Inf)
 
 #first timestep 
-msm.sim <- simulate(msm.sim ~ Form(~edges) + Diss(~edges),
+msm.sim <- simulate(msm.sim ~ Form(~edges) + Persist(~edges),
                     coef=c(coef.form,coef.diss),
                     time.slices = 1,
                     monitor="all",
@@ -78,7 +78,7 @@ msm.sim <- simulate(msm.sim ~ Form(~edges) + Diss(~edges),
                     dynamic=TRUE
 )
 #second timestep
-msm.sim <- simulate(msm.sim ~ Form(~edges) + Diss(~edges),
+msm.sim <- simulate(msm.sim ~ Form(~edges) + Persist(~edges),
                     coef=c(coef.form,coef.diss),
                     time.slices = 1,
                     monitor="all",
@@ -112,7 +112,7 @@ add.edges(msm.sim,msm.edgelist[,1],msm.edgelist[,2])
 activate.edges(msm.sim, -Inf, Inf)
 
 # simulate first timestep (0,1)
-msm.sim <- simulate(msm.sim ~ Form(~edges) + Diss(~edges),
+msm.sim <- simulate(msm.sim ~ Form(~edges) + Persist(~edges),
                     coef=c(coef.form,coef.diss),
                     time.slices = 1,
                     monitor="formation",
@@ -126,7 +126,7 @@ add.vertices.active(msm.sim,nv=5,onset=0,terminus=Inf)
 
 
 # simulate second timestep (1,2)
-msm.sim <- simulate(msm.sim ~ Form(~edges) + Diss(~edges),
+msm.sim <- simulate(msm.sim ~ Form(~edges) + Persist(~edges),
                     coef=c(coef.form,coef.diss),
                     time.slices = 1,
                     monitor="all",
@@ -147,7 +147,7 @@ if(!all(network.dynamic.check(msm.sim,complete=FALSE)$dyad.checks)){
 }
 
 # at this point msm.sim has observations as far as 2.  Try sampling at 2 and upating from (2,3)
-msm.sim <- simulate(msm.sim ~ Form(~edges) + Diss(~edges),
+msm.sim <- simulate(msm.sim ~ Form(~edges) + Persist(~edges),
                     coef=c(coef.form,coef.diss),
                     time.slices = 1, time.start=2,time.offset=0,
                     monitor="formation",
@@ -163,7 +163,7 @@ if (!all(get.change.times(msm.sim)==0:2)){
 }
 
 # try it again to make sure nothing got mangled
-msm.sim <- simulate(msm.sim ~ Form(~edges) + Diss(~edges),
+msm.sim <- simulate(msm.sim ~ Form(~edges) + Persist(~edges),
                     coef=c(coef.form,coef.diss),
                     time.slices = 1, time.start=3,time.offset=0,
                     monitor="all",
@@ -182,7 +182,7 @@ if (!all(get.change.times(msm.sim)==0:3)){
 dyn<-as.networkDynamic(network.initialize(4))
 deactivate.vertices(dyn,v=1)
 # define stergm that should toggle on all ties
-changes<-simulate(dyn ~ Form(~edges) + Diss(~edges),coef = c(1,0),output='changes',dynamic=TRUE)
+changes<-simulate(dyn ~ Form(~edges) + Persist(~edges),coef = c(1,0),output='changes',dynamic=TRUE)
 # check if any changes involve vertex 1 (shouldn't because it is inactive)
 if(any(changes[,2:3]==1)){
   stop("simulate.networkDynamic returned changes involving an inactive vertex" )
@@ -206,7 +206,7 @@ coef.form[1] <- coef.form[1] - coef.diss
 msm.edgelist <- as.edgelist(simulate(msm.est,dynamic=FALSE))
 add.edges(msm.sim,msm.edgelist[,1],msm.edgelist[,2])
 
-msm.sim <- simulate(msm.sim ~ Form(~edges) + Diss(~edges),
+msm.sim <- simulate(msm.sim ~ Form(~edges) + Persist(~edges),
                     coef=c(coef.form,coef.diss),
                     time.slices = 1, time.start=0,time.offset=0,
                     monitor="all",
@@ -224,13 +224,13 @@ if(length((msm.sim%n%'net.obs.period')$observations)>1){
 g0<-network.initialize(20,dir=TRUE)
 g1<-san(g0~edges,target.stats=20,verbose=TRUE)
 # Simulate a networkDynamic from static 
-dynsim<-simulate(g1 ~ Form(~edges) + Diss(~edges),
+dynsim<-simulate(g1 ~ Form(~edges) + Persist(~edges),
                  coef=c(-9.326322,2.197225),
                  time.slices=1,verbose=TRUE, dynamic=TRUE)
 # add more vertices
 add.vertices(dynsim,3)
 # simulate another step
-dynsim<-simulate(dynsim ~ Form(~edges) + Diss(~edges),
+dynsim<-simulate(dynsim ~ Form(~edges) + Persist(~edges),
                  coef = c(-9.326322,2.197225),
                  time.slices=1,verbose=TRUE, dynamic=TRUE)
 # expect to see a pid defined, but will just be numeric values
@@ -249,25 +249,25 @@ if(all(is.numeric(dynsim%v%"tergm_pid"))){
 }
 
 # simulate
-dynsim<-simulate(dynsim ~ Form(~edges) + Diss(~edges),
+dynsim<-simulate(dynsim ~ Form(~edges) + Persist(~edges),
                  coef=c(-9.326322,2.197225),
                  time.slices=1,verbose=TRUE, dynamic=TRUE)
 # delete some vertices
 delete.vertices(dynsim,vid = 5:10)
-dynsim<-simulate(dynsim ~ Form(~edges) + Diss(~edges),
+dynsim<-simulate(dynsim ~ Form(~edges) + Persist(~edges),
                  coef=c(-9.326322,2.197225),
                  time.slices=1,verbose=TRUE, dynamic=TRUE)
 
 # test with an externally defined PID  --------------
 
 # Simulate a networkDynamic from static 
-dynsim<-simulate(g1 ~ Form(~edges) + Diss(~edges),
+dynsim<-simulate(g1 ~ Form(~edges) + Persist(~edges),
                  coef=c(-9.326322,2.197225),
                  time.slices=1,verbose=TRUE, dynamic=TRUE)
 dynsim%n%'vertex.pid'<-'letters'
 dynsim%v%'letters'<-LETTERS[1:20]
 # simulate another step
-dynsim<-simulate(dynsim ~ Form(~edges) + Diss(~edges),
+dynsim<-simulate(dynsim ~ Form(~edges) + Persist(~edges),
                  coef=c(-9.326322,2.197225),
                  time.slices=1,verbose=TRUE, dynamic=TRUE)
 # expect to see a pid defined, but will just be numeric values
@@ -301,7 +301,7 @@ coef.form <- coef(fit)
 coef.form[1] <- coef.form[1] - log(40-1)
 
 fit.sim <- simulate(fit, dynamic=FALSE)
-diag.sim <- simulate(fit.sim ~ Form(~ edges + offset(nodemix("loc", levels2=-c(1, 3)))) + Diss(~offset(edges)),
+diag.sim <- simulate(fit.sim ~ Form(~ edges + offset(nodemix("loc", levels2=-c(1, 3)))) + Persist(~offset(edges)),
                      coef=c(coef.form,log(40-1)),
                      time.slices = 10,
                      monitor = "formation",

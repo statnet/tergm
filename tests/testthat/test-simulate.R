@@ -19,7 +19,7 @@ test_that("simulate_formula.network behaves reasonably", {
   expect_false("lasttoggle" %in% list.network.attributes(rv))
   
   ## if we don't specify 'dynamic=TRUE' we should trigger an error
-  expect_error(rv <- simulate(nw ~ Form(~edges) + Diss(~edges), coef = c(-3, 1)), ".*This term requires either last-toggle data or dynamic mode.*")
+  expect_error(rv <- simulate(nw ~ Form(~edges) + Persist(~edges), coef = c(-3, 1)), ".*This term requires either last-toggle data or dynamic mode.*")
 
   ## if we do specify 'dynamic=TRUE' we should go to tergm simulation
   expect_warning(rv <- simulate(nw ~ edges, coef = c(-3), output = "final", dynamic = TRUE), NA)
@@ -30,7 +30,7 @@ test_that("simulate_formula.network behaves reasonably", {
   expect_identical(cbind(as.edgelist(rv), 1L), lt[order(lt[,1], lt[,2]),,drop=FALSE])
 
   ## if we do specify 'dynamic=TRUE' we should go to tergm simulation
-  expect_warning(rv <- simulate(nw ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), output = "final", dynamic = TRUE), NA)
+  expect_warning(rv <- simulate(nw ~ Form(~edges) + Persist(~edges), coef = c(-3, 1), output = "final", dynamic = TRUE), NA)
   expect_identical(class(rv), "network")
   ## should have time and lasttoggle since the model is durational (and also because we did tergm simulation)
   expect_identical(rv %n% "time", 1L)
@@ -38,7 +38,7 @@ test_that("simulate_formula.network behaves reasonably", {
   expect_identical(cbind(as.edgelist(rv), 1L), lt[order(lt[,1], lt[,2]),,drop=FALSE])
 
   ## now do another time step with the previous return value
-  rv2 <- simulate(rv ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), output = "final", dynamic = TRUE)
+  rv2 <- simulate(rv ~ Form(~edges) + Persist(~edges), coef = c(-3, 1), output = "final", dynamic = TRUE)
   expect_identical(class(rv2), "network")
   expect_identical(rv2 %n% "time", 2L)
   rv1 <- rv
@@ -51,21 +51,21 @@ test_that("simulate_formula.network behaves reasonably", {
   expect_identical(mlt, lt)
 
   ## obtain also stats, changes, and ergm_state starting from rv
-  rv_stats <- simulate(rv ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), time.slices = 5, output = "stats", stats = TRUE, dynamic = TRUE)
+  rv_stats <- simulate(rv ~ Form(~edges) + Persist(~edges), coef = c(-3, 1), time.slices = 5, output = "stats", stats = TRUE, dynamic = TRUE)
   expect_true(NROW(rv_stats) == 5 && NCOL(rv_stats) == 2)
   expect_identical(colnames(rv_stats), c("Form~edges", "Diss~edges"))
   expect_true(all(rv_stats[,1] > rv_stats[,2]))
 
-  rv_stats_mon <- simulate(rv ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), output = "stats", monitor = ~edges, dynamic = TRUE)
+  rv_stats_mon <- simulate(rv ~ Form(~edges) + Persist(~edges), coef = c(-3, 1), output = "stats", monitor = ~edges, dynamic = TRUE)
   expect_true(NROW(rv_stats_mon) == 1 && NCOL(rv_stats_mon) == 1)
   expect_identical(colnames(rv_stats_mon), c("edges"))
   expect_true(rv_stats_mon[1,1] > 0)
   
-  rv_changes <- simulate(rv ~ Form(~edges) + Diss(~edges), coef = c(-3, 0), output = "changes", dynamic = TRUE)
+  rv_changes <- simulate(rv ~ Form(~edges) + Persist(~edges), coef = c(-3, 0), output = "changes", dynamic = TRUE)
   expect_true(all(rv_changes[,1] == 2L))
   expect_true(all(c(0L, 1L) %in% rv_changes[,4]))
 
-  rv_ergm_state <- simulate(rv ~ Form(~edges) + Diss(~edges), coef = c(-3, 0), time.slices = 3, output = "ergm_state", dynamic = TRUE)
+  rv_ergm_state <- simulate(rv ~ Form(~edges) + Persist(~edges), coef = c(-3, 0), time.slices = 3, output = "ergm_state", dynamic = TRUE)
   expect_identical(rv_ergm_state$nw0 %n% "time", 4L)
   expect_true(NROW(rv_ergm_state$el) > 0)
   expect_true(NROW(rv_ergm_state$nw0 %n% "lasttoggle") > NROW(rv_ergm_state$el))
@@ -73,10 +73,10 @@ test_that("simulate_formula.network behaves reasonably", {
   expect_true(all(c(1L, 2L, 3L, 4L) %in% (rv_ergm_state$nw0 %n% "lasttoggle")[,3]))
 
   ## now obtain networkDynamic return value, and restart sim from it, checking various components for basic sensibility
-  rv_nwd <- simulate(nw ~ Form(~edges) + Diss(~edges), coef = c(-3, 0), time.slices = 3, dynamic = TRUE)
+  rv_nwd <- simulate(nw ~ Form(~edges) + Persist(~edges), coef = c(-3, 0), time.slices = 3, dynamic = TRUE)
   expect_identical(get.change.times(rv_nwd), c(1, 2, 3))
   ## technically running simulate_formula.networkDynamic in this next call...
-  rv_nw <- simulate(rv_nwd ~ Form(~edges) + Diss(~edges), coef = c(-3, 0), time.slices = 2, output = "final", dynamic = TRUE)
+  rv_nw <- simulate(rv_nwd ~ Form(~edges) + Persist(~edges), coef = c(-3, 0), time.slices = 2, output = "final", dynamic = TRUE)
   expect_identical(rv_nw %n% "time", 5L)
   
   ## every edge in nw3 should have a lasttoggle time in nw5
@@ -100,16 +100,16 @@ test_that("simulate_formula.networkDynamic behaves reasonably", {
   set.seed(0)
   nw <- network.initialize(100, directed = FALSE)
   nw1 <- simulate(nw ~ edges, coef = c(-3), output = "final", dynamic = TRUE)
-  nw2 <- simulate(nw1 ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), output = "final", dynamic = TRUE)
-  nw4 <- simulate(nw2 ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), output = "final", time.slices = 2, dynamic = TRUE)
-  nw5 <- expect_warning(simulate(nw2 ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), output = "final", time.start = 3, time.slices = 2, dynamic = TRUE))
+  nw2 <- simulate(nw1 ~ Form(~edges) + Persist(~edges), coef = c(-3, 1), output = "final", dynamic = TRUE)
+  nw4 <- simulate(nw2 ~ Form(~edges) + Persist(~edges), coef = c(-3, 1), output = "final", time.slices = 2, dynamic = TRUE)
+  nw5 <- expect_warning(simulate(nw2 ~ Form(~edges) + Persist(~edges), coef = c(-3, 1), output = "final", time.start = 3, time.slices = 2, dynamic = TRUE))
   
   set.seed(0)
   nw <- network.initialize(100, directed = FALSE)
   nwd1 <- simulate(nw ~ edges, coef = c(-3), dynamic = TRUE)
-  nwd2 <- simulate(nwd1 ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), dynamic = TRUE)
-  nwd4 <- simulate(nwd2 ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), time.slices = 2, dynamic = TRUE)
-  nwd5 <- expect_warning(simulate(nwd2 ~ Form(~edges) + Diss(~edges), coef = c(-3, 1), time.start = 3, time.slices = 2, dynamic = TRUE))
+  nwd2 <- simulate(nwd1 ~ Form(~edges) + Persist(~edges), coef = c(-3, 1), dynamic = TRUE)
+  nwd4 <- simulate(nwd2 ~ Form(~edges) + Persist(~edges), coef = c(-3, 1), time.slices = 2, dynamic = TRUE)
+  nwd5 <- expect_warning(simulate(nwd2 ~ Form(~edges) + Persist(~edges), coef = c(-3, 1), time.start = 3, time.slices = 2, dynamic = TRUE))
   
   expect_identical(nw1 %n% "time", as.integer(.get.last.obs.time(nwd1)))
   expect_identical(nw2 %n% "time", as.integer(.get.last.obs.time(nwd2)))
@@ -183,13 +183,13 @@ test_that("simulate.network behaves reasonably", {
   ## obtain what should be the same results with the new interface
   set.seed(0)
   new_nw1 <- simulate(nw ~ edges + concurrent, coef = c(-3, 0.5), output = "final", dynamic = TRUE)
-  new_nw2 <- simulate(new_nw1 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "final", dynamic = TRUE)
-  new_nw4 <- simulate(new_nw2 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "final", time.slices = 2, dynamic = TRUE)
-  new_nw5 <- expect_warning(simulate(new_nw2 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "final", time.start = 3, time.slices = 2, dynamic = TRUE))
-  new_nw6 <- simulate(new_nw2 ~ Form(~edges + concurrent) + Diss(~edges), coef = attr(new_nw5, "coef"), output = "final", basis = new_nw5, dynamic = TRUE)
+  new_nw2 <- simulate(new_nw1 ~ Form(~edges + concurrent) + Persist(~edges), coef = c(-3, 0.5, 1), output = "final", dynamic = TRUE)
+  new_nw4 <- simulate(new_nw2 ~ Form(~edges + concurrent) + Persist(~edges), coef = c(-3, 0.5, 1), output = "final", time.slices = 2, dynamic = TRUE)
+  new_nw5 <- expect_warning(simulate(new_nw2 ~ Form(~edges + concurrent) + Persist(~edges), coef = c(-3, 0.5, 1), output = "final", time.start = 3, time.slices = 2, dynamic = TRUE))
+  new_nw6 <- simulate(new_nw2 ~ Form(~edges + concurrent) + Persist(~edges), coef = attr(new_nw5, "coef"), output = "final", basis = new_nw5, dynamic = TRUE)
 
-  new_stats_nw <- simulate(new_nw6 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "final", time.slices = 10, stats = TRUE, monitor = ~triangle + degree(1), dynamic = TRUE)
-  new_stats <- simulate(new_nw6 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "stats", time.slices = 10, stats = TRUE, monitor = ~triangle + degree(1), dynamic = TRUE)
+  new_stats_nw <- simulate(new_nw6 ~ Form(~edges + concurrent) + Persist(~edges), coef = c(-3, 0.5, 1), output = "final", time.slices = 10, stats = TRUE, monitor = ~triangle + degree(1), dynamic = TRUE)
+  new_stats <- simulate(new_nw6 ~ Form(~edges + concurrent) + Persist(~edges), coef = c(-3, 0.5, 1), output = "stats", time.slices = 10, stats = TRUE, monitor = ~triangle + degree(1), dynamic = TRUE)
   
   ## test for equality (attributes will differ)
   expect_equal(old_nw1, new_nw1, check.attributes = FALSE)
@@ -231,20 +231,20 @@ test_that("simulate.networkDynamic behaves reasonably", {
   ## obtain what should be the same results with the new interface
   set.seed(2)
   new_nwD1 <- simulate(nw ~ edges + concurrent, coef = c(-3, 0.5), dynamic = TRUE)
-  new_nwD2 <- simulate(new_nwD1 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), dynamic = TRUE)
-  new_nwD4 <- simulate(new_nwD2 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), time.slices = 2, dynamic = TRUE)
-  new_nwD5 <- expect_warning(simulate(new_nwD2 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), time.start = 3, time.slices = 2, dynamic = TRUE))
-  new_nwD6 <- simulate(new_nwD2 ~ Form(~edges + concurrent) + Diss(~edges), coef = attr(new_nwD5, "coef"), basis = new_nwD5, dynamic = TRUE)
+  new_nwD2 <- simulate(new_nwD1 ~ Form(~edges + concurrent) + Persist(~edges), coef = c(-3, 0.5, 1), dynamic = TRUE)
+  new_nwD4 <- simulate(new_nwD2 ~ Form(~edges + concurrent) + Persist(~edges), coef = c(-3, 0.5, 1), time.slices = 2, dynamic = TRUE)
+  new_nwD5 <- expect_warning(simulate(new_nwD2 ~ Form(~edges + concurrent) + Persist(~edges), coef = c(-3, 0.5, 1), time.start = 3, time.slices = 2, dynamic = TRUE))
+  new_nwD6 <- simulate(new_nwD2 ~ Form(~edges + concurrent) + Persist(~edges), coef = attr(new_nwD5, "coef"), basis = new_nwD5, dynamic = TRUE)
 
-  new_nwD7 <- simulate(new_nwD6 ~ Form(~edges + concurrent) + Diss(~edges), dynamic = TRUE)
+  new_nwD7 <- simulate(new_nwD6 ~ Form(~edges + concurrent) + Persist(~edges), dynamic = TRUE)
 
-  new_stats_nwD <- simulate(new_nwD6 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), time.slices = 10, stats = TRUE, monitor = ~triangle + degree(1), dynamic = TRUE)
-  new_stats <- simulate(new_nwD6 ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), output = "stats", time.slices = 10, stats = TRUE, monitor = ~triangle + degree(1), dynamic = TRUE)
+  new_stats_nwD <- simulate(new_nwD6 ~ Form(~edges + concurrent) + Persist(~edges), coef = c(-3, 0.5, 1), time.slices = 10, stats = TRUE, monitor = ~triangle + degree(1), dynamic = TRUE)
+  new_stats <- simulate(new_nwD6 ~ Form(~edges + concurrent) + Persist(~edges), coef = c(-3, 0.5, 1), output = "stats", time.slices = 10, stats = TRUE, monitor = ~triangle + degree(1), dynamic = TRUE)
 
-  new_nwD8 <- simulate(new_stats_nwD ~ Form(~edges + concurrent) + Diss(~edges), monitor = ~triangle + degree(1), dynamic = TRUE)
+  new_nwD8 <- simulate(new_stats_nwD ~ Form(~edges + concurrent) + Persist(~edges), monitor = ~triangle + degree(1), dynamic = TRUE)
   
-  new_nwD_constr <- simulate(nw ~ Form(~edges + concurrent) + Diss(~edges), coef = c(-3, 0.5, 1), constraints = ~bd(maxout=1), time.slices = 10, dynamic = TRUE)
-  new_nwD_constr2 <- simulate(new_nwD_constr ~ Form(~edges + concurrent) + Diss(~edges), constraints = ~bd(maxout=1), time.slices = 10, dynamic = TRUE)
+  new_nwD_constr <- simulate(nw ~ Form(~edges + concurrent) + Persist(~edges), coef = c(-3, 0.5, 1), constraints = ~bd(maxout=1), time.slices = 10, dynamic = TRUE)
+  new_nwD_constr2 <- simulate(new_nwD_constr ~ Form(~edges + concurrent) + Persist(~edges), constraints = ~bd(maxout=1), time.slices = 10, dynamic = TRUE)
 
   ## test for equality (attributes will differ)
   expect_equal(old_nwD1, new_nwD1, check.attributes = FALSE)
@@ -286,12 +286,12 @@ statnet.common::opttest({
 test_that("simulate.tergm behaves reasonably", {
   nw <- network.initialize(100, directed = FALSE)
 
-  nw1 <- simulate(nw ~ Form(~edges) + Diss(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final")
-  nw2 <- simulate(nw1 ~ Form(~edges) + Diss(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final")
-  nw3 <- simulate(nw2 ~ Form(~edges) + Diss(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final")
-  nw4 <- simulate(nw3 ~ Form(~edges) + Diss(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final")
+  nw1 <- simulate(nw ~ Form(~edges) + Persist(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final")
+  nw2 <- simulate(nw1 ~ Form(~edges) + Persist(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final")
+  nw3 <- simulate(nw2 ~ Form(~edges) + Persist(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final")
+  nw4 <- simulate(nw3 ~ Form(~edges) + Persist(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final")
 
-  nw100 <- simulate(nw ~ Form(~edges) + Diss(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final", time.slices = 100)
+  nw100 <- simulate(nw ~ Form(~edges) + Persist(~edges), coef = c(-5, 1), dynamic = TRUE, output = "final", time.slices = 100)
 
   nwx <- network(100, directed = FALSE)
   
@@ -299,11 +299,11 @@ test_that("simulate.tergm behaves reasonably", {
 
   # pretty fast
   set.seed(0)
-  CMLE <- tergm(nwL ~ Form(~edges) + Diss(~edges), estimate="CMLE")
+  CMLE <- tergm(nwL ~ Form(~edges) + Persist(~edges), estimate="CMLE")
 
   # this one can take a few minutes...
   set.seed(0)
-  EGMME <- tergm(nw100 ~ Form(~edges) + Diss(~edges), targets = ~edges + mean.age, target.stats = c(120.9842, 3.718282), estimate = "EGMME")
+  EGMME <- tergm(nw100 ~ Form(~edges) + Persist(~edges), targets = ~edges + mean.age, target.stats = c(120.9842, 3.718282), estimate = "EGMME")
 
   set.seed(0)
   rv_EGMME <- simulate(EGMME, output = "final")
@@ -333,27 +333,27 @@ test_that("simulate.tergm behaves reasonably", {
   expect_error(simulate(CMLE, nw.start = 5, output = "final"))
 
   set.seed(0)
-  rv_E_nw <- simulate(EGMME$network ~ Form(~edges) + Diss(~edges), coef = coef(EGMME), monitor = EGMME$targets, output = "final", dynamic = TRUE)
+  rv_E_nw <- simulate(EGMME$network ~ Form(~edges) + Persist(~edges), coef = coef(EGMME), monitor = EGMME$targets, output = "final", dynamic = TRUE)
 
   set.seed(0)
-  rv_E_x_nw <- simulate(nwx ~ Form(~edges) + Diss(~edges), coef = coef(EGMME), monitor = EGMME$targets, output = "final", dynamic = TRUE)
+  rv_E_x_nw <- simulate(nwx ~ Form(~edges) + Persist(~edges), coef = coef(EGMME), monitor = EGMME$targets, output = "final", dynamic = TRUE)
 
   set.seed(0)
-  rv_C_first_nw <- simulate(nw1 ~ Form(~edges) + Diss(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)  
+  rv_C_first_nw <- simulate(nw1 ~ Form(~edges) + Persist(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)
   set.seed(0)
-  rv_C_last_nw <- simulate(nw4 ~ Form(~edges) + Diss(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)  
+  rv_C_last_nw <- simulate(nw4 ~ Form(~edges) + Persist(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)
 
   set.seed(0)
-  rv_C_x_nw <- simulate(nwx ~ Form(~edges) + Diss(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)  
+  rv_C_x_nw <- simulate(nwx ~ Form(~edges) + Persist(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)
 
   set.seed(0)
-  rv_C_1_nw <- simulate(nw1 ~ Form(~edges) + Diss(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)    
+  rv_C_1_nw <- simulate(nw1 ~ Form(~edges) + Persist(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)
   set.seed(0)
-  rv_C_2_nw <- simulate(nw2 ~ Form(~edges) + Diss(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)    
+  rv_C_2_nw <- simulate(nw2 ~ Form(~edges) + Persist(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)
   set.seed(0)
-  rv_C_3_nw <- simulate(nw3 ~ Form(~edges) + Diss(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)    
+  rv_C_3_nw <- simulate(nw3 ~ Form(~edges) + Persist(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)
   set.seed(0)
-  rv_C_4_nw <- simulate(nw4 ~ Form(~edges) + Diss(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)    
+  rv_C_4_nw <- simulate(nw4 ~ Form(~edges) + Persist(~edges), coef = coef(CMLE), output = "final", dynamic = TRUE)
 
   ## subset network attributes to those present in direct simulations of the original networks to avoid
   ## considering unrelated attributes introduced during the CMLE fit

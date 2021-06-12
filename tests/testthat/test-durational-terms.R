@@ -476,7 +476,7 @@ test_that("durational terms behave correctly with summary and godfather", {
                                  degree.mean.age(degree_vec, attrname, emptyval=6345.4, log=TRUE) + 
                                  degrange.mean.age(degrange_from, degrange_to, attrname, emptyval=7345.4, log=TRUE) +
                                  Form(~edges) + 
-                                 Diss(~edges),
+                                 Persist(~edges),
                             toggles=toggles,
                             start=toggle_tmin-1L,
                             end=toggle_tmax+1L)
@@ -506,7 +506,7 @@ test_that("durational terms behave correctly with summary and godfather", {
                                  degree.mean.age(degree_vec, attrname, emptyval=6345.4, log=TRUE) + 
                                  degrange.mean.age(degrange_from, degrange_to, attrname, emptyval=7345.4, log=TRUE) +
                                  Form(~edges) + 
-                                 Diss(~edges),
+                                 Persist(~edges),
                             toggles=toggles,
                             start=toggle_tmin-1L,
                             end=toggle_tmax+1L)    
@@ -528,7 +528,7 @@ test_that("durational terms behave correctly with summary and godfather", {
                                  nodefactor.mean.age(attr="mean_age_attr", log=TRUE, levels=nodefactor_ma_lev,emptyval=nodefactor_emptyvals) +
                                  nodemix.mean.age(attr="mean_age_attr", log=TRUE, levels=nodemix_ma_lev, levels2=nodemix_ma_lev2) +
                                  Form(~edges) + 
-                                 Diss(~edges),
+                                 Persist(~edges),
                             toggles=toggles,
                             start=toggle_tmin-1L,
                             end=toggle_tmax+1L)  
@@ -697,7 +697,7 @@ test_that("edges.ageinterval behaves correctly inside a dissolution operator", {
   nw <- network(16, directed=FALSE)
   ndyads <- network.dyadcount(nw)
 
-  nwd <- simulate(nw~Form(~edges)+Diss(~edges+edges.ageinterval(3,7)), dynamic=TRUE, output="networkDynamic", coef=c(-2,2,-1/2), time.slices=T)
+  nwd <- simulate(nw~Form(~edges)+Persist(~edges+edges.ageinterval(3,7)), dynamic=TRUE, output="networkDynamic", coef=c(-2,2,-1/2), time.slices=T)
   spells <- as.data.frame(nwd)
 
   # Test dissolution hazards

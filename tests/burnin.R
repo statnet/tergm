@@ -34,7 +34,7 @@ print(coef.form)
 print(coef.diss)
 
 # Simulate a networkDynamic
-dynsim<-simulate(g1 ~ Form(~edges) + Diss(~edges),coef=c(coef.form,coef.diss),time.slices=S,verbose=TRUE, dynamic=TRUE)
+dynsim<-simulate(g1 ~ Form(~edges) + Persist(~edges),coef=c(coef.form,coef.diss),time.slices=S,verbose=TRUE, dynamic=TRUE)
 
 # "Resume" the simulation.
-dynsim2<-simulate(dynsim ~ Form(~edges) + Diss(~edges),time.slices=S,verbose=TRUE, dynamic=TRUE)
+dynsim2<-simulate(dynsim ~ Form(~edges) + Persist(~edges),time.slices=S,verbose=TRUE, dynamic=TRUE)

@@ -19,29 +19,29 @@
 
 test_that(".extract.fd.formulae behaves reasonably", {
   
-  F1 <- ~Form(~edges) + Diss(~edges)
+  F1 <- ~Form(~edges) + Persist(~edges)
   
-  F2 <- ~Form(~edges + gwesp(0,fixed=TRUE)) + Diss(~edges)
+  F2 <- ~Form(~edges + gwesp(0,fixed=TRUE)) + Persist(~edges)
   
-  F3 <- ~Form(~edges + gwesp(0,fixed=TRUE)) + Diss(~edges) + edges - triangle
+  F3 <- ~Form(~edges + gwesp(0,fixed=TRUE)) + Persist(~edges) + edges - triangle
   
   X <- ~edges
   
-  F4 <- ~Form(X) + Diss(X)
+  F4 <- ~Form(X) + Persist(X)
   
-  F5 <- ~Form(~offset(edges) + gwesp(0,fixed=TRUE)) + Diss(~offset(edges))
+  F5 <- ~Form(~offset(edges) + gwesp(0,fixed=TRUE)) + Persist(~offset(edges))
 
   Y <- ~offset(edges)
   
-  F6 <- ~Form(Y) - Diss(~edges)
+  F6 <- ~Form(Y) - Persist(~edges)
   
-  F7 <- ~Form(Y) - Diss(Y)
+  F7 <- ~Form(Y) - Persist(Y)
   
-  F8 <- ~-Form(~edges - triangle) + Diss(~edges) + Diss(~triangle) + Diss(~-offset(triangle))
+  F8 <- ~-Form(~edges - triangle) + Persist(~edges) + Persist(~triangle) + Persist(~-offset(triangle))
   
-  F9 <- ~-Form(~offset(edges) - offset(triangle) + offset(gwesp(0,fixed=TRUE))) + Diss(~edges)
+  F9 <- ~-Form(~offset(edges) - offset(triangle) + offset(gwesp(0,fixed=TRUE))) + Persist(~edges)
   
-  F10 <- ~-Form(~-edges + triangle) + Form(~-gwesp(0,fixed=TRUE)) - Diss(~-edges) + Diss(~triangle) + Diss(~-gwesp(0,fixed=TRUE))
+  F10 <- ~-Form(~-edges + triangle) + Form(~-gwesp(0,fixed=TRUE)) - Persist(~-edges) + Persist(~triangle) + Persist(~-gwesp(0,fixed=TRUE))
   
   R1 <- .extract.fd.formulae(F1)
   expect_equal(~edges, R1$form)
@@ -103,7 +103,7 @@ test_that(".extract.fd.formulae behaves reasonably", {
   expect_equal(~., R10$nonsep)
   expect_equal(~edges-triangle-gwesp(0,fixed=TRUE)+edges+triangle-gwesp(0,fixed=TRUE), R10$all)
   
-  F11 <- ~Form(~edges) + Diss(~edges) + edges
+  F11 <- ~Form(~edges) + Persist(~edges) + edges
   environment(F11) <- new.env()
   
   R11 <- .extract.fd.formulae(F11)
@@ -118,7 +118,7 @@ test_that(".extract.fd.formulae behaves reasonably", {
   environment(a) <- new.env()
   environment(b) <- new.env()
   
-  F12 <- ~Form(a) + Diss(b) + edges
+  F12 <- ~Form(a) + Persist(b) + edges
   environment(F12) <- new.env()
   environment(F12)$a <- a
   environment(F12)$b <- b

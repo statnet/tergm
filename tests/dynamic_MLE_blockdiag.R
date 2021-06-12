@@ -50,7 +50,7 @@ y1<-simulate(y0~edges, constraints=~blockdiag("a"), coef=theta, control=control.
 
 # Force CMPLE
 set.seed(543)
-fit<-tergm(list(y0,y1) ~ Form(~edges) + Diss(~edges), constraints=~blockdiag("a"), estimate="CMPLE", times=c(1,2))
+fit<-tergm(list(y0,y1) ~ Form(~edges) + Persist(~edges), constraints=~blockdiag("a"), estimate="CMPLE", times=c(1,2))
 
 stopifnot(fit$estimate=="CMPLE")
 stopifnot(z.error(form.mle(y0,y1), coef(fit)[1], vcov(fit)[1,1]) <= tolerance)
@@ -58,7 +58,7 @@ stopifnot(z.error(diss.mle(y0,y1), coef(fit)[2], vcov(fit)[2,2]) <= tolerance)
 
 # Autodetected CMPLE
 set.seed(543)
-fit<-tergm(list(y0,y1) ~ Form(~edges) + Diss(~edges), constraints=~blockdiag("a"), estimate="CMLE", times=c(1,2))
+fit<-tergm(list(y0,y1) ~ Form(~edges) + Persist(~edges), constraints=~blockdiag("a"), estimate="CMLE", times=c(1,2))
 
 stopifnot(fit$estimate=="CMLE")
 stopifnot(z.error(form.mle(y0,y1), coef(fit)[1], vcov(fit)[1,1]) <= tolerance)
@@ -68,7 +68,7 @@ stopifnot(z.error(diss.mle(y0,y1), coef(fit)[2], vcov(fit)[2,2]) <= tolerance)
 for(prop.weight in prop.weights){
 cat("====",prop.weight,"====\n")
 set.seed(543)
-fit<-tergm(list(y0,y1) ~ Form(~edges) + Diss(~edges), constraints=~blockdiag("a"), estimate="CMLE", control=control.tergm(CMLE.ergm=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 2*1024, MCMC.burnin=10000, MCMC.interval = 1024, force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2))
+fit<-tergm(list(y0,y1) ~ Form(~edges) + Persist(~edges), constraints=~blockdiag("a"), estimate="CMLE", control=control.tergm(CMLE.ergm=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 2*1024, MCMC.burnin=10000, MCMC.interval = 1024, force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2))
 
 stopifnot(fit$estimate=="CMLE")
 stopifnot(z.error(form.mle(y0,y1), coef(fit)[1], vcov(fit)[1,1]) <= tolerance)
@@ -85,7 +85,7 @@ y1m[1,2] <- NA
 
 # Force CMPLE
 set.seed(765)
-fit<-tergm(list(y0,y1m) ~ Form(~edges) + Diss(~edges), constraints=~blockdiag("a"), estimate="CMPLE", times=c(1,2))
+fit<-tergm(list(y0,y1m) ~ Form(~edges) + Persist(~edges), constraints=~blockdiag("a"), estimate="CMPLE", times=c(1,2))
 
 stopifnot(fit$estimate=="CMPLE")
 stopifnot(z.error(form.mle(y0,y1m), coef(fit)[1], vcov(fit)[1,1]) <= tolerance)
@@ -93,7 +93,7 @@ stopifnot(z.error(diss.mle(y0,y1m), coef(fit)[2], vcov(fit)[2,2]) <= tolerance)
 
 # Autodetected CMPLE
 set.seed(765)
-fit<-tergm(list(y0,y1m) ~ Form(~edges) + Diss(~edges), constraints=~blockdiag("a"), estimate="CMLE", times=c(1,2))
+fit<-tergm(list(y0,y1m) ~ Form(~edges) + Persist(~edges), constraints=~blockdiag("a"), estimate="CMLE", times=c(1,2))
 
 stopifnot(fit$estimate=="CMLE")
 stopifnot(z.error(form.mle(y0,y1m), coef(fit)[1], vcov(fit)[1,1]) <= tolerance)
@@ -103,7 +103,7 @@ stopifnot(z.error(diss.mle(y0,y1m), coef(fit)[2], vcov(fit)[2,2]) <= tolerance)
 for(prop.weight in prop.weights){
 cat("====",prop.weight,"====\n")
 set.seed(234)
-fit<-tergm(list(y0,y1m) ~ Form(~edges) + Diss(~edges), constraints=~blockdiag("a"), estimate="CMLE", control=control.tergm(CMLE.ergm=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 2*1024, MCMC.burnin=10000, MCMC.interval = 1024, force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2))
+fit<-tergm(list(y0,y1m) ~ Form(~edges) + Persist(~edges), constraints=~blockdiag("a"), estimate="CMLE", control=control.tergm(CMLE.ergm=control.ergm(MCMLE.effectiveSize = NULL, MCMC.samplesize = 2*1024, MCMC.burnin=10000, MCMC.interval = 1024, force.main=TRUE, MCMC.prop.weights=prop.weight)), times=c(1,2))
 
 stopifnot(fit$estimate=="CMLE")
 stopifnot(z.error(form.mle(y0,y1m), coef(fit)[1], vcov(fit)[1,1]) <= tolerance)
