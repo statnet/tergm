@@ -8,13 +8,20 @@
 #  Copyright 2008-2020 Statnet Commons
 #######################################################################
 
-stopifnot_dynamic <- function(nw,...,dynamic=FALSE){
-  if(!dynamic && ! "lasttoggle" %in% list.network.attributes(nw))
-    ergm_Init_abort(paste0("This term requires either last-toggle data or dynamic mode, e.g., from ", sQuote("simulate(..., dynamic=TRUE)"), "."))
+stopifnot_dynamic <- function(nw, ..., dynamic=FALSE, .netseries.OK=FALSE){
+  if(!dynamic && ! "lasttoggle" %in% list.network.attributes(nw)){
+    msg <- paste0("This term requires either dynamic data (",
+                  if(.netseries.OK) "network series or ",
+                  "network dynamic or last toggle information) ",
+                  "or must be set to dynamic mode (typically by passing ",
+                  sQuote("dynamic=TRUE)"), " to ", sQuote("summary()"),
+                  ", ", sQuote("simulate()"), ", etc..")
+    ergm_Init_abort(msg)
+  }
 }
 
 `InitErgmTerm.Form (dynamic)` <- function(nw, arglist,  ...) {
-  stopifnot_dynamic(nw, ...)
+  stopifnot_dynamic(nw, .netseries.OK=TRUE, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
@@ -48,7 +55,7 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
 
 
 `InitErgmTerm.Persist (dynamic)` <- function(nw, arglist,  ...) {
-  stopifnot_dynamic(nw, ...)
+  stopifnot_dynamic(nw, .netseries.OK=TRUE, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
@@ -82,7 +89,7 @@ InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
 
 
 `InitErgmTerm.Change (dynamic)` <- function(nw, arglist,  ...) {
-  stopifnot_dynamic(nw, ...)
+  stopifnot_dynamic(nw, .netseries.OK=TRUE, ...)
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula"),
                       vartypes = c("formula"),
