@@ -349,7 +349,7 @@ unset.offset.call <- function(object){
     
   for(i in seq_along(x)) {
     if(form_flags[i]) {
-      arg <- eval(x[[i]][[2]], env = environment(formula))
+      arg <- eval(x[[i]][[2]], envir = environment(formula))
       
       pos <- sum(form_flags) - sum(form_flags[seq_len(i)])
       ind <- c(3, rep(2, pos), if(pos < sum(form_flags) - 1) 3 else if (leading_form_sign == -1) 2, 2)
@@ -359,7 +359,7 @@ unset.offset.call <- function(object){
       ind <- c(3, rep(2, pos), if(pos < length(x) - 1) 3 else if (leading_sign == -1) 2, 2)
       all[[ind]] <- arg
     } else if(pers_flags[i]) {
-      arg <- eval(x[[i]][[2]], env = environment(formula))
+      arg <- eval(x[[i]][[2]], envir = environment(formula))
 
       pos <- sum(pers_flags | diss_flags) - sum((pers_flags | diss_flags)[seq_len(i)])
       ind <- c(3, rep(2, pos), if(pos < sum(pers_flags | diss_flags) - 1) 3 else if (leading_pers_sign == -1) 2, 2)
@@ -369,7 +369,7 @@ unset.offset.call <- function(object){
       ind <- c(3, rep(2, pos), if(pos < length(x) - 1) 3 else if (leading_sign == -1) 2, 2)
       all[[ind]] <- arg
     } else if(diss_flags[i]) {
-      arg <- eval(x[[i]][[2]], env = environment(formula))
+      arg <- eval(x[[i]][[2]], envir = environment(formula))
       arg1 <- append_rhs.formula(~-1, arg)
       environment(arg1) <- environment(arg)
       
