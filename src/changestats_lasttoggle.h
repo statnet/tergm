@@ -80,6 +80,10 @@ static inline int ElapsedTimeToggle(Vertex tail, Vertex head, StoreTimeAndLastto
     // if we're toggling this dyad *off* then we can safely use ElapsedTime
     return ElapsedTime(tail, head, dur_inf);
   }
+  if(!dur_inf->ticktock) {
+    // outside of ticktock, we should use ordinary ElapsedTime
+    return ElapsedTime(tail, head, dur_inf);    
+  }
   
   // otherwise we're toggling this dyad *on*
   TailHead dyad = TH(tail, head);
