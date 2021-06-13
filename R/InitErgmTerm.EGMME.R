@@ -13,9 +13,8 @@ stopifnot_dynamic <- function(nw, ..., dynamic=FALSE, .netseries.OK=FALSE){
     msg <- paste0("This term requires either dynamic data (",
                   if(.netseries.OK) "network series or ",
                   "network dynamic or last toggle information) ",
-                  "or must be set to dynamic mode (typically by passing ",
-                  sQuote("dynamic=TRUE)"), " to ", sQuote("summary()"),
-                  ", ", sQuote("simulate()"), ", etc..")
+                  "or for dynamic mode to be set (typically by passing ",
+                  sQuote("dynamic=TRUE)"), " to the top-level function.")
     ergm_Init_abort(msg)
   }
 }
