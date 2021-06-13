@@ -28,6 +28,7 @@
 \alias{degrange.mean.age}
 \alias{InitErgmTerm.Form}
 \alias{InitErgmTerm.Diss}
+\alias{InitErgmTerm.Persist}
 \alias{InitErgmTerm.Cross}
 \alias{InitErgmTerm.Change}
 \alias{InitErgmTerm.edge.ages}
@@ -62,24 +63,25 @@
   \describe{
     \item{\code{Form(formula)}}{
       \emph{The Formation Operator Term:} This term accepts a model formula
-      \code{formula} and produces the corresponding formation model.
-    }
-    
-    \item{\code{Diss(formula)}}{
-      \emph{The Dissolution Operator Term:} This term accepts a model formula
-      \code{formula} and produces the corresponding dissolution model.  Note, this
-      not the equivalent of the old style \code{dissolution} model because the signs of
-      the coefficients are reversed.
+      \code{formula} and produces the corresponding model for the post-formation network: effectively a network containing both previous time step's ties and ties just formed.
     }
     
     \item{\code{Persist(formula)}}{
-      \emph{The Dissolution Operator Term:} This term accepts a model formula
-      \code{formula} and produces the corresponding dissolution model.  Note, this
-      is the equivalent of the old style \code{dissolution} model, and it will produce
-      the same results as the \code{Diss} operator, except the signs of the 
-      coefficients are reversed.
+      \emph{The Persistence Operator Term:} This term accepts a model formula
+      \code{formula} and produces the corresponding model for the post-dissolution/persistence network: effectively the network containing ties that persisted since the last time step.  This
+      is the equivalent of the old-style \code{dissolution} model.
+
+      It will produce the same results as the \code{Diss()} operator, except the signs of the 
+      coefficients are reversed. (This typically means that a higher coefficient means \emph{less} dissolution.)
     }
 
+    \item{\code{Diss(formula)}}{
+      \emph{The Dissolution Operator Term:} This term accepts a model formula
+      \code{formula} and produces the corresponding model for the post-dissolution network (same as \code{Persist()}), but with all statistics negated.
+      This is not the equivalent of the old style \code{dissolution} model, because the signs of
+      the coefficients are reversed. (This typically means that a higher coefficient means \emph{more} dissolution.)
+    }
+    
     \item{\code{Cross(formula)}}{
       \emph{The Crossection Operator Term:} This term accepts a model formula
       \code{formula} and produces the corresponding model for the cross-sectional
