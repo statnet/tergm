@@ -26,19 +26,19 @@ coef.diss <- c(2.944439)
 
 # Fit the model with very poor starting values.
 set.seed(3)
-dynfit<-tergm(g1 ~ Form(~edges + degree(1)) + Persist(~offset(edges)), targets="formation", estimate="EGMME", constraints=~., offset.coef=coef.diss,target.stats=target.stats[-3],verbose=TRUE,control=control.tergm(SA.plot.progress=do.plot,SA.restart.on.err=FALSE,init=c(-log(.95/.05),0, coef.diss)))
+dynfit<-tergm(g1 ~ Form(~edges + degree(1)) + Diss(~offset(edges)), targets="formation", estimate="EGMME", constraints=~., offset.coef=-coef.diss,target.stats=target.stats[-3],verbose=TRUE,control=control.tergm(SA.plot.progress=do.plot,SA.restart.on.err=FALSE,init=c(-log(.95/.05),0, -coef.diss)))
 
 print(summary(dynfit))
 mcmc.diagnostics(dynfit)
 
-stopifnot(all.equal(c(coef.form,coef.diss),coef(dynfit),tol=0.01,check.attributes=FALSE))
+stopifnot(all.equal(c(coef.form,-coef.diss),coef(dynfit),tol=0.01,check.attributes=FALSE))
 
 # All parameters free, edges, degree(1), and edge.ages as target.
 set.seed(5)
-dynfit2<-tergm(g1 ~ Form(~edges + degree(1)) + Persist(~edges), targets=~edges+degree(1)+mean.age, estimate="EGMME", constraints=~., target.stats=target.stats,control=control.tergm(SA.plot.progress=do.plot,SA.plot.stats=TRUE))
+dynfit2<-tergm(g1 ~ Form(~edges + degree(1)) + Diss(~edges), targets=~edges+degree(1)+mean.age, estimate="EGMME", constraints=~., target.stats=target.stats,control=control.tergm(SA.plot.progress=do.plot,SA.plot.stats=TRUE))
 
 print(summary(dynfit2))
 mcmc.diagnostics(dynfit2)
 
-stopifnot(all.equal(c(coef.form,coef.diss),coef(dynfit2),tol=0.01,check.attributes=FALSE))
+stopifnot(all.equal(c(coef.form,-coef.diss),coef(dynfit2),tol=0.01,check.attributes=FALSE))
 }, "EGMME")
