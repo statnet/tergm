@@ -24,16 +24,17 @@ test_that("EGMME errors when it should", {
                      target.stats = c(3.718282), 
                      estimate = "EGMME"), "Incorrect number")
 
-  expect_error(tergm(nw ~ Form(~edges + nodefactor("attr", levels = c(2,4))) + Persist(~edges),
-                     targets = ~edges + offset(nodefactor("attr", levels = 2:4), 2) + mean.age, 
-                     target.stats = c(120.9842, 50, 70, 3.718282), 
-                     SAN.offsets = c(1),
-                     estimate = "EGMME"), "Failed to remove")
+# this call now works due to changes in EGMME offset handling
+#  expect_error(tergm(nw ~ Form(~edges + nodefactor("attr", levels = c(2,4))) + Persist(~edges),
+#                     targets = ~edges + offset(nodefactor("attr", levels = 2:4), 2) + mean.age,
+#                     target.stats = c(120.9842, 50, 70, 3.718282),
+#                     SAN.offsets = c(1),
+#                     estimate = "EGMME"), "Failed to remove")
 
   expect_error(tergm(nw ~ Form(~offset(edges)) + Persist(~edges),
                      targets = ~Form(~offset(edges)) + edges, 
                      target.stats = c(120.9842), 
-                     estimate = "EGMME"), "Failed to remove")
+                     estimate = "EGMME"), "Incorrect number")
 
   expect_error(tergm(nw ~ Form(~edges) + Persist(~edges) + triangle,
                      targets = ~edges + triangle + mean.age, 

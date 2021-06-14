@@ -292,3 +292,69 @@ F_CHANGESTAT_FN(f_on_discord_lt_net_Network){
   ModelDestroy(auxnet->onwp, m);
   STORAGE = NULL;
 }
+
+typedef struct {
+  Model *model;
+  int *stats;
+  int nstats;
+} _statistics_storage;
+
+I_CHANGESTAT_FN(i__statistics_term) {
+  ALLOC_STORAGE(1, _statistics_storage, sto);
+
+  sto->model = ModelInitialize(getListElement(mtp->R, "submodel"), mtp->ext_state, nwp, FALSE);
+  sto->stats = INTEGER(getListElement(mtp->R, "stats"));
+  sto->nstats = asInteger(getListElement(mtp->R, "nstats"));
+
+  SELECT_C_OR_D_BASED_ON_SUBMODEL(sto->model);
+  DELETE_IF_UNUSED_IN_SUBMODEL(x_func, sto->model);
+  DELETE_IF_UNUSED_IN_SUBMODEL(z_func, sto->model);
+}
+
+D_CHANGESTAT_FN(d__statistics_term) {
+  GET_STORAGE(_statistics_storage, sto);
+
+  ChangeStats(ntoggles, tails, heads, nwp, sto->model);
+
+  for(int i = 0; i < sto->nstats; i++) {
+    CHANGE_STAT[i] = sto->model->workspace[sto->stats[i]];
+  }
+}
+
+C_CHANGESTAT_FN(c__statistics_term) {
+  GET_STORAGE(_statistics_storage, sto);
+
+  ChangeStats1(tail, head, nwp, sto->model, edgestate);
+
+  for(int i = 0; i < sto->nstats; i++) {
+    CHANGE_STAT[i] = sto->model->workspace[sto->stats[i]];
+  }
+}
+
+X_CHANGESTAT_FN(x__statistics_term) {
+  GET_STORAGE(_statistics_storage, sto);
+
+  memset(sto->model->workspace, 0, sto->model->n_stats*sizeof(double)); /* Zero all change stats. */
+  PROPAGATE_X_SIGNAL(nwp, sto->model);
+
+  for(int i = 0; i < sto->nstats; i++) {
+    CHANGE_STAT[i] = sto->model->workspace[sto->stats[i]];
+  }
+}
+
+Z_CHANGESTAT_FN(z__statistics_term) {
+  GET_STORAGE(_statistics_storage, sto);
+
+  memset(sto->model->workspace, 0, sto->model->n_stats*sizeof(double)); /* Zero all change stats. */
+  ZStats(nwp, sto->model, FALSE);
+
+  for(int i = 0; i < sto->nstats; i++) {
+    CHANGE_STAT[i] = sto->model->workspace[sto->stats[i]];
+  }
+}
+
+F_CHANGESTAT_FN(f__statistics_term) {
+  GET_STORAGE(_statistics_storage, sto);
+
+  ModelDestroy(nwp, sto->model);
+}

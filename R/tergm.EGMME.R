@@ -26,7 +26,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
                       formation = .extract.fd.formulae(formula)$form,
                       dissolution = .extract.fd.formulae(formula)$pers)
   }
-  
+
   if(length(targets)==3) {
     warning("Targets formula has an LHS, which will be ignored in favor of nw.")
     targets <- targets[c(1,3)] # in a formula f<-y~x, f[1]=~, f[2]=y, and f[3]=x
@@ -37,15 +37,14 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
   SAN.formula <- targets # including any offsets
 
   target_model <- ergm_model(targets, nw, dynamic=TRUE, term.options = control$term.options)
-  if(any(target_model$etamap$offsetmap) || any(target_model$etamap$offsettheta)) {
-    message("Targets contains offset terms; they will only be used during the SAN run, and removal of the offsets will be attempted for the EGMME targets.")
+  if(any(target_model$etamap$offsetmap)) {
+    message("Targets contains offset statistics; they will only be used during the SAN run, and removal of the offset statistics will be attempted for the EGMME targets.")
 
-    # this can fail to behave appropriately in 4.0, so check the result and error if something looks wrong
-    targets <- statnet.common::filter_rhs.formula(targets, function(x) !inherits(x, "call") || !(x[[1]] == "offset"))
+    non_offsets <- !target_model$etamap$offsetmap
+    targets <- trim_env(~.Statistics(targets, non_offsets), keep = c("targets", "non_offsets"))
     
     updated_target_model <- ergm_model(targets, nw, dynamic=TRUE, term.options = control$term.options)
     if(any(updated_target_model$etamap$offsetmap) || 
-       any(updated_target_model$etamap$offsettheta) || 
        sum(!target_model$etamap$offsetmap) != nparam(updated_target_model, canonical = TRUE)) {
          stop("Failed to remove offsets from targets formula; please specify targets formula without offsets.")
     }
@@ -71,7 +70,8 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
   
   model.mon <- ergm_model(targets, nw, dynamic=TRUE, term.options=control$term.options)
 
-  if(any(model$etamap$canonical==0) || any(model.mon$etamap$canonical==0) || any(model.SAN$etamap$canonical==0)) stop("Equilibrium GMME for models based on curved ERGMs is not supported at this time.")
+  ## SAN model is a superset of monitoring model, so it suffices to check the SAN model and not the monitoring model here
+  if(any(model$etamap$canonical==0) || any(model.SAN$etamap$canonical==0)) stop("Equilibrium GMME for models based on curved ERGMs is not supported at this time.")
 
   p.free<-sum(!model$etamap$offsettheta)
   if(p.free==0) stop("Model specification has no free parameters (all are offsets).")
