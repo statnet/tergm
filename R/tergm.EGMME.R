@@ -70,8 +70,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
   
   model.mon <- ergm_model(targets, nw, dynamic=TRUE, term.options=control$term.options)
 
-  ## SAN model is a superset of monitoring model, so it suffices to check the SAN model and not the monitoring model here
-  if(any(model$etamap$canonical==0) || any(model.SAN$etamap$canonical==0)) stop("Equilibrium GMME for models based on curved ERGMs is not supported at this time.")
+  if(is.curved(model) || is.curved(model.mon) || (control$SAN$SAN.maxit > 0 && is.curved(model.SAN))) stop("Equilibrium GMME for models based on curved ERGMs is not supported at this time.")
 
   p.free<-sum(!model$etamap$offsettheta)
   if(p.free==0) stop("Model specification has no free parameters (all are offsets).")
