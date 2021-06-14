@@ -26,7 +26,12 @@ test_that("the .Statistics term behaves appropriately", {
   s2 <- summary(~.Statistics(ff1, stats1), basis = nw)
   expect_identical(s1, s2)
 
-  nw <- simulate(nw ~ Form(~edges) + Diss(~edges), coef = c(-4, 4), time.slices = 10, dynamic = TRUE, output = "final")
+  set.seed(0)
+  nw1 <- simulate(nw ~ Form(~edges) + Diss(~edges), coef = c(-4, 4), time.slices = 10, dynamic = TRUE, output = "final")
+  set.seed(0)
+  nw2 <- simulate(nw ~ .Statistics(~Form(~edges) + Diss(~edges)), coef = c(-4, 4), time.slices = 10, dynamic = TRUE, output = "final")
+  expect_identical(nw1, nw2)
+  nw <- nw1
 
   ## durational, non-curved
   ff2 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + concurrent + edges.ageinterval(1) + edges.ageinterval(4) + edges.ageinterval(15) + mean.age + Form(~edges + triangle + mean.age) + Diss(~edges + concurrent + isolates + edges.ageinterval(2) + edges.ageinterval(6))
