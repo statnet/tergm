@@ -214,7 +214,7 @@ InitErgmTerm..Statistics <- function(nw, arglist, ...) {
     wem <- modifyList(wem,
                       list(coef.names = param_names(m, canonical = TRUE)[statistics],
                            map = function(x, n, ...) { ergm.eta(x, m$etamap)[statistics] },
-                           gradient = function(x, n, ...) { ergm.etagrad(x, m$etamap)[statistics] }))
+                           gradient = function(x, n, ...) { ergm.etagrad(x, m$etamap)[,statistics,drop=FALSE] }))
   } else {
     for(name in c("minpar", "maxpar", "coef.names", "offset", "emptynwstats")) {
       if(!is.null(wem[[name]])) wem[[name]] <- wem[[name]][statistics]
