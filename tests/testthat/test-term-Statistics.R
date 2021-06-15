@@ -27,9 +27,11 @@ test_that("the .Statistics term behaves appropriately", {
   expect_identical(s1, s2)
 
   set.seed(0)
-  nw1 <- simulate(nw ~ Form(~edges) + Diss(~edges), coef = c(-4, 4), time.slices = 10, dynamic = TRUE, output = "final")
+  nw1 <- simulate(nw ~ Form(~edges + triangle) + Diss(~edges + gwesp(0, fixed = TRUE)), coef = c(-4, 0, 4, 0), time.slices = 10, dynamic = TRUE, output = "final")
   set.seed(0)
-  nw2 <- simulate(nw ~ .Statistics(~Form(~edges) + Diss(~edges)), coef = c(-4, 4), time.slices = 10, dynamic = TRUE, output = "final")
+  nw2 <- simulate(nw ~ .Statistics(~Form(~edges + triangle) + Diss(~edges + gwesp(0, fixed = TRUE)), c(3,1)), coef = c(4, -4), time.slices = 10, dynamic = TRUE, output = "final")
+  attr(nw1, "coef") <- NULL
+  attr(nw2, "coef") <- NULL
   expect_identical(nw1, nw2)
   nw <- nw1
 
