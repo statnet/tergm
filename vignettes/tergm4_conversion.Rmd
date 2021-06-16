@@ -17,7 +17,11 @@ options(width=100) # Changed from 80
 
 # Introduction #
 
-Version 4.0 of the `tergm` package introduces new user interfaces for specifying `tergm` models.  While backwards compatibility has been maintained as much as possible, some users may wish to convert their code to use the new interfaces, and this document describes how to go about that in typical use cases.
+Version 4.0 of the `tergm` package introduces new user interfaces for 
+specifying `tergm` models.  While backwards compatibility has been maintained 
+as much as possible, some users may wish to convert their code to use the new 
+interfaces, and this document describes how to go about that in typical use 
+cases.
 
 # Estimation #
 
@@ -48,29 +52,38 @@ for EGMME.
 
 To convert these to the new 4.0 user interface, we make the following changes.
 
-- Replace the function name `stergm` with `tergm` (in 4.0, the tergms need not be separable, hence we drop the s).
+- Replace the function name `stergm` with `tergm` (in 4.0, the tergms need not 
+  be separable, hence we drop the s).
 
-- Combine the network (or network list), formation, and dissolution formulas into a single formula, schematically of the form 
+- Combine the network (or network list), formation, and dissolution formulas 
+  into a single formula, schematically of the form 
 
   ```
-  network ~ Form(formation formula) + Diss(dissolution formula)
+  network ~ Form(formation formula) + Persist(dissolution formula)
   ```
 
-  where `Form` and `Diss` are operator terms defined in `tergm` 4.0.  For the CMLE example, this would result in the formula 
+  where `Form` and `Persist` are operator terms defined in `tergm` 4.0.  For the 
+  CMLE example, this would result in the formula 
   
   ```
-  samp ~ Form(~edges+mutual+cyclicalties+transitiveties) + Diss(~edges+mutual+cyclicalties+transitiveties)
+  samp ~ Form(~edges+mutual+cyclicalties+transitiveties) + Persist(~edges+mutual+cyclicalties+transitiveties)
   ```
   
   and in the EGMME example, it would result in the formula 
   
   ```
-  flobusiness ~ Form(~edges+gwesp(0,fixed=T)) + Diss(~offset(edges))
+  flobusiness ~ Form(~edges+gwesp(0,fixed=T)) + Persist(~offset(edges))
   ```
   
   These formulas will be our first arguments to the `tergm` function.
 
-- The `offset.coef.form` and `offset.coef.diss` arguments (if present) should be combined into a single `offset.coef` argument, schematically of the form `offset.coef = c(offset.coef.form, offset.coef.diss)`, corresponding to the order in which we have included the formation and dissolution formulas in the combined formula.  Here, the CMLE example has no offsets, so this applies only to the EGMME example where we have only a single dissolution offset to begin with.  The result is that we replace
+- The `offset.coef.form` and `offset.coef.diss` arguments (if present) should 
+  be combined into a single `offset.coef` argument, schematically of the form 
+  `offset.coef = c(offset.coef.form, offset.coef.diss)`, corresponding to the 
+  order in which we have included the formation and dissolution formulas in the 
+  combined formula.  Here, the CMLE example has no offsets, so this applies 
+  only to the EGMME example where we have only a single dissolution offset to 
+  begin with.  The result is that we replace
 
   ```
   offset.coef.diss = log(9)
@@ -84,7 +97,17 @@ To convert these to the new 4.0 user interface, we make the following changes.
 
   in the EGMME call.
 
-- The control argument (if present), previously of class `control.stergm`, should be replaced by one of class `control.tergm`.  This can be accomplished by replacing `control.stergm()` with `control.tergm()`, `snctrl()`, or `list()`, and updating arguments as follows.  Arguments to `control.stergm()` occurring in pairs with `.form` and `.diss` in their names have been collapsed to single, correspondingly named arguments to `control.tergm()` without `.form` or `.diss`.  Additionally, the arguments `MCMC.init.maxedges` and `MCMC.init.maxchanges` to `control.stergm()` have been replaced by the `MCMC.maxedges` and `MCMC.maxchanges` arguments to `control.tergm()`.  In the examples above, no such arguments are used, so the only change we need to make is `control.stergm -> control.tergm` in the EGMME call.
+- The control argument (if present), previously of class `control.stergm`, 
+  should be replaced by one of class `control.tergm`.  This can be accomplished 
+  by replacing `control.stergm()` with `control.tergm()`, `snctrl()`, or 
+  `list()`, and updating arguments as follows.  Arguments to `control.stergm()` 
+  occurring in pairs with `.form` and `.diss` in their names have been 
+  collapsed to single, correspondingly named arguments to `control.tergm()` 
+  without `.form` or `.diss`.  Additionally, the arguments `MCMC.init.maxedges` 
+  and `MCMC.init.maxchanges` to `control.stergm()` have been replaced by the 
+  `MCMC.maxedges` and `MCMC.maxchanges` arguments to `control.tergm()`.  In the 
+  examples above, no such arguments are used, so the only change we need to 
+  make is `control.stergm -> control.tergm` in the EGMME call.
 
 
 Overall, this produces the new-style calls
@@ -92,7 +115,7 @@ Overall, this produces the new-style calls
 data(samplk)
 samp <- list(samplk1, samplk2, samplk3)
 samp.fit <- tergm(samp ~ Form(~edges+mutual+cyclicalties+transitiveties) + 
-                         Diss(~edges+mutual+cyclicalties+transitiveties),
+                         Persist(~edges+mutual+cyclicalties+transitiveties),
                    estimate = "CMLE",
                    times = 1:3)
 ```
@@ -100,7 +123,7 @@ for CMLE, and
 ```
 data(florentine)
 tergm.fit.1 <- tergm(flobusiness ~ Form(~edges+gwesp(0,fixed=T)) + 
-                                   Diss(~offset(edges)),
+                                   Persist(~offset(edges)),
                      targets = "formation",
                      offset.coef = log(9),
                      estimate = "EGMME",
@@ -113,22 +136,46 @@ for EGMME.
 
 ## From a fitted `tergm` object ##
 
-A typical call in `tergm` 3.x for simulating from a fitted `stergm` might look something like
+A typical call in `tergm` 3.x for simulating from a fitted `stergm` might look 
+something like
 ```
 stergm.sim.1 <- simulate(stergm.fit.1, 
                          nsim = 1,
                          time.slices = 1000)
 ```
 
-To convert from simulating a fitted `stergm` in `tergm` 3.x to simulating a fitted `tergm` in `tergm` 4.0, we make the following changes.
+To convert from simulating a fitted `stergm` in `tergm` 3.x to simulating a 
+fitted `tergm` in `tergm` 4.0, we make the following changes.
 
-- Replace the `coef.form` and `coef.diss` arguments (which will default to the coefficients of the fitted `stergm`) with the `coef` argument (which will default to the coefficients of the fitted `tergm`), which is schematically of the form `coef = c(coef.form, coef.diss)`, assuming the combined formula used when estimating the `tergm` was of the form described in the Estimation section (with `Form(formation formula)` preceding `Diss(dissolution formula)`).  These arguments are not passed in the example above, so no corresponding changes are needed in that example.
+- Replace the `coef.form` and `coef.diss` arguments (which will default to the 
+  coefficients of the fitted `stergm`) with the `coef` argument (which will 
+  default to the coefficients of the fitted `tergm`), which is schematically of 
+  the form `coef = c(coef.form, coef.diss)`, assuming the combined formula used 
+  when estimating the `tergm` was of the form described in the Estimation 
+  section (with `Form(formation formula)` preceding 
+  `Persist(dissolution formula)`).  These arguments are not passed in the example 
+  above, so no corresponding changes are needed in that example.
 
-- Replace the `stats.form` and `stats.diss` arguments (if passed) with the `stats` argument.  These arguments are not passed in the example above, so no corresponding changes are needed in that example.
+- Replace the `stats.form` and `stats.diss` arguments (if passed) with the 
+  `stats` argument.  These arguments are not passed in the example above, so 
+  no corresponding changes are needed in that example.
 
-- The control argument (if passed), previously of class `control.simulate.stergm`, should be replaced by one of class `control.simulate.tergm`.  This can be accomplished by replacing `control.simulate.stergm()` with `control.simulate.tergm()`, `snctrl()`, or `list()`, and updating arguments as follows.  Arguments to `control.simulate.stergm()` occurring in pairs with `.form` and `.diss` in their names have been collapsed to single, correspondingly named arguments to `control.simulate.tergm()` without `.form` or `.diss`.  Additionally, the arguments `MCMC.init.maxedges` and `MCMC.init.maxchanges` to `control.simulate.stergm()` have been replaced by the `MCMC.maxedges` and `MCMC.maxchanges` arguments to `control.simulate.tergm()`.  In the example above, no control argument is passed, so no corresponding changes are needed in that example.
+- The control argument (if passed), previously of class 
+  `control.simulate.stergm`, should be replaced by one of class 
+  `control.simulate.tergm`.  This can be accomplished by replacing 
+  `control.simulate.stergm()` with `control.simulate.tergm()`, `snctrl()`, or 
+  `list()`, and updating arguments as follows.  Arguments to 
+  `control.simulate.stergm()` occurring in pairs with `.form` and `.diss` in 
+  their names have been collapsed to single, correspondingly named arguments to 
+  `control.simulate.tergm()` without `.form` or `.diss`.  Additionally, the 
+  arguments `MCMC.init.maxedges` and `MCMC.init.maxchanges` to 
+  `control.simulate.stergm()` have been replaced by the `MCMC.maxedges` and 
+  `MCMC.maxchanges` arguments to `control.simulate.tergm()`.  In the example 
+  above, no control argument is passed, so no corresponding changes are needed 
+  in that example.
 
-Thus, the most we need to do to convert to a 4.0 style call for this example is to drop the s from the object names for consistency, yielding
+Thus, the most we need to do to convert to a 4.0 style call for this example is 
+to drop the s from the object names for consistency, yielding
 ```
 tergm.sim.1 <- simulate(tergm.fit.1, 
                         nsim = 1,
@@ -137,7 +184,9 @@ tergm.sim.1 <- simulate(tergm.fit.1,
 
 ## From a network (or networkDynamic) ##
 
-A typical call in `tergm` 3.x for simulating based on a starting network (or networkDynamic), along with specified formation and dissolution formulas and coefficients, might look something like
+A typical call in `tergm` 3.x for simulating based on a starting network (or 
+networkDynamic), along with specified formation and dissolution formulas and 
+coefficients, might look something like
 ```
 stergm.sim.2 <- simulate(flobusiness, 
                          formation = ~edges+gwesp(0,fixed=T),
@@ -148,22 +197,34 @@ stergm.sim.2 <- simulate(flobusiness,
                          time.slices = 50000)
 ```
 
-To convert from simulating based on a starting network in `tergm` 3.x to simulating based on a starting network in `tergm` 4.0, we make the following changes.
+To convert from simulating based on a starting network in `tergm` 3.x to 
+simulating based on a starting network in `tergm` 4.0, we make the following 
+changes.
 
-- Combine the network, formation, and dissolution formulas into a single formula, as for estimation.
+- Combine the network, formation, and dissolution formulas into a single 
+  formula, as for estimation.
 
-- Combine the `coef.form` and `coef.diss` arguments into a single `coef` argument, as when simulating from a fitted `tergm` (with coefficients specified).
+- Combine the `coef.form` and `coef.diss` arguments into a single `coef` 
+  argument, as when simulating from a fitted `tergm` (with coefficients 
+  specified).
 
-- The control argument (if passed), previously of class `control.simulate.network`, should be replaced by one of class `control.simulate.formula.tergm`.  This can be accomplished by replacing `control.simulate.network()` with `control.simulate.formula.tergm()`, `snctrl()`, or `list()`, and updating arguments as when simulating from a fitted `tergm`.
+- The control argument (if passed), previously of class 
+  `control.simulate.network`, should be replaced by one of class 
+  `control.simulate.formula.tergm`.  This can be accomplished by replacing 
+  `control.simulate.network()` with `control.simulate.formula.tergm()`, 
+  `snctrl()`, or `list()`, and updating arguments as when simulating from a 
+  fitted `tergm`.
 
-- Combine the `stats.form` and `stats.diss` arguments (if passed) into a single `stats` argument.
+- Combine the `stats.form` and `stats.diss` arguments (if passed) into a 
+  single `stats` argument.
 
-- Pass `dynamic = TRUE` to indicate that you want `tergm` simulation (otherwise, `ergm` simulation will be attempted instead).
+- Pass `dynamic = TRUE` to indicate that you want `tergm` simulation 
+  (otherwise, `ergm` simulation will be attempted instead).
 
 Thus, we obtain the 4.0 simulation call
 ```
 tergm.sim.2 <- simulate(flobusiness ~ Form(~edges+gwesp(0,fixed=T)) +
-                                      Diss(~edges),
+                                      Persist(~edges),
                         monitor = "all",
                         coef = c(-7.981749, 1.575780, log(99)), 
                         time.slices = 50000,
