@@ -2,7 +2,7 @@
 % Please edit documentation in R/stergm.utils.R
 \name{.extract.fd.formulae}
 \alias{.extract.fd.formulae}
-\title{An Internal Function for Extracting (Some) Formation and Dissolution Formulas from a Combined Formula}
+\title{An Internal Function for Extracting (Some) Formation and Persistence Formulas from a Combined Formula}
 \usage{
 .extract.fd.formulae(formula)
 }
@@ -10,32 +10,25 @@
 \item{formula}{a \code{formula}.}
 }
 \value{
-A \code{list} containing \code{form}, \code{diss}, \code{nonsep}, and \code{all} formulas as described above.
+A \code{list} containing \code{form}, \code{pers}, \code{nonsep}, and \code{all} formulas as described above.
 }
 \description{
 This function is used in \code{tergm.EGMME.initialfit} and also when targets or monitoring
 formulas are specified by characters.  It makes a basic attempt to identify the
-formation and dissolution formulas within a larger combined formula (which may also
-include nonseparable terms).  More specifically, terms in the combined formula beginning
-with \code{Form} have their (first) argument extracted, and these arguments are accumulated into
-an overall formation formula.  The environment of this overall formula is the environment
-of the argument to \code{Form} when only one instance of \code{Form} occurs in the combined
-formula; otherwise it is obtained by starting with the first \code{Form}'s argument's environment
-and then updating the environment successively for each additional instance of \code{Form} using
-\code{statnet.commmon}'s \code{nonsimp_update.formula} with \code{from.new = TRUE}.  The same procedure
-is applied to instances of \code{Diss} in the combined formula to produce the dissolution formula.
-Formulas containing non-separable terms in the overall formula and all terms in the formation, dissolution,
-and non-separable formulas are also returned.  The non-separable formula's environment is
-that of the combined formula, and the environment of the "all" formula is obtained by starting with the
-first of formation, dissolution, and non-separable formulas that contains terms and proceding
-successively through any others that do as well, using \code{statnet.commmon}'s \code{nonsimp_update.formula}
-with \code{from.new = TRUE} as needed.
-
-Signs outside of \code{Form} and \code{Diss} are propagated to the formation and dissolution formulas.
-Instances of \code{Form} and \code{Diss} occurring inside other terms or inside of \code{offset} are
-not recognized and will be interpreted as belonging to the nonseparable part of the combined
-formula.  (Offsets can usually be propagated inside the \code{Form} or \code{Diss} in the original
-formula specification to avoid this problem.)
+formation and persistence formulas within a larger combined formula (which may also
+include non-separable terms).  Instances of \code{Form} at the top level (which may occur
+inside \code{offset}) contribute to the formation formula; instances of \code{Persist} and
+\code{Diss} at the top level (which may also occur inside \code{offset}) contribute to the
+persistence formula; all other terms are regarded as non-separable (this includes instances
+of \code{Form}, \code{Persist}, and \code{Diss} that occur inside other operator terms,
+including inside \code{Offset}).  The formation and persistence formulas are obtained by adding
+the contributing terms, replacing \code{Form} and \code{Persist} with trivial operators that protect
+the environments of their formula arguments but have no effect on statistics or coefficient names
+(meaning the formulas effectively become cross-sectional), and replacing \code{Diss} by a similar operator
+that negates statistics.  These are included in the return value as the \code{form} and \code{pers}
+elements of the list, which also includes the formula of non-separable terms as \code{nonsep},
+and the formula of all terms after replacing \code{Form}, \code{Persist}, and \code{Diss} as described
+above as \code{all}.
 
 If usage proves problematic, one may specify the monitoring and/or targets formulas explicitly
 (rather than by characters), and one may pass initial coefficient values for the EGMME to avoid
