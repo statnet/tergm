@@ -265,31 +265,24 @@ unset.offset.call <- function(object){
 }
 
 #' @rdname stergm.utils
-#' @title An Internal Function for Extracting (Some) Formation and Dissolution Formulas from a Combined Formula
-#'
+#' @title An Internal Function for Extracting (Some) Formation and Persistence Formulas from a Combined Formula
+#' 
 #' @description This function is used in \code{tergm.EGMME.initialfit} and also when targets or monitoring
 #' formulas are specified by characters.  It makes a basic attempt to identify the
-#' formation and dissolution formulas within a larger combined formula (which may also
-#' include nonseparable terms).  More specifically, terms in the combined formula beginning
-#' with \code{Form} have their (first) argument extracted, and these arguments are accumulated into
-#' an overall formation formula.  The environment of this overall formula is the environment
-#' of the argument to \code{Form} when only one instance of \code{Form} occurs in the combined
-#' formula; otherwise it is obtained by starting with the first \code{Form}'s argument's environment
-#' and then updating the environment successively for each additional instance of \code{Form} using
-#' \code{statnet.commmon}'s \code{nonsimp_update.formula} with \code{from.new = TRUE}.  The same procedure
-#' is applied to instances of \code{Diss} in the combined formula to produce the dissolution formula.
-#' Formulas containing non-separable terms in the overall formula and all terms in the formation, dissolution,
-#' and non-separable formulas are also returned.  The non-separable formula's environment is
-#' that of the combined formula, and the environment of the "all" formula is obtained by starting with the
-#' first of formation, dissolution, and non-separable formulas that contains terms and proceding 
-#' successively through any others that do as well, using \code{statnet.commmon}'s \code{nonsimp_update.formula} 
-#' with \code{from.new = TRUE} as needed.
-#' 
-#' Signs outside of \code{Form} and \code{Diss} are propagated to the formation and dissolution formulas.
-#' Instances of \code{Form} and \code{Diss} occurring inside other terms or inside of \code{offset} are
-#' not recognized and will be interpreted as belonging to the nonseparable part of the combined
-#' formula.  (Offsets can usually be propagated inside the \code{Form} or \code{Diss} in the original
-#' formula specification to avoid this problem.)
+#' formation and persistence formulas within a larger combined formula (which may also
+#' include non-separable terms).  Instances of \code{Form} at the top level (which may occur
+#' inside \code{offset}) contribute to the formation formula; instances of \code{Persist} and
+#' \code{Diss} at the top level (which may also occur inside \code{offset}) contribute to the 
+#' persistence formula; all other terms are regarded as non-separable (this includes instances 
+#' of \code{Form}, \code{Persist}, and \code{Diss} that occur inside other operator terms, 
+#' including inside \code{Offset}).  The formation and persistence formulas are obtained by adding 
+#' the contributing terms, replacing \code{Form} and \code{Persist} with trivial operators that protect
+#' the environments of their formula arguments but have no effect on statistics or coefficient names 
+#' (meaning the formulas effectively become cross-sectional), and replacing \code{Diss} by a similar operator
+#' that negates statistics.  These are included in the return value as the \code{form} and \code{pers}
+#' elements of the list, which also includes the formula of non-separable terms as \code{nonsep},
+#' and the formula of all terms after replacing \code{Form}, \code{Persist}, and \code{Diss} as described
+#' above as \code{all}.
 #' 
 #' If usage proves problematic, one may specify the monitoring and/or targets formulas explicitly 
 #' (rather than by characters), and one may pass initial coefficient values for the EGMME to avoid
@@ -297,89 +290,66 @@ unset.offset.call <- function(object){
 #'
 #' @param formula a \code{formula}.
 #'
-#' @return A \code{list} containing \code{form}, \code{diss}, \code{nonsep}, and \code{all} formulas as described above.
+#' @return A \code{list} containing \code{form}, \code{pers}, \code{nonsep}, and \code{all} formulas as described above.
 .extract.fd.formulae <- function(formula) {
   x <- list_rhs.formula(formula)
   signs <- attr(x, "sign")
-  
-  form_flags <- logical(length(x))
-  pers_flags <- logical(length(x))
-  diss_flags <- logical(length(x))
     
   form <- ~.
   pers <- ~.
   nonsep <- ~.
   all <- ~.
-  
+
   for(i in seq_along(x)) {
     term <- x[[i]]
     sign <- signs[i]
-    
+
     if(!is.call(term)) {
       nonsep <- append_rhs.formula(nonsep, structure(list(term), sign=sign))
       all <- append_rhs.formula(all, structure(list(term), sign=sign))
       next
     }
 
-    if(grepl("^Form", term[[1]])) {
-      form_flags[i] <- TRUE
-      form <- append_rhs.formula(form, structure(list(quote(Sum(,label=I))), sign=sign))
-      all <- append_rhs.formula(all, structure(list(quote(Sum(,label=I))), sign=sign))
-    } else if (grepl("^Persist", term[[1]])) {
-      pers_flags[i] <- TRUE
-      pers <- append_rhs.formula(pers, structure(list(quote(Sum(,label=I))), sign=sign))
-      all <- append_rhs.formula(all, structure(list(quote(Sum(,label=I))), sign=sign))
-    } else if (grepl("^Diss", term[[1]])) {
-      diss_flags[i] <- TRUE
-      pers <- append_rhs.formula(pers, structure(list(quote(Sum(,label=I))), sign=sign))
-      all <- append_rhs.formula(all, structure(list(quote(Sum(,label=I))), sign=sign))
+    offset <- identical(quote(offset), term[[1]])
+
+    if(offset) {
+      subterm <- term[[2]]
+      if(!is.call(subterm)) {
+        nonsep <- append_rhs.formula(nonsep, structure(list(term), sign=sign))
+        all <- append_rhs.formula(all, structure(list(term), sign=sign))
+        next
+      }
+    } else {
+      subterm <- term
+    }
+
+    if(identical(quote(Form), subterm[[1]])) {
+      if(offset) {
+        term[[2]][[1]] <- quote(.P)
+      } else {
+        term[[1]] <- quote(.P)      
+      }
+      form <- append_rhs.formula(form, structure(list(term), sign=sign))
+      all <- append_rhs.formula(all, structure(list(term), sign=sign))      
+    } else if (identical(quote(Persist), subterm[[1]])) {
+      if(offset) {
+        term[[2]][[1]] <- quote(.P)
+      } else {
+        term[[1]] <- quote(.P)      
+      }
+      pers <- append_rhs.formula(pers, structure(list(term), sign=sign))
+      all <- append_rhs.formula(all, structure(list(term), sign=sign))      
+    } else if (identical(quote(Diss), subterm[[1]])) {
+      if(offset) {
+        term[[2]][[1]] <- quote(.M)
+      } else {
+        term[[1]] <- quote(.M)      
+      }
+      pers <- append_rhs.formula(pers, structure(list(term), sign=sign))
+      all <- append_rhs.formula(all, structure(list(term), sign=sign))      
     } else {
       nonsep <- append_rhs.formula(nonsep, structure(list(term), sign=sign))
-      all <- append_rhs.formula(all, structure(list(term), sign=sign))
-    }
-  }
-  
-  if(any(form_flags)) {
-    leading_form_sign <- signs[which(form_flags)[1]]
-  }
-  if(any(pers_flags | diss_flags)) {
-    leading_pers_sign <- signs[which(pers_flags | diss_flags)[1]]  
-  }
-  leading_sign <- signs[1]
-    
-  for(i in seq_along(x)) {
-    if(form_flags[i]) {
-      arg <- eval(x[[i]][[2]], envir = environment(formula))
-      
-      pos <- sum(form_flags) - sum(form_flags[seq_len(i)])
-      ind <- c(3, rep(2, pos), if(pos < sum(form_flags) - 1) 3 else if (leading_form_sign == -1) 2, 2)
-      form[[ind]] <- arg
-      
-      pos <- length(x) - i
-      ind <- c(3, rep(2, pos), if(pos < length(x) - 1) 3 else if (leading_sign == -1) 2, 2)
-      all[[ind]] <- arg
-    } else if(pers_flags[i]) {
-      arg <- eval(x[[i]][[2]], envir = environment(formula))
-
-      pos <- sum(pers_flags | diss_flags) - sum((pers_flags | diss_flags)[seq_len(i)])
-      ind <- c(3, rep(2, pos), if(pos < sum(pers_flags | diss_flags) - 1) 3 else if (leading_pers_sign == -1) 2, 2)
-      pers[[ind]] <- arg
-      
-      pos <- length(x) - i
-      ind <- c(3, rep(2, pos), if(pos < length(x) - 1) 3 else if (leading_sign == -1) 2, 2)
-      all[[ind]] <- arg
-    } else if(diss_flags[i]) {
-      arg <- eval(x[[i]][[2]], envir = environment(formula))
-      arg1 <- append_rhs.formula(~-1, arg)
-      environment(arg1) <- environment(arg)
-      
-      pos <- sum(pers_flags | diss_flags) - sum((pers_flags | diss_flags)[seq_len(i)])
-      ind <- c(3, rep(2, pos), if(pos < sum(pers_flags | diss_flags) - 1) 3 else if (leading_pers_sign == -1) 2, 2)
-      pers[[ind]] <- arg1
-      
-      pos <- length(x) - i
-      ind <- c(3, rep(2, pos), if(pos < length(x) - 1) 3 else if (leading_sign == -1) 2, 2)
-      all[[ind]] <- arg1
+      all <- append_rhs.formula(all, structure(list(term), sign=sign))      
     }
   }
   
@@ -408,4 +378,44 @@ unset.offset.call <- function(object){
        pers = pers, 
        nonsep = nonsep, 
        all = all)
+}
+
+# Sum with a Plus sign and label = I
+InitErgmTerm..P <- function(nw, arglist, ..., env = baseenv()) {
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c("formula"),
+                      vartypes = c("formula"),
+                      defaultvalues = list(NULL),
+                      required = c(TRUE))
+  
+  m <- ergm_model(a$formula, nw, ..., offset.decorate=FALSE)
+  
+  if(length(a$formula) == 3) {
+    a$formula <- a$formula[c(1,3)]
+  }
+  a$label <- I
+
+  term <- as.call(c(list(as.name("Sum")),a))
+  out <- call.ErgmTerm(term, env = env, nw = nw, ...)
+  out$duration <- is.durational(m)
+  out
+}
+
+# Sum with a Minus sign and label = I
+InitErgmTerm..M <- function(nw, arglist, ..., env = baseenv()) {
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c("formula"),
+                      vartypes = c("formula"),
+                      defaultvalues = list(NULL),
+                      required = c(TRUE))
+
+  m <- ergm_model(a$formula, nw, ..., offset.decorate=FALSE)
+  
+  a$formula[c(2,3)] <- c(-1, ult(a$formula))
+  a$label <- I
+
+  term <- as.call(c(list(as.name("Sum")),a))
+  out <- call.ErgmTerm(term, env = env, nw = nw, ...)
+  out$duration <- is.durational(m)
+  out
 }

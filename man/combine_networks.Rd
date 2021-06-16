@@ -100,7 +100,8 @@ image(as.matrix(o2))
 head(get.vertex.attribute(o2, ".NetworkID", unlist=FALSE))
 
 data(florentine)
-f1 <- combine_networks(list(business=flobusiness, marriage=flomarriage), blockName.vattr=".NetworkName")
+f1 <- combine_networks(list(business=flobusiness, marriage=flomarriage),
+                       blockName.vattr=".NetworkName")
 image(as.matrix(f1))
 head(get.vertex.attribute(f1, ".NetworkID"))
 head(get.vertex.attribute(f1, ".NetworkName"))

@@ -10,7 +10,7 @@
 
 test_that("the .SubsetStatistics term behaves appropriately", {
   nw0 <- network.initialize(100, dir = FALSE)
-  nw <- simulate(nw0 ~ edges, coef = c(-2), dynamic = TRUE, output = "final")
+  nw <- simulate(nw0 ~ edges, coef = c(-4), dynamic = TRUE, output = "final")
 
   ## non-durational, non-curved
   ff0 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + concurrent
@@ -20,47 +20,47 @@ test_that("the .SubsetStatistics term behaves appropriately", {
   expect_identical(s1, s2)
 
   ## non-durational, curved
-  ff1 <- ~edges + triangle + gwesp(0, fixed = TRUE) + gwesp(fixed = FALSE, cutoff = 5)
-  stats1 <- sample(which(c(TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, TRUE)))
+  ff1 <- ~edges + triangle + gwesp(0, fixed = TRUE) + gwesp(fixed = FALSE, cutoff = 5) + isolates
+  stats1 <- sample(which(c(TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, TRUE, TRUE)))
   s1 <- summary(ff1, basis = nw)[stats1]
   s2 <- summary(~.SubsetStatistics(ff1, stats1), basis = nw)
   expect_identical(s1, s2)
 
   set.seed(0)
-  nw1 <- simulate(nw ~ Form(~edges + triangle) + Diss(~edges + gwesp(0, fixed = TRUE)), coef = c(-4, 0, 4, 0), time.slices = 10, dynamic = TRUE, output = "final")
+  nw1 <- simulate(nw ~ Form(~edges + triangle) + Persist(~edges + gwesp(0, fixed = TRUE)), coef = c(-6, 0, 4, 0), time.slices = 10, dynamic = TRUE, output = "final")
   set.seed(0)
-  nw2 <- simulate(nw ~ .SubsetStatistics(~Form(~edges + triangle) + Diss(~edges + gwesp(0, fixed = TRUE)), c(3,1)), coef = c(4, -4), time.slices = 10, dynamic = TRUE, output = "final")
+  nw2 <- simulate(nw ~ .SubsetStatistics(~Form(~edges + triangle) + Persist(~edges + gwesp(0, fixed = TRUE)), c(3,1)), coef = c(4, -6), time.slices = 10, dynamic = TRUE, output = "final")
   attr(nw1, "coef") <- NULL
   attr(nw2, "coef") <- NULL
   expect_identical(nw1, nw2)
   nw <- nw1
 
   ## durational, non-curved
-  ff2 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + concurrent + edges.ageinterval(1) + edges.ageinterval(4) + edges.ageinterval(15) + mean.age + Form(~edges + triangle + mean.age) + Diss(~edges + concurrent + isolates + edges.ageinterval(2) + edges.ageinterval(6))
+  ff2 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + concurrent + edges.ageinterval(1) + edges.ageinterval(4) + edges.ageinterval(15) + mean.age + Form(~edges + triangle + mean.age) + Persist(~edges + concurrent + isolates + edges.ageinterval(2) + edges.ageinterval(6))
   stats2 <- sample(which(c(TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)))
   s1 <- summary(ff2, basis = nw)[stats2]
   s2 <- summary(~.SubsetStatistics(ff2, I(c(stats2, 27L))), basis = nw)
   expect_identical(s1, s2)
 
   ## durational, curved
-  ff3 <- ~edges + triangle + gwesp(0, fixed = TRUE) + gwesp(fixed = FALSE, cutoff = 5) + mean.age + Form(~edges + triangle + mean.age) + Diss(~gwesp(fixed = FALSE, cutoff = 5))
-  stats3 <- c(TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)
+  ff3 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + gwesp(fixed = FALSE, cutoff = 5) + mean.age + Form(~edges + triangle + mean.age) + Diss(~gwesp(fixed = FALSE, cutoff = 5))
+  stats3 <- c(TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)
   s1 <- summary(ff3, basis = nw)[stats3]
   s2 <- summary(~.SubsetStatistics(ff3, stats3), basis = nw)
   expect_identical(s1, s2)
 
   set.seed(0)
-  sim01 <- simulate(nw ~ Form(~edges) + Diss(~edges),
-                    coef = c(-4, 4),
-                    time.slices = 100,
+  sim01 <- simulate(nw ~ Form(~edges) + Persist(~edges),
+                    coef = c(-6, 4),
+                    time.slices = 10,
                     dynamic = TRUE,
                     monitor = ff0,
                     output = "stats")[,stats0]
 
   set.seed(0)
-  sim02 <- simulate(nw ~ Form(~edges) + Diss(~edges),
-                    coef = c(-4, 4),
-                    time.slices = 100,
+  sim02 <- simulate(nw ~ Form(~edges) + Persist(~edges),
+                    coef = c(-6, 4),
+                    time.slices = 10,
                     dynamic = TRUE,
                     monitor = ~.SubsetStatistics(ff0,stats0),
                     output = "stats")
@@ -68,17 +68,17 @@ test_that("the .SubsetStatistics term behaves appropriately", {
   expect_identical(sim01, sim02)
 
   set.seed(1)
-  sim11 <- simulate(nw ~ Form(~edges) + Diss(~edges),
-                    coef = c(-4, 4),
-                    time.slices = 100,
+  sim11 <- simulate(nw ~ Form(~edges) + Persist(~edges),
+                    coef = c(-6, 4),
+                    time.slices = 10,
                     dynamic = TRUE,
                     monitor = ff1,
                     output = "stats")[,stats1]
 
   set.seed(1)
-  sim12 <- simulate(nw ~ Form(~edges) + Diss(~edges),
-                    coef = c(-4, 4),
-                    time.slices = 100,
+  sim12 <- simulate(nw ~ Form(~edges) + Persist(~edges),
+                    coef = c(-6, 4),
+                    time.slices = 10,
                     dynamic = TRUE,
                     monitor = ~.SubsetStatistics(ff1,stats1),
                     output = "stats")
@@ -86,17 +86,17 @@ test_that("the .SubsetStatistics term behaves appropriately", {
   expect_identical(sim11, sim12)
 
   set.seed(2)
-  sim21 <- simulate(nw ~ Form(~edges) + Diss(~edges),
-                    coef = c(-4, 4),
-                    time.slices = 100,
+  sim21 <- simulate(nw ~ Form(~edges) + Persist(~edges),
+                    coef = c(-6, 4),
+                    time.slices = 10,
                     dynamic = TRUE,
                     monitor = ff2,
                     output = "stats")[,stats2]
 
   set.seed(2)
-  sim22 <- simulate(nw ~ Form(~edges) + Diss(~edges),
-                    coef = c(-4, 4),
-                    time.slices = 100,
+  sim22 <- simulate(nw ~ Form(~edges) + Persist(~edges),
+                    coef = c(-6, 4),
+                    time.slices = 10,
                     dynamic = TRUE,
                     monitor = ~.SubsetStatistics(ff2,I(c(stats2, 27L))),
                     output = "stats")
@@ -104,17 +104,17 @@ test_that("the .SubsetStatistics term behaves appropriately", {
   expect_identical(sim21, sim22)
 
   set.seed(3)
-  sim31 <- simulate(nw ~ Form(~edges) + Diss(~edges),
-                    coef = c(-4, 4),
-                    time.slices = 100,
+  sim31 <- simulate(nw ~ Form(~edges) + Persist(~edges),
+                    coef = c(-6, 4),
+                    time.slices = 10,
                     dynamic = TRUE,
                     monitor = ff3,
                     output = "stats")[,stats3]
 
   set.seed(3)
-  sim32 <- simulate(nw ~ Form(~edges) + Diss(~edges),
-                    coef = c(-4, 4),
-                    time.slices = 100,
+  sim32 <- simulate(nw ~ Form(~edges) + Persist(~edges),
+                    coef = c(-6, 4),
+                    time.slices = 10,
                     dynamic = TRUE,
                     monitor = ~.SubsetStatistics(ff3,stats3),
                     output = "stats")
