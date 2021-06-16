@@ -205,16 +205,16 @@ InitErgmTerm..Statistics <- function(nw, arglist, ...) {
   statistics <- as.integer(statistics[statistics >= 1 & statistics <= nparam(m, canonical = TRUE)])
   if(length(statistics) == 0) return(NULL)
 
-  wem <- wrap.ergm_model(m, nw)
+  wm <- wrap.ergm_model(m, nw)
 
   if(is.curved(m)) {
-    wem <- modifyList(wem,
-                      list(coef.names = param_names(m, canonical = TRUE)[statistics],
-                           map = function(x, n, ...) { ergm.eta(x, m$etamap)[statistics] },
-                           gradient = function(x, n, ...) { ergm.etagrad(x, m$etamap)[,statistics,drop=FALSE] }))
+    wm <- replace(wm, c("coef.names", "map", "gradient"),
+                   list(coef.names = param_names(m, canonical = TRUE)[statistics],
+                        map = function(x, n, ...) { ergm.eta(x, m$etamap)[statistics] },
+                        gradient = function(x, n, ...) { ergm.etagrad(x, m$etamap)[,statistics,drop=FALSE] }))
   } else {
     for(name in c("minpar", "maxpar", "coef.names", "offset", "emptynwstats")) {
-      if(!is.null(wem[[name]])) wem[[name]] <- wem[[name]][statistics]
+      if(!is.null(wm[[name]])) wm[[name]] <- wm[[name]][statistics]
     }
   }
 
@@ -224,5 +224,6 @@ InitErgmTerm..Statistics <- function(nw, arglist, ...) {
          nstats = length(statistics),
          stats = statistics - 1L),
     ergm_propagate_ext.encode(m),
-    wem)
+    wm)
 }
+
