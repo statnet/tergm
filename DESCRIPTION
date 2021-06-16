@@ -1,6 +1,6 @@
 Package: tergm
-Version: 4.0.0-2237
-Date: 2021-06-12
+Version: 4.0.0
+Date: 2021-06-17
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
 	person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="pavel@statnet.org", comment=c(ORCID="0000-0002-9101-3362")),
@@ -47,7 +47,3 @@ VignetteBuilder: rmarkdown, knitr
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
-Remotes: github::statnet/statnet.common@master,
-    github::statnet/network@master,
-    github::statnet/networkDynamic@master,
-    github::statnet/ergm@master
