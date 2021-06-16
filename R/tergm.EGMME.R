@@ -41,7 +41,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
     message("Targets contains offset statistics; they will only be used during the SAN run, and removal of the offset statistics will be attempted for the EGMME targets.")
 
     non_offsets <- !target_model$etamap$offsetmap
-    targets <- trim_env(~.Statistics(targets, non_offsets), keep = c("targets", "non_offsets"))
+    targets <- trim_env(~.SubsetStatistics(targets, non_offsets), keep = c("targets", "non_offsets"))
     
     updated_target_model <- ergm_model(targets, nw, dynamic=TRUE, term.options = control$term.options)
     if(any(updated_target_model$etamap$offsetmap) || 
