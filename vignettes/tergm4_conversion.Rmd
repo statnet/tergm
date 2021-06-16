@@ -1,6 +1,10 @@
 ---
 title: Conversions for `tergm` version 4.0
-output: html_document
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{Conversions for tergm version 4.0}
 ---
 
 ```{r, echo=FALSE, cache=FALSE, eval=TRUE}
