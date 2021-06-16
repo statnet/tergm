@@ -208,10 +208,11 @@ InitErgmTerm..Statistics <- function(nw, arglist, ...) {
   wm <- wrap.ergm_model(m, nw)
 
   if(is.curved(m)) {
-    wm <- replace(wm, c("coef.names", "map", "gradient"),
-                   list(coef.names = param_names(m, canonical = TRUE)[statistics],
-                        map = function(x, n, ...) { ergm.eta(x, m$etamap)[statistics] },
-                        gradient = function(x, n, ...) { ergm.etagrad(x, m$etamap)[,statistics,drop=FALSE] }))
+    wm <- replace(wm, c("coef.names", "emptynwstats", "map", "gradient"),
+                  list(coef.names = param_names(m, canonical = TRUE)[statistics],
+                       emptynwstats = wm$emptynwstats[statistics],
+                       map = function(x, n, ...) { ergm.eta(x, m$etamap)[statistics] },
+                       gradient = function(x, n, ...) { ergm.etagrad(x, m$etamap)[,statistics,drop=FALSE] }))
   } else {
     for(name in c("minpar", "maxpar", "coef.names", "offset", "emptynwstats")) {
       if(!is.null(wm[[name]])) wm[[name]] <- wm[[name]][statistics]
