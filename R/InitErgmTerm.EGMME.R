@@ -176,8 +176,6 @@ InitErgmTerm..lasttoggle <- function(nw, arglist, ...){
        )
 }
 
-#' @rdname statistics_operator
-#' @name .Statistics
 #' @title An Internal Operator Term for Subsetting Statistics
 #'
 #' @description The \code{.Statistics} term is used internally in \code{tergm}'s EGMME
@@ -192,8 +190,7 @@ InitErgmTerm..lasttoggle <- function(nw, arglist, ...){
 #' model (meaning thetas are dropped and/or rearranged just as the etas are), and if the original
 #' model is curved, so is the derived model, which retains the full set of original thetas, even
 #' if some of them do not influence any retained etas.
-NULL
-
+#' @noRd
 InitErgmTerm..Statistics <- function(nw, arglist, ...) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula", "statistics"),
