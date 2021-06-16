@@ -38,7 +38,7 @@ is.durational.NULL <- function(object, ...) FALSE # By convention.
 #' @export
 is.durational.ergm_model <- function(object, ...){
 #' @import purrr
-  map(object$terms, "duration") %>% unlist %>% NVL(FALSE) %>% max
+  map(object$terms, "duration") %>% unlist %>% NVL(FALSE) %>% max %>% as.logical
 }
 
 #' @describeIn is.durational Test if the \code{\link{ergm_state}} has duration-dependent terms, which call for \code{\link{lasttoggle}} data structures.

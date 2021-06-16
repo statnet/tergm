@@ -292,3 +292,50 @@ F_CHANGESTAT_FN(f_on_discord_lt_net_Network){
   ModelDestroy(auxnet->onwp, m);
   STORAGE = NULL;
 }
+
+/* Take a subset of the network statistics of the submodel and drop the rest. */
+
+#define _REMAP_WS_ONTO_CS_                                              \
+  for(unsigned int i = 0; i < N_CHANGE_STATS; i++)                      \
+    CHANGE_STAT[i] = m->workspace[IINPUT_PARAM[i]]; // IINPUT_PARAM = the mapping.
+
+I_CHANGESTAT_FN(i_subset_stats) {
+  GET_STORAGE(Model, m);
+  STORAGE = m = ModelInitialize(getListElement(mtp->R, "submodel"), mtp->ext_state, nwp, FALSE);
+
+  SELECT_C_OR_D_BASED_ON_SUBMODEL(m);
+  DELETE_IF_UNUSED_IN_SUBMODEL(x_func, m);
+  DELETE_IF_UNUSED_IN_SUBMODEL(z_func, m);
+}
+
+D_CHANGESTAT_FN(d_subset_stats) {
+  GET_STORAGE(Model, m);
+  ChangeStats(ntoggles, tails, heads, nwp, m);
+  _REMAP_WS_ONTO_CS_
+}
+
+C_CHANGESTAT_FN(c_subset_stats) {
+  GET_STORAGE(Model, m);
+  ChangeStats1(tail, head, nwp, m, edgestate);
+  _REMAP_WS_ONTO_CS_
+}
+
+X_CHANGESTAT_FN(x_subset_stats) {
+  GET_STORAGE(Model, m);
+  PROPAGATE_X_SIGNAL_INTO(nwp, m, m->workspace);
+  _REMAP_WS_ONTO_CS_
+}
+
+Z_CHANGESTAT_FN(z_subset_stats) {
+  GET_STORAGE(Model, m);
+  ZStats(nwp, m, FALSE);
+  _REMAP_WS_ONTO_CS_
+}
+
+F_CHANGESTAT_FN(f_subset_stats) {
+  GET_STORAGE(Model, m);
+  ModelDestroy(nwp, m);
+  STORAGE = NULL;
+}
+
+#undef _REMAP_WS_ONTO_CS_
