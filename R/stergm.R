@@ -201,6 +201,8 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
     if(estimate == "EGMME") {
       nw_stergm <- nw
       term.options <- control$term.options
+      form_model <- ergm_model(formation, nw = nw_stergm, term.options = term.options, dynamic = TRUE, ...)
+      diss_model <- ergm_model(dissolution, nw = nw_stergm, term.options = term.options, dynamic = TRUE, ...)
     } else {
       if(inherits(nw, "network.list") || (is.list(nw) & !is.network(nw))) {
         nw_stergm <- NetSeries(nw, NA.impute = control$CMLE.NA.impute)
@@ -210,9 +212,9 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
         stop("Unsupported specification for the network series. See help for ", sQuote("NetSeries"), " for arguments.")
       }
       term.options <- control$CMLE.form.ergm$term.options
+      form_model <- ergm_model(formation, nw = nw_stergm, term.options = term.options, ...)
+      diss_model <- ergm_model(dissolution, nw = nw_stergm, term.options = term.options, ...)
     }
-    form_model <- ergm_model(formation, nw = nw_stergm, term.options = term.options, if(estimate == "EGMME") dynamic = TRUE, ...)
-    diss_model <- ergm_model(dissolution, nw = nw_stergm, term.options = term.options, if(estimate == "EGMME") dynamic = TRUE, ...)
     
     init.form <- NVL(control$init.form, rep(NA, nparam(form_model, canonical = FALSE)))
     init.diss <- NVL(control$init.diss, rep(NA, nparam(diss_model, canonical = FALSE)))
