@@ -30,7 +30,7 @@ join_nets <- function(nwl, blockID, blockName){
   nw
 }
 
-#' A network series specification for modelling for conditional modeling.
+#' A network series specification for conditional modeling.
 #'
 #' A function for specifying the LHS of a temporal network series ERGM.
 #'
