@@ -119,7 +119,7 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
   .PrevNet <- join_nets(nwl0,".NetworkID",".NetworkName")
   nw %ergmlhs% "constraints" <- nonsimp_update.formula(nw%ergmlhs%"constraints", .~.+discord(.PrevNet), from.new=".PrevNet")
 
-  nw
+  structure(nw, class = c("tergm_NetSeries", class(nw)))
 }
 
 
@@ -130,7 +130,7 @@ InitErgmTerm.Form <- function(nw, arglist,  ..., env=baseenv()) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  if(!is(nw, "combined_networks")) {
+  if(!is(nw, "tergm_NetSeries")) {
     return(`InitErgmTerm.Form (dynamic)`(nw = nw, arglist = a["formula"], ...))
   }
 
@@ -172,7 +172,7 @@ InitErgmTerm.Persist <- function(nw, arglist,  ..., env=baseenv()) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  if(!is(nw, "combined_networks")) {
+  if(!is(nw, "tergm_NetSeries")) {
     return(`InitErgmTerm.Persist (dynamic)`(nw = nw, arglist = a["formula"], ...))
   }
 
@@ -211,7 +211,7 @@ InitErgmTerm.Diss <- function(nw, arglist,  ..., env=baseenv()) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  if(!is(nw, "combined_networks")) {
+  if(!is(nw, "tergm_NetSeries")) {
     return(`InitErgmTerm.Diss (dynamic)`(nw = nw, arglist = a["formula"], ...))
   }
   
@@ -233,7 +233,7 @@ InitErgmTerm.Change <- function(nw, arglist,  ..., env=baseenv()) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  if(!is(nw, "combined_networks")) {
+  if(!is(nw, "tergm_NetSeries")) {
     return(`InitErgmTerm.Change (dynamic)`(nw = nw, arglist = a["formula"], ...))
   }
 
@@ -287,7 +287,7 @@ InitErgmTerm.Cross <- function(nw, arglist, ..., env=baseenv()) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  if (!is(nw, "combined_networks")) {
+  if (!is(nw, "tergm_NetSeries")) {
     # Just call Passthrough() operator.
     term <- as.call(c(list(as.name("Passthrough")), a))
     return(call.ErgmTerm(term, env = env, nw = nw, ...))
