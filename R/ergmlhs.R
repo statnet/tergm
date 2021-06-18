@@ -1,6 +1,6 @@
 .combine_ergmlhs <- function(nwl, ignore.settings=c()){
   ergml <- nwl %>% map(`%n%`, "ergm") %>% map(NVL, list())
-  l <- ergml[[1]]
+  l <- structure(ergml[[1]], class="ergm_lhs")
 
   for(i in seq_along(ergml)[-1]){
     l2 <- ergml[[i]]

@@ -2,7 +2,7 @@
 % Please edit documentation in R/InitErgmTerm.netseries.R
 \name{NetSeries}
 \alias{NetSeries}
-\title{A network series specification for modelling for conditional modeling.}
+\title{A network series specification for conditional modeling.}
 \usage{
 NetSeries(..., order = 1, NA.impute = NULL)
 }
