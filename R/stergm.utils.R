@@ -265,24 +265,24 @@ unset.offset.call <- function(object){
 }
 
 #' @rdname stergm.utils
-#' @title An Internal Function for Extracting (Some) Formation and Persistence Formulas from a Combined Formula
+#' @title An Internal Function for Extracting (Some) Formation and Dissolution Formulas from a Combined Formula
 #' 
 #' @description This function is used in \code{tergm.EGMME.initialfit} and also when targets or monitoring
 #' formulas are specified by characters.  It makes a basic attempt to identify the
-#' formation and persistence formulas within a larger combined formula (which may also
+#' formation and dissolution formulas within a larger combined formula (which may also
 #' include non-separable terms).  Instances of \code{Form} at the top level (which may occur
 #' inside \code{offset}) contribute to the formation formula; instances of \code{Persist} and
 #' \code{Diss} at the top level (which may also occur inside \code{offset}) contribute to the 
-#' persistence formula; all other terms are regarded as non-separable (this includes instances 
+#' dissolution formula; all other terms are regarded as non-separable (this includes instances 
 #' of \code{Form}, \code{Persist}, and \code{Diss} that occur inside other operator terms, 
-#' including inside \code{Offset}).  The formation and persistence formulas are obtained by adding 
+#' including inside \code{Offset}).  The formation and dissolution formulas are obtained by adding 
 #' the contributing terms, replacing \code{Form} and \code{Persist} with trivial operators that protect
 #' the environments of their formula arguments but have no effect on statistics or coefficient names 
 #' (meaning the formulas effectively become cross-sectional), and replacing \code{Diss} by a similar operator
 #' that negates statistics.  These are included in the return value as the \code{form} and \code{pers}
-#' elements of the list, which also includes the formula of non-separable terms as \code{nonsep},
-#' and the formula of all terms after replacing \code{Form}, \code{Persist}, and \code{Diss} as described
-#' above as \code{all}.
+#' elements of the list (the "dissolution" formula really being the persistence formula), which also includes 
+#' the formula of non-separable terms as \code{nonsep}, and the formula of all terms after replacing 
+#' \code{Form}, \code{Persist}, and \code{Diss} as described above as \code{all}.
 #' 
 #' If usage proves problematic, one may specify the monitoring and/or targets formulas explicitly 
 #' (rather than by characters), and one may pass initial coefficient values for the EGMME to avoid
