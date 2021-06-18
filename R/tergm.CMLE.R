@@ -11,17 +11,19 @@ tergm.CMLE <- function(formula, times, ...,
                         estimate,
                         control) {
   nw <- eval_lhs.formula(formula)
-  
-  if(inherits(nw, "network.list") || (is.list(nw) & !is.network(nw))){
-    NetSeries <- NetSeries(nw, NA.impute=control$CMLE.NA.impute)
-  }else if(inherits(nw,"networkDynamic")){
-    NetSeries <- NetSeries(nw, times, NA.impute=control$CMLE.NA.impute)
-  }else{
-    stop("Unsupported specification for the network series. See help for ",sQuote("NetSeries")," for arguments.")
+
+  if(!is(nw, "tergm_NetSeries")){
+    if(inherits(nw, "network.list") || (is.list(nw) && !is.network(nw) && is.network(nw[[1]]))){
+      NetSeries <- NetSeries(nw, NA.impute=control$CMLE.NA.impute)
+    }else if(inherits(nw,"networkDynamic")){
+      NetSeries <- NetSeries(nw, times, NA.impute=control$CMLE.NA.impute)
+    }else{
+      stop("Unsupported specification for the network series. See help for ",sQuote("NetSeries")," for arguments.")
+    }
+
+    formula <- nonsimp_update.formula(formula, NetSeries~., from.new="NetSeries")
   }
 
-  formula <- nonsimp_update.formula(formula, NetSeries~., from.new="NetSeries")
-  
   fit <- ergm(formula, ..., control=control$CMLE.ergm)
   class(fit) <- c("tergm_CMLE", "tergm", class(fit))
   fit
