@@ -204,12 +204,16 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
       form_model <- ergm_model(formation, nw = nw_stergm, term.options = term.options, dynamic = TRUE, ...)
       diss_model <- ergm_model(dissolution, nw = nw_stergm, term.options = term.options, dynamic = TRUE, ...)
     } else {
-      if(inherits(nw, "network.list") || (is.list(nw) & !is.network(nw))) {
-        nw_stergm <- NetSeries(nw, NA.impute = control$CMLE.NA.impute)
-      } else if(inherits(nw,"networkDynamic")) {
-        nw_stergm <- NetSeries(nw, times, NA.impute = control$CMLE.NA.impute)
+      if(!is(nw, "tergm_NetSeries")) {
+        if(inherits(nw, "network.list") || (is.list(nw) && !is.network(nw) && is.network(nw[[1]]))) {
+          nw_stergm <- NetSeries(nw, NA.impute=control$CMLE.NA.impute)
+        } else if(inherits(nw,"networkDynamic")) {
+          nw_stergm <- NetSeries(nw, times, NA.impute=control$CMLE.NA.impute)
+        } else {
+          stop("Unsupported specification for the network series. See help for ",sQuote("NetSeries")," for arguments.")
+        }
       } else {
-        stop("Unsupported specification for the network series. See help for ", sQuote("NetSeries"), " for arguments.")
+        nw_stergm <- nw
       }
       term.options <- control$CMLE.form.ergm$term.options
       form_model <- ergm_model(formation, nw = nw_stergm, term.options = term.options, ...)

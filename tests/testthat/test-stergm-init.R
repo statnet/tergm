@@ -96,5 +96,202 @@ test_that("stergm correctly handles initial coefficient specifications", {
                estimate = "CMLE",
                control = control.stergm(init.form = c(NA, NA, 1, NA, 1)))
 
-  expect_equal(coef(rv)[c(3,5)], c(4,-7), check.attributes = FALSE)  
+  expect_equal(coef(rv)[c(3,5)], c(4,-7), check.attributes = FALSE)
+  
+  ## test errors
+  expect_error(rv <- stergm(nwlist,
+                            formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+                            dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+                            offset.coef.form = c(1),
+                            offset.coef.diss = c(-1),
+                            estimate = "CMLE",
+                            control = control.stergm()), 
+                            "Invalid offset parameter vector offset.coef: wrong number of parameters: expected 3 got 2.")
+               
+  expect_error(rv <- stergm(nwlist,
+                            formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+                            dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+                            offset.coef.form = c(1,1),
+                            estimate = "CMLE",
+                            control = control.stergm()), 
+                            "Invalid offset parameter vector offset.coef: wrong number of parameters: expected 3 got 2.")
+               
+  expect_error(rv <- stergm(nwlist,
+                            formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+                            dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+                            offset.coef.form = c(1,1),
+                            estimate = "CMLE",
+                            control = control.stergm(init.diss = c(NA, NA, NA, NA, NA, NA, NA))), 
+                            "Dissolution model contains offsets whose coefficients have not been specified.")
+               
+  expect_error(rv <- stergm(nwlist,
+                            formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+                            dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+                            offset.coef.diss = c(-1),
+                            estimate = "CMLE",
+                            control = control.stergm(init.form = c(NA, NA, NA, NA, 1))), 
+                            "Formation model contains offsets whose coefficients have not been specified.")
+               
+  expect_error(rv <- stergm(nwlist,
+                            formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+                            dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+                            estimate = "CMLE",
+                            control = control.stergm(init.form = c(NA, NA, 1, NA, 1),
+                                                     init.diss = c(NA, -1, NA, NA, NA, NA))), 
+                            "Incorrect length of control\\$init.diss passed to stergm\\(\\); expected 7, got 6.")
+    
+  ## test EGMME (with tergm() redefined to simply return what it's passed)
+  actualtergm <- tergm::tergm
+  unlockBinding("tergm", environment(stergm))
+  environment(stergm)$tergm <- function(...) list(...)
+  lockBinding("tergm", environment(stergm))
+  
+  ## valid specification tests
+  rv <- stergm(nw1,
+               formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+               dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+               targets = ~nodefactor("attr") + nodematch("attr", diff = TRUE),
+               offset.coef.form = c(1,1),
+               offset.coef.diss = c(-1),
+               estimate = "EGMME",
+               control = control.stergm())
+
+  expect_equal(rv$offset.coef, c(1,1,-1), check.attributes = FALSE)
+  expect_equal(rv$control$init, NULL, check.attributes = FALSE)
+
+  rv <- stergm(nw1,
+               formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+               dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+               targets = ~nodefactor("attr") + nodematch("attr", diff = TRUE),
+               offset.coef.form = c(1,1),
+               estimate = "EGMME",
+               control = control.stergm(init.diss = c(NA, -1, NA, NA, NA, NA, NA)))
+
+  expect_equal(rv$offset.coef, c(1,1,-1), check.attributes = FALSE)
+  expect_equal(rv$control$init, c(NA,NA,1,NA,1,NA,-1,NA,NA,NA,NA,NA), check.attributes = FALSE)
+
+  rv <- stergm(nw1,
+               formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+               dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+               targets = ~nodefactor("attr") + nodematch("attr", diff = TRUE),
+               offset.coef.diss = c(-1),
+               estimate = "EGMME",
+               control = control.stergm(init.form = c(NA, NA, 1, NA, 1)))
+
+  expect_equal(rv$offset.coef, c(1,1,-1), check.attributes = FALSE)
+  expect_equal(rv$control$init, c(NA,NA,1,NA,1,NA,-1,NA,NA,NA,NA,NA), check.attributes = FALSE)
+
+  rv <- stergm(nw1,
+               formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+               dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+               targets = ~nodefactor("attr") + nodematch("attr", diff = TRUE),
+               estimate = "EGMME",
+               control = control.stergm(init.form = c(NA, NA, 1, NA, 1),
+                                        init.diss = c(NA, -1, NA, NA, NA, NA, NA)))
+
+  expect_equal(rv$offset.coef, c(1,1,-1), check.attributes = FALSE)
+  expect_equal(rv$control$init, c(NA,NA,1,NA,1,NA,-1,NA,NA,NA,NA,NA), check.attributes = FALSE)
+
+  ## override tests
+  rv <- stergm(nw1,
+               formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+               dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+               targets = ~nodefactor("attr") + nodematch("attr", diff = TRUE),
+               offset.coef.form = c(1,1),
+               offset.coef.diss = c(2),
+               estimate = "EGMME",
+               control = control.stergm(init.diss = c(NA, -1, NA, NA, NA, NA, NA)))
+
+  expect_equal(rv$offset.coef, c(1,1,2), check.attributes = FALSE)
+  expect_equal(rv$control$init, c(NA,NA,1,NA,1,NA,2,NA,NA,NA,NA,NA), check.attributes = FALSE)
+
+  rv <- stergm(nw1,
+               formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+               dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+               targets = ~nodefactor("attr") + nodematch("attr", diff = TRUE),
+               offset.coef.form = c(5,-3),
+               offset.coef.diss = c(-1),
+               estimate = "EGMME",
+               control = control.stergm(init.form = c(NA, NA, 1, NA, 1)))
+
+  expect_equal(rv$offset.coef, c(5,-3,-1), check.attributes = FALSE)
+  expect_equal(rv$control$init, c(NA,NA,5,NA,-3,NA,-1,NA,NA,NA,NA,NA), check.attributes = FALSE)
+
+  rv <- stergm(nw1,
+               formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+               dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+               targets = ~nodefactor("attr") + nodematch("attr", diff = TRUE),
+               estimate = "EGMME",
+               offset.coef.form = c(5,-3),
+               offset.coef.diss = c(1),               
+               control = control.stergm(init.form = c(NA, NA, 1, NA, 1),
+                                        init.diss = c(NA, -1, NA, NA, NA, NA, NA)))
+
+  expect_equal(rv$offset.coef, c(5,-3,1), check.attributes = FALSE)
+  expect_equal(rv$control$init, c(NA,NA,5,NA,-3,NA,1,NA,NA,NA,NA,NA), check.attributes = FALSE)
+
+  rv <- stergm(nw1,
+               formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+               dissolution = ~edges + nodecov("cov") + nodematch("attr", diff = TRUE),
+               targets = ~edges + nodefactor("attr") + nodematch("attr", diff = TRUE),
+               offset.coef.form = c(4,-7),
+               estimate = "EGMME",
+               control = control.stergm(init.form = c(NA, NA, 1, NA, 1)))
+
+  expect_equal(rv$offset.coef, c(4,-7), check.attributes = FALSE)
+  expect_equal(rv$control$init, c(NA,NA,4,NA,-7,NA,NA,NA,NA,NA,NA,NA), check.attributes = FALSE)
+  
+  ## test errors               
+  expect_error(rv <- stergm(nw1,
+                            formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+                            dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+                            targets = ~nodefactor("attr") + nodematch("attr", diff = TRUE),
+                            offset.coef.form = c(1,1),
+                            estimate = "EGMME",
+                            control = control.stergm(init.diss = c(NA, NA, NA, NA, NA, NA, NA))), 
+                            "Dissolution model contains offsets whose coefficients have not been specified.")
+               
+  expect_error(rv <- stergm(nw1,
+                            formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+                            dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+                            targets = ~nodefactor("attr") + nodematch("attr", diff = TRUE),
+                            offset.coef.diss = c(-1),
+                            estimate = "EGMME",
+                            control = control.stergm(init.form = c(NA, NA, NA, NA, 1))), 
+                            "Formation model contains offsets whose coefficients have not been specified.")
+               
+  expect_error(rv <- stergm(nw1,
+                            formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+                            dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+                            targets = ~nodefactor("attr") + nodematch("attr", diff = TRUE),
+                            estimate = "EGMME",
+                            control = control.stergm(init.form = c(NA, NA, 1, NA, 1),
+                                                     init.diss = c(NA, -1, NA, NA, NA, NA))), 
+                            "Incorrect length of control\\$init.diss passed to stergm\\(\\); expected 7, got 6.")  
+
+  # restore tergm definition
+  unlockBinding("tergm", environment(stergm))
+  environment(stergm)$tergm <- actualtergm
+  lockBinding("tergm", environment(stergm))
+
+  ## test a couple of errors that are caught lower down
+  expect_error(rv <- stergm(nw1,
+                            formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+                            dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+                            targets = ~nodefactor("attr") + nodematch("attr", diff = TRUE),
+                            offset.coef.form = c(1),
+                            offset.coef.diss = c(-1),
+                            estimate = "EGMME",
+                            control = control.stergm()), 
+                            "Invalid offset parameter vector offset.coef: wrong number of parameters: expected 3 got 2.")
+               
+  expect_error(rv <- stergm(nw1,
+                            formation = ~edges + offset(nodefactor("attr"), c(2,4)),
+                            dissolution = ~edges + offset(nodecov("cov")) + nodematch("attr", diff = TRUE),
+                            targets = ~nodefactor("attr") + nodematch("attr", diff = TRUE),
+                            offset.coef.form = c(1,1),
+                            estimate = "EGMME",
+                            control = control.stergm()), 
+                            "Invalid offset parameter vector offset.coef: wrong number of parameters: expected 3 got 2.")
+  
 })
