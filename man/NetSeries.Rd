@@ -27,6 +27,15 @@ A network object with temporal metadata.
 \description{
 A function for specifying the LHS of a temporal network series ERGM.
 }
+\note{
+It is not recommended to modify the network returned by
+\code{NetSeries} except by adding and removing edges, and even that
+must be done with some care, to avoid putting it into an
+inconsistent state.
+
+It is almost always better to modify the original networks and
+regenerate the series.
+}
 \examples{
 
 data(samplk)
