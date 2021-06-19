@@ -163,7 +163,7 @@ See \code{\link{control.ergm}}.}
 \item{CMLE.form.ergm}{Control parameters used to fit the CMLE.  See
 \code{\link{control.ergm}}.}
 
-\item{CMLE.diss.ergm}{Ignored.}
+\item{CMLE.diss.ergm}{Ignored, with the exception of initial parameter values.}
 
 \item{CMLE.NA.impute}{In STERGM CMLE, missing dyads in
 transitioned-to networks are accommodated using methods of
@@ -445,10 +445,11 @@ function.  See the \code{usage} section in \code{\link{stergm}} for details.
 Generally speaking, \code{control.stergm} is remapped to \code{control.tergm},
 with dissolution controls ignored and formation controls used as controls
 for the overall \code{tergm} process.  An exception to this rule is the
-\code{init.form} and \code{init.diss} control arguments, which will be
-remapped jointly with \code{offset.coef.form} and \code{offset.coef.diss}
-to determine the \code{control$init} and \code{offset.coef} arguments
-passed to \code{tergm}.
+initial parameter values specified via \code{init.form}, \code{init.diss},
+\code{CMLE.form.ergm$init}, and \code{CMLE.diss.ergm$init}, which will be
+remapped jointly with the \code{stergm()} arguments \code{offset.coef.form}
+and \code{offset.coef.diss} to determine the initial parameter values passed
+to \code{tergm}.
 
 It is recommended that new code make use of \code{tergm} and \code{control.tergm}
 directly; \code{stergm} wrappers are included only for backwards compatibility.
