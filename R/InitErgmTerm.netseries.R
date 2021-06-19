@@ -30,7 +30,7 @@ join_nets <- function(nwl, blockID, blockName){
   nw
 }
 
-#' A network series specification for modelling for conditional modeling.
+#' A network series specification for conditional modeling.
 #'
 #' A function for specifying the LHS of a temporal network series ERGM.
 #'
@@ -50,6 +50,14 @@ join_nets <- function(nwl, blockID, blockName){
 #'   \code{imputers} of \code{\link{impute.network.list}} for details.
 #'
 #' @return A network object with temporal metadata.
+#'
+#' @note It is not recommended to modify the network returned by
+#'   `NetSeries` except by adding and removing edges, and even that
+#'   must be done with some care, to avoid putting it into an
+#'   inconsistent state.
+#'
+#'   It is almost always better to modify the original networks and
+#'   regenerate the series.
 #'
 #' @seealso [Help on model specification][ergm-terms] for specific terms.
 #' 
@@ -119,7 +127,7 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
   .PrevNet <- join_nets(nwl0,".NetworkID",".NetworkName")
   nw %ergmlhs% "constraints" <- nonsimp_update.formula(nw%ergmlhs%"constraints", .~.+discord(.PrevNet), from.new=".PrevNet")
 
-  nw
+  structure(nw, class = c("tergm_NetSeries", class(nw)))
 }
 
 
@@ -130,7 +138,7 @@ InitErgmTerm.Form <- function(nw, arglist,  ..., env=baseenv()) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  if(!is(nw, "combined_networks")) {
+  if(!is(nw, "tergm_NetSeries")) {
     return(`InitErgmTerm.Form (dynamic)`(nw = nw, arglist = a["formula"], ...))
   }
 
@@ -172,7 +180,7 @@ InitErgmTerm.Persist <- function(nw, arglist,  ..., env=baseenv()) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  if(!is(nw, "combined_networks")) {
+  if(!is(nw, "tergm_NetSeries")) {
     return(`InitErgmTerm.Persist (dynamic)`(nw = nw, arglist = a["formula"], ...))
   }
 
@@ -211,7 +219,7 @@ InitErgmTerm.Diss <- function(nw, arglist,  ..., env=baseenv()) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  if(!is(nw, "combined_networks")) {
+  if(!is(nw, "tergm_NetSeries")) {
     return(`InitErgmTerm.Diss (dynamic)`(nw = nw, arglist = a["formula"], ...))
   }
   
@@ -233,7 +241,7 @@ InitErgmTerm.Change <- function(nw, arglist,  ..., env=baseenv()) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  if(!is(nw, "combined_networks")) {
+  if(!is(nw, "tergm_NetSeries")) {
     return(`InitErgmTerm.Change (dynamic)`(nw = nw, arglist = a["formula"], ...))
   }
 
@@ -287,7 +295,7 @@ InitErgmTerm.Cross <- function(nw, arglist, ..., env=baseenv()) {
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  if (!is(nw, "combined_networks")) {
+  if (!is(nw, "tergm_NetSeries")) {
     # Just call Passthrough() operator.
     term <- as.call(c(list(as.name("Passthrough")), a))
     return(call.ErgmTerm(term, env = env, nw = nw, ...))

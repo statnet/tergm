@@ -445,10 +445,10 @@ function.  See the \code{usage} section in \code{\link{stergm}} for details.
 Generally speaking, \code{control.stergm} is remapped to \code{control.tergm},
 with dissolution controls ignored and formation controls used as controls
 for the overall \code{tergm} process.  An exception to this rule is the
-\code{init.form} and \code{init.diss} control arguments, both of which
-should be passed if one wishes to specify \code{init} for the \code{tergm}
-by way of \code{control.stergm} (the value of \code{init} being the concatenation
-of \code{init.form} and \code{init.diss}).
+\code{init.form} and \code{init.diss} control arguments, which will be
+remapped jointly with \code{offset.coef.form} and \code{offset.coef.diss}
+to determine the \code{control$init} and \code{offset.coef} arguments
+passed to \code{tergm}.
 
 It is recommended that new code make use of \code{tergm} and \code{control.tergm}
 directly; \code{stergm} wrappers are included only for backwards compatibility.

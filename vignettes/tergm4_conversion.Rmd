@@ -77,13 +77,21 @@ To convert these to the new 4.0 user interface, we make the following changes.
   
   These formulas will be our first arguments to the `tergm` function.
 
-- The `offset.coef.form` and `offset.coef.diss` arguments (if present) should 
-  be combined into a single `offset.coef` argument, schematically of the form 
-  `offset.coef = c(offset.coef.form, offset.coef.diss)`, corresponding to the 
-  order in which we have included the formation and dissolution formulas in the 
-  combined formula.  Here, the CMLE example has no offsets, so this applies 
-  only to the EGMME example where we have only a single dissolution offset to 
-  begin with.  The result is that we replace
+- The initial coefficient specifications for the formation and dissolution
+  models, if passed, should be combined into a specification of initial
+  coefficients for the combined model.  This can be done through the `tergm`
+  function's `offset.coef` argument and/or `control$init` argument, with the 
+  former overriding the corresponding elements of the latter.  If `offset.coef`
+  is passed, it should have length equal to the number of offset thetas in the
+  combined model, and if `control$init` is passed, it should have length equal
+  to the total number of thetas in the combined model.  (`NA`s may be used in
+  `control$init` to indicate that initial values for those (non-offset) thetas
+  are not being passed.)  Here `control` refers to the `control.tergm` class 
+  control discussed more below.
+
+  In our examples, the CMLE call does not specify initial coefficient values, 
+  and the EGMME call specifies only a single dissolution offset.  The result 
+  is that we replace
 
   ```
   offset.coef.diss = log(9)

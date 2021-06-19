@@ -195,12 +195,70 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
     warning("Dissolution formula has an LHS, which will be ignored in favor of nw.")
     dissolution <- dissolution[c(1,3)] # in a formula f<-y~x, f[1]=~, f[2]=y, and f[3]=x
   }
-  
-  if((is.null(control$init.form) && !is.null(control$init.diss)) || (!is.null(control$init.form) && is.null(control$init.diss))) {
-    stop("tergm 4.0 requires that both 'init.form' and 'init.diss' are specified when either is.")
-  }
 
-  # would be a problem if one is specified and the other isn't, but we now check for that above
+  if(!is.null(control$init.form) || !is.null(control$init.diss)) {
+    ## need to make sure offsets and inits are set up properly for the tergm call below
+    if(estimate == "EGMME") {
+      nw_stergm <- nw
+      term.options <- control$term.options
+      form_model <- ergm_model(formation, nw = nw_stergm, term.options = term.options, dynamic = TRUE, ...)
+      diss_model <- ergm_model(dissolution, nw = nw_stergm, term.options = term.options, dynamic = TRUE, ...)
+    } else {
+      if(!is(nw, "tergm_NetSeries")) {
+        if(inherits(nw, "network.list") || (is.list(nw) && !is.network(nw) && is.network(nw[[1]]))) {
+          nw_stergm <- NetSeries(nw, NA.impute=control$CMLE.NA.impute)
+        } else if(inherits(nw,"networkDynamic")) {
+          nw_stergm <- NetSeries(nw, times, NA.impute=control$CMLE.NA.impute)
+        } else {
+          stop("Unsupported specification for the network series. See help for ",sQuote("NetSeries")," for arguments.")
+        }
+      } else {
+        nw_stergm <- nw
+      }
+      term.options <- control$CMLE.form.ergm$term.options
+      form_model <- ergm_model(formation, nw = nw_stergm, term.options = term.options, ...)
+      diss_model <- ergm_model(dissolution, nw = nw_stergm, term.options = term.options, ...)
+    }
+    
+    init.form <- NVL(control$init.form, rep(NA, nparam(form_model, canonical = FALSE)))
+    init.diss <- NVL(control$init.diss, rep(NA, nparam(diss_model, canonical = FALSE)))
+
+    if(length(init.form) != nparam(form_model, canonical = FALSE)) {
+      stop("Incorrect length of control$init.form passed to stergm(); expected ", nparam(form_model, canonical = FALSE), ", got ", length(init.form), ".")
+    }
+
+    if(length(init.diss) != nparam(diss_model, canonical = FALSE)) {
+      stop("Incorrect length of control$init.diss passed to stergm(); expected ", nparam(diss_model, canonical = FALSE), ", got ", length(init.diss), ".")
+    }
+    
+    if(!is.null(offset.coef.form)) {
+      if(length(offset.coef.form) != sum(form_model$etamap$offsettheta)) {
+        stop("Incorrect length of offset.coef.form passed to stergm(); expected ", sum(form_model$etamap$offsettheta), ", got ", length(offset.coef.form), ".")
+      }
+      init.form[form_model$etamap$offsettheta] <- offset.coef.form
+    }
+    if(!is.null(offset.coef.diss)) {
+      if(length(offset.coef.diss) != sum(diss_model$etamap$offsettheta)) {
+        stop("Incorrect length of offset.coef.diss passed to stergm(); expected ", sum(diss_model$etamap$offsettheta), ", got ", length(offset.coef.diss), ".")
+      }      
+      init.diss[diss_model$etamap$offsettheta] <- offset.coef.diss
+    }
+    
+    offset.coef.form <- init.form[form_model$etamap$offsettheta]
+    offset.coef.diss <- init.diss[diss_model$etamap$offsettheta]
+    
+    if(any(is.na(offset.coef.form))) {
+      stop("Formation model contains offsets whose coefficients have not been specified.")
+    }
+
+    if(any(is.na(offset.coef.diss))) {
+      stop("Dissolution model contains offsets whose coefficients have not been specified.")
+    }
+    
+    control$init.form <- init.form
+    control$init.diss <- init.diss
+  }
+  
   control$init <- c(control$init.form, control$init.diss) 
 
   control$MCMC.prop <- control$MCMC.prop.form

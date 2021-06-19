@@ -12,3 +12,4 @@ Rplots.pdf
 ^.github$
 ^codecov\.yml$
 ^revdep$
+^README.md$
