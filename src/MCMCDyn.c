@@ -237,11 +237,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
   memset(m->workspace, 0, m->n_stats*sizeof(double)); /* Zero all change stats. */
   SEND_X_SIGNAL_INTO(nwp, m, MHp, m->workspace, TICK, NULL);
   /* Record network statistics for posterity. */
-  if(stats) {
-    for (unsigned int i = 0; i < m->n_stats; i++)
-      stats[i] += m->workspace[i];
-  }
-
+  if(stats) addonto(stats, m->workspace, m->n_stats);
 
   /* Run the process. */
   
