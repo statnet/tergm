@@ -298,7 +298,9 @@ InitErgmTerm.Cross <- function(nw, arglist, ..., env=baseenv()) {
   if (!is(nw, "tergm_NetSeries")) {
     # Just call Passthrough() operator.
     term <- as.call(c(list(as.name("Passthrough")), a))
-    return(call.ErgmTerm(term, env = env, nw = nw, ...))
+    term <- call.ErgmTerm(term, env = env, nw = nw, ...)
+    term$duration <- is.durational(term$submodel)
+    return(term)
   }
 
   auxiliaries <- base_env(~.crossnets(".NetworkID"))

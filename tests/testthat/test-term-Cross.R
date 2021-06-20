@@ -146,7 +146,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
   expect_true(!is.curved(m21))
   expect_true(!is.curved(m22))
   expect_true(is.durational(m21))
-  expect_true(!is.durational(m22))
+  expect_true(is.durational(m22))
   expect_identical(paste0("Passthrough~", param_names(m21, canonical = FALSE)), param_names(m22, canonical = FALSE))
   expect_identical(paste0("Passthrough~", param_names(m21, canonical = TRUE)), param_names(m22, canonical = TRUE))
 
@@ -155,7 +155,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
   expect_true(is.curved(m31))
   expect_true(is.curved(m32))
   expect_true(is.durational(m31))
-  expect_true(!is.durational(m32))
+  expect_true(is.durational(m32))
   expect_identical(paste0("Passthrough~", param_names(m31, canonical = FALSE)), param_names(m32, canonical = FALSE))
   expect_identical(paste0("Passthrough~", param_names(m31, canonical = TRUE)), param_names(m32, canonical = TRUE))
 })
