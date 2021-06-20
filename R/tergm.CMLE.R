@@ -7,9 +7,7 @@
 #
 #  Copyright 2008-2020 Statnet Commons
 #######################################################################
-tergm.CMLE <- function(formula, times, ...,
-                        estimate,
-                        control) {
+tergm.CMLE <- function(formula, times, ..., control) {
   nw <- eval_lhs.formula(formula)
 
   if(!is(nw, "tergm_NetSeries")){
