@@ -324,6 +324,15 @@ test_that(".extract.fd.formulae behaves reasonably", {
   expect_equal(~.M(~mean.age), R$pers)
   expect_equal(~edges*concurrent + triangle + isolates:degree(1), R$nonsep)
   expect_equal(~.P(~edges + triangle:gwesp(0,fixed=TRUE)) + edges*concurrent + .M(~mean.age) + triangle + isolates:degree(1), R$all)
+
+  ## test that interactions are always treated as non-separable (maybe not ideal, but at least documentable)
+  F <- ~edges:Form(~edges) + Form(~edges)*edges + Diss(~edges)*Form(~edges) + Persist(~edges):Diss(~edges) +
+        offset(edges):Form(~edges) + offset(edges:Form(~edges)) + edges:offset(Form(~edges))
+  R <- .extract.fd.formulae(F)
+  expect_equal(~., R$form)
+  expect_equal(~., R$pers)
+  expect_equal(F, R$nonsep)
+  expect_equal(F, R$all)
 })
 
 test_that("terms .P/.M behave as plus/minus identity", {
