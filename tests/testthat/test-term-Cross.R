@@ -49,7 +49,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
 
   set.seed(0)
   sim01 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ff0,
@@ -57,7 +57,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
 
   set.seed(0)
   sim02 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ~Cross(ff0),
@@ -68,7 +68,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
 
   set.seed(1)
   sim11 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ff1,
@@ -76,7 +76,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
 
   set.seed(1)
   sim12 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ~Cross(ff1),
@@ -87,7 +87,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
 
   set.seed(2)
   sim21 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ff2,
@@ -95,7 +95,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
 
   set.seed(2)
   sim22 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ~Cross(ff2),
@@ -106,7 +106,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
 
   set.seed(3)
   sim31 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ff3,
@@ -114,7 +114,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
 
   set.seed(3)
   sim32 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ~Cross(ff3),

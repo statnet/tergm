@@ -51,7 +51,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
 
   set.seed(0)
   sim01 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ff0,
@@ -59,7 +59,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
 
   set.seed(0)
   sim02 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ~.SubsetStatistics(ff0,stats0),
@@ -69,7 +69,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
 
   set.seed(1)
   sim11 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ff1,
@@ -77,7 +77,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
 
   set.seed(1)
   sim12 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ~.SubsetStatistics(ff1,stats1),
@@ -87,7 +87,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
 
   set.seed(2)
   sim21 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ff2,
@@ -95,7 +95,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
 
   set.seed(2)
   sim22 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ~.SubsetStatistics(ff2,I(c(stats2, 27L))),
@@ -105,7 +105,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
 
   set.seed(3)
   sim31 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ff3,
@@ -113,7 +113,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
 
   set.seed(3)
   sim32 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 4),
+                    coef = c(-6, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ~.SubsetStatistics(ff3,stats3),
