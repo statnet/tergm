@@ -327,7 +327,9 @@ test_that(".extract.fd.formulae behaves reasonably", {
 
   ## test that interactions are always treated as non-separable (maybe not ideal, but at least documentable)
   F <- ~edges:Form(~edges) + Form(~edges)*edges + Diss(~edges)*Form(~edges) + Persist(~edges):Diss(~edges) +
-        offset(edges):Form(~edges) + offset(edges:Form(~edges)) + edges:offset(Form(~edges))
+        offset(edges):Form(~edges) + offset(edges:Form(~edges)) + edges:offset(Form(~edges)) +
+        offset(edges)*Form(~edges) + offset(edges*Form(~edges)) + edges*offset(Form(~edges)) +
+        Form(~edges):Form(~triangle) + Form(~edges)*Form(~triangle)        
   R <- .extract.fd.formulae(F)
   expect_equal(~., R$form)
   expect_equal(~., R$pers)
