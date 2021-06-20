@@ -39,8 +39,8 @@ samp.fit <- stergm(samp,
                    dissolution = ~edges+mutual+cyclicalties+transitiveties,
                    estimate = "CMLE",
                    times = 1:3,
-                   control = control.stergm(CMLE.form.ergm = control.ergm(init = c(-3.5,2,0,NA)),
-                                            CMLE.diss.ergm = control.ergm(init = c(0,1,0,1/2))))
+                   control = control.stergm(CMLE.control.form = control.ergm(init = c(-3.5,2,0,NA)),
+                                            CMLE.control.diss = control.ergm(init = c(0,1,0,1/2))))
 ```
 
 for CMLE, and
@@ -89,6 +89,27 @@ To convert these to the new 4.0 user interface, we make the following changes.
   
   These formulas will be our first arguments to the `tergm` function.
 
+- The control argument (if present), previously of class `control.stergm`, 
+  should be replaced by one of class `control.tergm`.  This can be accomplished 
+  by replacing `control.stergm()` with `control.tergm()`, `snctrl()`, or 
+  `list()`, and updating arguments as follows.  Arguments to `control.stergm()` 
+  occurring in pairs with `.form` and `.diss` in their names have been 
+  collapsed to single, correspondingly named arguments to `control.tergm()` 
+  without `.form` or `.diss`.  Additionally, the arguments `CMLE.control.form` and
+  `CMLE.control.diss` to `control.stergm()` correspond to the `CMLE.ergm` 
+  argument to `control.tergm()` (and have been renamed as the `CMLE.form.ergm`
+  and `CMLE.diss.ergm` control arguments to `control.stergm()`).
+  Furthermore, the arguments `MCMC.init.maxedges` 
+  and `MCMC.init.maxchanges` to `control.stergm()` have been replaced by the 
+  `MCMC.maxedges` and `MCMC.maxchanges` arguments to `control.tergm()`; these
+  arguments have also been replaced in `control.stergm()`, so code continuing
+  to use the old interface will still need to change from using 
+  `MCMC.init.maxedges` and `MCMC.init.maxchanges` to using `MCMC.maxedges` and 
+  `MCMC.maxchanges`.  
+  
+  Our discussion of initial coefficient values below will also include the 
+  necessary control argument changes for our examples above.
+
 - The initial coefficient specifications for the formation and dissolution
   models, if passed, should be combined into a specification of initial
   coefficients for the combined model.  This can be done through the `tergm`
@@ -100,10 +121,10 @@ To convert these to the new 4.0 user interface, we make the following changes.
   model.  (`NA`s may be used in `control$init` or `control$CMLE.ergm$init` to 
   indicate that initial values for those (non-offset) thetas are not being 
   passed.)  Here `control` refers to the `control.tergm` class control 
-  discussed more below.
+  discussed in the previous bullet point.
 
   In our examples, the CMLE call specifies initial coefficient values through
-  `control$CMLE.*.ergm$init`.  We can combine these into 
+  `control$CMLE.control.*$init`.  We can combine these into 
   `control$CMLE.ergm$init` as
   
   ```
@@ -126,24 +147,6 @@ To convert these to the new 4.0 user interface, we make the following changes.
   ```
   offset.coef = log(9)
   ```
-
-- The control argument (if present), previously of class `control.stergm`, 
-  should be replaced by one of class `control.tergm`.  This can be accomplished 
-  by replacing `control.stergm()` with `control.tergm()`, `snctrl()`, or 
-  `list()`, and updating arguments as follows.  Arguments to `control.stergm()` 
-  occurring in pairs with `.form` and `.diss` in their names have been 
-  collapsed to single, correspondingly named arguments to `control.tergm()` 
-  without `.form` or `.diss`.  Additionally, the arguments `MCMC.init.maxedges` 
-  and `MCMC.init.maxchanges` to `control.stergm()` have been replaced by the 
-  `MCMC.maxedges` and `MCMC.maxchanges` arguments to `control.tergm()`; these
-  arguments have also been replaced in `control.stergm()`, so code continuing
-  to use the old interface will still need to change from using 
-  `MCMC.init.maxedges` and `MCMC.init.maxchanges` to using `MCMC.maxedges` and 
-  `MCMC.maxchanges`.
-  
-  Our discussion of initial coefficient values above already covers the needed 
-  control argument changes in our examples, so no additional changes are needed 
-  at this point.
 
 Overall, this produces the new-style calls
 
@@ -170,7 +173,6 @@ tergm.fit.1 <- tergm(flobusiness ~ Form(~edges+gwesp(0,fixed=T)) +
 ```
 
 for EGMME.
-
 
 # Simulation #
 
