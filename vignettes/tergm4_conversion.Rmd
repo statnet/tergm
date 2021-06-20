@@ -23,10 +23,9 @@ degree of backwards compatibility, there are some points of backwards
 incompatibility, and some users may wish to convert their code to use the new 
 interfaces anyway, so this document describes how to go about doing that.  The 
 examples given here are somewhat artificial so as to better illustrate the 
-range of possible changes needed; they may not be completely indicative of 
-"typical" use cases (often using more arguments than are needed for the task at 
-hand), but the point is simply to exhibit the sorts of syntactical changes that 
-may be needed, regardless of the details of the application.
+range of possible changes needed; they may not be typical or even plausible in 
+every detail, but are intended to exhibit the types of updates that users may 
+need to make.
 
 # Estimation #
 
@@ -68,7 +67,8 @@ To convert these to the new 4.0 user interface, we make the following changes.
   into a single formula, schematically of the form 
 
   ```
-  network ~ Form(formation formula) + Persist(dissolution formula)
+  network ~ Form(formation formula) + 
+            Persist(dissolution formula)
   ```
 
   where `Form` and `Persist` are operator terms defined in `tergm` 4.0.
@@ -83,7 +83,8 @@ To convert these to the new 4.0 user interface, we make the following changes.
   and for the EGMME example, it results in the formula 
   
   ```
-  flobusiness ~ Form(~edges+gwesp(0,fixed=T)) + Persist(~offset(edges))
+  flobusiness ~ Form(~edges+gwesp(0,fixed=T)) + 
+                Persist(~offset(edges))
   ```
   
   These formulas will be our first arguments to the `tergm` function.
@@ -109,9 +110,9 @@ To convert these to the new 4.0 user interface, we make the following changes.
   control = control.tergm(CMLE.ergm = control.ergm(init = c(-3.5,2,0,NA,0,1,0,1/2)))
   ```  
   
-  noting that we also replaced `control.stergm` with `control.tergm`.  We can
-  simplify this further by exploiting new control list flattening features, 
-  writing 
+  noting that we also replaced `control.stergm()` with `control.tergm()`.  We 
+  can simplify this further by exploiting new control list flattening 
+  features, writing 
   
   ```
   control = snctrl(init = c(-3.5,2,0,NA,0,1,0,1/2))
@@ -226,8 +227,8 @@ fitted `tergm` in `tergm` 4.0, we make the following changes.
   arguments `MCMC.init.maxedges` and `MCMC.init.maxchanges` to 
   `control.simulate.stergm()` have been replaced by the `MCMC.maxedges` and 
   `MCMC.maxchanges` arguments to `control.simulate.tergm()`; these arguments
-  have also been replaced in `control.simulate.stergm`, so code continuing to
-  use `control.simulate.stergm` will still need to change from using 
+  have also been replaced in `control.simulate.stergm()`, so code continuing 
+  to use `control.simulate.stergm()` will still need to change from using 
   `MCMC.init.maxedges` and `MCMC.init.maxchanges` to using `MCMC.maxedges` and 
   `MCMC.maxchanges`.
   
@@ -276,7 +277,8 @@ changes.
   formula, schematically of the form 
 
   ```
-  network ~ Form(formation formula) + Persist(dissolution formula)
+  network ~ Form(formation formula) + 
+            Persist(dissolution formula)
   ```
   
   as for estimation.
