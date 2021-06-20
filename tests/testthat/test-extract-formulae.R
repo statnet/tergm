@@ -317,6 +317,13 @@ test_that(".extract.fd.formulae behaves reasonably", {
   expect_equal(~-offset(triangle)+edges, R$nonsep)
   expect_equal(~-offset(.P(~edges))-.P(~offset(concurrent))+offset(.M(~-isolates))-offset(triangle)+edges, R$all)
 
+  ## test interactions
+  F <- ~Form(~edges + triangle:gwesp(0,fixed=TRUE)) + edges*concurrent + Diss(~mean.age) + triangle + isolates:degree(1)
+  R <- .extract.fd.formulae(F)
+  expect_equal(~.P(~edges + triangle:gwesp(0,fixed=TRUE)), R$form)
+  expect_equal(~.M(~mean.age), R$pers)
+  expect_equal(~edges*concurrent + triangle + isolates:degree(1), R$nonsep)
+  expect_equal(~.P(~edges + triangle:gwesp(0,fixed=TRUE)) + edges*concurrent + .M(~mean.age) + triangle + isolates:degree(1), R$all)
 })
 
 test_that("terms .P/.M behave as plus/minus identity", {
