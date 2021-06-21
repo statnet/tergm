@@ -11,11 +11,11 @@
 test_that("term Change behaves reasonably in dynamic contexts", {
   nw0 <- network.initialize(100, dir = FALSE)
   set.seed(0)
-  nw1 <- simulate(nw0 ~ edges, coef = c(-4), dynamic = TRUE, output = "final", time.slices = 1)
+  nw1 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-4, 2), dynamic = TRUE, output = "final", time.slices = 1)
   set.seed(0)
-  nw <- simulate(nw0 ~ edges, coef = c(-4), dynamic = TRUE, output = "final", time.slices = 10)
+  nw <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-4, 2), dynamic = TRUE, output = "final", time.slices = 10)
   set.seed(0)
-  nwd <- simulate(nw0 ~ edges, coef = c(-4), dynamic = TRUE, output = "networkDynamic", time.slices = 10)
+  nwd <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-4, 2), dynamic = TRUE, output = "networkDynamic", time.slices = 10)
 
   nw10 <- network.collapse(nwd, at = 10)
   nw9 <- network.collapse(nwd, at = 9)
@@ -42,7 +42,7 @@ test_that("term Change behaves reasonably in dynamic contexts", {
   expect_identical(s1, s2)
 
   set.seed(0)
-  s3 <- simulate(nw0 ~ edges, coef = c(-4), dynamic = TRUE, output = "stats", monitor = ~Change(ff0), time.slices = 1)
+  s3 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-4, 2), dynamic = TRUE, output = "stats", monitor = ~Change(ff0), time.slices = 1)
   expect_identical(s1, s3[1,])
 
   ## non-durational, curved
@@ -58,7 +58,7 @@ test_that("term Change behaves reasonably in dynamic contexts", {
   expect_identical(s1, s2)
   
   set.seed(0)
-  s3 <- simulate(nw0 ~ edges, coef = c(-4), dynamic = TRUE, output = "stats", monitor = ~Change(ff1), time.slices = 1)
+  s3 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-4, 2), dynamic = TRUE, output = "stats", monitor = ~Change(ff1), time.slices = 1)
   expect_identical(s1, s3[1,])
   
   ## durational, non-curved
@@ -74,7 +74,7 @@ test_that("term Change behaves reasonably in dynamic contexts", {
   expect_identical(s1, s2)
 
   set.seed(0)
-  s3 <- simulate(nw0 ~ edges, coef = c(-4), dynamic = TRUE, output = "stats", monitor = ~Change(ff2), time.slices = 1)
+  s3 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-4, 2), dynamic = TRUE, output = "stats", monitor = ~Change(ff2), time.slices = 1)
   expect_identical(s1, s3[1,])
 
   ## durational, curved
@@ -90,12 +90,12 @@ test_that("term Change behaves reasonably in dynamic contexts", {
   expect_identical(s1, s2)
 
   set.seed(0)
-  s3 <- simulate(nw0 ~ edges, coef = c(-4), dynamic = TRUE, output = "stats", monitor = ~Change(ff3), time.slices = 1)
+  s3 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-4, 2), dynamic = TRUE, output = "stats", monitor = ~Change(ff3), time.slices = 1)
   expect_identical(s1, s3[1,])
 
   set.seed(0)
   sim01 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 2),
+                    coef = c(-4, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ff0,
@@ -103,7 +103,7 @@ test_that("term Change behaves reasonably in dynamic contexts", {
 
   set.seed(0)
   sim02 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 2),
+                    coef = c(-4, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ~Change(ff0),
@@ -121,7 +121,7 @@ test_that("term Change behaves reasonably in dynamic contexts", {
                     
   set.seed(1)
   sim11 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 2),
+                    coef = c(-4, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ff1,
@@ -129,7 +129,7 @@ test_that("term Change behaves reasonably in dynamic contexts", {
 
   set.seed(1)
   sim12 <- simulate(nw ~ Form(~edges) + Persist(~edges),
-                    coef = c(-6, 2),
+                    coef = c(-4, 2),
                     time.slices = 10,
                     dynamic = TRUE,
                     monitor = ~Change(ff1),
