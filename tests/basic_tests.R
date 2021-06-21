@@ -117,3 +117,41 @@ nw <- simulate(nw ~ Form(~edges + triangle) + Persist(~edges), coef = c(-1,-Inf,
 rv <- summary(nw ~ edges + triangle)
 stopifnot(summary(nw ~ triangle) == 0)
 stopifnot(nw %n% "time" == 5)
+
+
+## durational operator tests, including emptynwstats
+nw <- network.initialize(100, dir = FALSE)
+
+stat_names <- c("Form~edges", "Form~isolates", "Persist~edges", "Persist~isolates", "Diss~edges", "Diss~isolates", "Change~edges", "Change~isolates")
+
+# y0, y1 empty.
+
+expected <- c(0, 100, 0, 100, 0, -100, 0, 100)
+names(expected) <- stat_names
+actual <- summary(nw ~ Form(~edges+isolates) + Persist(~edges+isolates) + Diss(~edges+isolates) + Change(~edges+isolates), dynamic=TRUE)
+stopifnot(identical(expected, actual))
+
+# y0, y1 both have (1,2)
+nw[1,2] <- TRUE
+
+expected <- c(1, 98, 1, 98, -1, -98, 0, 100)
+names(expected) <- stat_names
+actual <- summary(nw ~ Form(~edges+isolates) + Persist(~edges+isolates) + Diss(~edges+isolates) + Change(~edges+isolates), dynamic=TRUE)
+stopifnot(identical(expected, actual))
+
+# y1 has (1,2), y0 has (1,2) and (3,4)
+nw %n% "time" <- 1
+nw %n% "lasttoggle" <- cbind(3,4,1)
+
+expected <- c(2, 96, 1, 98, -1, -98, 1, 98)
+names(expected) <- stat_names
+actual <- summary(nw ~ Form(~edges+isolates) + Persist(~edges+isolates) + Diss(~edges+isolates) + Change(~edges+isolates), dynamic=TRUE)
+stopifnot(identical(expected, actual))
+
+# y1 has (1,2), y0 has (1,2), (2,3), and (3,4)
+nw %n% "lasttoggle" <- rbind(nw %n% "lasttoggle", cbind(2,3,1))
+
+expected <- c(3, 96, 1, 98, -1, -98, 2, 97)
+names(expected) <- stat_names
+actual <- summary(nw ~ Form(~edges+isolates) + Persist(~edges+isolates) + Diss(~edges+isolates) + Change(~edges+isolates), dynamic=TRUE)
+stopifnot(identical(expected, actual))
