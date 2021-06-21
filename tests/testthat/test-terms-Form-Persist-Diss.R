@@ -11,11 +11,11 @@
 test_that("terms Form, Diss, Persist behave reasonably in dynamic contexts", {
   nw0 <- network.initialize(100, dir = FALSE)
   set.seed(0)
-  nw1 <- simulate(nw0 ~ Form(~edges) + Diss(~edges), coef = c(-5, 2), dynamic = TRUE, output = "final", time.slices = 1)
+  nw1 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-5, 2), dynamic = TRUE, output = "final", time.slices = 1)
   set.seed(0)
-  nw <- simulate(nw0 ~ Form(~edges) + Diss(~edges), coef = c(-5, 2), dynamic = TRUE, output = "final", time.slices = 10)
+  nw <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-5, 2), dynamic = TRUE, output = "final", time.slices = 10)
   set.seed(0)
-  nwd <- simulate(nw0 ~ Form(~edges) + Diss(~edges), coef = c(-5, 2), dynamic = TRUE, output = "networkDynamic", time.slices = 10)
+  nwd <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-5, 2), dynamic = TRUE, output = "networkDynamic", time.slices = 10)
 
   nw10 <- network.collapse(nwd, at = 10)
   nw9 <- network.collapse(nwd, at = 9)
@@ -49,7 +49,7 @@ test_that("terms Form, Diss, Persist behave reasonably in dynamic contexts", {
   expect_identical(s1, s2)
   
   set.seed(0)
-  s3 <- simulate(nw0 ~ Form(~edges) + Diss(~edges), coef = c(-5, 2), dynamic = TRUE, output = "stats", monitor = ~Form(ff0), time.slices = 1)
+  s3 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-5, 2), dynamic = TRUE, output = "stats", monitor = ~Form(ff0), time.slices = 1)
   expect_identical(s1, s3[1,])
 
   # Persist
@@ -64,7 +64,7 @@ test_that("terms Form, Diss, Persist behave reasonably in dynamic contexts", {
   expect_identical(s1, s2)
   
   set.seed(0)
-  s3 <- simulate(nw0 ~ Form(~edges) + Diss(~edges), coef = c(-5, 2), dynamic = TRUE, output = "stats", monitor = ~Persist(ff0), time.slices = 1)
+  s3 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-5, 2), dynamic = TRUE, output = "stats", monitor = ~Persist(ff0), time.slices = 1)
   expect_identical(s1, s3[1,])
 
   # Diss
@@ -79,7 +79,7 @@ test_that("terms Form, Diss, Persist behave reasonably in dynamic contexts", {
   expect_identical(-s1, s2)
   
   set.seed(0)
-  s3 <- simulate(nw0 ~ Form(~edges) + Diss(~edges), coef = c(-5, 2), dynamic = TRUE, output = "stats", monitor = ~Diss(ff0), time.slices = 1)
+  s3 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-5, 2), dynamic = TRUE, output = "stats", monitor = ~Diss(ff0), time.slices = 1)
   expect_identical(-s1, s3[1,])
 
   ## non-durational, curved
@@ -97,7 +97,7 @@ test_that("terms Form, Diss, Persist behave reasonably in dynamic contexts", {
   expect_identical(s1, s2)
   
   set.seed(0)
-  s3 <- simulate(nw0 ~ Form(~edges) + Diss(~edges), coef = c(-5, 2), dynamic = TRUE, output = "stats", monitor = ~Form(ff1), time.slices = 1)
+  s3 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-5, 2), dynamic = TRUE, output = "stats", monitor = ~Form(ff1), time.slices = 1)
   expect_identical(s1, s3[1,])
 
   # Persist
@@ -112,7 +112,7 @@ test_that("terms Form, Diss, Persist behave reasonably in dynamic contexts", {
   expect_identical(s1, s2)
   
   set.seed(0)
-  s3 <- simulate(nw0 ~ Form(~edges) + Diss(~edges), coef = c(-5, 2), dynamic = TRUE, output = "stats", monitor = ~Persist(ff1), time.slices = 1)
+  s3 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-5, 2), dynamic = TRUE, output = "stats", monitor = ~Persist(ff1), time.slices = 1)
   expect_identical(s1, s3[1,])
 
   # Diss
@@ -127,7 +127,7 @@ test_that("terms Form, Diss, Persist behave reasonably in dynamic contexts", {
   expect_identical(-s1, s2)
   
   set.seed(0)
-  s3 <- simulate(nw0 ~ Form(~edges) + Diss(~edges), coef = c(-5, 2), dynamic = TRUE, output = "stats", monitor = ~Diss(ff1), time.slices = 1)
+  s3 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-5, 2), dynamic = TRUE, output = "stats", monitor = ~Diss(ff1), time.slices = 1)
   expect_identical(-s1, s3[1,])
 
   set.seed(0)
