@@ -1,6 +1,9 @@
 #' @describeIn combine_networks A wrapper around
 #'   [network::print.network()] to print constituent network
 #'   information and omit some internal variables.
+#'
+#' @param x,object a combined network.
+#' @param ... additional arguments to methods.
 #' @export
 print.combined_networks<-function(x, ...) {
   cat(" Combined ", length((x%n%".subnetattr")[[1]]$n), " networks on ", sQuote(names(x$gal$.subnetattr)), ":\n", sep="")

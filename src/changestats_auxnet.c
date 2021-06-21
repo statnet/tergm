@@ -29,7 +29,9 @@ U_CHANGESTAT_FN(u__discord_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
   GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
   if(dur_inf->ticktock){
-      ToggleKnownEdge(tail, head, auxnet->onwp, edgestate);
+    // NB: Here, edgestate is state of (tail,head) in the input
+    // network, so we don't know the edge state in onwp.
+    ToggleEdge(tail, head, auxnet->onwp);
   } // In fiat mode, discord never changes.
 }
 
@@ -43,11 +45,15 @@ X_CHANGESTAT_FN(x__discord_lt_net_Network){
 
       GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
       TailHead dyad;
-      // Here, we need to toggle all edges that were toggled in the current
-      // (soon to be previous) time step.
+      // Here, we need to toggle all edges that were toggled in the
+      // current (soon to be previous) time step, which should result
+      // in an empty network.
       kh_foreach_key(dur_inf->discord, dyad, {
-          ToggleEdge(dyad.tail, dyad.head, auxnet->onwp);
+          ToggleKnownEdge(dyad.tail, dyad.head, auxnet->onwp, TRUE);
         });
+#ifdef DEBUG
+      if(EDGECOUNT(auxnet->onwp)) error("_discord_lt_net_Network's output network is in an inconsistent state.");
+#endif // DEBUG
     }
     break;
   default: break;

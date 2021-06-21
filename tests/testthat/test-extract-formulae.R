@@ -317,11 +317,29 @@ test_that(".extract.fd.formulae behaves reasonably", {
   expect_equal(~-offset(triangle)+edges, R$nonsep)
   expect_equal(~-offset(.P(~edges))-.P(~offset(concurrent))+offset(.M(~-isolates))-offset(triangle)+edges, R$all)
 
+  ## test interactions
+  F <- ~Form(~edges + triangle:gwesp(0,fixed=TRUE)) + edges*concurrent + Diss(~mean.age) + triangle + isolates:degree(1)
+  R <- .extract.fd.formulae(F)
+  expect_equal(~.P(~edges + triangle:gwesp(0,fixed=TRUE)), R$form)
+  expect_equal(~.M(~mean.age), R$pers)
+  expect_equal(~edges*concurrent + triangle + isolates:degree(1), R$nonsep)
+  expect_equal(~.P(~edges + triangle:gwesp(0,fixed=TRUE)) + edges*concurrent + .M(~mean.age) + triangle + isolates:degree(1), R$all)
+
+  ## test that interactions are always treated as non-separable (maybe not ideal, but at least documentable)
+  F <- ~edges:Form(~edges) + Form(~edges)*edges + Diss(~edges)*Form(~edges) + Persist(~edges):Diss(~edges) +
+        offset(edges):Form(~edges) + offset(edges:Form(~edges)) + edges:offset(Form(~edges)) +
+        offset(edges)*Form(~edges) + offset(edges*Form(~edges)) + edges*offset(Form(~edges)) +
+        Form(~edges):Form(~triangle) + Form(~edges)*Form(~triangle)        
+  R <- .extract.fd.formulae(F)
+  expect_equal(~., R$form)
+  expect_equal(~., R$pers)
+  expect_equal(F, R$nonsep)
+  expect_equal(F, R$all)
 })
 
 test_that("terms .P/.M behave as plus/minus identity", {
   nw0 <- network.initialize(100, dir = FALSE)
-  nw <- simulate(nw0 ~ edges, coef = c(-2), dynamic = TRUE, output = "final")
+  nw <- simulate(nw0 ~ edges, coef = c(-4), dynamic = TRUE, output = "final")
 
   ## non-durational, non-curved
   ff0 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + concurrent
@@ -370,7 +388,7 @@ test_that("terms .P/.M behave as plus/minus identity", {
   
   set.seed(0)
   sim01 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
-                    coef = c(-4, 4), 
+                    coef = c(-6, 2), 
                     time.slices = 10, 
                     dynamic = TRUE,
                     monitor = ff0,                    
@@ -378,7 +396,7 @@ test_that("terms .P/.M behave as plus/minus identity", {
 
   set.seed(0)
   sim02 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
-                    coef = c(-4, 4), 
+                    coef = c(-6, 2), 
                     time.slices = 10, 
                     dynamic = TRUE,
                     monitor = ~.P(ff0),                    
@@ -386,7 +404,7 @@ test_that("terms .P/.M behave as plus/minus identity", {
                     
   set.seed(0)
   sim03 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
-                    coef = c(-4, 4), 
+                    coef = c(-6, 2), 
                     time.slices = 10, 
                     dynamic = TRUE,
                     monitor = ~.M(ff0),                    
@@ -397,7 +415,7 @@ test_that("terms .P/.M behave as plus/minus identity", {
 
   set.seed(1)
   sim11 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
-                    coef = c(-4, 4), 
+                    coef = c(-6, 2), 
                     time.slices = 10, 
                     dynamic = TRUE,
                     monitor = ff1,                    
@@ -405,7 +423,7 @@ test_that("terms .P/.M behave as plus/minus identity", {
 
   set.seed(1)
   sim12 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
-                    coef = c(-4, 4), 
+                    coef = c(-6, 2), 
                     time.slices = 10, 
                     dynamic = TRUE,
                     monitor = ~.P(ff1),                    
@@ -413,7 +431,7 @@ test_that("terms .P/.M behave as plus/minus identity", {
                     
   set.seed(1)
   sim13 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
-                    coef = c(-4, 4), 
+                    coef = c(-6, 2), 
                     time.slices = 10, 
                     dynamic = TRUE,
                     monitor = ~.M(ff1),                    
@@ -424,7 +442,7 @@ test_that("terms .P/.M behave as plus/minus identity", {
 
   set.seed(2)
   sim21 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
-                    coef = c(-4, 4), 
+                    coef = c(-6, 2), 
                     time.slices = 10, 
                     dynamic = TRUE,
                     monitor = ff2,                    
@@ -432,7 +450,7 @@ test_that("terms .P/.M behave as plus/minus identity", {
 
   set.seed(2)
   sim22 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
-                    coef = c(-4, 4), 
+                    coef = c(-6, 2), 
                     time.slices = 10, 
                     dynamic = TRUE,
                     monitor = ~.P(ff2),                    
@@ -440,7 +458,7 @@ test_that("terms .P/.M behave as plus/minus identity", {
                     
   set.seed(2)
   sim23 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
-                    coef = c(-4, 4), 
+                    coef = c(-6, 2), 
                     time.slices = 10, 
                     dynamic = TRUE,
                     monitor = ~.M(ff2),                    
@@ -451,7 +469,7 @@ test_that("terms .P/.M behave as plus/minus identity", {
 
   set.seed(3)
   sim31 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
-                    coef = c(-4, 4), 
+                    coef = c(-6, 2), 
                     time.slices = 10, 
                     dynamic = TRUE,
                     monitor = ff3,                    
@@ -459,7 +477,7 @@ test_that("terms .P/.M behave as plus/minus identity", {
 
   set.seed(3)
   sim32 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
-                    coef = c(-4, 4), 
+                    coef = c(-6, 2), 
                     time.slices = 10, 
                     dynamic = TRUE,
                     monitor = ~.P(ff3),                    
@@ -467,7 +485,7 @@ test_that("terms .P/.M behave as plus/minus identity", {
                     
   set.seed(3)
   sim33 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
-                    coef = c(-4, 4), 
+                    coef = c(-6, 2), 
                     time.slices = 10, 
                     dynamic = TRUE,
                     monitor = ~.M(ff3),                    
@@ -500,9 +518,9 @@ test_that("terms .P/.M behave as plus/minus identity", {
   expect_true(!is.durational(m11))
   expect_true(!is.durational(m12))
   expect_true(!is.durational(m13))
-#  expect_identical(param_names(m11, canonical = FALSE), param_names(m12, canonical = FALSE))
+  expect_identical(param_names(m11, canonical = FALSE), param_names(m12, canonical = FALSE))
   expect_identical(param_names(m11, canonical = TRUE), param_names(m12, canonical = TRUE))
-#  expect_identical(param_names(m11, canonical = FALSE), param_names(m13, canonical = FALSE))
+  expect_identical(param_names(m11, canonical = FALSE), param_names(m13, canonical = FALSE))
   expect_identical(param_names(m11, canonical = TRUE), param_names(m13, canonical = TRUE))
 
   m21 <- ergm_model(ff2, nw = nw)
@@ -528,8 +546,8 @@ test_that("terms .P/.M behave as plus/minus identity", {
   expect_true(is.durational(m31))
   expect_true(is.durational(m32))
   expect_true(is.durational(m33))
-#  expect_identical(param_names(m31, canonical = FALSE), param_names(m32, canonical = FALSE))
+  expect_identical(param_names(m31, canonical = FALSE), param_names(m32, canonical = FALSE))
   expect_identical(param_names(m31, canonical = TRUE), param_names(m32, canonical = TRUE))
-#  expect_identical(param_names(m31, canonical = FALSE), param_names(m33, canonical = FALSE))
+  expect_identical(param_names(m31, canonical = FALSE), param_names(m33, canonical = FALSE))
   expect_identical(param_names(m31, canonical = TRUE), param_names(m33, canonical = TRUE))
 })

@@ -196,13 +196,18 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
     dissolution <- dissolution[c(1,3)] # in a formula f<-y~x, f[1]=~, f[2]=y, and f[3]=x
   }
 
-  if(!is.null(control$init.form) || !is.null(control$init.diss)) {
-    ## need to make sure offsets and inits are set up properly for the tergm call below
+  ## need to make sure offsets and inits are set up properly for the tergm call below
+  if(!is.null(control$init.form) || 
+     !is.null(control$init.diss) || 
+     (estimate %in% c("CMLE", "CMPLE") && (!is.null(control$CMLE.form.ergm$init) || 
+                                           !is.null(control$CMLE.diss.ergm$init)))) {
     if(estimate == "EGMME") {
       nw_stergm <- nw
       term.options <- control$term.options
       form_model <- ergm_model(formation, nw = nw_stergm, term.options = term.options, dynamic = TRUE, ...)
       diss_model <- ergm_model(dissolution, nw = nw_stergm, term.options = term.options, dynamic = TRUE, ...)
+      init.form <- NVL(control$init.form, rep(NA, nparam(form_model, canonical = FALSE)))
+      init.diss <- NVL(control$init.diss, rep(NA, nparam(diss_model, canonical = FALSE)))
     } else {
       if(!is(nw, "tergm_NetSeries")) {
         if(inherits(nw, "network.list") || (is.list(nw) && !is.network(nw) && is.network(nw[[1]]))) {
@@ -218,17 +223,16 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
       term.options <- control$CMLE.form.ergm$term.options
       form_model <- ergm_model(formation, nw = nw_stergm, term.options = term.options, ...)
       diss_model <- ergm_model(dissolution, nw = nw_stergm, term.options = term.options, ...)
+      init.form <- NVL(control$CMLE.form.ergm$init, control$init.form, rep(NA, nparam(form_model, canonical = FALSE)))
+      init.diss <- NVL(control$CMLE.diss.ergm$init, control$init.diss, rep(NA, nparam(diss_model, canonical = FALSE)))
     }
-    
-    init.form <- NVL(control$init.form, rep(NA, nparam(form_model, canonical = FALSE)))
-    init.diss <- NVL(control$init.diss, rep(NA, nparam(diss_model, canonical = FALSE)))
 
     if(length(init.form) != nparam(form_model, canonical = FALSE)) {
-      stop("Incorrect length of control$init.form passed to stergm(); expected ", nparam(form_model, canonical = FALSE), ", got ", length(init.form), ".")
+      stop("Incorrect length of init.form passed to stergm(); expected ", nparam(form_model, canonical = FALSE), ", got ", length(init.form), ".")
     }
 
     if(length(init.diss) != nparam(diss_model, canonical = FALSE)) {
-      stop("Incorrect length of control$init.diss passed to stergm(); expected ", nparam(diss_model, canonical = FALSE), ", got ", length(init.diss), ".")
+      stop("Incorrect length of init.diss passed to stergm(); expected ", nparam(diss_model, canonical = FALSE), ", got ", length(init.diss), ".")
     }
     
     if(!is.null(offset.coef.form)) {

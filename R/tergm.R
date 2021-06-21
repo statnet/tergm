@@ -179,14 +179,8 @@ tergm <- function(formula, constraints = ~., estimate, times=NULL, offset.coef=N
   out$formula <- formula
   out$estimate <- estimate
   out$estimate.desc <- switch(estimate,
-                              CMPLE = if(out$MPLE_is_MLE) "Conditional Maximum Likelihood"
-                                     else "Conditional Maximum Pseudolikelihood",
-                              CMLE = paste(switch(control$CMLE.ergm$main.method,
-                                                  MCMLE = "Monte Carlo",
-                                                  `Stochastic-Approximation`="Stochastic Approximation",
-                                             `Robbins-Monro`="Robbins-Monro",
-                                             `Stepping`="Hummel Stepping"),
-                                           "Conditional Maximum Likelihood"),
+                              CMPLE = ,
+                              CMLE = sub("Maximum Pseudolikelihood", "Conditional Maximum Pseudolikelihood", sub("Maximum Likelihood", "Conditional Maximum Likelihood", out$estimate.desc)),
                               EGMME = switch(control$EGMME.main.method,
                                              `Gradient-Descent`="Gradient Descent Equilibrium Generalized Method of Moments Results"))
   out$control <- control

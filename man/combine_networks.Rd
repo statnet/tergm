@@ -57,6 +57,10 @@ attribute of the combined network, so that if the network is
 resplit using on the same attribute (e.g. using
 \code{\link[=uncombine_network]{uncombine_network()}}), an expensive call to \code{\link[=split.network]{split.network()}}
 can be avoided, at the cost of storage.}
+
+\item{x, object}{a combined network.}
+
+\item{...}{additional arguments to methods.}
 }
 \value{
 an object of class \code{combined_networks} inheriting from

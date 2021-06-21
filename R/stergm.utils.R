@@ -273,9 +273,12 @@ unset.offset.call <- function(object){
 #' include non-separable terms).  Instances of \code{Form} at the top level (which may occur
 #' inside \code{offset}) contribute to the formation formula; instances of \code{Persist} and
 #' \code{Diss} at the top level (which may also occur inside \code{offset}) contribute to the 
-#' dissolution formula; all other terms are regarded as non-separable (this includes instances 
+#' dissolution formula.  All other terms are regarded as non-separable; this includes instances 
 #' of \code{Form}, \code{Persist}, and \code{Diss} that occur inside other operator terms, 
-#' including inside \code{Offset}).  The formation and dissolution formulas are obtained by adding 
+#' including inside \code{Offset}, and also includes all interactions at the top level (for which
+#' the top level term is effectively the interaction operator \code{*} or \code{:}), 
+#' whether or not they include \code{Form}, \code{Persist}, and/or \code{Diss}.  
+#' The formation and dissolution formulas are obtained by adding 
 #' the contributing terms, replacing \code{Form} and \code{Persist} with trivial operators that protect
 #' the environments of their formula arguments but have no effect on statistics or coefficient names 
 #' (meaning the formulas effectively become cross-sectional), and replacing \code{Diss} by a similar operator
