@@ -34,7 +34,8 @@ stopifnot_dynamic <- function(nw, ..., dynamic=FALSE, .netseries.OK=FALSE){
          submodel = m,
          duration=TRUE),
     ergm_propagate_ext.encode(m),
-    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Form")))
+    modifyList(wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Form")),
+               list(emptynwstats=NULL)))
 }
 
 InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
@@ -68,7 +69,8 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
          submodel = m,
          duration=TRUE),
     ergm_propagate_ext.encode(m),
-    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Persist")))
+    modifyList(wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Persist")),
+               list(emptynwstats=NULL)))
 }
 
 `InitErgmTerm.Diss (dynamic)` <- function(nw, arglist,  ...) {
@@ -86,7 +88,8 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
          submodel = m,
          duration=TRUE),
     ergm_propagate_ext.encode(m),
-    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Diss")))
+    modifyList(wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Diss")),
+               list(emptynwstats=NULL)))
 }
 
 InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
@@ -120,7 +123,8 @@ InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
          submodel = m,
          duration=TRUE),
     ergm_propagate_ext.encode(m),
-    wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Change")))
+    modifyList(wrap.ergm_model(m, nw, ergm_mk_std_op_namewrap("Change")),
+               list(emptynwstats=NULL)))
 }
 
 
