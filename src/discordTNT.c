@@ -388,7 +388,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
            (!DIRECTED || _tail == tail || _head == head) &&            
            // will change toggleability status if we accept the proposed toggle
            (!edgestate || (DIRECTED ? (alter == _tail ? sto->static_sto->outdegree[sto->static_sto->bd_vattr[ego]][alter] < sto->static_sto->maxout[sto->static_sto->bd_vattr[ego]][alter] 
-                                                     : sto->static_sto->indegree[sto->static_sto->bd_vattr[ego]][alter] < sto->static_sto->maxin[sto->static_sto->bd_vattr[ego]][alter]) 
+                                                      : sto->static_sto->indegree[sto->static_sto->bd_vattr[ego]][alter] < sto->static_sto->maxin[sto->static_sto->bd_vattr[ego]][alter]) 
                                     : (sto->static_sto->indegree[sto->static_sto->bd_vattr[ego]][alter] + sto->static_sto->outdegree[sto->static_sto->bd_vattr[ego]][alter] < sto->static_sto->maxout[sto->static_sto->bd_vattr[ego]][alter])))) {
           int stratmixingtype = sto->static_sto->indmat[sto->static_sto->strat_vattr[_tail]][sto->static_sto->strat_vattr[_head]];
           HashELToggleKnown(_tail, _head, sto->BDTDNE[stratmixingtype], !edgestate);
