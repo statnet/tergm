@@ -129,8 +129,8 @@ test_that("EGMME initialfit behaves reasonably", {
   
   
   ff <- ~Diss(~edges) + Form(~edges + nodecov("cov")) + offset(Persist(~nodecov("cov"))) + Form(~offset(gwesp(0, fixed = TRUE)))
-  mff <- ~edges + nodecov("cov")
-  target.stats <- c(100, 100)
+  mff <- ~edges + nodecov("cov") + concurrent
+  target.stats <- c(100, 100, 80)
   init <- c(NA,NA,NA,0.3,0.1)
   
   expect_error(test.EGMME.initialfit(nw, ff, mff, target.stats, init), "No initial parameter method")
