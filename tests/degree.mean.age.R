@@ -24,7 +24,7 @@ logit<-function(p)log(p/(1-p))
 
 coef.form.f<-function(coef.diss,density) -log(((1+exp(coef.diss))/(density/(1-density)))-1)
 
-S<-10000
+S<-1000
 
 n<-100
 target.stats<-edges<-100
