@@ -62,7 +62,7 @@
 %% }
 
 
-\section{Changes in version 4.0.0}{
+\section{Changes in version 4.0.1}{
     \subsection{NEW FEATURES}{
       \itemize{
         \item The package has undergone a major rewrite, making use of operator terms introduced in \pkg{\link[ergm:ergm-packge]{ergm}} 4.0 to facilitate model specification. See the \dQuote{Conversions for \pkg{tergm} version 4.0} vignette for some examples.
