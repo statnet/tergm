@@ -8,6 +8,8 @@
 #  Copyright 2008-2021 Statnet Commons
 ################################################################################
 
+o <- options(ergm.eval.loglik=FALSE)
+
 test_that("EGMME initialfit behaves reasonably", {
 
   test.EGMME.initialfit <- function(nw, ff, mff, target.stats, init, control = control.tergm()) {
@@ -143,3 +145,5 @@ test_that("EGMME initialfit behaves reasonably", {
   
   expect_error(test.EGMME.initialfit(nw, ff, mff, target.stats), "No initial parameter method")
 })
+
+options(o)
