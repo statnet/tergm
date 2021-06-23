@@ -127,6 +127,7 @@ summary(dynfit)
 # CMLE Example
 data(samplk)
 
+\donttest{
 # Fit a transition from Time 1 to Time 2
 samplk12 <- tergm(list(samplk1, samplk2)~
                   Form(~edges+mutual+transitiveties+cyclicalties)+
@@ -143,6 +144,7 @@ samplk12.gof
 plot(samplk12.gof)
 
 plot(samplk12.gof, plotlogodds=TRUE)
+}
 
 # Fit a transition from Time 1 to Time 2 and from Time 2 to Time 3 jointly
 samplk123 <- tergm(list(samplk1, samplk2, samplk3)~

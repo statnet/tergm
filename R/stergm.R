@@ -148,6 +148,8 @@
 #' mcmc.diagnostics(dynfit)
 #' summary(dynfit)
 #' }
+#'
+#' \donttest{
 #' # CMLE Example
 #' data(samplk)
 #' 
@@ -168,7 +170,8 @@
 #' 
 #' mcmc.diagnostics(samplk123)
 #' summary(samplk123)
-#' 
+#' }
+#'
 #' @import network
 #' @import networkDynamic
 #' @export
