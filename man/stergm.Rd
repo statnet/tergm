@@ -180,16 +180,12 @@ summary(samplk123)
 
 }
 \references{
-\itemize{
+Krivitsky P.N. and Handcock M.S. (2014) A Separable Model for Dynamic Networks. \emph{Journal of the Royal Statistical Society, Series B}, 76(1): 29-46. \doi{10.1111/rssb.12014}
 
-\item Krivitsky P.N. and Handcock M.S. (2014) A Separable Model for Dynamic Networks. \emph{Journal of the Royal Statistical Society, Series B}, 76(1): 29-46. \doi{10.1111/rssb.12014}
-
-\item Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
+Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
 Egocentric Data with Durational Information. \emph{Pennsylvania State
 University Department of Statistics Technical Report}, 2012(2012-01).
 \url{https://web.archive.org/web/20170830053722/https://stat.psu.edu/research/technical-report-files/2012-technical-reports/TR1201A.pdf}
-
-}
 }
 \seealso{
 ergm, network, \\%v\\%, \\%n\\%, \code{\link{ergm-terms}}
