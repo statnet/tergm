@@ -15,10 +15,10 @@ logit<-function(p)log(p/(1-p))
 
 coef.form.f<-function(coef.diss,density) -log(((1+exp(coef.diss))/(density/(1-density)))-1)
 
-S<-1000
+S<-300
 
-n<-100
-target.stats<-edges<-100
+n<-40
+target.stats<-edges<-40
 duration<-12
 coef.diss<-logit(1-1/duration)
 
@@ -32,7 +32,7 @@ cat("\nUndirected:\n")
 
 g0<-network.initialize(n,dir=FALSE)
 
-g0 %v% "a" <- rep(1:2, c(20,40))
+g0 %v% "a" <- rep(1:2, c(1,3)/4*n)
 
 print(coef.form)
 print(coef.diss)

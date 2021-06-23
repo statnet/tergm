@@ -15,7 +15,7 @@ do.plot <- FALSE
 g0<-network.initialize(n,dir=FALSE)
 
 #                    edges, mean.age
-target.stats<-c(     n*1/2,       20)
+target.stats<-c(     n*1/2,       10)
 logit<-function(p)log(p/(1-p))
 coef.exact<-function(density,duration)
     list(form=-log(((1+exp(logit(1-1/duration)))/(density/(1-density)))-1),
@@ -31,10 +31,10 @@ g1<-san(g0~meandeg,target.stats=target.stats[1],verbose=TRUE)
 
 # Fit the model with very poor starting values.
 set.seed(1)
-dynfit<-tergm(g1 ~ Form(~edges) + Persist(~edges), targets=~edges+mean.age, estimate="EGMME",target.stats=target.stats[-3], constraints=~., verbose=TRUE,control=control.tergm(SA.plot.progress=do.plot,SA.restart.on.err=FALSE,init=c(-log(.95/.05), 1)))
+dynfit<-tergm(g1 ~ Form(~edges) + Persist(~edges), targets=~edges+mean.age, estimate="EGMME",target.stats=target.stats[-3], constraints=~., verbose=TRUE,control=control.tergm(SA.plot.progress=do.plot,SA.phase2.levels.min=2, SA.phase2.levels.max=4, SA.phase2.repeats = 10, SA.restart.on.err=FALSE,init=c(-log(.95/.05), 1)))
 
 print(summary(dynfit))
 mcmc.diagnostics(dynfit)
 
-stopifnot(all.equal(unlist(truth),coef(dynfit),tol=0.02,check.attributes=FALSE))
+stopifnot(all.equal(unlist(truth),coef(dynfit),tol=0.05,check.attributes=FALSE))
 #},"simple EGMME")

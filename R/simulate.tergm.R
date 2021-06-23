@@ -190,6 +190,7 @@
 #'    at the start time.
 #'
 #' @examples
+#' \donttest{
 #' data(samplk)
 #' 
 #' # Fit a transition from Time 1 to Time 2
@@ -214,7 +215,7 @@
 #'                         Diss(~edges+mutual+transitiveties+cyclicalties),
 #'                         coef = coef(samplk12),
 #'                         dynamic=TRUE)
-#' 
+#' }
 #' @importFrom stats simulate
 #' @export
 simulate.tergm<-function(object, nsim=1, seed=NULL,

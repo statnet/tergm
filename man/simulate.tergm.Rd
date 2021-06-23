@@ -269,6 +269,7 @@ specified, \code{time.start} will override it with a warning.)
 }
 }
 \examples{
+\donttest{
 data(samplk)
 
 # Fit a transition from Time 1 to Time 2
@@ -293,5 +294,5 @@ sim3 <- simulate(sim2 ~ Form(~edges+mutual+transitiveties+cyclicalties) +
                         Diss(~edges+mutual+transitiveties+cyclicalties),
                         coef = coef(samplk12),
                         dynamic=TRUE)
-
+}
 }
