@@ -76,5 +76,5 @@ Gives the network a series of timed proposals it can't refuse. Returns the
 statistics of the network, and, optionally, the final network.
 }
 \seealso{
-simulate.tergm, simulate_formula.network, simulate_formula.networkDynamic
+\code{\link[=simulate.tergm]{simulate.tergm()}}, \code{\link[=simulate_formula.network]{simulate_formula.network()}}, \code{\link[=simulate_formula.networkDynamic]{simulate_formula.networkDynamic()}}
 }

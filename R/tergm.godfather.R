@@ -58,7 +58,7 @@
 #'   matrix of statistics described in the previous paragraph attached to it as
 #'   an \code{attr}-style attribute \code{"stats"}.
 #'
-#' @seealso simulate.tergm, simulate_formula.network, simulate_formula.networkDynamic
+#' @seealso [simulate.tergm()], [simulate_formula.network()], [simulate_formula.networkDynamic()]
 #'
 #' @export tergm.godfather
 tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALSE],

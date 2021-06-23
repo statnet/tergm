@@ -455,20 +455,20 @@ It is recommended that new code make use of \code{tergm} and \code{control.tergm
 directly; \code{stergm} wrappers are included only for backwards compatibility.
 }
 \references{
-\itemize{ \item Boer, P., Huisman, M., Snijders,
+Boer, P., Huisman, M., Snijders,
 T.A.B., and Zeggelink, E.P.H. (2003), StOCNET User\'s
 Manual. Version 1.4.
 
-\item Firth (1993), Bias Reduction in Maximum Likelihood Estimates.
+Firth (1993), Bias Reduction in Maximum Likelihood Estimates.
 Biometrika, 80: 27-38.
 
-\item Hunter, D. R. and M. S. Handcock (2006), Inference in curved
+Hunter, D. R. and M. S. Handcock (2006), Inference in curved
 exponential family models for networks. Journal of Computational and
 Graphical Statistics, 15: 565-583.
 
-\item Hummel, R. M., Hunter, D. R., and Handcock, M. S. (2010), A Steplength
+Hummel, R. M., Hunter, D. R., and Handcock, M. S. (2010), A Steplength
 Algorithm for Fitting ERGMs, Penn State Department of Statistics Technical
-Report.  }
+Report.
 }
 \seealso{
 \code{\link{stergm}},\code{\link{tergm}},\code{\link{control.tergm}}. The

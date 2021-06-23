@@ -155,17 +155,22 @@ summary(samplk123)
 
 }
 \references{
-\itemize{
+Krackhardt, D and Handcock, MS (2006) Heider vs Simmel: Emergent
+features in dynamic structures.  ICML Workshop on Statistical
+Network Analysis. Springer, Berlin, Heidelberg, 2006.
 
-\item Krivitsky P.N. and Handcock M.S. (2014) A Separable Model for Dynamic Networks. \emph{Journal of the Royal Statistical Society, Series B}, 76(1): 29-46. \doi{10.1111/rssb.12014}
+Hanneke S, Fu W, and Xing EP (2010). Discrete
+Temporal Models of Social Networks. \emph{Electronic Journal of Statistics},
+2010, 4, 585-605.
+\doi{10.1214/09-EJS548}
 
-\item Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
+Krivitsky P.N. and Handcock M.S. (2014) A Separable Model for Dynamic Networks. \emph{Journal of the Royal Statistical Society, Series B}, 76(1): 29-46. \doi{10.1111/rssb.12014}
+
+Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
 Egocentric Data with Durational Information. \emph{Pennsylvania State
 University Department of Statistics Technical Report}, 2012(2012-01).
 \url{http://stat.psu.edu/research/technical-report-files/2012-technical-reports/modeling-of-dynamic-networks-based-on-egocentric-data-with-durational-information}
-
-}
 }
 \seealso{
-ergm, network, \\%v\\%, \\%n\\%, \code{\link{ergm-terms}}
+\code{\link[=ergm]{ergm()}}, \code{\link[=network]{network()}}, \code{\link{\%v\%}}, \code{\link{\%n\%}}, \code{\link{ergm-terms}}
 }
