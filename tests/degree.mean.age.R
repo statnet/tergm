@@ -13,15 +13,6 @@ library(tergm)
 set.seed(0)
 logit<-function(p)log(p/(1-p))
 
-# NB:  duration.matrix function no longer exists in ergm package
-#print.sim.stats<-function(dynsim,m,d){
-#  t.score<-function(x,m) (mean(x)-m)/sqrt(apply(cbind(x),2,var)/effectiveSize(mcmc(x)))
-#  target.stats.sim<-apply(dynsim$stats.form,2,mean)
-#  durations<-duration.matrix(dynsim)$duration
-#  cat('Edge count:\n   Target:',m,', Simulated:',target.stats.sim,', t:', t.score(dynsim$stats.form,m) ,'\n')
-#  cat('Duration:\n   Target:',d,', Simulated:',mean(durations),', t:', t.score(durations,d) ,'\n')
-#}
-
 coef.form.f<-function(coef.diss,density) -log(((1+exp(coef.diss))/(density/(1-density)))-1)
 
 S<-1000
