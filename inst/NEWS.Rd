@@ -62,6 +62,30 @@
 %% }
 
 
+\section{Changes in version 4.0.0}{
+    \subsection{NEW FEATURES}{
+      \itemize{
+        \item The package has undergone a major rewrite, making use of operator terms introduced in \pkg{\link[ergm:ergm-packge]{ergm}} 4.0 to facilitate model specification. See the \dQuote{Conversions for \pkg{tergm} version 4.0} vignette for some examples.
+
+        \item \code{\link{stergm}} has been superseded by \code{\link{tergm}}, which can fit non-separable discrete temporal ERGMs as well as separable.
+
+        \item In temporal estimation and simulation, operator terms \code{\link{Form}()}, \code{\link{Persist}()}, and \code{\link{Diss}()} can be used to specify STERGMs, with \code{Form()} evaluating statistics on a post-formation network, \code{Persist()} on post-dissolution (i.e., persistence) network, and \code{Diss()} on the post-dissolution network, but with statistics negated for convenience. \code{\link{Change}()} and \code{\link{Cross}()} can be used to specify models for changes (i.e., a \dQuote{virtual} network that has edges where the previous network differs from the current one) and models for cross-section.
+
+        \item \code{\link{NetSeries}()} constructor can be used to specify network series for conditional estimation and simulation (though \code{\link{tergm}} does it automatically for appropriate input).
+
+        \item Constraints applied via \code{constraints=} argument for \code{\link{tergm}()} and \code{\link{simulate.tergm}()} are now applied to the sampled or estimated networks rather than to formation and dissolution phases separately.
+
+        \item Control parameters in \pkg{\link[=tergm-package]{tergm}}'s functions can now be specified using \code{\link{snctrl}()}.
+      }
+   }
+
+  \subsection{DEPRECATED & DEFUNCT}{
+    \itemize{
+      \item \code{\link{stergm}} and its family of functions has been deprecated.
+    }
+  }  
+}
+
 \section{Changes in version 3.7.0}{
   \subsection{BUG FIXES}{
     \itemize{
