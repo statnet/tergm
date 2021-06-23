@@ -8,6 +8,8 @@
 #  Copyright 2008-2021 Statnet Commons
 ################################################################################
 
+NITER <- 1
+
 test_that("discordStratTNT behaves reasonably", {
 
   net_size <- 500L
@@ -22,7 +24,7 @@ test_that("discordStratTNT behaves reasonably", {
     
   nw_sim <- nw
   
-  for(i in 1:3) {
+  for(i in 1:NITER) {
     nw_sim <- simulate(nw_sim ~ edges, 
                        coef = c(-3), 
                        time.slices = 5,
@@ -55,7 +57,7 @@ test_that("discordBDTNT behaves reasonably", {
     
     nw_sim <- nw
     
-    for(i in 1:2) {
+    for(i in 1:NITER) {
       nw_sim <- simulate(nw_sim ~ edges, 
                          coef = c(0),
                          time.slices = 5,                       
@@ -94,7 +96,7 @@ test_that("discordBDStratTNT behaves reasonably", {
         
     nw_sim <- nw
     
-    for(i in 1:2) {
+    for(i in 1:NITER) {
       nw_sim <- simulate(nw_sim ~ edges, 
                          coef = c(0), 
                          time.slices = 5,
@@ -324,7 +326,7 @@ test_that("discordBDStratTNT simulates reasonably with heterogeneous degree boun
     maxout <- maxout + round(5*(runif(length(maxout)) - 1/2))
     maxout[maxout < 0] <- 0
     
-    for(i in 1:2) {    
+    for(i in 1:NITER) {
       nw_sim <- simulate(nw_sim ~ Form(~edges) + Persist(~edges),
                          coef = c(0,0),
                          dynamic = TRUE,
@@ -386,7 +388,7 @@ test_that("discordBDStratTNT simulates reasonably with bipartite heterogeneous d
     maxout <- maxout + round(5*(runif(length(maxout)) - 1/2))
     maxout[maxout < 0] <- 0
     
-    for(i in 1:2) {    
+    for(i in 1:NITER) {
       nw_sim <- simulate(nw_sim ~ Form(~edges) + Persist(~edges),
                          coef = c(0,0),
                          dynamic = TRUE,
@@ -450,7 +452,7 @@ test_that("discordBDStratTNT simulates reasonably with directed heterogeneous de
     maxin <- maxout + round(5*(runif(length(maxout)) - 1/2))
     maxin[maxin < 0] <- 0
     
-    for(i in 1:2) {      
+    for(i in 1:NITER) {
       nw_sim <- simulate(nw_sim ~ Form(~edges) + Persist(~edges),
                          coef = c(0,0),
                          dynamic = TRUE,

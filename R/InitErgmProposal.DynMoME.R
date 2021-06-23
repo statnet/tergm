@@ -15,7 +15,7 @@
 #      <dissolution>
 #===================================================================
 
-InitErgmProposal.discordTNT <- function(arguments, nw, model) {
+InitErgmProposal.discordTNT <- function(arguments, nw, ...) {
   discordance_fraction <- NVL(arguments$discordance_fraction, 1/2)
   if(!is.numeric(discordance_fraction) || length(discordance_fraction) != 1 || discordance_fraction <= 0 || discordance_fraction >= 1) {
     ergm_Init_abort("Argument ", sQuote("discordance_fraction"), " to ", sQuote("discordTNT"), " must be a number strictly between 0 and 1.")
@@ -25,8 +25,10 @@ InitErgmProposal.discordTNT <- function(arguments, nw, model) {
   proposal
 }
 
-InitErgmProposal.discordBDStratTNT <- function(arguments, nw, model) {
-  proposal <- ergm:::InitErgmProposal.BDStratTNT(arguments, nw)
+InitErgmProposal.discordBDStratTNT <- function(arguments, nw, ...) {
+  # Work around CRAN's ::: warning.
+  InitErgmProposal.BDStratTNT <- eval(locate_prefixed_function("BDStratTNT", "InitErgmProposal", "Metropolis-Hastings proposal"))
+  proposal <- InitErgmProposal.BDStratTNT(arguments, nw, ...)
   proposal$name <- "discordBDStratTNT"
   proposal$auxiliaries <- ~.lasttoggle
   proposal

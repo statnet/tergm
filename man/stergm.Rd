@@ -157,6 +157,8 @@ par(ask=TRUE)
 mcmc.diagnostics(dynfit)
 summary(dynfit)
 }
+
+\donttest{
 # CMLE Example
 data(samplk)
 
@@ -177,6 +179,7 @@ samplk123 <- stergm(list(samplk1, samplk2, samplk3),
 
 mcmc.diagnostics(samplk123)
 summary(samplk123)
+}
 
 }
 \references{

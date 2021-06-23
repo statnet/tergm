@@ -10,8 +10,8 @@
 library(statnet.common)
 #opttest({
 library(tergm)
-n<-40
-do.plot <- TRUE
+n<-20
+do.plot <- FALSE
 g0<-network.initialize(n,dir=FALSE)
 
 #                    edges, mean.age
@@ -36,5 +36,5 @@ dynfit<-tergm(g1 ~ Form(~edges) + Persist(~edges), targets=~edges+mean.age, esti
 print(summary(dynfit))
 mcmc.diagnostics(dynfit)
 
-stopifnot(all.equal(unlist(truth),coef(dynfit),tol=0.01,check.attributes=FALSE))
+stopifnot(all.equal(unlist(truth),coef(dynfit),tol=0.02,check.attributes=FALSE))
 #},"simple EGMME")
