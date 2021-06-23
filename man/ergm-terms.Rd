@@ -1,12 +1,12 @@
-%  File man/ergm-terms.Rd in package tergm, part of the Statnet suite
-%  of packages for network analysis, https://statnet.org .
+%  File man/ergm-terms.Rd in package tergm, part of the
+%  Statnet suite of packages for network analysis, https://statnet.org .
 %
 %  This software is distributed under the GPL-3 license.  It is free,
 %  open source, and has the attribution requirements (GPL Section 7) at
-%  https://statnet.org/attribution
+%  https://statnet.org/attribution .
 %
-%  Copyright 2008-2020 Statnet Commons
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Copyright 2008-2021 Statnet Commons
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \name{ergm-terms}
 \alias{ergm-terms}
 \alias{ergm.terms}
@@ -41,21 +41,29 @@
 \alias{InitErgmTerm.degree.mean.age}
 
 \docType{methods}
-\title{Temporally-Sensitive Terms used in Exponential Family Random Graph Models}
+\title{Temporally-Sensitive Operator and Durational Terms used in Exponential Family Random Graph Models}
 \description{
-  Unlike ordinary \code{\link[ergm]{ergm-terms}}, which take only a single
-  network as an argument, the terms documented here may also take into account
-  the elapsed time since each dyad in the network was last toggled.  As currently 
-  implemented, such "durational" terms may not be used in the formation
-  or dissolution models (whether specified separably with \code{formation} and 
-  \code{dissolution} arguments in the old style, or inside one of the new style temporal
-  operator terms (\code{Form}, \code{Persist}, \code{Diss}, \code{Cross} or 
-  \code{Change}).  But the durational terms may be used as targets, monitors,
-  or summary statistics, and may also appear as non-separable effects 
-  in the generative model (necessarily specified in the new style).  The ability to 
-  use these terms in the temporal operators may be added in the future.
+  The terms described here are unique to temporal networks:  each summarizes
+  some type of change or durational information.
+  
+  The operator terms include: \code{Form()}, \code{Persist()}, \code{Diss()}, 
+  \code{Cross()} and \code{Change()}.  These are used to specify how the 
+  \code{\link[ergm]{ergm-terms}} in a formula are evaluated across a network
+  time-series.  Note, you cannot use an operator within another operator, so
+  \code{Cross(~Form(~edges))} is not a valid specification.
+  
+  The durational terms are distinguished either by their name, \code{mean.age}, or
+  their name extensions: \code{<name>.ages}, 
+  \code{<name>.mean.age}, and \code{<name>.age.interval}.  In contrast to their named
+  \code{\link[ergm]{ergm-terms}} counterparts, these durational terms take into account
+  the elapsed time since each (term-relevant) dyad in the network was last toggled.  
+  
+  As currently implemented, the package does not support use of durational 
+  terms during estimation.  But durational terms may be used as targets, monitors,
+  or summary statistics.  The ability to 
+  use these terms in the estimation of models is under development.
 
-  All terms listed here are binary.
+  All terms listed here currently work with binary-valued ties only.
 }
 
 \section{Operator Terms included in the
@@ -63,23 +71,33 @@
   \describe{
     \item{\code{Form(formula)}}{
       \emph{The Formation Operator Term:} This term accepts a model formula
-      \code{formula} and produces the corresponding model for the post-formation network: effectively a network containing both previous time step's ties and ties just formed.
+      \code{formula} and produces the corresponding model for the post-formation network:
+      effectively a network containing both previous time step's ties and ties just formed,
+      the union of the previous and current network.  This is the equivalent of the 
+      old-style \code{formation} model.
     }
     
     \item{\code{Persist(formula)}}{
       \emph{The Persistence Operator Term:} This term accepts a model formula
-      \code{formula} and produces the corresponding model for the post-dissolution/persistence network: effectively the network containing ties that persisted since the last time step.  This
-      is the equivalent of the old-style \code{dissolution} model.
-
-      It will produce the same results as the \code{Diss()} operator, except the signs of the 
-      coefficients are reversed. (This typically means that a higher coefficient means \emph{less} dissolution.)
+      \code{formula} and produces the corresponding model for the 
+      post-dissolution/persistence network: effectively the network containing 
+      ties that persisted since the last time step.  
+      
+      This is the equivalent of the old-style \code{dissolution} model.  So 
+      a larger positive coefficient for \code{Persist()} operator means 
+      \emph{less} dissolution.  It 
+      produces the same results as the new \code{Diss()} operator, except the 
+      signs of the coefficients are negated.  
     }
 
     \item{\code{Diss(formula)}}{
       \emph{The Dissolution Operator Term:} This term accepts a model formula
-      \code{formula} and produces the corresponding model for the post-dissolution network (same as \code{Persist()}), but with all statistics negated.
-      This is not the equivalent of the old style \code{dissolution} model, because the signs of
-      the coefficients are reversed. (This typically means that a higher coefficient means \emph{more} dissolution.)
+      \code{formula} and produces the corresponding model for the post-dissolution 
+      network (same as \code{Persist()}), but with all statistics negated.
+      
+      Note:  This is not the equivalent of the old style \code{dissolution} model, 
+      because the signs of the coefficients are reversed. So a larger positive 
+      coefficient for \code{Diss()} operator means \emph{more} dissolution.
     }
     
     \item{\code{Cross(formula)}}{
@@ -159,9 +177,9 @@
       \code{to} may be scalars, vectors of the same length, or one of
       them must have length one, in which case it is recycled.
 
-      When used in the dissolution formula of a STERGM, it can be used
-      to model a non-Markovian dissolution process, controlling the
-      hazard function in the interval directly.
+%      When used in the dissolution formula of a STERGM, it can be used
+%      to model a non-Markovian dissolution process, controlling the
+%      hazard function in the interval directly.
     }
 
     \item{\code{edge.ages}}{\emph{Sum of ages of extant
