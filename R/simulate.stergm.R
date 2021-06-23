@@ -167,6 +167,7 @@
 #'         \code{simulate.network} and \code{simulate.networkDynamic} in
 #'         an attempt to increase backwards compatibility.
 #' @examples
+#' \donttest{
 #' logit<-function(p)log(p/(1-p))
 #' coef.form.f<-function(coef.diss,density) -log(((1+exp(coef.diss))/(density/(1-density)))-1)
 #' 
@@ -198,8 +199,7 @@
 #' 
 #' # "Resume" the simulation.
 #' dynsim2<-simulate(dynsim,formation=~edges,dissolution=~edges,time.slices=S,verbose=TRUE)
-
-
+#' }
 #' @rdname simulate.stergm
 #' @export
 simulate.network <- function(object, nsim=1, seed=NULL,

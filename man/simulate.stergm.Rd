@@ -158,6 +158,7 @@ tie persistence, it maps to the new \code{Persist()} operator
 in the \code{tergm} function, NOT the \code{Diss()} operator
 }
 \examples{
+\donttest{
 logit<-function(p)log(p/(1-p))
 coef.form.f<-function(coef.diss,density) -log(((1+exp(coef.diss))/(density/(1-density)))-1)
 
@@ -189,4 +190,5 @@ dynsim<-simulate(g1,formation=~edges,dissolution=~edges,
 
 # "Resume" the simulation.
 dynsim2<-simulate(dynsim,formation=~edges,dissolution=~edges,time.slices=S,verbose=TRUE)
+}
 }
