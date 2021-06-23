@@ -3,15 +3,15 @@ Version: 4.0.0
 Date: 2021-06-23
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
-	person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="pavel@statnet.org", comment=c(ORCID="0000-0002-9101-3362")),
+        person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="pavel+tergm@unsw.edu.au", comment=c(ORCID="0000-0002-9101-3362")),
         person("Mark S.", "Handcock", role=c("aut","ths"), email="handcock@stat.ucla.edu"),
         person("David R.", "Hunter", role=c("ctb"), email="dhunter@stat.psu.edu"),
         person("Steven M.", "Goodreau", role=c("ctb","ths"), email="goodreau@u.washington.edu"),
         person("Martina", "Morris", role=c("ctb","ths"), email="morrism@u.washington.edu"),
-	person("Nicole Bohme", "Carnegie", role=c("ctb"), email="nicole.carnegie@nyu.edu"),
+        person("Nicole Bohme", "Carnegie", role=c("ctb"), email="nicole.carnegie@nyu.edu"),
         person("Carter T.", "Butts", role=c("ctb"), email="buttsc@uci.edu"),
-	person("Ayn", "Leslie-Cook", role=c("ctb"), email="aynlc3@uw.edu"),
-	person("Skye", "Bender-deMoll", role=c("ctb"), email="skyebend@skyeome.net"),
+        person("Ayn", "Leslie-Cook", role=c("ctb"), email="aynlc3@uw.edu"),
+        person("Skye", "Bender-deMoll", role=c("ctb"), email="skyebend@skyeome.net"),
         person("Li","Wang",role=c("ctb"),email="lxwang@gmail.com"),
         person("Kirk","Li",role=c("ctb"),email="kirkli@uw.edu"),
         person("Chad", "Klumb", role=c("ctb"), email="cklumb@gmail.com"))
