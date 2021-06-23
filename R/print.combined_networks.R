@@ -1,3 +1,12 @@
+#  File R/print.combined_networks.R in package tergm, part of the
+#  Statnet suite of packages for network analysis, https://statnet.org .
+#
+#  This software is distributed under the GPL-3 license.  It is free,
+#  open source, and has the attribution requirements (GPL Section 7) at
+#  https://statnet.org/attribution .
+#
+#  Copyright 2008-2021 Statnet Commons
+################################################################################
 #' @describeIn combine_networks A wrapper around
 #'   [network::print.network()] to print constituent network
 #'   information and omit some internal variables.
