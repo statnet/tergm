@@ -323,6 +323,8 @@ test_that("simulate.tergm behaves reasonably", {
   rv_CMLE_x <- simulate(CMLE, nw.start = nwx, output = "final")  
 
   set.seed(0)
+  expect_error(simulate(CMLE, output = "final"))
+  set.seed(0)
   expect_error(simulate(CMLE, nw.start = 0, output = "final"))
   set.seed(0)
   rv_CMLE_1 <- simulate(CMLE, nw.start = 1, output = "final")  

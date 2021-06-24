@@ -255,8 +255,8 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
 
   nw <- object$network
   if(is.null(nw.start)){
-    if(is.network(object$network)) nw.start <- nw
-    else stop('Simulating from TERGM CMLE fit requires the starting network to be specified in the nw.start argument: "first", "last", a numeric index of the network in the series (with "first"==1), or a network (NOT networkDynamic at this time).')
+    if(is(object, "tergm_CMLE")) stop('Simulating from TERGM CMLE fit requires the starting network to be specified in the nw.start argument: "first", "last", a numeric index of the network in the series (with "first"==1), or a network (NOT networkDynamic at this time).')
+    nw.start <- nw
   }else if(is.numeric(nw.start)){
     nwl <- uncombine_network(nw)
     if(nw.start == 1) nw.start <- (nwl[[1]] %n% ".PrevNets")[[1]]
