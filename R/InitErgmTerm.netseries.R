@@ -148,7 +148,7 @@ InitErgmTerm.Form <- function(nw, arglist,  ..., env=baseenv()) {
   a$formula <- f
 
   # Just call Cross() operator.
-  term <- as.call(c(list(as.name("Cross")),a))
+  term <- as.call(c(list(as.name("Cross")), c(a, label=FALSE)))
   out <- call.ErgmTerm(term, env=env, nw=nw, ...)
   out
 }
@@ -190,7 +190,7 @@ InitErgmTerm.Persist <- function(nw, arglist,  ..., env=baseenv()) {
   a$formula <- f
 
   # Just call Cross() operator.
-  term <- as.call(c(list(as.name("Cross")),a))
+  term <- as.call(c(list(as.name("Cross")), c(a, label=FALSE)))
   out <- call.ErgmTerm(term, env=env, nw=nw, ...)
   out
 }
@@ -230,7 +230,7 @@ InitErgmTerm.Diss <- function(nw, arglist,  ..., env=baseenv()) {
   term <- call("Persist", substitute(~Sum(formula, I), list(formula=formula)))
   out <- call.ErgmTerm(term, env=env, nw=nw, ...)
   out$coef.names <- renamer(out$coef.names)
-  if(!is.null(out$param)) names(out$param) <- renamer(names(out$param))
+  if(!is.null(out$params)) names(out$params) <- renamer(names(out$params))
   out
 }
 
@@ -251,7 +251,7 @@ InitErgmTerm.Change <- function(nw, arglist,  ..., env=baseenv()) {
   a$formula <- f
 
   # Just call Cross() operator.
-  term <- as.call(c(list(as.name("Cross")),a))
+  term <- as.call(c(list(as.name("Cross")), c(a, label=FALSE)))
   out <- call.ErgmTerm(term, env=env, nw=nw, ...)
   out
 }
@@ -290,16 +290,21 @@ InitErgmTerm..crossnets <- function(nw, arglist, ...){
 #' @import purrr
 InitErgmTerm.Cross <- function(nw, arglist, ..., env=baseenv()) {
   a <- check.ErgmTerm(nw, arglist,
-                      varnames = c("formula"),
-                      vartypes = c("formula"),
-                      defaultvalues = list(NULL),
-                      required = c(TRUE))
+                      varnames = c("formula", "label"),
+                      vartypes = c("formula", "logical"),
+                      defaultvalues = list(NULL, TRUE),
+                      required = c(TRUE, FALSE))
+  namewrap <- if(a$label) ergm_mk_std_op_namewrap("Cross") else identity
 
   if (!is(nw, "tergm_NetSeries")) {
     # Just call Passthrough() operator.
-    term <- as.call(c(list(as.name("Passthrough")), a))
+    term <- as.call(c(list(as.name("Passthrough")), list(formula = a$formula, label=FALSE)))
     term <- call.ErgmTerm(term, env = env, nw = nw, ...)
     term$duration <- is.durational(term$submodel)
+
+    term$coef.names <- namewrap(term$coef.names)
+    if(!is.null(term$params)) names(term$params) <- namewrap(names(term$params))
+
     return(term)
   }
 
@@ -320,7 +325,7 @@ InitErgmTerm.Cross <- function(nw, arglist, ..., env=baseenv()) {
   if(!all_identical(nparams) && !all_identical(ms %>% map(param_names, canonical=FALSE))) ergm_Init_abort("The transitions appear to have different sets of parameters. This may be a consequence of a change in network composition. The levels= argument may help.")
   nparam <- nparams[1]
 
-  wms <- mapply(wrap.ergm_model, ms, nwl, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+  wms <- mapply(wrap.ergm_model, ms, nwl, MoreArgs=list(namewrap = namewrap), SIMPLIFY=FALSE, USE.NAMES=FALSE)
 
   gss <- map(wms, "emptynwstats")
   gs <-

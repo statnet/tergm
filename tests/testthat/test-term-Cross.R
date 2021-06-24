@@ -16,14 +16,14 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
   ff0 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + concurrent
   s1 <- summary(ff0, basis = nw)
   s2 <- summary(~Cross(ff0), basis = nw)
-  names(s1) <- paste0("Passthrough~", names(s1))
+  names(s1) <- paste0("Cross~", names(s1))
   expect_identical(s1, s2)
 
   ## non-durational, curved
   ff1 <- ~edges + triangle + gwesp(0, fixed = TRUE) + gwesp(fixed = FALSE, cutoff = 5) + isolates
   s1 <- summary(ff1, basis = nw)
   s2 <- summary(~Cross(ff1), basis = nw)
-  names(s1) <- paste0("Passthrough~", names(s1))
+  names(s1) <- paste0("Cross~", names(s1))
   expect_identical(s1, s2)
 
   set.seed(0)
@@ -37,14 +37,14 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
   ff2 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + concurrent + edges.ageinterval(1) + edges.ageinterval(4) + edges.ageinterval(15) + mean.age + Form(~edges + triangle + mean.age) + Persist(~edges + concurrent + isolates + edges.ageinterval(2) + edges.ageinterval(6))
   s1 <- summary(ff2, basis = nw)
   s2 <- summary(~Cross(ff2), basis = nw)
-  names(s1) <- paste0("Passthrough~", names(s1))
+  names(s1) <- paste0("Cross~", names(s1))
   expect_identical(s1, s2)
 
   ## durational, curved
   ff3 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + gwesp(fixed = FALSE, cutoff = 5) + mean.age + Form(~edges + triangle + mean.age) + Diss(~gwesp(fixed = FALSE, cutoff = 5))
   s1 <- summary(ff3, basis = nw)
   s2 <- summary(~Cross(ff3), basis = nw)
-  names(s1) <- paste0("Passthrough~", names(s1))
+  names(s1) <- paste0("Cross~", names(s1))
   expect_identical(s1, s2)
 
   set.seed(0)
@@ -63,7 +63,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
                     monitor = ~Cross(ff0),
                     output = "stats")
                     
-  colnames(sim01) <- paste0("Passthrough~", colnames(sim01))
+  colnames(sim01) <- paste0("Cross~", colnames(sim01))
   expect_identical(sim01, sim02)
 
   set.seed(1)
@@ -82,7 +82,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
                     monitor = ~Cross(ff1),
                     output = "stats")
 
-  colnames(sim11) <- paste0("Passthrough~", colnames(sim11))
+  colnames(sim11) <- paste0("Cross~", colnames(sim11))
   expect_identical(sim11, sim12)
 
   set.seed(2)
@@ -101,7 +101,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
                     monitor = ~Cross(ff2),
                     output = "stats")
 
-  colnames(sim21) <- paste0("Passthrough~", colnames(sim21))
+  colnames(sim21) <- paste0("Cross~", colnames(sim21))
   expect_identical(sim21, sim22)
 
   set.seed(3)
@@ -120,7 +120,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
                     monitor = ~Cross(ff3),
                     output = "stats")
 
-  colnames(sim31) <- paste0("Passthrough~", colnames(sim31))
+  colnames(sim31) <- paste0("Cross~", colnames(sim31))
   expect_identical(sim31, sim32)
 
   m01 <- ergm_model(ff0, nw = nw)
@@ -129,8 +129,8 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
   expect_true(!is.curved(m02))
   expect_true(!is.durational(m01))
   expect_true(!is.durational(m02))
-  expect_identical(paste0("Passthrough~", param_names(m01, canonical = FALSE)), param_names(m02, canonical = FALSE))
-  expect_identical(paste0("Passthrough~", param_names(m01, canonical = TRUE)), param_names(m02, canonical = TRUE))
+  expect_identical(paste0("Cross~", param_names(m01, canonical = FALSE)), param_names(m02, canonical = FALSE))
+  expect_identical(paste0("Cross~", param_names(m01, canonical = TRUE)), param_names(m02, canonical = TRUE))
 
   m11 <- ergm_model(ff1, nw = nw)
   m12 <- ergm_model(~Cross(ff1), nw = nw)
@@ -138,8 +138,8 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
   expect_true(is.curved(m12))
   expect_true(!is.durational(m11))
   expect_true(!is.durational(m12))
-  expect_identical(paste0("Passthrough~", param_names(m11, canonical = FALSE)), param_names(m12, canonical = FALSE))
-  expect_identical(paste0("Passthrough~", param_names(m11, canonical = TRUE)), param_names(m12, canonical = TRUE))
+  expect_identical(paste0("Cross~", param_names(m11, canonical = FALSE)), param_names(m12, canonical = FALSE))
+  expect_identical(paste0("Cross~", param_names(m11, canonical = TRUE)), param_names(m12, canonical = TRUE))
 
   m21 <- ergm_model(ff2, nw = nw)
   m22 <- ergm_model(~Cross(ff2), nw = nw)
@@ -147,8 +147,8 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
   expect_true(!is.curved(m22))
   expect_true(is.durational(m21))
   expect_true(is.durational(m22))
-  expect_identical(paste0("Passthrough~", param_names(m21, canonical = FALSE)), param_names(m22, canonical = FALSE))
-  expect_identical(paste0("Passthrough~", param_names(m21, canonical = TRUE)), param_names(m22, canonical = TRUE))
+  expect_identical(paste0("Cross~", param_names(m21, canonical = FALSE)), param_names(m22, canonical = FALSE))
+  expect_identical(paste0("Cross~", param_names(m21, canonical = TRUE)), param_names(m22, canonical = TRUE))
 
   m31 <- ergm_model(ff3, nw = nw)
   m32 <- ergm_model(~Cross(ff3), nw = nw)
@@ -156,6 +156,6 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
   expect_true(is.curved(m32))
   expect_true(is.durational(m31))
   expect_true(is.durational(m32))
-  expect_identical(paste0("Passthrough~", param_names(m31, canonical = FALSE)), param_names(m32, canonical = FALSE))
-  expect_identical(paste0("Passthrough~", param_names(m31, canonical = TRUE)), param_names(m32, canonical = TRUE))
+  expect_identical(paste0("Cross~", param_names(m31, canonical = FALSE)), param_names(m32, canonical = FALSE))
+  expect_identical(paste0("Cross~", param_names(m31, canonical = TRUE)), param_names(m32, canonical = TRUE))
 })
