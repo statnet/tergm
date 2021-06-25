@@ -361,8 +361,8 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                               proposal,
                               eta, control=control, verbose=verbose)
     
-    stats.gen <- if(control$collect) mcmc(sweep(z$statsmatrix.gen,2,summary(formula, basis=nw, dynamic=TRUE),"+"),start=time.burnin+1,thin=time.interval)
-    stats.mon <- if(!is.null(model.mon)) mcmc(sweep(z$statsmatrix.mon,2,summary(monitor, basis=nw, dynamic=TRUE),"+"),start=time.burnin+1,thin=time.interval)
+    stats.gen <- if(control$collect) mcmc(sweep(z$statsmatrix.gen,2,summary(model, nw=nw),"+"),start=time.burnin+1,thin=time.interval)
+    stats.mon <- if(!is.null(model.mon)) mcmc(sweep(z$statsmatrix.mon,2,summary(model.mon, nw=nw),"+"),start=time.burnin+1,thin=time.interval)
 
     out <-
       switch(output,
