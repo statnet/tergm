@@ -287,7 +287,23 @@ InitErgmTerm..crossnets <- function(nw, arglist, ...){
 }
 
 # A term for a cross-sectional model for the network in a series.
+
+#' @name Cross-ergmTerm
+#' @title The Crossection Operator Term
+#' @description The Crossection Operator Term
+#' @details This term accepts a model formula
+#'   and produces the corresponding model for the cross-sectional
+#'   network. It is mainly useful for CMLE estimation, and has no effect (i.e.,
+#'   `Cross(~TERM) == ~TERM` ) for EGMME and dynamic simulation.
+#'
+#' @usage
+#' # binary: Cross(formula)
+#' @param formula model formula
+#'
+#' @template ergmTerm-general
 #' @import purrr
+#'
+#' @concept operator
 InitErgmTerm.Cross <- function(nw, arglist, ..., env=baseenv()) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula", "label"),
