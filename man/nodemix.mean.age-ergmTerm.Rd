@@ -5,7 +5,8 @@
 \alias{InitErgmTerm.nodemix.mean.age}
 \title{Average ages of extant ties of specified mixing types}
 \usage{
-# binary: nodemix.mean.age(attr, b1levels=NULL, b2levels=NULL, levels=NULL, levels2=NULL, emptyval=0, log=FALSE)
+# binary: nodemix.mean.age(attr, b1levels=NULL, b2levels=NULL, levels=NULL,
+#                          levels2=NULL, emptyval=0, log=FALSE)
 }
 \arguments{
 \item{attr}{quantitative attribute (see Specifying Vertex attributes and Levels (\code{?nodal_attributes}) for details.)}

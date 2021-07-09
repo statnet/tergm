@@ -54,7 +54,7 @@ else if(any(from>=to)) stop("Term edges.ageinterval must have from<to.")
 #'   present in the network, of the amount of time elapsed since
 #'   formation.
 #'
-#'   Unlike [`mean.age`] , this statistic is well-defined on
+#'   Unlike [`mean.age`][mean.age-ergmTerm] , this statistic is well-defined on
 #'   an empty network. However, if used as a target, it appears to
 #'   produce highly biased dissolution parameter estimates if the goal
 #'   is to get an intended average duration.
@@ -183,7 +183,8 @@ InitErgmTerm.nodefactor.mean.age <- function(nw, arglist, ...) {
 #'   of the amount of time elapsed since formation.
 #'
 #' @usage
-#' # binary: nodemix.mean.age(attr, b1levels=NULL, b2levels=NULL, levels=NULL, levels2=NULL, emptyval=0, log=FALSE)
+#' # binary: nodemix.mean.age(attr, b1levels=NULL, b2levels=NULL, levels=NULL,
+#' #                          levels2=NULL, emptyval=0, log=FALSE)
 #' @template ergmTerm-attr
 #' @param b1levels,b2levels,levels,level2 control what statistics are included in the model and the order in which they appear. `levels2` apply to all networks; `levels` applies to unipartite networks; `b1levels` and `b2levels` apply to bipartite networks (see Specifying Vertex attributes and Levels (`?nodal_attributes`) for details)
 #' @param emptyval can be used to specify the value returned if the network is empty. A different value may be
@@ -373,7 +374,7 @@ InitErgmTerm.edgecov.mean.age<-function(nw, arglist, ...) {
 #'
 #'   "Weights" can be negative.
 #'
-#'   Unlike [`edgecov.mean.age`] , this statistic is well-defined on
+#'   Unlike [`edgecov.mean.age`][edgecov.mean.age-ergmTerm] , this statistic is well-defined on
 #'   an empty network. However, if used as a target, it appears to
 #'   produce highly biased dissolution parameter estimates if the goal
 #'   is to get an intended average duration.

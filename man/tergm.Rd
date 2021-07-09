@@ -31,7 +31,7 @@ of networks being modeled.
 
 The default is \code{~.}, for an unconstrained model.
 
-See the \link[=ergm-constraints]{ERGM constraints} documentation for the
+See the \link[=ergmConstraint]{ERGM constraints} documentation for the
 constraints implemented in the \strong{\link[=ergm-package]{ergm}} package.
 Other packages may add their own constraints.
 

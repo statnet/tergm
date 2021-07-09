@@ -66,8 +66,8 @@
         (rather than the temporal operator networks).
         
         Proposal arguments are the same as for \code{\link[ergm:ergm-proposals]{BDStratTNT}},
-        and should be passed in via the \code{\link[ergm:ergm-constraints]{bd}} and
-        \code{\link[ergm:ergm-constraints]{blocks}} constraints and 
+        and should be passed in via the \code{\link[ergm:ergmConstraint]{bd}} and
+        \code{\link[ergm:ergmConstraint]{blocks}} constraints and
         the \code{\link[ergm:ergm-hints]{Strat}} hint.
       }    
     }  
@@ -75,7 +75,7 @@
 }
 
 \seealso{\code{\link[=tergm-package]{tergm}} package, \code{\link{ergm}}, 
-         \code{\link{ergm-constraints}}, and ergm's 
+         \code{\link{ergmConstraint}}, and ergm's
          \code{\link[ergm]{ergm_proposal}} help page}
 
 

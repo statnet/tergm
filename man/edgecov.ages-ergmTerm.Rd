@@ -25,7 +25,7 @@ formation, multiplied by a dyadic covariate.
 
 "Weights" can be negative.
 
-Unlike \code{\link{edgecov.mean.age}} , this statistic is well-defined on
+Unlike \code{\link[=edgecov.mean.age-ergmTerm]{edgecov.mean.age}} , this statistic is well-defined on
 an empty network. However, if used as a target, it appears to
 produce highly biased dissolution parameter estimates if the goal
 is to get an intended average duration.

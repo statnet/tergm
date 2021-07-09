@@ -13,3 +13,4 @@ Rplots.pdf
 ^codecov\.yml$
 ^revdep$
 ^README.md$
+^man-roxygen$

@@ -43,7 +43,7 @@ attribute into which to store the name of the network to which
 that vertex originally belonged.}
 
 \item{detect.edgecov}{if \code{TRUE}, combine network attributes that
-look like dyadic covariate (\code{\link[ergm:edgecov]{ergm::edgecov}}) matrices into a
+look like dyadic covariate (\code{\link[ergm:edgecov-ergmTerm]{ergm::edgecov}}) matrices into a
 block-diagonal matrix.}
 
 \item{keep.unshared.attr}{whether to keep those network, vertex,
