@@ -125,7 +125,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
   if(!is.null(control$init)){
     # Check length of control$init.
     if(length(control$init)!=length(model$etamap$offsettheta)) {
-      if(verbose) message("control$init is ", paste(control$init, collapse = " "), "\n", " number of statistics is ", length(model$coef.names))
+      if(verbose) message("control$init is ", paste(control$init, collapse = " "), "\n", " number of statistics is ", length(param_names(model, canonical = TRUE)))
       stop(paste("Invalid starting formation parameter vector control$init:",
                  "wrong number of parameters."))
     }
@@ -144,7 +144,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
   # Make sure any offset elements are given in control$init.
   if(any(is.na(control$init) & model$etamap$offsettheta)) stop("The model contains offset terms whose parameter values have not been specified:", paste.and(param_names(model)[is.na(control$init)&model$offsettheta]), ".", sep="")
     
-  names(control$init) <- model$coef.names
+  names(control$init) <- param_names(model)
 
   initialfit <- tergm.EGMME.initialfit(control$init, nw, model, formula, model.mon, targets, control, verbose)
   

@@ -32,36 +32,36 @@ tergm.EGMME.initialfit<-function(init, nw, model, formula, model.mon, formula.mo
       stop("No initial parameter method for specified model and targets combination is implemented. Specify via control$init.")    
     }
     
-    wf <- grepl("^Form~", model$coef.names) | grepl("^offset\\(Form~", model$coef.names)
-    wp <- grepl("^Persist~", model$coef.names) | grepl("^offset\\(Persist~", model$coef.names)
-    wd <- grepl("^Diss~", model$coef.names) | grepl("^offset\\(Diss~", model$coef.names)
+    wf <- grepl("^Form~", param_names(model)) | grepl("^offset\\(Form~", param_names(model))
+    wp <- grepl("^Persist~", param_names(model)) | grepl("^offset\\(Persist~", param_names(model))
+    wd <- grepl("^Diss~", param_names(model)) | grepl("^offset\\(Diss~", param_names(model))
     
     init[wd] <- -init[wd]
     
     init.form <- init[wf]
     init.pers <- init[wp | wd]
     
-    names(init.form) <- model.form$coef.names
-    names(init.pers) <- model.pers$coef.names
+    names(init.form) <- param_names(model.form)
+    names(init.pers) <- param_names(model.pers)
     
     form <- nonsimp_update.formula(form, nw ~ ., from.new = "nw")
     model.form$formula <- form
   
-    if(all(model.form$coef.names[!model.form$etamap$offsettheta] %in% .do(model.mon$coef.names))
+    if(all(param_names(model.form)[!model.form$etamap$offsettheta] %in% .do(param_names(model.mon)))
              && (
                   all(model.pers$etamap$offsettheta)
                   || (
-                       length(model.pers$coef.names) == 1
-                       && .do(model.pers$coef.names) == "edges"
-                       && "mean.age" %in% .do(model.mon$coef.names)
+                       length(param_names(model.pers)) == 1
+                       && .do(param_names(model.pers)) == "edges"
+                       && "mean.age" %in% .do(param_names(model.mon))
                      )
                 )
-             && all(.do(model.pers$coef.names) %in% model.form$coef.names)
+             && all(.do(param_names(model.pers)) %in% param_names(model.form))
              && is.dyad.independent(model.pers)) {
       if(verbose) message("Formation statistics are analogous to targeted statistics, dissolution is fixed or is edges with a mean.age target, dissolution terms appear to have formation analogs, and dissolution process is dyad-independent, so using edges dissolution approximation  (Carnegie et al.).")
       
       if(!all(model.pers$etamap$offsettheta)){ # This must mean that the two provisos above are satisfied.
-        mean.age <- model.mon$target.stats[.do(model.mon$coef.names)=="mean.age"]
+        mean.age <- model.mon$target.stats[.do(param_names(model.mon))=="mean.age"]
         init.pers <- log(mean.age+1)
         names(init.pers) <- "edges"
       }
@@ -69,7 +69,7 @@ tergm.EGMME.initialfit<-function(init, nw, model, formula, model.mon, formula.mo
       form.offset.coef <- if(any(model.form$etamap$offsetmap)) init.form[model.form$etamap$offsetmap] else NULL
       
       # Fit an ERGM to the formation terms:
-      form.targets <- model.mon$target.stats[match(model.form$coef.names,.do(model.mon$coef.names))]
+      form.targets <- model.mon$target.stats[match(param_names(model.form),.do(param_names(model.mon)))]
       form.targets <- form.targets[!model.form$etamap$offsettheta]
       
       ergm_control <- NVL(control$EGMME.initialfit.control, control.ergm())

@@ -17,10 +17,10 @@ tergm.EGMME.GD <- function(theta0, nw, model, model.mon,
   offsets <- model$etamap$offsettheta # which parameters are offsets?
   p.free <- sum(!model$etamap$offsettheta) # number of free parameters
   p <- length(model$etamap$offsettheta) # total number of parameters
-  p.names<- model$coef.names
+  p.names<- param_names(model)
   
   q <- length(model.mon$etamap$offsettheta) # number of target statistics
-  q.names<-model.mon$coef.names
+  q.names<-param_names(model.mon)
 
   # Define the function to set optimization parameters.  
   eval.optpars <- function(states, history, control, test.G,window,update.jitter){
