@@ -178,6 +178,8 @@ typedef struct {
   int *maxl;
   
   int in_discord;
+
+  double discordance_fraction;    
     
   BDStratTNTStorage *static_sto;
 } discordBDStratTNTStorage;
@@ -204,6 +206,8 @@ MH_I_FN(Mi_discordBDStratTNT) {
   sto->combined_BDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL);
   sto->combined_nonBDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL);
   sto->transferEL = UnsrtELInitialize(0, NULL, NULL, FALSE);
+
+  sto->discordance_fraction = asReal(getListElement(MHp->R, "discordance_fraction"));  
 }
 
 MH_X_FN(Mx_discordBDStratTNT) {
@@ -247,7 +251,7 @@ MH_P_FN(MH_discordBDStratTNT) {
   int in_network;
   int in_discord;
   
-  if(nddyadstype == 0 || unif_rand() < 0.5) {
+  if(nddyadstype == 0 || unif_rand() < 1 - sto->discordance_fraction) {
     // propose from network
     if((unif_rand() < 0.5 && nedgestype > 0) || ndyadstype == 0) {
       // propose toggling off an existing edge of strat mixing type strat_i
@@ -341,11 +345,8 @@ MH_P_FN(MH_discordBDStratTNT) {
   
   double backward_discord = in_discord ? 0 : 1.0/propnddyadstype;
   
-  if(nddyadstype == 0) forward_network *= 2;
-  if(propnddyadstype == 0) backward_network *= 2;
-  
-  double forward = forward_discord + forward_network;
-  double backward = backward_discord + backward_network;
+  double forward = (nddyadstype == 0) ? forward_network : (sto->discordance_fraction*forward_discord + (1 - sto->discordance_fraction)*forward_network);
+  double backward = (propnddyadstype == 0) ? backward_network : (sto->discordance_fraction*backward_discord + (1 - sto->discordance_fraction)*backward_network);
 
   MHp->logratio = log(prob_weight*backward/forward);
 }
