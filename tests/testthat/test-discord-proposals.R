@@ -8,7 +8,7 @@
 #  Copyright 2008-2021 Statnet Commons
 ################################################################################
 
-NITER <- 1
+NITER <- 2
 
 test_that("discordStratTNT behaves reasonably", {
 
@@ -26,8 +26,8 @@ test_that("discordStratTNT behaves reasonably", {
   
   for(i in 1:NITER) {
     nw_sim <- simulate(nw_sim ~ edges, 
-                       coef = c(-3), 
-                       time.slices = 5,
+                       coef = c(-5), 
+                       time.slices = 3,
                        constraints = ~strat(attr = "vattr", pmat = pmat),
                        dynamic = TRUE,
                        output = "final")
@@ -43,7 +43,7 @@ test_that("discordStratTNT behaves reasonably", {
 
 
 test_that("discordBDTNT behaves reasonably", {
-  for(deg_bound in c(1,3)) {
+  for(deg_bound in c(2)) {
     net_size <- 500L
   
     nw <- network.initialize(net_size, dir = FALSE)
@@ -59,8 +59,8 @@ test_that("discordBDTNT behaves reasonably", {
     
     for(i in 1:NITER) {
       nw_sim <- simulate(nw_sim ~ edges, 
-                         coef = c(0),
-                         time.slices = 5,                       
+                         coef = c(-4),
+                         time.slices = 3,                       
                          constraints = ~bd(maxout = deg_bound) + blocks(attr = "vattr", levels2 = levels2),
                          dynamic = TRUE,
                          output = "final")
@@ -98,8 +98,8 @@ test_that("discordBDStratTNT behaves reasonably", {
     
     for(i in 1:NITER) {
       nw_sim <- simulate(nw_sim ~ edges, 
-                         coef = c(0), 
-                         time.slices = 5,
+                         coef = c(-5), 
+                         time.slices = 3,
                          constraints = ~bd(maxout = deg_bound) + blocks(attr = "sex", levels2 = levels2) + strat(attr = "vattr", pmat = pmat),
                          dynamic = TRUE,
                          output = "final")
@@ -288,7 +288,7 @@ test_that("discordBDStratTNT behaves reasonably", {
 })
 
 test_that("discordBDStratTNT simulates reasonably with heterogeneous degree bounds", {
-  for(deg_bound in c(1,3)) {
+  for(deg_bound in c(1)) {
     net_size <- 2000L
   
     nw <- network.initialize(net_size, dir = FALSE)
@@ -328,7 +328,7 @@ test_that("discordBDStratTNT simulates reasonably with heterogeneous degree boun
     
     for(i in 1:NITER) {
       nw_sim <- simulate(nw_sim ~ Form(~edges) + Persist(~edges),
-                         coef = c(0,0),
+                         coef = c(-7,2),
                          dynamic = TRUE,
                          time.slices = 3,                         
                          constraints = ~bd(attribs = attribs, maxout = maxout) + blocks(~blocks_attr, levels2 = blocks_levels_2) + strat(attr = "vattr", pmat = pmat),
@@ -350,7 +350,7 @@ test_that("discordBDStratTNT simulates reasonably with heterogeneous degree boun
 })
 
 test_that("discordBDStratTNT simulates reasonably with bipartite heterogeneous degree bounds", {
-  for(deg_bound in c(1,3)) {
+  for(deg_bound in c(1)) {
     net_size <- 2000L
     bip <- 700L
     
@@ -390,7 +390,7 @@ test_that("discordBDStratTNT simulates reasonably with bipartite heterogeneous d
     
     for(i in 1:NITER) {
       nw_sim <- simulate(nw_sim ~ Form(~edges) + Persist(~edges),
-                         coef = c(0,0),
+                         coef = c(-6,2),
                          dynamic = TRUE,
                          time.slices = 3,                         
                          constraints = ~bd(attribs = attribs, maxout = maxout) + blocks(~blocks_attr, levels2 = blocks_levels_2) + strat(attr = "vattr", pmat = pmat),
@@ -412,7 +412,7 @@ test_that("discordBDStratTNT simulates reasonably with bipartite heterogeneous d
 })
 
 test_that("discordBDStratTNT simulates reasonably with directed heterogeneous degree bounds", {
-  for(deg_bound in c(1,3)) {
+  for(deg_bound in c(1)) {
     net_size <- 2000L
   
     nw <- network.initialize(net_size, dir = TRUE)
@@ -454,7 +454,7 @@ test_that("discordBDStratTNT simulates reasonably with directed heterogeneous de
     
     for(i in 1:NITER) {
       nw_sim <- simulate(nw_sim ~ Form(~edges) + Persist(~edges),
-                         coef = c(0,0),
+                         coef = c(-7,2),
                          dynamic = TRUE,
                          time.slices = 3,                         
                          constraints = ~bd(attribs = attribs, maxout = maxout, maxin = maxin) + blocks(~blocks_attr, levels2 = blocks_levels_2) + strat(attr = "vattr", pmat = pmat),
