@@ -18,7 +18,7 @@
 #' @usage
 #' # discord
 #'
-#' @template ergmTerm-general
+#' @template ergmConstraint-general
 InitErgmConstraint.discord <- function(lhs.nw, ref=NULL, ...){
   nw <- if(is.character(ref)) lhs.nw %n% ref else lhs.nw
 
