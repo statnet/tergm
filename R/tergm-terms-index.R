@@ -78,3 +78,44 @@
 #' @keywords models
 #'
 NULL
+
+#' Constraints and hints for Temporal Exponential Family Random Graph Models
+#'
+#' @name ergmConstraint
+#' @aliases ergm-constraints constraints-ergm ergm.constraints constraints.ergm ergm-hints hints-ergm ergm.hints hints.ergm
+#' @docType package
+#' @description This page describes the hints and network sample
+#'   space constraints that are included with the [`tergm`][tergm-package]
+#'   package. For more information, and instructions for using hints and constraints, see
+#'   [`ergmConstraint`][ergm::ergmConstraint] and [`ergm`].
+#'
+#' @section Constraints and hints to represent network statistics included in the [`tergm`][tergm-package] package:
+#' ## Term index
+#' \if{latex}{\Sexpr[results=rd,stage=render]{ergm:::.formatIndexLatex(ergm:::.buildTermsDataframe("ergmConstraint"))}}
+#' \if{text}{\Sexpr[results=rd,stage=render]{ergm:::.formatIndexText(ergm:::.buildTermsDataframe("ergmConstraint"))}}
+#' \if{html}{\Sexpr[results=rd,stage=render]{ergm:::.formatIndexHtml(ergm:::.buildTermsDataframe("ergmConstraint"))}}
+#'
+#' @references
+#' - Krivitsky PN and Handcock MS (2014) A Separable Model for Dynamic Networks.
+#'   *Journal of the Royal Statistical Society, Series B*, 76(1): 29-46. \doi{10.1111/rssb.12014}
+#'
+#' - Goodreau SM, Handcock MS, Hunter DR, Butts CT, Morris M (2008a).  A \pkg{statnet} Tutorial.
+#'   *Journal of Statistical Software*, 24(8).  \url{https://www.jstatsoft.org/v24/i08/}.
+#'
+#' - Hunter, D. R. and Handcock, M. S. (2006) Inference in curved exponential family models for networks,
+#'   *Journal of Computational and Graphical Statistics*.
+#'
+#' - Hunter DR, Handcock MS, Butts CT, Goodreau SM, Morris M (2008b).
+#'   \pkg{ergm}: A Package to Fit, Simulate and Diagnose Exponential-Family Models for Networks.
+#'   *Journal of Statistical Software*, 24(3). \url{https://www.jstatsoft.org/v24/i03/}.
+#'
+#' - Krivitsky PN (2012). Exponential-Family Random Graph Models for Valued Networks.
+#'   *Electronic Journal of Statistics*, 2012, 6, 1100-1128. \doi{10.1214/12-EJS696}
+#'
+#' - Morris M, Handcock MS, Hunter DR (2008).  Specification of Exponential-Family Random Graph Models:
+#'   Terms and Computational Aspects. *Journal of Statistical Software*, 24(4).
+#'   \url{https://www.jstatsoft.org/v24/i04/}.
+#'
+#' @keywords models
+#'
+NULL
