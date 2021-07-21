@@ -55,5 +55,13 @@ test_that("edgelist_with_lasttoggle behaves reasonably", {
     ltdropadd <- ltdropadd[sample(seq_len(NROW(ltdropadd))),,drop=FALSE]
     nw %n% "lasttoggle" <- ltdropadd
     expect_equal(ltmod, edgelist_with_lasttoggle(nw))
+    
+    ## test corner cases
+    expect_equal(matrix(0L, 0, 3), edgelist_with_lasttoggle(nw0))
+    nw0 %n% "lasttoggle" <- lt
+    expect_equal(matrix(0L, 0, 3), edgelist_with_lasttoggle(nw0))
+
+    nw %n% "lasttoggle" <- NULL
+    expect_equal(cbind(as.edgelist(nw), as.integer(-.Machine$integer.max/2)), edgelist_with_lasttoggle(nw))
   }
 })
