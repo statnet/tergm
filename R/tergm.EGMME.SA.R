@@ -472,7 +472,7 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
                          mean = colMeans(history$oh[,1:p,drop=FALSE][,!offsets,drop=FALSE]),
                          linear = interpolate.par(out$oh.fit,out$w),
                          none = if(is.null(ergm.getCluster(control))) eta[!offsets] else stop("No interpolation does not make sense with multithreaded fitting."))
-      if(p.free) eta[!model$etamap$offsettheta] <- eta[seq_len(p.free)]
+      if(p.free) eta[!model$etamap$offsettheta] <- eta.free[seq_len(p.free)]
       
       if(verbose){
         message("Refining the estimate using the ", control$SA.refine, " method. New estimate:")
