@@ -36,6 +36,7 @@ control.stergm(
   CMLE.NA.impute = c(),
   CMLE.term.check.override = FALSE,
   EGMME.main.method = c("Gradient-Descent"),
+  EGMME.initialfit.control = control.ergm(),
   EGMME.MCMC.burnin.min = 1000,
   EGMME.MCMC.burnin.max = 1e+05,
   EGMME.MCMC.burnin.pval = 0.5,
@@ -189,6 +190,9 @@ overrides the tests.}
 \item{EGMME.main.method}{Estimation method used to find the
 Equilibrium Generalized Method of Moments estimator.  Currently
 only "Gradient-Descent" is implemented.}
+
+\item{EGMME.initialfit.control}{Control object for the ergm fit
+in tergm.EGMME.initialfit}
 
 \item{EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max, }{Number of
 Metropolis-Hastings steps

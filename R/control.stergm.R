@@ -108,6 +108,8 @@
 #' @param EGMME.main.method Estimation method used to find the
 #'   Equilibrium Generalized Method of Moments estimator.  Currently
 #'   only "Gradient-Descent" is implemented.
+#' @param EGMME.initialfit.control Control object for the ergm fit
+#'   in tergm.EGMME.initialfit
 #' @param EGMME.MCMC.burnin.min,EGMME.MCMC.burnin.max, Number of
 #'   Metropolis-Hastings steps 
 #'   per time step used in EGMME fitting. By default, this is
@@ -350,6 +352,8 @@ control.stergm<-function(init.form=NULL,
                          CMLE.term.check.override=FALSE,
                          
                          EGMME.main.method=c("Gradient-Descent"),
+
+                         EGMME.initialfit.control = control.ergm(),
 
                          EGMME.MCMC.burnin.min=1000,
                          EGMME.MCMC.burnin.max=100000,
