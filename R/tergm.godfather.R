@@ -159,7 +159,7 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
   z$state <- update(z$state)
 
   stats <- matrix(z$s + m$obs, ncol=nparam(state,canonical=TRUE), byrow=TRUE)
-  colnames(stats) <- m$coef.names
+  colnames(stats) <- param_names(m, canonical = TRUE)
   if(!stats.start) stats <- stats[-1,,drop=FALSE]
   #' @importFrom coda mcmc
   stats <- mcmc(stats, start=if(stats.start) start else start+1)

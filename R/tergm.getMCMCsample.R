@@ -87,7 +87,7 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
 
   statsmatrix <- z$statsmatrix
   
-  if(!is.null(statsmatrix)) colnames(statsmatrix) <- model.comb$coef.names
+  if(!is.null(statsmatrix)) colnames(statsmatrix) <- param_names(model.comb, canonical = TRUE)
 
   # this is where we separate monitored stats from generative stats if model.mon is passed
   if(is.null(model.mon)) {

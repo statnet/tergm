@@ -15,10 +15,10 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
   offsets <- model$etamap$offsettheta # which parameters are offsets?
   p.free <- sum(!model$etamap$offsettheta) # number of free parameters
   p <- length(model$etamap$offsettheta) # total number of parameters
-  p.names <- model$coef.names
+  p.names <- param_names(model)
   
   q <- length(model.mon$etamap$offsettheta) # number of target statistics
-  q.names<-model.mon$coef.names
+  q.names<-param_names(model.mon)
 
   if(control$SA.plot.progress && !dev.interactive(TRUE)){
     warning("Progress plot requested on a non-interactive graphics device. Ignoring.")
@@ -472,7 +472,7 @@ tergm.EGMME.SA <- function(theta0, nw, model, model.mon,
                          mean = colMeans(history$oh[,1:p,drop=FALSE][,!offsets,drop=FALSE]),
                          linear = interpolate.par(out$oh.fit,out$w),
                          none = if(is.null(ergm.getCluster(control))) eta[!offsets] else stop("No interpolation does not make sense with multithreaded fitting."))
-      if(p.free) eta[!model$etamap$offsettheta] <- eta[seq_len(p.free)]
+      if(p.free) eta[!model$etamap$offsettheta] <- eta.free[seq_len(p.free)]
       
       if(verbose){
         message("Refining the estimate using the ", control$SA.refine, " method. New estimate:")
@@ -589,7 +589,7 @@ tergm.EGMME.SA.Phase2.C <- function(state, model, model.mon,
   z$state <- update(z$state)
 
   eta <- z$eta[seq_len(model$etamap$etalength)]
-  names(eta) <- model$coef.names
+  names(eta) <- param_names(model, canonical = TRUE)
 
   newnetwork <- as.network(z$state)
   
