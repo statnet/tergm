@@ -40,7 +40,7 @@
 #' \item For a brief demonstration, please see the tergm package vignette:
 #' \code{browseVignettes(package='tergm')} \item A more detailed tutorial is
 #' available on the statnet wiki:
-#' \url{https://statnet.org/Workshops/tergm_tutorial.html} }
+#' \url{https://statnet.org/Workshops/tergm/tergm_tutorial.html} }
 #' 
 #'
 #' 
