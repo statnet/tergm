@@ -65,10 +65,12 @@
 \section{Changes in version 4.0.2}{
   \subsection{BUG FIXES}{
     \itemize{
-      Fixes to acommodate \code{\link[ergm:ergm-package]{ergm}}'s \code{BDStratTNT} API changes (which were not as backwards-compatible as hoped).
-    }
-    \item{
-      Better error checking in \code{\link[tergm]{simulate}()} calls.
+      \item{
+        Fixes to acommodate \code{\link[ergm:ergm-package]{ergm}}'s \code{BDStratTNT} API changes (which were not as backwards-compatible as hoped).
+      }
+      \item{
+        Better error checking in \code{\link[tergm]{simulate}()} calls.
+      }
     }
   }
 
