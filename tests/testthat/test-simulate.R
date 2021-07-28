@@ -261,15 +261,15 @@ test_that("simulate.networkDynamic behaves reasonably", {
   expect_true(!is.null(attr(old_nwD8, "stats")))
   expect_true(!is.null(attr(new_nwD8, "stats")))
 
-  expect_identical(attr(old_nwD8, "stats"), attr(new_nwD8, "stats"))
+  expect_equal(attr(old_nwD8, "stats"), attr(new_nwD8, "stats"))
 
-  expect_identical(attr(old_stats_nwD, "stats"), attr(new_stats_nwD, "stats"))
-  expect_identical(attr(old_stats_nwD, "stats.gen"), attr(new_stats_nwD, "stats.gen"))
-  expect_identical(cbind(attr(old_stats_nwD, "stats.form"), attr(old_stats_nwD, "stats.diss")), as.matrix(attr(new_stats_nwD, "stats.gen")))
+  expect_equal(attr(old_stats_nwD, "stats"), attr(new_stats_nwD, "stats"))
+  expect_equal(attr(old_stats_nwD, "stats.gen"), attr(new_stats_nwD, "stats.gen"))
+  expect_equal(cbind(attr(old_stats_nwD, "stats.form"), attr(old_stats_nwD, "stats.diss")), as.matrix(attr(new_stats_nwD, "stats.gen")))
 
-  expect_identical(old_stats$stats, new_stats$stats)
-  expect_identical(old_stats$stats.gen, new_stats$stats.gen)
-  expect_identical(cbind(old_stats$stats.form, old_stats$stats.diss), as.matrix(new_stats$stats.gen))
+  expect_equal(old_stats$stats, new_stats$stats)
+  expect_equal(old_stats$stats.gen, new_stats$stats.gen)
+  expect_equal(cbind(old_stats$stats.form, old_stats$stats.diss), as.matrix(new_stats$stats.gen))
 
   expect_equal(old_nwD_constr, new_nwD_constr, check.attributes = FALSE)
   expect_equal(old_nwD_constr2, new_nwD_constr2, check.attributes = FALSE)
@@ -279,10 +279,10 @@ test_that("simulate.networkDynamic behaves reasonably", {
   expect_true(summary(network.collapse(new_nwD_constr, at = 10) ~ edges) > 0)
   expect_true(summary(network.collapse(new_nwD_constr2, at = 20) ~ edges) > 0)
 
-  expect_identical(unname(summary(network.collapse(old_nwD_constr, at = 10) ~ concurrent)), 0)
-  expect_identical(unname(summary(network.collapse(old_nwD_constr2, at = 20) ~ concurrent)), 0)
-  expect_identical(unname(summary(network.collapse(new_nwD_constr, at = 10) ~ concurrent)), 0)
-  expect_identical(unname(summary(network.collapse(new_nwD_constr2, at = 20) ~ concurrent)), 0)
+  expect_equal(unname(summary(network.collapse(old_nwD_constr, at = 10) ~ concurrent)), 0)
+  expect_equal(unname(summary(network.collapse(old_nwD_constr2, at = 20) ~ concurrent)), 0)
+  expect_equal(unname(summary(network.collapse(new_nwD_constr, at = 10) ~ concurrent)), 0)
+  expect_equal(unname(summary(network.collapse(new_nwD_constr2, at = 20) ~ concurrent)), 0)
 })
 
 statnet.common::opttest({

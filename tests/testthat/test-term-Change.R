@@ -34,64 +34,64 @@ test_that("term Change behaves reasonably in dynamic contexts", {
   s1 <- summary(ff0, basis = nwdiff)
   s2 <- summary(~Change(ff0), basis = nw)
   names(s1) <- paste0("Change~", names(s1))
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
   
   s1 <- summary(ff0, basis = nwdiff01)
   s2 <- summary(~Change(ff0), basis = nw1)
   names(s1) <- paste0("Change~", names(s1))
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
 
   set.seed(0)
   s3 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-4, 2), dynamic = TRUE, output = "stats", monitor = ~Change(ff0), time.slices = 1)
-  expect_identical(s1, s3[1,])
+  expect_equal(s1, s3[1,])
 
   ## non-durational, curved
   ff1 <- ~edges + triangle + gwesp(0, fixed = TRUE) + gwesp(fixed = FALSE, cutoff = 5) + isolates
   s1 <- summary(ff1, basis = nwdiff)
   s2 <- summary(~Change(ff1), basis = nw)
   names(s1) <- paste0("Change~", names(s1))
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
 
   s1 <- summary(ff1, basis = nwdiff01)
   s2 <- summary(~Change(ff1), basis = nw1)
   names(s1) <- paste0("Change~", names(s1))
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
   
   set.seed(0)
   s3 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-4, 2), dynamic = TRUE, output = "stats", monitor = ~Change(ff1), time.slices = 1)
-  expect_identical(s1, s3[1,])
+  expect_equal(s1, s3[1,])
   
   ## durational, non-curved
   ff2 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + concurrent + edges.ageinterval(1) + edges.ageinterval(4) + edges.ageinterval(15) + mean.age + Form(~edges + triangle + mean.age) + Persist(~edges + concurrent + isolates + edges.ageinterval(2) + edges.ageinterval(6))
   s1 <- summary(ff2, basis = nwdiff)
   s2 <- summary(~Change(ff2), basis = nw)
   names(s1) <- paste0("Change~", names(s1))
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
 
   s1 <- summary(ff2, basis = nwdiff01)
   s2 <- summary(~Change(ff2), basis = nw1)
   names(s1) <- paste0("Change~", names(s1))
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
 
   set.seed(0)
   s3 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-4, 2), dynamic = TRUE, output = "stats", monitor = ~Change(ff2), time.slices = 1)
-  expect_identical(s1, s3[1,])
+  expect_equal(s1, s3[1,])
 
   ## durational, curved
   ff3 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + gwesp(fixed = FALSE, cutoff = 5) + mean.age + Form(~edges + triangle + mean.age) + Diss(~gwesp(fixed = FALSE, cutoff = 5))
   s1 <- summary(ff3, basis = nwdiff)
   s2 <- summary(~Change(ff3), basis = nw)
   names(s1) <- paste0("Change~", names(s1))
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
 
   s1 <- summary(ff3, basis = nwdiff01)
   s2 <- summary(~Change(ff3), basis = nw1)
   names(s1) <- paste0("Change~", names(s1))
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
 
   set.seed(0)
   s3 <- simulate(nw0 ~ Form(~edges) + Persist(~edges), coef = c(-4, 2), dynamic = TRUE, output = "stats", monitor = ~Change(ff3), time.slices = 1)
-  expect_identical(s1, s3[1,])
+  expect_equal(s1, s3[1,])
 
   set.seed(0)
   sim01 <- simulate(nw ~ Form(~edges) + Persist(~edges),
@@ -116,7 +116,7 @@ test_that("term Change behaves reasonably in dynamic contexts", {
     
     summ_stats <- summary(ff0, basis = nw_diff)
     names(summ_stats) <- paste0("Change~", names(summ_stats))
-    expect_identical(summ_stats, sim02[time_step - 10 + 1,])
+    expect_equal(summ_stats, sim02[time_step - 10 + 1,])
   }
                     
   set.seed(1)
@@ -142,7 +142,7 @@ test_that("term Change behaves reasonably in dynamic contexts", {
     
     summ_stats <- summary(ff1, basis = nw_diff)
     names(summ_stats) <- paste0("Change~", names(summ_stats))
-    expect_identical(summ_stats, sim12[time_step - 10 + 1,])
+    expect_equal(summ_stats, sim12[time_step - 10 + 1,])
   }
   
   m01 <- ergm_model(ff0, nw = nw)

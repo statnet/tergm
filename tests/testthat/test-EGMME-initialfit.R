@@ -37,7 +37,7 @@ test_that("EGMME initialfit behaves reasonably", {
   set.seed(0)
   e <- ergm(nw ~ edges, target.stats = target.stats[1])
   expected <- unname(c(coef(e)[1] - log(11), -log(11)))
-  expect_identical(expected, coef(x))
+  expect_equal(expected, coef(x))
   
   
   
@@ -50,7 +50,7 @@ test_that("EGMME initialfit behaves reasonably", {
   set.seed(0)
   e <- ergm(nw ~ edges, target.stats = target.stats[1])
   expected <- unname(c(coef(e)[1] - log(11), log(11)))
-  expect_identical(expected, coef(x))
+  expect_equal(expected, coef(x))
   
   
   
@@ -64,7 +64,7 @@ test_that("EGMME initialfit behaves reasonably", {
   set.seed(0)
   e <- ergm(nw ~ edges + nodecov("cov") + offset(gwesp(0, fixed = TRUE)), target.stats = target.stats[1:2], offset.coef = 0.1)
   expected <- unname(c(coef(e)[1] - log(11), coef(e)[2], 0.1, log(11)))
-  expect_identical(expected, coef(x))
+  expect_equal(expected, coef(x))
   
   
   
@@ -78,7 +78,7 @@ test_that("EGMME initialfit behaves reasonably", {
   set.seed(0)
   e <- ergm(nw ~ edges + nodecov("cov") + offset(gwesp(0, fixed = TRUE)), target.stats = target.stats[1:2], offset.coef = 0.1)
   expected <- unname(c(-log(11), coef(e)[1] - log(11), coef(e)[2], 0.1))
-  expect_identical(expected, coef(x))
+  expect_equal(expected, coef(x))
   
   
   
@@ -92,7 +92,7 @@ test_that("EGMME initialfit behaves reasonably", {
   set.seed(0)
   e <- ergm(nw ~ edges + nodecov("cov") + offset(gwesp(0, fixed = TRUE)), target.stats = target.stats[1:2], offset.coef = 0.1)
   expected <- unname(c(0.2, coef(e)[1] + 0.2, coef(e)[2] - 0.3, 0.3, 0.1))
-  expect_identical(expected, coef(x))
+  expect_equal(expected, coef(x))
   
   
   
@@ -103,7 +103,7 @@ test_that("EGMME initialfit behaves reasonably", {
   
   set.seed(0)
   x <- test.EGMME.initialfit(nw, ff, mff, target.stats, init)
-  expect_identical(init, coef(x))
+  expect_equal(init, coef(x))
   
   
   
@@ -116,7 +116,7 @@ test_that("EGMME initialfit behaves reasonably", {
   
   set.seed(0)
   x <- test.EGMME.initialfit(nw, ff, mff, target.stats, init, control)
-  expect_identical(c(0.2,0.8,0,0.3,0,0.5), coef(x))
+  expect_equal(c(0.2,0.8,0,0.3,0,0.5), coef(x))
   
   
   
