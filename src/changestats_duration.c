@@ -491,6 +491,9 @@ S_CHANGESTAT_FN(s_nodefactor_mean_age) {
       CHANGE_STAT[i] = emptyvals[i];
     }
   }
+
+  Free(edges);
+  Free(ages);
 }
 
 // mean age of ties by mixing type
@@ -667,7 +670,11 @@ S_CHANGESTAT_FN(s_nodemix_mean_age) {
     } else {
       CHANGE_STAT[i] = emptyvals[i];
     }
-  }  
+  }
+
+  Free(indmat);
+  Free(edges);
+  Free(ages);
 }
 
 /*****************
