@@ -17,14 +17,14 @@ test_that("the .SubsetStatistics term behaves appropriately", {
   stats0 <- c(TRUE, FALSE, TRUE, TRUE, FALSE)
   s1 <- summary(ff0, basis = nw)[stats0]
   s2 <- summary(~.SubsetStatistics(ff0, stats0), basis = nw)
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
 
   ## non-durational, curved
   ff1 <- ~edges + triangle + gwesp(0, fixed = TRUE) + gwesp(fixed = FALSE, cutoff = 5) + isolates
   stats1 <- sample(which(c(TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, TRUE, TRUE)))
   s1 <- summary(ff1, basis = nw)[stats1]
   s2 <- summary(~.SubsetStatistics(ff1, stats1), basis = nw)
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
 
   set.seed(0)
   nw1 <- simulate(nw ~ Form(~edges + triangle) + Persist(~edges + gwesp(0, fixed = TRUE)), coef = c(-6, 0, 4, 0), time.slices = 10, dynamic = TRUE, output = "final")
@@ -32,7 +32,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
   nw2 <- simulate(nw ~ .SubsetStatistics(~Form(~edges + triangle) + Persist(~edges + gwesp(0, fixed = TRUE)), c(3,1)), coef = c(4, -6), time.slices = 10, dynamic = TRUE, output = "final")
   attr(nw1, "coef") <- NULL
   attr(nw2, "coef") <- NULL
-  expect_identical(nw1, nw2)
+  expect_equal(nw1, nw2)
   nw <- nw1
 
   ## durational, non-curved
@@ -40,14 +40,14 @@ test_that("the .SubsetStatistics term behaves appropriately", {
   stats2 <- sample(which(c(TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)))
   s1 <- summary(ff2, basis = nw)[stats2]
   s2 <- summary(~.SubsetStatistics(ff2, I(c(stats2, 27L))), basis = nw)
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
 
   ## durational, curved
   ff3 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + gwesp(fixed = FALSE, cutoff = 5) + mean.age + Form(~edges + triangle + mean.age) + Diss(~gwesp(fixed = FALSE, cutoff = 5))
   stats3 <- c(TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)
   s1 <- summary(ff3, basis = nw)[stats3]
   s2 <- summary(~.SubsetStatistics(ff3, stats3), basis = nw)
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
 
   set.seed(0)
   sim01 <- simulate(nw ~ Form(~edges) + Persist(~edges),
@@ -65,7 +65,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
                     monitor = ~.SubsetStatistics(ff0,stats0),
                     output = "stats")
 
-  expect_identical(sim01, sim02)
+  expect_equal(sim01, sim02)
 
   set.seed(1)
   sim11 <- simulate(nw ~ Form(~edges) + Persist(~edges),
@@ -83,7 +83,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
                     monitor = ~.SubsetStatistics(ff1,stats1),
                     output = "stats")
 
-  expect_identical(sim11, sim12)
+  expect_equal(sim11, sim12)
 
   set.seed(2)
   sim21 <- simulate(nw ~ Form(~edges) + Persist(~edges),
@@ -101,7 +101,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
                     monitor = ~.SubsetStatistics(ff2,I(c(stats2, 27L))),
                     output = "stats")
 
-  expect_identical(sim21, sim22)
+  expect_equal(sim21, sim22)
 
   set.seed(3)
   sim31 <- simulate(nw ~ Form(~edges) + Persist(~edges),
@@ -119,7 +119,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
                     monitor = ~.SubsetStatistics(ff3,stats3),
                     output = "stats")
 
-  expect_identical(sim31, sim32)
+  expect_equal(sim31, sim32)
 
   m01 <- ergm_model(ff0, nw = nw)
   m02 <- ergm_model(~.SubsetStatistics(ff0, stats0), nw = nw)

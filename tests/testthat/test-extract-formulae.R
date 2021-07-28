@@ -337,16 +337,16 @@ test_that("terms .P/.M behave as plus/minus identity", {
   s1 <- summary(ff0, basis = nw)
   s2 <- summary(~.P(ff0), basis = nw)
   s3 <- summary(~.M(ff0), basis = nw)
-  expect_identical(s1, s2)
-  expect_identical(s1, -s3)
+  expect_equal(s1, s2)
+  expect_equal(s1, -s3)
   
   ## non-durational, curved
   ff1 <- ~edges + triangle + gwesp(0, fixed = TRUE) + gwesp(fixed = FALSE, cutoff = 5)
   s1 <- summary(ff1, basis = nw)
   s2 <- summary(~.P(ff1), basis = nw)
   s3 <- summary(~.M(ff1), basis = nw)
-  expect_identical(s1, s2)
-  expect_identical(s1, -s3)
+  expect_equal(s1, s2)
+  expect_equal(s1, -s3)
   
   set.seed(0)
   nw1 <- simulate(nw ~ Form(~edges + triangle) + Diss(~edges + gwesp(0, fixed = TRUE)), coef = c(-5, 0.01, -4, 0.01), time.slices = 10, dynamic = TRUE, output = "final")
@@ -357,8 +357,8 @@ test_that("terms .P/.M behave as plus/minus identity", {
   attr(nw1, "coef") <- NULL
   attr(nw2, "coef") <- NULL
   attr(nw3, "coef") <- NULL
-  expect_identical(nw1, nw2)
-  expect_identical(nw1, nw3)
+  expect_equal(nw1, nw2)
+  expect_equal(nw1, nw3)
   nw <- nw1
 
   ## durational, non-curved
@@ -366,16 +366,16 @@ test_that("terms .P/.M behave as plus/minus identity", {
   s1 <- summary(ff2, basis = nw)
   s2 <- summary(~.P(ff2), basis = nw)
   s3 <- summary(~.M(ff2), basis = nw)
-  expect_identical(s1, s2)
-  expect_identical(s1, -s3)
+  expect_equal(s1, s2)
+  expect_equal(s1, -s3)
   
   ## durational, curved
   ff3 <- ~edges + triangle + gwesp(0, fixed = TRUE) + gwesp(fixed = FALSE, cutoff = 5) + mean.age + Form(~edges + triangle + mean.age) + Diss(~gwesp(fixed = FALSE, cutoff = 5))
   s1 <- summary(ff3, basis = nw)
   s2 <- summary(~.P(ff3), basis = nw)
   s3 <- summary(~.M(ff3), basis = nw)
-  expect_identical(s1, s2)
-  expect_identical(s1, -s3)
+  expect_equal(s1, s2)
+  expect_equal(s1, -s3)
   
   set.seed(0)
   sim01 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
@@ -401,8 +401,8 @@ test_that("terms .P/.M behave as plus/minus identity", {
                     monitor = ~.M(ff0),                    
                     output = "stats")
 
-  expect_identical(sim01, sim02)
-  expect_identical(sim01, -sim03)
+  expect_equal(sim01, sim02)
+  expect_equal(sim01, -sim03)
 
   set.seed(1)
   sim11 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
@@ -428,8 +428,8 @@ test_that("terms .P/.M behave as plus/minus identity", {
                     monitor = ~.M(ff1),                    
                     output = "stats")
 
-  expect_identical(sim11, sim12)
-  expect_identical(sim11, -sim13)
+  expect_equal(sim11, sim12)
+  expect_equal(sim11, -sim13)
 
   set.seed(2)
   sim21 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
@@ -455,8 +455,8 @@ test_that("terms .P/.M behave as plus/minus identity", {
                     monitor = ~.M(ff2),                    
                     output = "stats")
 
-  expect_identical(sim21, sim22)
-  expect_identical(sim21, -sim23)
+  expect_equal(sim21, sim22)
+  expect_equal(sim21, -sim23)
 
   set.seed(3)
   sim31 <- simulate(nw ~ Form(~edges) + Persist(~edges), 
@@ -482,8 +482,8 @@ test_that("terms .P/.M behave as plus/minus identity", {
                     monitor = ~.M(ff3),                    
                     output = "stats")
 
-  expect_identical(sim31, sim32)
-  expect_identical(sim31, -sim33)
+  expect_equal(sim31, sim32)
+  expect_equal(sim31, -sim33)
   
   
   m01 <- ergm_model(ff0, nw = nw)

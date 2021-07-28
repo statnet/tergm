@@ -17,20 +17,20 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
   s1 <- summary(ff0, basis = nw)
   s2 <- summary(~Cross(ff0), basis = nw)
   names(s1) <- paste0("Cross~", names(s1))
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
 
   ## non-durational, curved
   ff1 <- ~edges + triangle + gwesp(0, fixed = TRUE) + gwesp(fixed = FALSE, cutoff = 5) + isolates
   s1 <- summary(ff1, basis = nw)
   s2 <- summary(~Cross(ff1), basis = nw)
   names(s1) <- paste0("Cross~", names(s1))
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
 
   set.seed(0)
   nw1 <- simulate(nw ~ Form(~edges + triangle) + Persist(~edges + gwesp(0, fixed = TRUE)), coef = c(-6, 0, 4, 0), time.slices = 10, dynamic = TRUE, output = "final")
   set.seed(0)
   nw2 <- simulate(nw ~ Cross(~Form(~edges + triangle) + Persist(~edges + gwesp(0, fixed = TRUE))), coef = c(-6, 0, 4, 0), time.slices = 10, dynamic = TRUE, output = "final")
-  expect_identical(nw1, nw2)
+  expect_equal(nw1, nw2)
   nw <- nw1
 
   ## durational, non-curved
@@ -38,14 +38,14 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
   s1 <- summary(ff2, basis = nw)
   s2 <- summary(~Cross(ff2), basis = nw)
   names(s1) <- paste0("Cross~", names(s1))
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
 
   ## durational, curved
   ff3 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + gwesp(fixed = FALSE, cutoff = 5) + mean.age + Form(~edges + triangle + mean.age) + Diss(~gwesp(fixed = FALSE, cutoff = 5))
   s1 <- summary(ff3, basis = nw)
   s2 <- summary(~Cross(ff3), basis = nw)
   names(s1) <- paste0("Cross~", names(s1))
-  expect_identical(s1, s2)
+  expect_equal(s1, s2)
 
   set.seed(0)
   sim01 <- simulate(nw ~ Form(~edges) + Persist(~edges),
@@ -64,7 +64,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
                     output = "stats")
                     
   colnames(sim01) <- paste0("Cross~", colnames(sim01))
-  expect_identical(sim01, sim02)
+  expect_equal(sim01, sim02)
 
   set.seed(1)
   sim11 <- simulate(nw ~ Form(~edges) + Persist(~edges),
@@ -83,7 +83,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
                     output = "stats")
 
   colnames(sim11) <- paste0("Cross~", colnames(sim11))
-  expect_identical(sim11, sim12)
+  expect_equal(sim11, sim12)
 
   set.seed(2)
   sim21 <- simulate(nw ~ Form(~edges) + Persist(~edges),
@@ -102,7 +102,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
                     output = "stats")
 
   colnames(sim21) <- paste0("Cross~", colnames(sim21))
-  expect_identical(sim21, sim22)
+  expect_equal(sim21, sim22)
 
   set.seed(3)
   sim31 <- simulate(nw ~ Form(~edges) + Persist(~edges),
@@ -121,7 +121,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
                     output = "stats")
 
   colnames(sim31) <- paste0("Cross~", colnames(sim31))
-  expect_identical(sim31, sim32)
+  expect_equal(sim31, sim32)
 
   m01 <- ergm_model(ff0, nw = nw)
   m02 <- ergm_model(~Cross(ff0), nw = nw)
