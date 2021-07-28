@@ -71,6 +71,9 @@
       \item{
         Better error checking in \code{\link[tergm]{simulate}()} calls.
       }
+      \item{
+        Some memory leaks fixed.
+      }
     }
   }
 
