@@ -33,13 +33,43 @@ dynamic models when only a cross-sectional network is available, provided
 some temporal information for it is available as well.
 
 This package aims to implement these and other ERGM-based models for network
-evoluation. At this time, it implements, via the \code{\link{tergm}}
+evolution. At this time, it implements, via the \code{\link{tergm}}
 function, a general framework for modeling tie dynamics in temporal networks
 with flexible model specification (including (S)TERGMs).  Estimation options
 include a conditional MLE (CMLE) approach for fitting to a series of
 networks and an Equilibrium Generalized Method of Moments Estimation (EGMME)
 for fitting to a single network with temporal information. For further
 development, see the referenced papers.
+}
+\section{Temporal model specification in \pkg{tergm}}{
+
+
+The operator terms implemented by \pkg{tergm} are \code{Form()},
+\code{Persist()}, \code{Diss()}, \code{Cross()}, and \code{Change()}.  These are used
+to specify how the \link[=ergmTerms]{\code{ergm} terms} in a formula are
+evaluated across a network time-series.  Note, you cannot use one
+of these operators within another temporal, so
+\code{Cross(~Form(~edges))} is not a valid specification. (Generally,
+nesting these operators within other operators will often not work;
+nesting other operators within them will almost always work,
+however.)
+
+The durational terms are distinguished either by their name,
+\code{mean.age}, or their name extensions: \verb{<name>.ages},
+\verb{<name>.mean.age}, and \verb{<name>.age.interval}.  In contrast to
+their named \link[=ergmTerms]{\code{ergm} terms} counterparts, these durational
+terms take into account the elapsed time since each (term-relevant) dyad in
+the network was last toggled.
+
+As currently implemented, the package does not support use of many
+durational terms during estimation, though it may work with some.
+But durational terms may be used as targets, monitors, or summary
+statistics.  The ability to use these terms in the estimation of
+models is under development.
+}
+
+\section{Compatibility with previous versions}{
+
 
 If you previously used the \code{\link[=stergm]{stergm()}} function in this package, please
 note that \code{\link[=stergm]{stergm()}} has been superceded by the new \code{\link{tergm}}
@@ -51,6 +81,7 @@ For detailed information on how to download and install the software, go to
 the Statnet project website: \url{https://statnet.org}.  A tutorial, support
 newsgroup, references and links to further resources are provided there.
 }
+
 \references{
 Hanneke S, Fu W and Xing EP (2010). Discrete
 Temporal Models of Social Networks. \emph{Electronic Journal of Statistics},
