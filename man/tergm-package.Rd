@@ -46,7 +46,7 @@ development, see the referenced papers.
 
 The operator terms implemented by \pkg{tergm} are \code{Form()},
 \code{Persist()}, \code{Diss()}, \code{Cross()}, and \code{Change()}.  These are used
-to specify how the \link[=ergmTerms]{\code{ergm} terms} in a formula are
+to specify how the \code{ergm} terms (\code{\link{ergmTerms}}) in a formula are
 evaluated across a network time-series.  Note, you cannot use one
 of these operators within another temporal, so
 \code{Cross(~Form(~edges))} is not a valid specification. (Generally,
@@ -57,7 +57,7 @@ however.)
 The durational terms are distinguished either by their name,
 \code{mean.age}, or their name extensions: \verb{<name>.ages},
 \verb{<name>.mean.age}, and \verb{<name>.age.interval}.  In contrast to
-their named \link[=ergmTerms]{\code{ergm} terms} counterparts, these durational
+their eponymous terms in \pkg{ergm}, these durational
 terms take into account the elapsed time since each (term-relevant) dyad in
 the network was last toggled.
 

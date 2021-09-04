@@ -50,7 +50,7 @@
 #'
 #' The operator terms implemented by \pkg{tergm} are `Form()`,
 #' `Persist()`, `Diss()`, `Cross()`, and `Change()`.  These are used
-#' to specify how the [`ergm` terms][ergmTerms] in a formula are
+#' to specify how the `ergm` terms ([`ergmTerms`]) in a formula are
 #' evaluated across a network time-series.  Note, you cannot use one
 #' of these operators within another temporal, so
 #' `Cross(~Form(~edges))` is not a valid specification. (Generally,
@@ -61,7 +61,7 @@
 #' The durational terms are distinguished either by their name,
 #' `mean.age`, or their name extensions: `<name>.ages`,
 #' `<name>.mean.age`, and `<name>.age.interval`.  In contrast to
-#' their named [`ergm` terms][ergmTerms] counterparts, these durational
+#' their eponymous terms in \pkg{ergm}, these durational
 #' terms take into account the elapsed time since each (term-relevant) dyad in
 #' the network was last toggled.
 #'
