@@ -30,7 +30,7 @@
 #'   that vertex originally belonged.
 #'
 #' @param detect.edgecov if `TRUE`, combine network attributes that
-#'   look like dyadic covariate ([`ergm::edgecov`]) matrices into a
+#'   look like dyadic covariate ([`ergm::edgecov`][ergm::edgecov-ergmTerm]) matrices into a
 #'   block-diagonal matrix.
 #'
 #' @param keep.unshared.attr whether to keep those network, vertex,

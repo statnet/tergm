@@ -36,7 +36,7 @@
 #' 
 #' The default is \code{~.}, for an unconstrained model.
 #' 
-#' See the [ERGM constraints][ergm-constraints] documentation for the
+#' See the [ERGM constraints][ergmConstraint] documentation for the
 #' constraints implemented in the **[ergm][ergm-package]** package.
 #' Other packages may add their own constraints.
 #' 
