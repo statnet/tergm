@@ -22,6 +22,7 @@
 #'
 #' @template ergmTerm-general
 #'
+#' @concept durational
 InitErgmTerm.edges.ageinterval<-function(nw, arglist, ...) {
   stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
@@ -63,6 +64,8 @@ else if(any(from>=to)) stop("Term edges.ageinterval must have from<to.")
 #' # binary: edge.ages
 #'
 #' @template ergmTerm-general
+#'
+#' @concept durational
 InitErgmTerm.edge.ages<-function(nw, arglist, ...) {
   stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist)
@@ -89,6 +92,8 @@ InitErgmTerm.edge.ages<-function(nw, arglist, ...) {
 #' @param log logical specifying if mean log age should be returned instead of mean age
 #'
 #' @template ergmTerm-general
+#'
+#' @concept durational
 InitErgmTerm.mean.age<-function(nw, arglist, ...) {
   stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
@@ -130,6 +135,8 @@ InitErgmTerm.mean.age<-function(nw, arglist, ...) {
 #' @param log logical specifying if mean log age should be returned instead of mean age
 #'
 #' @template ergmTerm-general
+#'
+#' @concept durational
 InitErgmTerm.nodefactor.mean.age <- function(nw, arglist, ...) {
   stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
@@ -197,6 +204,8 @@ InitErgmTerm.nodefactor.mean.age <- function(nw, arglist, ...) {
 #' @param log logical specifying if mean log age should be returned instead of mean age
 #'
 #' @template ergmTerm-general
+#'
+#' @concept durational
 InitErgmTerm.nodemix.mean.age <- function(nw, arglist, ...) {
   stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
@@ -334,6 +343,8 @@ InitErgmTerm.nodemix.mean.age <- function(nw, arglist, ...) {
 #'   and/or if only a few dyads have nonzero weights.
 #'
 #' @template ergmTerm-general
+#'
+#' @concept durational
 InitErgmTerm.edgecov.mean.age<-function(nw, arglist, ...) {
   stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist, 
@@ -384,6 +395,8 @@ InitErgmTerm.edgecov.mean.age<-function(nw, arglist, ...) {
 #' @template ergmTerm-x-attrname
 #'
 #' @template ergmTerm-general
+#'
+#' @concept durational
 InitErgmTerm.edgecov.ages<-function(nw, arglist, ...) {
   stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist, 
@@ -438,6 +451,8 @@ InitErgmTerm.edgecov.ages<-function(nw, arglist, ...) {
 #' @template ergmTerm-emptyval
 #'
 #' @template ergmTerm-general
+#'
+#' @concept durational
 InitErgmTerm.degree.mean.age<-function(nw, arglist, ...) {
   stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist, directed=FALSE,
@@ -501,6 +516,8 @@ InitErgmTerm.degree.mean.age<-function(nw, arglist, ...) {
 #' @template ergmTerm-byattr
 #' @template ergmTerm-emptyval
 #' @template ergmTerm-general
+#'
+#' @concept durational
 InitErgmTerm.degrange.mean.age<-function(nw, arglist, ...) {
   stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist, directed=FALSE,

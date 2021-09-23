@@ -20,6 +20,7 @@
   eval(COLLATE_ALL_MY_CONTROLS_EXPR)
 
   .RegisterProposals()
+  .RegisterKeywords()
 }
 
 # TODO: Figure out some automatic way to keep this in sync with statnet.common.
@@ -45,4 +46,8 @@ eval(UPDATE_MY_SCTRL_EXPR)
   ergm_proposal_table("c", "Bernoulli", "|.dyads&sparse&discord|bd",  1, "discordTNT", "staticDiscordTNT")
   ergm_proposal_table("t", "Bernoulli", "|discord&sparse",  1, "discordTNT", "discordTNT")
   ergm_proposal_table("t", "Bernoulli", "|bdmax|blocks|strat|discord&sparse",  0, "discordBDStratTNT", "discordBDStratTNT")
+}
+
+.RegisterKeywords <- function() {
+  ergm_keyword(name='durational', short='dur', description="", popular=TRUE, package="tergm")
 }
