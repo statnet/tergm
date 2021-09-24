@@ -304,6 +304,7 @@ InitErgmTerm..crossnets <- function(nw, arglist, ...){
 #' @import purrr
 #'
 #' @concept operator
+#' @concept durational
 InitErgmTerm.Cross <- function(nw, arglist, ..., env=baseenv()) {
   a <- check.ErgmTerm(nw, arglist,
                       varnames = c("formula", "label"),

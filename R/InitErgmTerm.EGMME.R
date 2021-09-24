@@ -35,6 +35,7 @@ stopifnot_dynamic <- function(nw, ..., dynamic=FALSE, .netseries.OK=FALSE){
 #' @template ergmTerm-general
 #'
 #' @concept operator
+#' @concept durational
 `InitErgmTerm.Form (dynamic)` <- function(nw, arglist,  ...) {
   stopifnot_dynamic(nw, .netseries.OK=TRUE, ...)
   a <- check.ErgmTerm(nw, arglist,
@@ -90,6 +91,7 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
 #' @template ergmTerm-general
 #'
 #' @concept operator
+#' @concept durational
 `InitErgmTerm.Persist (dynamic)` <- function(nw, arglist,  ...) {
   stopifnot_dynamic(nw, .netseries.OK=TRUE, ...)
   a <- check.ErgmTerm(nw, arglist,
@@ -127,6 +129,7 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
 #' @template ergmTerm-general
 #'
 #' @concept operator
+#' @concept durational
 `InitErgmTerm.Diss (dynamic)` <- function(nw, arglist,  ...) {
   stopifnot_dynamic(nw, .netseries.OK=TRUE, ...)
   a <- check.ErgmTerm(nw, arglist,
@@ -175,6 +178,7 @@ InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
 #' @template ergmTerm-general
 #'
 #' @concept operator
+#' @concept durational
 `InitErgmTerm.Change (dynamic)` <- function(nw, arglist,  ...) {
   stopifnot_dynamic(nw, .netseries.OK=TRUE, ...)
   a <- check.ErgmTerm(nw, arglist,
