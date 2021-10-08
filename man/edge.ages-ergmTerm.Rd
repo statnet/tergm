@@ -20,3 +20,4 @@ an empty network. However, if used as a target, it appears to
 produce highly biased dissolution parameter estimates if the goal
 is to get an intended average duration.
 }
+\concept{durational}

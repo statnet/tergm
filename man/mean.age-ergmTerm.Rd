@@ -22,3 +22,4 @@ This term adds one statistic equaling the average, over all ties
 present in the network, of the amount of time elapsed since
 formation.
 }
+\concept{durational}

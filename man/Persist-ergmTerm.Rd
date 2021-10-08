@@ -25,4 +25,5 @@ less dissolution. It
 produces the same results as the new \code{Diss()} operator, except the
 signs of the coefficients are negated.
 }
+\concept{durational}
 \concept{operator}

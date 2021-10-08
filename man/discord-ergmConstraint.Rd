@@ -15,3 +15,5 @@ Propose toggling discordant dyads with greater
 frequency (typically about 50 percent).  May be used in
 dynamic fitting and simulation.
 }
+\concept{dyad-independent}
+\concept{hint}

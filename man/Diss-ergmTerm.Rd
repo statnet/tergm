@@ -22,4 +22,5 @@ Note: This is not the equivalent of the old style \code{dissolution} model,
 because the signs of the coefficients are reversed. So a larger positive
 coefficient for \code{Diss()} operator means more dissolution.
 }
+\concept{durational}
 \concept{operator}

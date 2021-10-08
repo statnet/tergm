@@ -34,3 +34,4 @@ with degree greater than or equal to
 \code{from[i]} but strictly less than \code{to[i]} , of the amount of time elapsed
 since the tie's formation. The optional argument
 }
+\concept{durational}

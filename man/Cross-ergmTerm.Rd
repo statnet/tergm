@@ -19,4 +19,5 @@ and produces the corresponding model for the cross-sectional
 network. It is mainly useful for CMLE estimation, and has no effect (i.e.,
 \code{Cross(~TERM) == ~TERM} ) for EGMME and dynamic simulation.
 }
+\concept{durational}
 \concept{operator}

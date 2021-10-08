@@ -19,3 +19,4 @@ which the time elapsed since formation is greater than or equal to
 \code{from} but strictly less than \code{to} . In other words, it
 is in the semiopen interval \verb{[from, to)} .
 }
+\concept{durational}

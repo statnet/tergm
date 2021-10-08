@@ -31,3 +31,4 @@ This term adds one statistic for each mixing type of \code{attr} ,
 equaling the average, over all ties of that mixing type,
 of the amount of time elapsed since formation.
 }
+\concept{durational}

@@ -20,4 +20,5 @@ effectively a network containing both previous time step's ties and ties just fo
 the union of the previous and current network. This is the equivalent of the
 old-style \code{formation} model.
 }
+\concept{durational}
 \concept{operator}

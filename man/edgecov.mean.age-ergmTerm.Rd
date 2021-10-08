@@ -30,3 +30,4 @@ formation, weighted by a (nonnegative) dyadic covariate.
 
 The behavior when there are negative weights is undefined.
 }
+\concept{durational}

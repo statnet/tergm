@@ -32,3 +32,4 @@ This term adds one statistic for each level of \code{attr} ,
 equaling the average, over all half-ties incident on nodes of that level,
 of the amount of time elapsed since formation.
 }
+\concept{durational}

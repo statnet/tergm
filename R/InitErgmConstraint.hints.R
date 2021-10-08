@@ -19,6 +19,8 @@
 #' # discord
 #'
 #' @template ergmConstraint-general
+#' @concept hint
+#' @concept dyad-independent
 InitErgmConstraint.discord <- function(lhs.nw, ref=NULL, ...){
   nw <- if(is.character(ref)) lhs.nw %n% ref else lhs.nw
 
