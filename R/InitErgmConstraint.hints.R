@@ -8,18 +8,16 @@
 #  Copyright 2008-2021 Statnet Commons
 ################################################################################
 
-#' @name discord-ergmConstraint
-#' @title The Dynamic Discordance Hint
-#' @description The Dynamic Discordance Hint
-#' @details Propose toggling discordant dyads with greater
+#' @name discord-ergmHint
+#' @title Discordant dyads
+#' @description Propose toggling discordant dyads with greater
 #'   frequency (typically about 50 percent).  May be used in
 #'   dynamic fitting and simulation.
 #'
 #' @usage
 #' # discord
 #'
-#' @template ergmConstraint-general
-#' @concept hint
+#' @template ergmHint-general
 #' @concept dyad-independent
 InitErgmConstraint.discord <- function(lhs.nw, ref=NULL, ...){
   nw <- if(is.character(ref)) lhs.nw %n% ref else lhs.nw
