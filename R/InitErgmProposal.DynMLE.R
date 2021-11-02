@@ -7,6 +7,16 @@
 #
 #  Copyright 2008-2021 Statnet Commons
 ################################################################################
+
+#' @templateVar name staticDiscordTNT
+#' @aliases InitErgmProposal.staticDiscordTNT
+#' @title TNT proposal for CMLE fitting
+#' @description A version of \code{\link[ergm:ergm-proposals]{TNT}} appropriate for CMLE fitting,
+#'   proposals stratified both by discordance status and edge status.  The argument
+#'   code{ref} specifies the data relative to which discordance status is defined.
+#' @template ergmProposal
+NULL
+
 InitErgmProposal.staticDiscordTNT <- function(arguments, nw, model) {
   dissolvable <- as.rlebdm(arguments$constraints$discord$nw)
   formable <- !dissolvable
