@@ -23,7 +23,7 @@
 #'   approximately \code{1 - discordance_fraction} of proposed toggles being TNT proposals from
 #'   network.  The value of \code{discordance_fraction} can be set by the user as a proposal argument,
 #'   defaults to `0.5`.
-#' @template ergmProposal
+#' @template ergmProposal-general
 NULL
 
 InitErgmProposal.discordTNT <- function(arguments, nw, ...) {
@@ -51,7 +51,7 @@ InitErgmProposal.discordTNT <- function(arguments, nw, ...) {
 #'   and should be passed in via the \code{\link[ergm:ergmConstraint]{bd}} and
 #'   code{\link[ergm:ergmConstraint]{blocks}} constraints and
 #'   \code{\link[ergm:ergm-hints]{Strat}} hint.
-#' @template ergmProposal
+#' @template ergmProposal-general
 NULL
 
 InitErgmProposal.discordBDStratTNT <- function(arguments, nw, ...) {
