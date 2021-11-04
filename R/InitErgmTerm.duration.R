@@ -8,7 +8,7 @@
 #  Copyright 2008-2021 Statnet Commons
 ################################################################################
 
-#' @name edges.ageinterval-ergmTerm
+#' @templateVar name edges.ageinterval
 #' @title Number of edges with age falling into a specified range
 #' @description Number of edges with age falling into a specified range
 #' @details This term counts the number of edges in the network for
@@ -48,7 +48,7 @@ else if(any(from>=to)) stop("Term edges.ageinterval must have from<to.")
        auxiliaries = ~.lasttoggle)
 }
 
-#' @name edge.ages-ergmTerm
+#' @templateVar name edge.ages
 #' @title Sum of ages of extant ties
 #' @description Sum of ages of extant ties
 #' @details This term adds one statistic equaling sum, over all ties
@@ -77,7 +77,7 @@ InitErgmTerm.edge.ages<-function(nw, arglist, ...) {
        auxiliaries = ~.lasttoggle)
 }
 
-#' @name mean.age-ergmTerm
+#' @templateVar name mean.age
 #' @title Average age of an extant tie
 #' @description Average age of an extant tie
 #' @details This term adds one statistic equaling the average, over all ties
@@ -112,7 +112,7 @@ InitErgmTerm.mean.age<-function(nw, arglist, ...) {
        auxiliaries = ~.lasttoggle)
 }
 
-#' @name nodefactor.mean.age-ergmTerm
+#' @templateVar name nodefactor.mean.age
 #' @title Average ages of extant half-ties incident on nodes of specified attribute levels
 #' @description Average ages of extant half-ties incident on nodes of specified attribute levels
 #' @details This term adds one statistic for each level of `attr` ,
@@ -182,7 +182,7 @@ InitErgmTerm.nodefactor.mean.age <- function(nw, arglist, ...) {
        log = as.integer(a$log))  
 }
 
-#' @name nodemix.mean.age-ergmTerm
+#' @templateVar name nodemix.mean.age
 #' @title Average ages of extant ties of specified mixing types
 #' @description Average ages of extant ties of specified mixing types
 #' @details This term adds one statistic for each mixing type of `attr` ,
@@ -325,7 +325,7 @@ InitErgmTerm.nodemix.mean.age <- function(nw, arglist, ...) {
        nodecov = as.integer(c(0L, nodecov) - 1L)) # two shifts to make the C code cleaner
 }
 
-#' @name edgecov.mean.age-ergmTerm
+#' @templateVar name edgecov.mean.age
 #' @title Weighted average age of an extant tie
 #' @description Weighted average age of an extant tie
 #' @details This term adds one statistic equaling the average, over all ties
@@ -376,7 +376,7 @@ InitErgmTerm.edgecov.mean.age<-function(nw, arglist, ...) {
   list(name="edgecov_mean_age", coef.names = cn, inputs = inputs, duration=TRUE, dependence=FALSE, emptynwstats = a$emptyval, auxiliaries = ~.lasttoggle)
 }
 
-#' @name edgecov.ages-ergmTerm
+#' @templateVar name edgecov.ages
 #' @title Weighted sum of ages of extant ties
 #' @description Weighted sum of ages of extant ties
 #' @details This term adds one statistic equaling sum, over all ties
@@ -430,7 +430,7 @@ InitErgmTerm.edgecov.ages<-function(nw, arglist, ...) {
 
 ################################################################################
 
-#' @name degree.mean.age-ergmTerm
+#' @templateVar name degree.mean.age
 #' @title Average age of ties incident on nodes having a given degree
 #' @description Average age of ties incident on nodes having a given degree
 #' @details This term adds one
@@ -497,7 +497,7 @@ InitErgmTerm.degree.mean.age<-function(nw, arglist, ...) {
 
 ################################################################################
 
-#' @name degrange.mean.age-ergmTerm
+#' @templateVar name degrange.mean.age
 #' @title Average age of ties incident on nodes having degree in a given range
 #' @description Average age of ties incident on nodes having degree in a given range
 #' @details This term adds one

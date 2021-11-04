@@ -3,6 +3,7 @@
 \name{discord-ergmHint}
 \alias{discord-ergmHint}
 \alias{InitErgmConstraint.discord}
+\alias{discord-ergmConstraint}
 \title{Discordant dyads}
 \usage{
 # discord
