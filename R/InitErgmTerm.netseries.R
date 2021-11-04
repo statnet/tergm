@@ -288,7 +288,7 @@ InitErgmTerm..crossnets <- function(nw, arglist, ...){
 
 # A term for a cross-sectional model for the network in a series.
 
-#' @name Cross-ergmTerm
+#' @templateVar name Cross
 #' @title The Crossection Operator Term
 #' @description The Crossection Operator Term
 #' @details This term accepts a model formula

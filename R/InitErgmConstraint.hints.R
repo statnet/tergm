@@ -8,7 +8,7 @@
 #  Copyright 2008-2021 Statnet Commons
 ################################################################################
 
-#' @name discord-ergmHint
+#' @templateVar name discord
 #' @title Discordant dyads
 #' @description Propose toggling discordant dyads with greater
 #'   frequency (typically about 50 percent).  May be used in

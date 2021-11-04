@@ -19,7 +19,7 @@ stopifnot_dynamic <- function(nw, ..., dynamic=FALSE, .netseries.OK=FALSE){
   }
 }
 
-#' @name Form-ergmTerm
+#' @templateVar name Form
 #' @title The Formation Operator Term
 #' @description The Formation Operator Term
 #' @details This term accepts a model formula
@@ -70,7 +70,7 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
        dependence=FALSE)
 }
 
-#' @name Persist-ergmTerm
+#' @templateVar name Persist
 #' @title The Persistence Operator Term
 #' @description The Persistence Operator Term
 #' @details This term accepts a model formula
@@ -111,7 +111,7 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
                list(emptynwstats=NULL)))
 }
 
-#' @name Diss-ergmTerm
+#' @templateVar name Diss
 #' @title The Dissolution Operator Term
 #' @description The Dissolution Operator Term
 #' @details This term accepts a model formula
@@ -164,7 +164,7 @@ InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
        dependence=FALSE)
 }
 
-#' @name Change-ergmTerm
+#' @templateVar name Change
 #' @title The Change Operator Term
 #' @description The Change Operator Term
 #' @details This term accepts a model formula
