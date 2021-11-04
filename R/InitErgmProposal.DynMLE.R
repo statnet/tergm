@@ -14,7 +14,7 @@
 #' @description A version of \code{\link[ergm:ergm-proposals]{TNT}} appropriate for CMLE fitting,
 #'   proposals stratified both by discordance status and edge status.  The argument
 #'   code{ref} specifies the data relative to which discordance status is defined.
-#' @template ergmProposal
+#' @template ergmProposal-general
 NULL
 
 InitErgmProposal.staticDiscordTNT <- function(arguments, nw, model) {
