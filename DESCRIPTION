@@ -27,6 +27,7 @@ Imports:
     nlme (>= 3.1.139),
     MASS (>= 7.3.51.4),
     statnet.common (>= 4.4.0),
+    statnet.data,
     purrr
 LinkingTo:
     ergm
@@ -49,4 +50,5 @@ Encoding: UTF-8
 Remotes: github::statnet/statnet.common@master,
     github::statnet/network@master,
     github::statnet/networkDynamic@master,
-    github::statnet/ergm@master
+    github::statnet/ergm@master,
+    github::statnet/statnet.data@master
