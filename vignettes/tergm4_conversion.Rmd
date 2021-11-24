@@ -32,7 +32,7 @@ need to make.
 Estimation calls in `tergm` 3.x might look something like
 
 ```
-data(samplk)
+data(samplk1, samplk2, samplk3, package="statnet.data")
 samp <- list(samplk1, samplk2, samplk3)
 samp.fit <- stergm(samp,
                    formation = ~edges+mutual+cyclicalties+transitiveties,
@@ -46,7 +46,7 @@ samp.fit <- stergm(samp,
 for CMLE, and
 
 ```
-data(florentine)
+data(flobusiness, package="statnet.data")
 stergm.fit.1 <- stergm(flobusiness,
                        formation = ~edges+gwesp(0,fixed=T),
                        dissolution = ~offset(edges),
@@ -151,7 +151,7 @@ To convert these to the new 4.0 user interface, we make the following changes.
 Overall, this produces the new-style calls
 
 ```
-data(samplk)
+data(samplk1, samplk2, samplk3, package="statnet.data")
 samp <- list(samplk1, samplk2, samplk3)
 samp.fit <- tergm(samp ~ Form(~edges+mutual+cyclicalties+transitiveties) + 
                          Persist(~edges+mutual+cyclicalties+transitiveties),
@@ -163,7 +163,7 @@ samp.fit <- tergm(samp ~ Form(~edges+mutual+cyclicalties+transitiveties) +
 for CMLE, and
 
 ```
-data(florentine)
+data(flobusiness, package="statnet.data")
 tergm.fit.1 <- tergm(flobusiness ~ Form(~edges+gwesp(0,fixed=T)) + 
                                    Persist(~offset(edges)),
                      targets = "formation",

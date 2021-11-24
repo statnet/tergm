@@ -95,7 +95,7 @@ Fitting an ERGM usually begins with obtaining data:
 set.seed(0) # for reproducibility
 library(ergm)
 options(ergm.term=list(cache.sp=FALSE))
-data("florentine")
+data("flobusiness", package="statnet.data")
 ls()
 @
 
@@ -571,7 +571,7 @@ Many classic network studies were of this type, and data of this form continue t
 Let us consider the first two time points in the famous Sampson monastery data:
 
 <<>>=
-data(samplk)
+data(samplk1, samplk2, samplk3, package="statnet.data")
 ls(pattern="samp*")
 @
 
