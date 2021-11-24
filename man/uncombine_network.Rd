@@ -42,7 +42,7 @@ preserving attributes that can be preserved.
 }
 \examples{
 
-data(samplk)
+data(samplk1, samplk2, samplk3, package="statnet.data")
 
 o1 <- combine_networks(list(samplk1, samplk2, samplk3))
 image(as.matrix(o1))

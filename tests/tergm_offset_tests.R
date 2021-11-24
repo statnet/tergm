@@ -10,7 +10,7 @@
 library(statnet.common)
 opttest({
   library(tergm)
-  data(florentine)
+  data(flobusiness, package="statnet.data")
   net <- flobusiness
   summary(net ~ edges+degree(3))
   set.seed(3)

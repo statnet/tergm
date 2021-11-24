@@ -10,7 +10,7 @@
 library(statnet.common)
 opttest({
   library(tergm)
-  data(florentine)
+  data(flobusiness, package="statnet.data")
   net <- flobusiness
   set.seed(1)
   
@@ -24,7 +24,7 @@ opttest({
 }, testname='tergm_parallel')
 
 opttest({
-  data(florentine)
+  data(flobusiness, package="statnet.data")
   net <- flobusiness
   set.seed(1)
   

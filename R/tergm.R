@@ -129,7 +129,7 @@
 #' }
 #' \donttest{
 #' # CMLE Example
-#' data(samplk)
+#' data(samplk1, samplk2, samplk3, package="statnet.data")
 #'
 #' # Fit a transition from Time 1 to Time 2
 #' samplk12 <- tergm(list(samplk1, samplk2)~

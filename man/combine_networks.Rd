@@ -118,7 +118,7 @@ information and omit some internal variables.
 
 \examples{
 
-data(samplk)
+data(samplk1, samplk2, samplk3, package="statnet.data")
 
 o1 <- combine_networks(list(samplk1, samplk2, samplk3))
 image(as.matrix(o1))
@@ -127,7 +127,7 @@ o2 <- combine_networks(list(o1, o1))
 image(as.matrix(o2))
 head(get.vertex.attribute(o2, ".NetworkID", unlist=FALSE))
 
-data(florentine)
+data(flobusiness, flomarriage, package="statnet.data")
 f1 <- combine_networks(list(business=flobusiness, marriage=flomarriage),
                        blockName.vattr=".NetworkName")
 image(as.matrix(f1))

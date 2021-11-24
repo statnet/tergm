@@ -63,7 +63,7 @@ join_nets <- function(nwl, blockID, blockName){
 #' 
 #' @examples
 #'
-#' data(samplk)
+#' data(samplk1, samplk2, samplk3, package="statnet.data")
 #'
 #' # Method 1: list of networks
 #' monks <- NetSeries(list(samplk1,samplk2,samplk3))
