@@ -132,7 +132,7 @@ network.extract.with.lasttoggle <- function(nwd, at){
 
 
 to.networkDynamic.lasttoggle <- function(nw){
-  nwd <- nw
+  nwd <- as.networkDynamic(nw)
   if(!is.null(nw %n% "lasttoggle")){
     
     lt.edges <- edgelist_with_lasttoggle(nw)
@@ -144,7 +144,7 @@ to.networkDynamic.lasttoggle <- function(nw){
   }
   nwd<-delete.network.attribute(nwd, "time")
   nwd<-delete.network.attribute(nwd, "lasttoggle")
-  class(nwd) <- c("networkDynamic","network")
+  #class(nwd) <- c("networkDynamic","network")
   #attr(nwd,"end") <- nw %n% "time"
   
   nwd
