@@ -140,7 +140,7 @@ to.networkDynamic.lasttoggle <- function(nw){
     lt.edges <- lt.edges[lt.edges[,3]>as.integer(-.Machine$integer.max/2),,drop=FALSE] 
 
     # removed the +1 after lt.edges[,3]
-    if(nrow(lt.edges)) nwd <- deactivate.edges(nwd, onset=-Inf, terminus=lt.edges[,3], e=apply(lt.edges[,1:2,drop=FALSE],1,function(e) get.edgeIDs(nw, e[1], e[2])))
+    if(nrow(lt.edges)) nwd <- deactivate.edges(nwd, onset=-Inf, terminus=lt.edges[,3], e=apply(lt.edges[,1:2,drop=FALSE],1,function(e) get.edgeIDs(nwd, e[1], e[2])))
   }
   nwd<-delete.network.attribute(nwd, "time")
   nwd<-delete.network.attribute(nwd, "lasttoggle")
