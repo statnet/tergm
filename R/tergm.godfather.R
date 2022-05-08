@@ -132,7 +132,13 @@ tergm.godfather <- function(formula, changes=NULL, toggles=changes[,-4,drop=FALS
     nw %n% "time" <- start
   }
 
-  if(!is.directed(nw)) toggles[,2:3] <- t(apply(toggles[,2:3,drop=FALSE], 1, sort))
+  if(!is.directed(nw)) {
+    tails <- toggles[,2]
+    heads <- toggles[,3]
+    toggles[,2] <- pmin(tails, heads)
+    toggles[,3] <- pmax(tails, heads)
+  }
+  
   toggles <- toggles[order(toggles[,1],toggles[,2],toggles[,3]),,drop=FALSE]
 
   formula <- nonsimp_update.formula(formula, nw~., from.new="nw")
