@@ -602,7 +602,7 @@ InitErgmTerm.EdgeAges <- function(nw, arglist, ...) {
     ergm_Init_abort("EdgeAges formula argument must be cross-sectional and dyad-independent")
   }
 
-  wm <- wrap.ergm_model(m, nw, namewrap = function(x) paste0("EdgeAges(", x, ")"))
+  wm <- wrap.ergm_model(m, nw, namewrap = ergm_mk_std_op_namewrap("EdgeAges"))
 
   ## EdgeAges stats = 0 on emptynw, even if the submodel stats don't = 0 on emptynw
   wm$emptynwstats <- NULL
