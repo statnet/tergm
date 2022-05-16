@@ -302,3 +302,83 @@ F_CHANGESTAT_FN(f_subset_stats) {
 }
 
 #undef _REMAP_WS_ONTO_CS_
+
+
+
+/*****************
+ EdgeAges
+
+ Sum of (tie age) * (submodel on-toggle change stats) for all extant ties.
+
+*****************/
+
+typedef struct {
+  Model *model;
+  double *stats;
+} EdgeAges_storage;
+
+I_CHANGESTAT_FN(i_EdgeAges) {
+  ALLOC_STORAGE(1, EdgeAges_storage, sto);
+  sto->model = ModelInitialize(getListElement(mtp->R, "submodel"), mtp->ext_state, nwp, FALSE);
+  sto->stats = Calloc(N_CHANGE_STATS, double);
+
+  EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
+    ChangeStats1(tail, head, nwp, sto->model, edge_var);
+
+    for(int i = 0; i < N_CHANGE_STATS; i++) {
+      sto->stats[i] -= sto->model->workspace[i];
+    }
+  });
+}
+
+X_CHANGESTAT_FN(x_EdgeAges) {
+  GET_STORAGE(EdgeAges_storage, sto);
+
+  if(type == TICK) {
+    memcpy(CHANGE_STAT, sto->stats, N_CHANGE_STATS*sizeof(double));
+  }
+
+  // ignoring any change from this...
+  PROPAGATE_X_SIGNAL(nwp, sto->model);
+}
+
+C_CHANGESTAT_FN(c_EdgeAges) {
+  GET_STORAGE(EdgeAges_storage, sto);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+
+  ChangeStats1(tail, head, nwp, sto->model, edgestate);
+  int age = ElapsedTimeToggle(tail, head, dur_inf, edgestate) + 1;
+
+  for(int i = 0; i < N_CHANGE_STATS; i++) {
+    CHANGE_STAT[i] = age*sto->model->workspace[i];
+  }
+}
+
+U_CHANGESTAT_FN(u_EdgeAges) {
+  GET_STORAGE(EdgeAges_storage, sto);
+  ChangeStats1(tail, head, nwp, sto->model, edgestate);
+  for(int i = 0; i < N_CHANGE_STATS; i++) {
+    sto->stats[i] += sto->model->workspace[i];
+  }
+}
+
+S_CHANGESTAT_FN(s_EdgeAges) {
+  Model *m = ModelInitialize(getListElement(mtp->R, "submodel"), mtp->ext_state, nwp, FALSE);
+  GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
+
+  EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
+    ChangeStats1(tail, head, nwp, m, edge_var);
+    int age = ElapsedTime(tail, head, dur_inf) + 1;
+    for(int i = 0; i < N_CHANGE_STATS; i++) {
+      CHANGE_STAT[i] -= age*m->workspace[i];
+    }
+  });
+}
+
+// no Z_FN as emptynwstats = 0 for EdgeAges, regardless of submodel
+
+F_CHANGESTAT_FN(f_EdgeAges) {
+  GET_STORAGE(EdgeAges_storage, sto);
+  ModelDestroy(nwp, sto->model);
+  Free(sto->stats);
+}

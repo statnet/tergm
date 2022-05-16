@@ -571,4 +571,47 @@ InitErgmTerm.degrange.mean.age<-function(nw, arglist, ...) {
        emptynwstats=rep(a$emptyval,length(coef.names)), duration=TRUE, dependence=TRUE, auxiliaries = ~.lasttoggle)
 }
 
+#' @templateVar name EdgeAges
+#' @title The EdgeAges Operator Term
+#' @description The EdgeAges Operator Term
+#' @details This term accepts a cross-sectional, dyad-independent model
+#'   formula.  The statistics of the EdgeAges term are equal to the sum over
+#'   all extant ties of the tie age times the on-toggle change statistics for
+#'   the tie under the given model formula.
+#'
+#' @usage
+#' # binary: EdgeAges(formula)
+#' @param formula cross-sectional, dyad-independent model formula
+#'
+#' @template ergmTerm-general
+#'
+#' @concept operator
+#' @concept durational
+InitErgmTerm.EdgeAges <- function(nw, arglist, ...) {
+  stopifnot_dynamic(nw, ...)
 
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c("formula"),
+                      vartypes = c("formula"),
+                      defaultvalues = list(NULL),
+                      required = c(TRUE))
+
+  m <- ergm_model(a$formula, nw, ..., offset.decorate = FALSE)
+
+  if(is.durational(m) || !is.dyad.independent(m)) {
+    ergm_Init_abort("EdgeAges formula argument must be cross-sectional and dyad-independent")
+  }
+
+  wm <- wrap.ergm_model(m, nw, namewrap = ergm_mk_std_op_namewrap("EdgeAges"))
+
+  ## EdgeAges stats = 0 on emptynw, even if the submodel stats don't = 0 on emptynw
+  wm$emptynwstats <- NULL
+
+  c(list(name = "EdgeAges",
+         submodel = m,
+         duration = TRUE,
+         dependence = FALSE,
+         auxiliaries = ~.lasttoggle),
+    ergm_propagate_ext.encode(m),
+    wm)
+}
