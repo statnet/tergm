@@ -32,7 +32,11 @@ tergm_MCMC_slave(state, eta, control, verbose)
 
 \item{theta}{the vector of curved parameters}
 
-\item{verbose}{logical; whether this and other functions should be verbose}
+\item{verbose}{A logical or an integer to control the amount of
+progress and diagnostic information to be printed. \code{FALSE}/\code{0}
+produces minimal output, with higher values producing more
+detail. Note that very high values (5+) may significantly slow
+down processing.}
 
 \item{eta}{the vector of natural parameters}
 }

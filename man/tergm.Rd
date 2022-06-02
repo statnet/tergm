@@ -81,8 +81,11 @@ set globally via \code{option(tergm.eval.loglik=...)}, falling back to
 \item{control}{A list of control parameters for algorithm tuning.
 Constructed using \code{\link{control.tergm}}.}
 
-\item{verbose}{logical or integer; if TRUE or positive, the program will
-print out progress information. Higher values result in more output.}
+\item{verbose}{A logical or an integer to control the amount of
+progress and diagnostic information to be printed. \code{FALSE}/\code{0}
+produces minimal output, with higher values producing more
+detail. Note that very high values (5+) may significantly slow
+down processing.}
 
 \item{\dots}{Additional arguments, to be passed to lower-level functions.}
 }

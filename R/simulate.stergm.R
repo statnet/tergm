@@ -107,7 +107,7 @@
 #' @param nsim Number of replications (separate chains of networks) of the
 #' process to run and return. The \code{\link{networkDynamic}} method only
 #' supports \code{nsim=1}.
-#' @param seed Random number integer seed.  See \code{\link[base]{set.seed}}.
+#' @template seed
 #' @param coef.form Parameters for the formation model.
 #' @param coef.diss Parameters for the dissolution (persistence) model.
 #' @param constraints A one-sided formula specifying one or more constraints on
@@ -158,8 +158,7 @@
 #' use the \code{monitor} argument instead.  Note that if either \code{stats.form}
 #' or \code{stats.diss} is \code{TRUE}, all generative model statistics will be
 #' returned.
-#' @param verbose Logical: If \code{TRUE}, extra information is printed as the Markov
-#' chain progresses.
+#' @template verbose
 #' @param \dots Further arguments passed to or used by methods.
 #' @return Depends on the \code{output} argument.  See \code{\link{simulate.tergm}}
 #'         for details.  Note that some formation/dissolution separated

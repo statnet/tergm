@@ -59,7 +59,8 @@
 process to run and return. The \code{\link{networkDynamic}} method only
 supports \code{nsim=1}.}
 
-\item{seed}{Random number integer seed.  See \code{\link[base]{set.seed}}.}
+\item{seed}{Seed value (integer) for the random number generator.  See
+\code{\link[base]{set.seed}}.}
 
 \item{formation, dissolution}{One-sided \code{\link{ergm}}-style formulas for
 the formation and dissolution models, respectively.  The dissolution model is parameterized in terms of tie persistence.}
@@ -126,8 +127,11 @@ use the \code{monitor} argument instead.  Note that if either \code{stats.form}
 or \code{stats.diss} is \code{TRUE}, all generative model statistics will be
 returned.}
 
-\item{verbose}{Logical: If \code{TRUE}, extra information is printed as the Markov
-chain progresses.}
+\item{verbose}{A logical or an integer to control the amount of
+progress and diagnostic information to be printed. \code{FALSE}/\code{0}
+produces minimal output, with higher values producing more
+detail. Note that very high values (5+) may significantly slow
+down processing.}
 
 \item{\dots}{Further arguments passed to or used by methods.}
 }

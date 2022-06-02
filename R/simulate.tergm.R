@@ -49,7 +49,7 @@
 #' @param nsim Number of replications (separate chains of networks) of the
 #' process to run and return. The \code{\link{networkDynamic}} method only
 #' supports \code{nsim=1}.
-#' @param seed Random number integer seed.  See \code{\link[base]{set.seed}}.
+#' @template seed
 #' @param coef Parameters for the model.
 #' @param constraints A one-sided formula specifying one or more constraints on
 #' the support of the distribution of the networks being modeled. Multiple constraints may be given,
@@ -113,8 +113,7 @@
 #' @param stats Logical: Whether to return
 #' model statistics. This is not the recommended method:
 #' use \code{monitor} argument instead.
-#' @param verbose Logical: If TRUE, extra information is printed as the Markov
-#' chain progresses.
+#' @template verbose
 #' @param \dots Further arguments passed to or used by methods.
 #' @param basis For the \code{network} and \code{networkDynamic} methods,
 #'   the network to start the simulation from.  (If \code{basis} is missing,

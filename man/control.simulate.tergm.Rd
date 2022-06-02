@@ -59,19 +59,16 @@ choices may be determined by calling \code{\link{ergm_proposal_table}}.}
 \item{MCMC.prop.args}{An alternative, direct way of specifying
 additional arguments to the proposal.}
 
-\item{MCMC.maxedges}{Maximum number of edges expected in
-network.}
+\item{MCMC.maxedges}{The maximum number of edges that may occur during the MCMC sampling. If this number is exceeded at any time, sampling is stopped immediately.}
 
 \item{MCMC.maxchanges}{Maximum number of changes for
 which to allocate space.}
 
-\item{term.options}{A list of additional arguments to be passed to term initializers.
-It can also be set globally via \code{options(ergm.term=list(...))}.}
+\item{term.options}{A list of additional arguments to be passed to term initializers. See \code{\link[=term.options]{? term.options}}.}
 
-\item{MCMC.packagenames}{Names of packages in which to look for
-change statistic functions in addition to those
-autodetected. This argument should not be needed outside of very
-strange setups.}
+\item{MCMC.packagenames}{Names of packages in which to look for change
+statistic functions in addition to those autodetected. This argument should
+not be needed outside of very strange setups.}
 }
 \value{
 A list with arguments as components.

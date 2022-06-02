@@ -7,8 +7,7 @@
 control.tergm.godfather(term.options = NULL)
 }
 \arguments{
-\item{term.options}{A list of optional settings such as calculation
-tuning options to be passed to the \code{InitErgmTerm} functions.}
+\item{term.options}{A list of additional arguments to be passed to term initializers. See \code{\link[=term.options]{? term.options}}.}
 }
 \description{
 Returns a list of its arguments.

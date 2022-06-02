@@ -112,8 +112,7 @@
 #' @param control A list of control parameters for algorithm tuning.
 #' Constructed using \code{\link{control.stergm}}.  Remapped to 
 #' \code{\link{control.tergm}}.
-#' @param verbose logical or integer; if TRUE or positive, the program will
-#' print out progress information. Higher values result in more output.
+#' @template verbose
 #' @param \dots Additional arguments, to be passed to lower-level functions.
 #' @return \code{\link{stergm}} returns an object of class [`tergm`];
 #'         see [tergm()] for details and methods.

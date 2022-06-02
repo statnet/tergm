@@ -26,7 +26,7 @@
 #' @param theta the vector of curved parameters
 #' @param eta the vector of natural parameters
 #' @param control the list of control parameters
-#' @param verbose logical; whether this and other functions should be verbose
+#' @template verbose
 #' @return returns the MCMC sample as a list containing: 
 #' \itemize{
 #'   \item statsmatrix.gen: the matrix of sampled statistics for \code{model},

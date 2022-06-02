@@ -79,8 +79,7 @@
 #'   `getOption("ergm.eval.loglik")` if not set.
 #' @param control A list of control parameters for algorithm tuning.
 #' Constructed using \code{\link{control.tergm}}.
-#' @param verbose logical or integer; if TRUE or positive, the program will
-#' print out progress information. Higher values result in more output.
+#' @template verbose
 #' @param \dots Additional arguments, to be passed to lower-level functions.
 #'
 #' @return \code{\link{tergm}} returns an object of class `tergm` that

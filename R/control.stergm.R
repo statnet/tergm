@@ -68,14 +68,10 @@
 #' @param MCMC.prop.form Hints and/or constraints for selecting and initializing the proposal.
 #' @param MCMC.prop.weights.diss,MCMC.prop.args.diss,MCMC.prop.diss
 #'   Ignored.
-#' @param MCMC.maxedges Maximum number of edges for which to
-#'   allocate space.
+#' @template control_MCMC_maxedges
 #' @param MCMC.maxchanges Maximum number of changes in dynamic
 #'   network simulation for which to allocate space.
-#' @param MCMC.packagenames Names of packages in which to look for
-#'   change statistic functions in addition to those
-#'   autodetected. This argument should not be needed outside of very
-#'   strange setups.
+#' @template control_MCMC_packagenames
 #' @param CMLE.MCMC.burnin Burnin used in CMLE fitting.
 #' @param CMLE.MCMC.interval Number of Metropolis-Hastings steps
 #'   between successive draws when running MCMC MLE.
@@ -289,19 +285,9 @@
 #'   error somewhere in the optimization process will cause it to
 #'   restart with a smaller gain value. Otherwise, the process will
 #'   stop. This is mainly used for debugging
-#' @param term.options A list of additional arguments to be passed to term initializers. It can also be set globally via `option(ergm.term=list(...))`.
-#' @param seed Seed value (integer) for the random number generator.
-#'   See \code{\link[base]{set.seed}}
-#' @param parallel Number of threads in which to run the
-#'   sampling. Defaults to 0 (no parallelism). See the entry on
-#'   [parallel processing][ergm-parallel] for details and
-#'   troubleshooting.
-#' @param parallel.type API to use for parallel processing. Supported
-#'   values are \code{"MPI"} and \code{"PSOCK"}. Defaults to using the
-#'   \code{parallel} package default.
-#' @param parallel.version.check Logical: If TRUE, check that the
-#'   version of \code{\link[=ergm-package]{ergm}} running on the slave
-#'   nodes is the same as that running on the master node.
+#' @template term_options
+#' @template seed
+#' @template control_MCMC_parallel
 #' @param MCMC.burnin,MCMC.burnin.mul No longer used. See
 #'   \code{EGMME.MCMC.burnin.min}, \code{EGMME.MCMC.burnin.max},
 #'   \code{EGMME.MCMC.burnin.pval}, \code{EGMME.MCMC.burnin.pval},

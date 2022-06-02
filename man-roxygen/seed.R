@@ -1,0 +1,11 @@
+#  File man-roxygen/seed.R in package tergm, part of the
+#  Statnet suite of packages for network analysis, https://statnet.org .
+#
+#  This software is distributed under the GPL-3 license.  It is free,
+#  open source, and has the attribution requirements (GPL Section 7) at
+#  https://statnet.org/attribution .
+#
+#  Copyright 2008-2022 Statnet Commons
+################################################################################
+#' @param seed Seed value (integer) for the random number generator.  See
+#' \code{\link[base]{set.seed}}.
