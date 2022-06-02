@@ -16,7 +16,7 @@ Authors@R: c(
         person("Kirk","Li",role=c("ctb"),email="kirkli@uw.edu"),
         person("Chad", "Klumb", role=c("ctb"), email="cklumb@gmail.com"))
 Depends:
-    ergm (>= 4.1.0),
+    ergm (>= 4.2.2),
     network (>= 1.15),
     networkDynamic (>= 0.10.0)
 Imports:
