@@ -118,8 +118,8 @@
 #' @param basis For the \code{network} and \code{networkDynamic} methods,
 #'   the network to start the simulation from.  (If \code{basis} is missing,
 #'   the default is the left hand side of the \code{object} argument.)
-#' @param dynamic Logical; if \code{TRUE}, dynamic simulation is performed in
-#'   \code{tergm}; if \code{FALSE} (the default), ordinary \code{ergm}
+#' @param dynamic Logical; if \code{TRUE} (the default for the `tergm` method), dynamic simulation is performed in
+#'   \code{tergm}: the chain is run forward the given number of steps; if \code{FALSE} (the default for the formula method), ordinary \code{ergm}
 #'   simulation is performed instead.  Note that when \code{dynamic=FALSE},
 #'   default argument values for \code{ergm}'s \code{simulate} methods
 #'   are used.
@@ -226,15 +226,17 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
                           output=c("networkDynamic", "stats", "changes", "final", "ergm_state"),
                           nw.start = NULL,
                           stats = FALSE,
-                          verbose=FALSE, ...){
+                          verbose=FALSE, ..., dynamic=TRUE){
   if(is(control, "control.simulate.stergm") || is(control, "control.simulate.network")) {
     control$MCMC.prop <- control$MCMC.prop.form
     control$MCMC.prop.weights <- control$MCMC.prop.weights.form
     control$MCMC.prop.args <- control$MCMC.prop.args.form
     control <- set.control.class("control.simulate.tergm")
-  }  
+  }
   
   check.control.class(c("simulate.tergm","simulate.formula.tergm"), "simulate.tergm")
+
+  if(!dynamic) return(NextMethod("simulate")) # Just run ergm::simulate.ergm().
   
   control.transfer <- list(MCMC.prop.weights="MCMC.prop.weights",
                            MCMC.prop.args="MCMC.prop.args",

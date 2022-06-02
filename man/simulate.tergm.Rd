@@ -23,7 +23,8 @@ Random Graph Model}
   nw.start = NULL,
   stats = FALSE,
   verbose = FALSE,
-  ...
+  ...,
+  dynamic = TRUE
 )
 
 \method{simulate_formula}{network}(
@@ -161,6 +162,12 @@ down processing.}
 
 \item{\dots}{Further arguments passed to or used by methods.}
 
+\item{dynamic}{Logical; if \code{TRUE} (the default for the \code{tergm} method), dynamic simulation is performed in
+\code{tergm}: the chain is run forward the given number of steps; if \code{FALSE} (the default for the formula method), ordinary \code{ergm}
+simulation is performed instead.  Note that when \code{dynamic=FALSE},
+default argument values for \code{ergm}'s \code{simulate} methods
+are used.}
+
 \item{time.offset}{Argument specifying the offset between the point when the
 state of the network is sampled (\code{time.start}) and the the beginning of
 the spell that should be recorded for the newly simulated network state.}
@@ -168,12 +175,6 @@ the spell that should be recorded for the newly simulated network state.}
 \item{basis}{For the \code{network} and \code{networkDynamic} methods,
 the network to start the simulation from.  (If \code{basis} is missing,
 the default is the left hand side of the \code{object} argument.)}
-
-\item{dynamic}{Logical; if \code{TRUE}, dynamic simulation is performed in
-\code{tergm}; if \code{FALSE} (the default), ordinary \code{ergm}
-simulation is performed instead.  Note that when \code{dynamic=FALSE},
-default argument values for \code{ergm}'s \code{simulate} methods
-are used.}
 }
 \value{
 Depends on the \code{output} argument:
