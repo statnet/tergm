@@ -332,8 +332,8 @@ control.stergm<-function(init.form=NULL,
                          CMLE.MCMC.burnin = 1024*16,
                          CMLE.MCMC.interval = 1024,
                          CMLE.ergm=NULL,
-                         CMLE.form.ergm=control.ergm(init=init.form, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop=MCMC.prop.form, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
-                         CMLE.diss.ergm=control.ergm(init=init.diss, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop=MCMC.prop.diss, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.form.ergm=control.ergm(init=init.form, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop=MCMC.prop.form, MCMC.prop.weights=MCMC.prop.weights.form, MCMC.prop.args=MCMC.prop.args.form, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, parallel.inherit.MT=parallel.inherit.MT, force.main=force.main),
+                         CMLE.diss.ergm=control.ergm(init=init.diss, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop=MCMC.prop.diss, MCMC.prop.weights=MCMC.prop.weights.diss, MCMC.prop.args=MCMC.prop.args.diss, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, parallel.inherit.MT=parallel.inherit.MT, force.main=force.main),
                          CMLE.NA.impute=c(),
                          CMLE.term.check.override=FALSE,
                          
@@ -363,7 +363,8 @@ control.stergm<-function(init.form=NULL,
                            
                            parallel=parallel,
                            parallel.type=parallel.type,
-                           parallel.version.check=parallel.version.check),
+                           parallel.version.check=parallel.version.check,
+                           parallel.inherit.MT=FALSE),
 
                          SA.restarts=10,
                          

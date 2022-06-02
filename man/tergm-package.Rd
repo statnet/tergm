@@ -103,11 +103,11 @@ University Department of Statistics Technical Report}, 2012(2012-01).
 
 Butts CT (2008).  \pkg{network}: A Package for Managing Relational
 Data in .  \emph{Journal of Statistical Software}, 24(2).
-\url{https://www.jstatsoft.org/v24/i02/}.
+\doi{10.18637/jss.v024.i02}
 
 Goodreau SM, Handcock MS, Hunter DR, Butts CT, Morris M (2008a).  A
 \pkg{statnet} Tutorial.  \emph{Journal of Statistical Software}, 24(8).
-\url{https://www.jstatsoft.org/v24/i08/}.
+\doi{10.18637/jss.v024.i08}
 
 Hunter, D. R. and Handcock, M. S. (2006) Inference in curved
 exponential family models for networks, \emph{Journal of Computational and
@@ -116,12 +116,12 @@ Graphical Statistics}, 15: 565-583
 Hunter DR, Handcock MS, Butts CT, Goodreau SM, Morris M (2008b).
 \pkg{ergm}: A Package to Fit, Simulate and Diagnose Exponential-Family
 Models for Networks.  \emph{Journal of Statistical Software}, 24(3).
-\url{https://www.jstatsoft.org/v24/i03/}.
+\doi{10.18637/jss.v024.i03}
 
 Morris M, Handcock MS, Hunter DR (2008).  Specification of
 Exponential-Family Random Graph Models: Terms and Computational Aspects.
 \emph{Journal of Statistical Software}, 24(4).
-\url{https://www.jstatsoft.org/v24/i04/}.
+\doi{10.18637/jss.v024.i04}
 }
 \keyword{models}
 \keyword{package}

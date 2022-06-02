@@ -26,13 +26,13 @@ control.stergm(
     MCMC.prop.weights.form, MCMC.prop.args = MCMC.prop.args.form, MCMC.maxedges =
     MCMC.maxedges, MCMC.packagenames = MCMC.packagenames, parallel = parallel,
     parallel.type = parallel.type, parallel.version.check = parallel.version.check,
-    force.main = force.main),
+    parallel.inherit.MT = parallel.inherit.MT, force.main = force.main),
   CMLE.diss.ergm = control.ergm(init = init.diss, MCMC.burnin = CMLE.MCMC.burnin,
     MCMC.interval = CMLE.MCMC.interval, MCMC.prop = MCMC.prop.diss, MCMC.prop.weights =
     MCMC.prop.weights.diss, MCMC.prop.args = MCMC.prop.args.diss, MCMC.maxedges =
     MCMC.maxedges, MCMC.packagenames = MCMC.packagenames, parallel = parallel,
     parallel.type = parallel.type, parallel.version.check = parallel.version.check,
-    force.main = force.main),
+    parallel.inherit.MT = parallel.inherit.MT, force.main = force.main),
   CMLE.NA.impute = c(),
   CMLE.term.check.override = FALSE,
   EGMME.main.method = c("Gradient-Descent"),
@@ -50,7 +50,7 @@ control.stergm(
     MCMC.prop.args.form, SAN.nsteps = round(sqrt(EGMME.MCMC.burnin.min *
     EGMME.MCMC.burnin.max)) * SAN.nsteps.times, SAN.packagenames = MCMC.packagenames,
     parallel = parallel, parallel.type = parallel.type, parallel.version.check =
-    parallel.version.check),
+    parallel.version.check, parallel.inherit.MT = FALSE),
   SA.restarts = 10,
   SA.burnin = 1000,
   SA.plot.progress = FALSE,
