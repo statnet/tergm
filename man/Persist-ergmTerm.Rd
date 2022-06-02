@@ -25,5 +25,8 @@ less dissolution. It
 produces the same results as the new \code{Diss()} operator, except the
 signs of the coefficients are negated.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{durational}
 \concept{operator}

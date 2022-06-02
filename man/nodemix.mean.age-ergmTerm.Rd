@@ -31,4 +31,7 @@ This term adds one statistic for each mixing type of \code{attr} ,
 equaling the average, over all ties of that mixing type,
 of the amount of time elapsed since formation.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{durational}

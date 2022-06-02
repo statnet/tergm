@@ -23,3 +23,4 @@ code{\link[ergm:blocks-ergmConstraint]{blocks}} constraints and
 \if{text}{\Sexpr[results=rd,stage=render]{ergm:::.formatProposalsText(ergm:::.buildProposalsList(proposal="discordBDStratTNT"))}}
 \if{latex}{\Sexpr[results=rd,stage=render]{ergm:::.formatProposalsLatex(ergm:::.buildProposalsList(proposal="discordBDStratTNT"))}}
 }
+\keyword{internal}

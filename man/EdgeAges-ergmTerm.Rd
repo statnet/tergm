@@ -19,5 +19,8 @@ formula.  The statistics of the EdgeAges term are equal to the sum over
 all extant ties of the tie age times the on-toggle change statistics for
 the tie under the given model formula.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{durational}
 \concept{operator}

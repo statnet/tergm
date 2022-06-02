@@ -35,4 +35,7 @@ for details). If specified, then separate degree
 statistics are calculated for nodes having each separate
 value of the attribute.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{durational}

@@ -8,3 +8,4 @@
 #  Copyright 2008-2022 Statnet Commons
 ################################################################################
 #' @name <%= name %>-ergmTerm
+#' @seealso [`ergmTerm`] for index of model terms currently visible to the package.

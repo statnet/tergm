@@ -20,5 +20,8 @@ effectively a network containing both previous time step's ties and ties just fo
 the union of the previous and current network. This is the equivalent of the
 old-style \code{formation} model.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{durational}
 \concept{operator}

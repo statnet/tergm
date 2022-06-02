@@ -34,4 +34,7 @@ with degree greater than or equal to
 \code{from[i]} but strictly less than \code{to[i]} , of the amount of time elapsed
 since the tie's formation. The optional argument
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{durational}

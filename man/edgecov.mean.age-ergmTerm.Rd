@@ -30,4 +30,7 @@ formation, weighted by a (nonnegative) dyadic covariate.
 
 The behavior when there are negative weights is undefined.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{durational}

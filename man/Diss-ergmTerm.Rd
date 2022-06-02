@@ -22,5 +22,8 @@ Note: This is not the equivalent of the old style \code{dissolution} model,
 because the signs of the coefficients are reversed. So a larger positive
 coefficient for \code{Diss()} operator means more dissolution.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{durational}
 \concept{operator}

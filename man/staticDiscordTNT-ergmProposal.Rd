@@ -14,3 +14,4 @@ proposals stratified both by discordance status and edge status.  The argument
 \if{text}{\Sexpr[results=rd,stage=render]{ergm:::.formatProposalsText(ergm:::.buildProposalsList(proposal="staticDiscordTNT"))}}
 \if{latex}{\Sexpr[results=rd,stage=render]{ergm:::.formatProposalsLatex(ergm:::.buildProposalsList(proposal="staticDiscordTNT"))}}
 }
+\keyword{internal}

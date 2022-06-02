@@ -18,5 +18,8 @@ This term accepts a model formula
 and produces the corresponding model for a network constructed
 by taking the dyads that have changed between time steps.
 }
+\seealso{
+\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+}
 \concept{durational}
 \concept{operator}
