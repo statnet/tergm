@@ -50,7 +50,7 @@
 #'
 #' The operator terms implemented by \pkg{tergm} are `Form()`,
 #' `Persist()`, `Diss()`, `Cross()`, and `Change()`.  These are used
-#' to specify how the `ergm` terms ([`ergmTerms`]) in a formula are
+#' to specify how the `ergm` terms ([`ergmTerm`]) in a formula are
 #' evaluated across a network time-series.  Note, you cannot use one
 #' of these operators within another temporal, so
 #' `Cross(~Form(~edges))` is not a valid specification. (Generally,

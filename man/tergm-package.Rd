@@ -46,7 +46,7 @@ development, see the referenced papers.
 
 The operator terms implemented by \pkg{tergm} are \code{Form()},
 \code{Persist()}, \code{Diss()}, \code{Cross()}, and \code{Change()}.  These are used
-to specify how the \code{ergm} terms (\code{\link{ergmTerms}}) in a formula are
+to specify how the \code{ergm} terms (\code{\link{ergmTerm}}) in a formula are
 evaluated across a network time-series.  Note, you cannot use one
 of these operators within another temporal, so
 \code{Cross(~Form(~edges))} is not a valid specification. (Generally,
