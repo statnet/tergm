@@ -427,6 +427,7 @@ control.stergm<-function(init.form=NULL,
                          parallel=0,
                          parallel.type=NULL,
                          parallel.version.check=TRUE,
+                         parallel.inherit.MT=FALSE,
                          ...){
 
   if(!is.null(MCMC.burnin) || !is.null(MCMC.burnin.mul)) stop("Control parameters MCMC.burnin and MCMC.burnin.mul are no longer used. See help for EGMME.MCMC.burnin.min, EGMME.MCMC.burnin.max, EGMME.MCMC.burnin.pval, EGMME.MCMC.burnin.pval, and CMLE.MCMC.burnin and CMLE.MCMC.interval for their replacements.")

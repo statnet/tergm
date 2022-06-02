@@ -95,6 +95,7 @@ control.stergm(
   parallel = 0,
   parallel.type = NULL,
   parallel.version.check = TRUE,
+  parallel.inherit.MT = FALSE,
   ...
 )
 }
@@ -430,12 +431,12 @@ package with PSOCK clusters. See \code{\link{ergm-parallel}}}
 \code{\link[=ergm-package]{ergm}} running on the slave nodes is the same as
 that running on the master node.}
 
+\item{parallel.inherit.MT}{Logical: If TRUE, slave nodes and
+processes inherit the \code{\link[=set.MT_terms]{set.MT_terms()}} setting.}
+
 \item{\dots}{Additional arguments, passed to other functions This argument
 is helpful because it collects any control parameters that have been
 deprecated; a warning message is printed in case of deprecated arguments.}
-
-\item{parallel.inherit.MT}{Logical: If TRUE, slave nodes and
-processes inherit the \code{\link[=set.MT_terms]{set.MT_terms()}} setting.}
 }
 \value{
 A list with arguments as components.
