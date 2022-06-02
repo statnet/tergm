@@ -5,9 +5,9 @@
 \alias{InitErgmProposal.staticDiscordTNT}
 \title{TNT proposal for CMLE fitting}
 \description{
-A version of \code{\link[ergm:ergm-proposals]{TNT}} appropriate for CMLE fitting,
+A version of \code{\link[ergm:TNT-ergmProposal]{TNT}} appropriate for CMLE fitting,
 proposals stratified both by discordance status and edge status.  The argument
-code{ref} specifies the data relative to which discordance status is defined.
+\code{ref} specifies the data relative to which discordance status is defined.
 }
 \details{
 \if{html}{\Sexpr[results=rd,stage=render]{ergm:::.formatProposalsHtml(ergm:::.buildProposalsList(proposal="staticDiscordTNT"))}}

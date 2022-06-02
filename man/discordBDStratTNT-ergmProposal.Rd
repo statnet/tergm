@@ -13,10 +13,10 @@ and mixing type constraints.  The degree bound constraint is imposed
 the instantaneous network state
 rather than the temporal operator networks).
 
-arguments are the same as for \code{\link[ergm:ergm-proposals]{BDStratTNT}},
-and should be passed in via the \code{\link[ergm:ergmConstraint]{bd}} and
-code{\link[ergm:ergmConstraint]{blocks}} constraints and
-\code{\link[ergm:ergm-hints]{Strat}} hint.
+arguments are the same as for \code{\link[ergm:BDStratTNT-ergmProposal]{BDStratTNT}},
+and should be passed in via the \code{\link[ergm:bd-ergmConstraint]{bd}} and
+code{\link[ergm:blocks-ergmConstraint]{blocks}} constraints and
+\code{\link[ergm:strat-ergmHint]{strat}} hint.
 }
 \details{
 \if{html}{\Sexpr[results=rd,stage=render]{ergm:::.formatProposalsHtml(ergm:::.buildProposalsList(proposal="discordBDStratTNT"))}}

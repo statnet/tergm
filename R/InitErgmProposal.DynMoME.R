@@ -7,18 +7,11 @@
 #
 #  Copyright 2008-2021 Statnet Commons
 ################################################################################
-#===================================================================
-# This file contains the 5 following MHP initializers, each
-# prepended with 'InitErgmProposal.'  All of these functions may also be
-# found in the <InitErgmProposal> file.
-#      <formation>       <formationTNT>
-#      <dissolution>
-#===================================================================
 
 #' @templateVar name discordTNT
 #' @aliases InitErgmProposal.discordTNT
 #' @title Temperal TNT proposal
-#' @description A temporal version of \code{\link[ergm:ergm-proposals]{TNT}}, with approximately
+#' @description A temporal version of \code{\link[ergm:TNT-ergmProposal]{TNT}}, with approximately
 #'   code{discordance_fraction} of proposed toggles being made on the set of discordant dyads,
 #'   approximately \code{1 - discordance_fraction} of proposed toggles being TNT proposals from
 #'   network.  The value of \code{discordance_fraction} can be set by the user as a proposal argument,
@@ -47,10 +40,10 @@ InitErgmProposal.discordTNT <- function(arguments, nw, ...) {
 #'   the instantaneous network state
 #'   rather than the temporal operator networks).
 #'
-#'   arguments are the same as for \code{\link[ergm:ergm-proposals]{BDStratTNT}},
-#'   and should be passed in via the \code{\link[ergm:ergmConstraint]{bd}} and
-#'   code{\link[ergm:ergmConstraint]{blocks}} constraints and
-#'   \code{\link[ergm:ergm-hints]{Strat}} hint.
+#'   arguments are the same as for \code{\link[ergm:BDStratTNT-ergmProposal]{BDStratTNT}},
+#'   and should be passed in via the \code{\link[ergm:bd-ergmConstraint]{bd}} and
+#'   code{\link[ergm:blocks-ergmConstraint]{blocks}} constraints and
+#'   \code{\link[ergm:strat-ergmHint]{strat}} hint.
 #' @template ergmProposal-general
 NULL
 

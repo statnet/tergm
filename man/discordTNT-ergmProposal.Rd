@@ -5,7 +5,7 @@
 \alias{InitErgmProposal.discordTNT}
 \title{Temperal TNT proposal}
 \description{
-A temporal version of \code{\link[ergm:ergm-proposals]{TNT}}, with approximately
+A temporal version of \code{\link[ergm:TNT-ergmProposal]{TNT}}, with approximately
 code{discordance_fraction} of proposed toggles being made on the set of discordant dyads,
 approximately \code{1 - discordance_fraction} of proposed toggles being TNT proposals from
 network.  The value of \code{discordance_fraction} can be set by the user as a proposal argument,
