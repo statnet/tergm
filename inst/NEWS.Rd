@@ -61,6 +61,62 @@
   % }
 %% }
 
+\section{Changes in version 4.1.0}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item Term documentation has been ported to the \pkg{ergm} 4.2 documentation API.
+
+      \item New term operator \code{\link[=EdgeAges-ergmTerm]{EdgeAges}}.
+    }
+
+    \itemize{
+      \item Term and proposal keyword/concept \code{durational} is registered by \pkg{tergm}.
+    }
+  }
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item Fixes to handling of \code{\link{networkDynamic}} objects.
+    }
+  }
+
+%%   \subsection{OTHER USER-VISIBLE CHANGES}{
+%%     \itemize{
+%%       \item Miscellaneous speed-ups.
+%%     }
+%%   }
+
+%%   \subsection{DEPRECATED & DEFUNCT}{
+%%     \itemize{
+%%     }
+%%   }
+  
+%%   \subsection{C-LEVEL FACILITIES}{
+%%     \itemize{
+%%       \item It is not clear that we need a subsection called "C-LEVEL FACILITIES".
+%%     }
+%%   }
+
+%%   \subsection{UTILITIES}{
+%%     \itemize{
+%%       \item Likewise, "UTILITIES" is probably unnecessary.
+%%     }
+%%   }
+
+%%   \subsection{INSTALLATION}{
+%%     \itemize{
+%%       \item ... as is "INSTALLATION".
+%%     }
+%%   }
+
+%%   \subsection{PACKAGE INSTALLATION}{
+%%     \itemize{
+%%       \item ditto.
+%%     }
+%%   }
+%%  }
+
+
 
 \section{Changes in version 4.0.2}{
   \subsection{BUG FIXES}{
