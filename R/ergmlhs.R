@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2021 Statnet Commons
+#  Copyright 2008-2022 Statnet Commons
 ################################################################################
 .combine_ergmlhs <- function(nwl, ignore.settings=c()){
   ergml <- nwl %>% map(`%n%`, "ergm") %>% map(NVL, list())
