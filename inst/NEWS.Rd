@@ -67,9 +67,7 @@
       \item Term documentation has been ported to the \pkg{ergm} 4.2 documentation API.
 
       \item New term operator \code{\link[=EdgeAges-ergmTerm]{EdgeAges}}.
-    }
 
-    \itemize{
       \item Term and proposal keyword/concept \code{durational} is registered by \pkg{tergm}.
     }
   }
@@ -114,7 +112,7 @@
 %%       \item ditto.
 %%     }
 %%   }
-%%  }
+}
 
 
 
