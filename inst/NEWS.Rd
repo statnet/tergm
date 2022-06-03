@@ -75,19 +75,24 @@
   \subsection{BUG FIXES}{
     \itemize{
       \item Fixes to handling of \code{\link{networkDynamic}} objects.
+
+      \item Fixes to documentation URLs.
     }
   }
 
-%%   \subsection{OTHER USER-VISIBLE CHANGES}{
-%%     \itemize{
-%%       \item Miscellaneous speed-ups.
-%%     }
-%%   }
+  \subsection{OTHER USER-VISIBLE CHANGES}{
+    \itemize{
+      \item Miscellaneous speed-ups.
 
-%%   \subsection{DEPRECATED & DEFUNCT}{
-%%     \itemize{
-%%     }
-%%   }
+      \item Documentation for some arguments and control parameters is now more standardized and detailed.
+    }
+  }
+
+  \subsection{DEPRECATED & DEFUNCT}{
+    \itemize{
+      \item [stergm()] has been deprecated in favor of [tergm()], whose special case it is. It, and its associated functions may be removed in a future release.
+    }
+  }
   
 %%   \subsection{C-LEVEL FACILITIES}{
 %%     \itemize{
