@@ -2,7 +2,7 @@
 % Please edit documentation in R/stergm.R
 \name{stergm}
 \alias{stergm}
-\title{Separable Temporal Exponential Family Random Graph Models}
+\title{Separable Temporal Exponential Family Random Graph Models (Deprecated)}
 \usage{
 stergm(
   nw,
@@ -114,9 +114,12 @@ down processing.}
 see \code{\link[=tergm]{tergm()}} for details and methods.
 }
 \description{
-\code{\link{stergm}} is used for finding Separable Temporal ERGMs' (STERGMs)
-Conditional MLE (CMLE) (Krivitsky and Handcock, 2010) and Equilibrium
-Generalized Method of Moments Estimator (EGMME) (Krivitsky, 2009).
+\code{\link{stergm}} is used for finding Separable Temporal ERGMs'
+(STERGMs) Conditional MLE (CMLE) (Krivitsky and Handcock, 2014) and
+Equilibrium Generalized Method of Moments Estimator (EGMME)
+(Krivitsky, 2009). This function is deprecated in favor of
+\code{\link[=tergm]{tergm()}}, whose special case it is, and may be removed in a future
+version.
 }
 \details{
 This function is included for backwards compatibility, and users are

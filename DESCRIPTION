@@ -1,6 +1,6 @@
 Package: tergm
-Version: 4.1-2426
-Date: 2022-06-02
+Version: 4.1-2429
+Date: 2022-06-03
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
         person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="pavel+tergm@unsw.edu.au", comment=c(ORCID="0000-0002-9101-3362")),

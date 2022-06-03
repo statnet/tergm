@@ -13,11 +13,14 @@
 
 
 
-#' Separable Temporal Exponential Family Random Graph Models
+#' Separable Temporal Exponential Family Random Graph Models (Deprecated)
 #' 
-#' \code{\link{stergm}} is used for finding Separable Temporal ERGMs' (STERGMs)
-#' Conditional MLE (CMLE) (Krivitsky and Handcock, 2010) and Equilibrium
-#' Generalized Method of Moments Estimator (EGMME) (Krivitsky, 2009).
+#' \code{\link{stergm}} is used for finding Separable Temporal ERGMs'
+#' (STERGMs) Conditional MLE (CMLE) (Krivitsky and Handcock, 2014) and
+#' Equilibrium Generalized Method of Moments Estimator (EGMME)
+#' (Krivitsky, 2009). This function is deprecated in favor of
+#' [tergm()], whose special case it is, and may be removed in a future
+#' version.
 #' 
 #' This function is included for backwards compatibility, and users are  
 #' encouraged to use the new \code{tergm} family of functions instead.
@@ -179,6 +182,8 @@ stergm <- function(nw, formation, dissolution, constraints = ~., estimate, times
                    eval.loglik=NVL(getOption("tergm.eval.loglik"), getOption("ergm.eval.loglik")),
                    control=control.stergm(),
                    verbose=FALSE, ..., SAN.offsets = NULL) {
+  .Deprecate_once("tergm")
+
   check.control.class("stergm", "stergm")
   
   if(!is.null(control$seed))  set.seed(as.integer(control$seed))
