@@ -202,12 +202,12 @@ test_that("simulate.network behaves reasonably", {
   expect_equal(old_nw6, new_nw6, check.attributes = FALSE)
 
   expect_identical(attr(old_stats_nw, "stats"), attr(new_stats_nw, "stats"))
-  expect_identical(attr(old_stats_nw, "stats.gen"), attr(new_stats_nw, "stats.gen"))
-  expect_identical(cbind(attr(old_stats_nw, "stats.form"), attr(old_stats_nw, "stats.diss")), as.matrix(attr(new_stats_nw, "stats.gen")))
+  ## expect_identical(attr(old_stats_nw, "stats.gen"), attr(new_stats_nw, "stats.gen"))
+  expect_identical(cbind(attr(old_stats_nw, "stats.form"), attr(old_stats_nw, "stats.diss")), as.matrix(attr(new_stats_nw, "stats")$model))
 
   expect_identical(old_stats$stats, new_stats$stats)
-  expect_identical(old_stats$stats.gen, new_stats$stats.gen)
-  expect_identical(cbind(old_stats$stats.form, old_stats$stats.diss), as.matrix(new_stats$stats.gen))
+  ## expect_identical(old_stats$stats.gen, new_stats$stats.gen)
+  expect_identical(cbind(old_stats$stats.form, old_stats$stats.diss), as.matrix(new_stats$stats)$model)
 })
 
 test_that("simulate.networkDynamic behaves reasonably", {
@@ -264,12 +264,12 @@ test_that("simulate.networkDynamic behaves reasonably", {
   expect_equal(attr(old_nwD8, "stats"), attr(new_nwD8, "stats"))
 
   expect_equal(attr(old_stats_nwD, "stats"), attr(new_stats_nwD, "stats"))
-  expect_equal(attr(old_stats_nwD, "stats.gen"), attr(new_stats_nwD, "stats.gen"))
-  expect_equal(cbind(attr(old_stats_nwD, "stats.form"), attr(old_stats_nwD, "stats.diss")), as.matrix(attr(new_stats_nwD, "stats.gen")))
+  ## expect_equal(attr(old_stats_nwD, "stats.gen"), attr(new_stats_nwD, "stats.gen"))
+  expect_equal(cbind(attr(old_stats_nwD, "stats.form"), attr(old_stats_nwD, "stats.diss")), as.matrix(attr(new_stats_nwD, "stats")$model))
 
   expect_equal(old_stats$stats, new_stats$stats)
-  expect_equal(old_stats$stats.gen, new_stats$stats.gen)
-  expect_equal(cbind(old_stats$stats.form, old_stats$stats.diss), as.matrix(new_stats$stats.gen))
+  ## expect_equal(old_stats$stats.gen, new_stats$stats.gen)
+  expect_equal(cbind(old_stats$stats.form, old_stats$stats.diss), as.matrix(new_stats$stats$model))
 
   expect_equal(old_nwD_constr, new_nwD_constr, check.attributes = FALSE)
   expect_equal(old_nwD_constr2, new_nwD_constr2, check.attributes = FALSE)

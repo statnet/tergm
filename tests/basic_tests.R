@@ -31,8 +31,7 @@ stopifnot(all(summary(nw~edges+Form(~edges)+Persist(~edges))==c(16,16,16)))
 
 # Now, let's start at Time 2, add edge (1,2) at time 4, remove it at time 5, and then delete edge (1,4) at time 7 and re-add it at time 8.
 o <- tergm.godfather(nw~edges+Form(~edges)+Persist(~edges), toggles=rbind(c(4,1,2),c(5,1,2),c(7,1,4),c(8,1,4)),start=2, end=10, end.network=TRUE)
-attr(o, "stats") # Statistics are appropriate: note how both formation and dissolution "lag":
-stopifnot(all(attr(o,"stats")==structure(c(16,17,16,16,15,16,16,16,
+stopifnot(all(attr(o,"stats")$monitor==structure(c(16,17,16,16,15,16,16,16,
                                            16,17,17,16,16,16,16,16,
                                            16,16,16,16,15,15,16,16),
                                          .Dim=c(8L,3L))))

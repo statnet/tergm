@@ -126,8 +126,8 @@
 #' @return Depends on the \code{output} argument:
 #'  \item{"stats"}{If \code{stats == FALSE}, an \code{\link{mcmc}} matrix with
 #'    monitored statistics, and if \code{stats == TRUE}, a
-#'    list containing elements \code{stats} for statistics specified in the
-#'    \code{monitor} argument, and \code{stats.gen} for the model statistics.
+#'    list containing elements \code{monitor} for statistics specified in the
+#'    \code{monitor} argument, and \code{model} for the model statistics.
 #'    If \code{stats == FALSE} and no monitored statistics are specified,
 #'    an empty list is returned, with a warning.
 #'    When \code{nsim>1}, an \code{\link{mcmc.list}} (or list of them) of
@@ -149,7 +149,7 @@
 #'    \describe{
 #'      \item{\code{formula}, \code{monitor}:}{Model
 #'    and monitoring formulas used in the simulation, respectively.}
-#'      \item{\code{stats}, \code{stats.gen}:}{Network statistics as above.}
+#'      \item{\code{stats}:}{Network statistics as above.}
 #'      \item{\code{coef}:}{Coefficients used in the simulation.}
 #'      \item{\code{changes}:}{A four-column matrix summarizing the changes in the
 #'    \code{"changes"} output. (This may be removed in the future.)}
@@ -374,8 +374,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                nwd <- to.networkDynamic.lasttoggle(nw)
                nwd <- networkDynamic.apply.changes(nwd,changes)
                attributes(nwd) <- c(attributes(nwd), # Don't clobber existing attributes!
-                                    list(stats.gen = stats.gen,
-                                         stats = stats.mon,
+                                    list(stats = list(model = stats.gen, monitor = stats.mon),
                                          coef = coef,
                                          changes = changes))
                nwd <- .add.net.obs.period.spell(nwd, start-1+time.offset, time.slices)
@@ -388,15 +387,14 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                # assume that simulate.stergm has added +1 to all the time values, so subtract 1 for an offset of 0
                changes[,1]<-changes[,1]-1+time.offset
                attributes(changes) <- c(attributes(changes), # Don't clobber existing attributes!
-                                        list(stats.gen = stats.gen,
-                                             stats = stats.mon,
+                                        list(stats = list(model = stats.gen, monitor = stats.mon),
                                              coef = coef,
                                              start = nw%n%"time" + 0,
                                              end = nw%n%"time" + time.slices))
                changes
              },
              stats = {
-               list(stats.gen = stats.gen, stats = stats.mon)
+               list(model = stats.gen, monitor = stats.mon)
              },
              final = {
                changes <- z$changed
@@ -407,8 +405,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                newnw <- as.network(z$newnetwork)
                newnw <- .add.net.obs.period.spell(newnw, start-1+time.offset, time.slices)
                attributes(newnw) <- c(attributes(newnw), # Don't clobber existing attributes!
-                                      list(stats.gen = stats.gen,
-                                           stats = stats.mon,
+                                      list(stats = list(model = stats.gen, monitor = stats.mon),
                                            coef = coef,
                                            start = nw%n%"time" + 0,
                                            end = nw%n%"time" + time.slices,
@@ -423,8 +420,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                changes[,1]<-changes[,1]-1+time.offset
                newnw <- z$newnetwork
                attributes(newnw) <- c(attributes(newnw), # Don't clobber existing attributes!
-                                      list(stats.gen = stats.gen,
-                                           stats = stats.mon,
+                                      list(stats = list(model = stats.gen, monitor = stats.mon),
                                            coef = coef,
                                            start = nw%n%"time" + 0,
                                            end = nw%n%"time" + time.slices,
@@ -557,8 +553,7 @@ simulate_formula.networkDynamic <- function(object, nsim=1, seed=NULL,
   }
   
   attributes(object) <- c(attributes(object), # Don't clobber existing attributes!
-                          list(stats.gen = attr(sim, "stats.gen"),
-                               stats = attr(sim, "stats"),
+                          list(stats = attr(sim, "stats"),
                                coef = coef,
                                changes = rbind(attr(object,"changes"),matrix(c(sim), nrow=nrow(sim),ncol=ncol(sim),dimnames=list(rownames(sim),colnames(sim))))
                                ))

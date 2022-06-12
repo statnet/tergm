@@ -45,17 +45,17 @@ simtest <- function(S, edges, dur, n, dir=FALSE, bip=0){
   # Simulate. Starting from an ordinary network:
   dynsim<-simulate(g1 ~ Form(~edges) + Persist(~edges),coef=c(coef.form,coef.diss),time.slices=S,verbose=TRUE,monitor=~edgecov("dc")+edgecov.ages("dc"), dynamic=TRUE)
   
-  sim.stats <- attr(dynsim, "stats")
+  sim.stats <- attr(dynsim, "stats")$monitor
   
   # Resuming from a networkDynamic:
   dynsim2<-simulate(dynsim ~ Form(~edges) + Persist(~edges),coef=c(coef.form,coef.diss),time.slices=S,verbose=TRUE,monitor=~edgecov("dc")+edgecov.ages("dc"), dynamic=TRUE)
   
-  sim.stats <- rbind(sim.stats, attr(dynsim2, "stats"))
+  sim.stats <- rbind(sim.stats, attr(dynsim2, "stats")$monitor)
   
   # Resuming from a resumed networkDynamic:
   dynsim3<-simulate(dynsim2 ~ Form(~edges) + Persist(~edges),coef=c(coef.form,coef.diss),time.slices=S,verbose=TRUE,monitor=~edgecov("dc")+edgecov.ages("dc"), dynamic=TRUE)
 
-  sim.stats <- rbind(sim.stats, attr(dynsim3, "stats"))
+  sim.stats <- rbind(sim.stats, attr(dynsim3, "stats")$monitor)
   
   # Replay the simulation using a networkDynamic:
   gf1.stats <- as.matrix(tergm.godfather(dynsim3~edgecov("dc")+edgecov.ages("dc"), start=0, end=S*3))
