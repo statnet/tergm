@@ -36,7 +36,7 @@ test_that("EGMME initialfit behaves reasonably", {
   x <- test.EGMME.initialfit(nw, ff, mff, target.stats)
   set.seed(0)
   e <- ergm(nw ~ edges, target.stats = target.stats[1])
-  expected <- unname(c(coef(e)[1] - log(11), -log(11)))
+  expected <- unname(c(coef(e)[1] - log(9), -log(9)))
   expect_equal(expected, coef(x))
   
   
@@ -49,7 +49,7 @@ test_that("EGMME initialfit behaves reasonably", {
   x <- test.EGMME.initialfit(nw, ff, mff, target.stats)
   set.seed(0)
   e <- ergm(nw ~ edges, target.stats = target.stats[1])
-  expected <- unname(c(coef(e)[1] - log(11), log(11)))
+  expected <- unname(c(coef(e)[1] - log(9), log(9)))
   expect_equal(expected, coef(x))
   
   
@@ -63,7 +63,7 @@ test_that("EGMME initialfit behaves reasonably", {
   x <- test.EGMME.initialfit(nw, ff, mff, target.stats, init)
   set.seed(0)
   e <- ergm(nw ~ edges + nodecov("cov") + offset(gwesp(0, fixed = TRUE)), target.stats = target.stats[1:2], offset.coef = 0.1)
-  expected <- unname(c(coef(e)[1] - log(11), coef(e)[2], 0.1, log(11)))
+  expected <- unname(c(coef(e)[1] - log(9), coef(e)[2], 0.1, log(9)))
   expect_equal(expected, coef(x))
   
   
@@ -77,7 +77,7 @@ test_that("EGMME initialfit behaves reasonably", {
   x <- test.EGMME.initialfit(nw, ff, mff, target.stats, init)
   set.seed(0)
   e <- ergm(nw ~ edges + nodecov("cov") + offset(gwesp(0, fixed = TRUE)), target.stats = target.stats[1:2], offset.coef = 0.1)
-  expected <- unname(c(-log(11), coef(e)[1] - log(11), coef(e)[2], 0.1))
+  expected <- unname(c(-log(9), coef(e)[1] - log(9), coef(e)[2], 0.1))
   expect_equal(expected, coef(x))
   
   
