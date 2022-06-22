@@ -59,20 +59,9 @@
 #' terms of tie persistence: negative coefficients imply lower rates of persistence
 #' and postive coefficients imply higher rates.  The dissolution effects are simply the
 #' negation of these coefficients.
-#' @param constraints A one-sided formula specifying one or more constraints on
-#' the support of the distribution of the networks being modeled, using syntax
-#' similar to the \code{formula} argument. Multiple constraints may be given,
-#' separated by \dQuote{+} operators.  Together with the model terms in the
-#' formula and the reference measure, the constraints define the distribution
-#' of networks being modeled.
-#' 
-#' The default is \code{~.}, for an unconstrained model.
-#' 
-#' See the [ERGM constraints][ergmConstraint] documentation for the
-#' constraints implemented in the **[ergm][ergm-package]** package.
-#' Other packages may add their own constraints.
-#' 
-#' Note that not all possible combinations of constraints are supported.
+#'
+#' @template constraints
+#'
 #' @param estimate One of "EGMME" for Equilibrium Generalized Method of Moments
 #' Estimation, based on a single network with some temporal information and
 #' making an assumption that it is a product of a STERGM process running to its

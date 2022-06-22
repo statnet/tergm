@@ -37,20 +37,30 @@ terms of tie persistence: negative coefficients imply lower rates of persistence
 and postive coefficients imply higher rates.  The dissolution effects are simply the
 negation of these coefficients.}
 
-\item{constraints}{A one-sided formula specifying one or more constraints on
-the support of the distribution of the networks being modeled, using syntax
-similar to the \code{formula} argument. Multiple constraints may be given,
-separated by \dQuote{+} operators.  Together with the model terms in the
-formula and the reference measure, the constraints define the distribution
-of networks being modeled.
+\item{constraints}{A formula specifying one or more constraints
+on the support of the distribution of the networks being modeled. Multiple constraints
+may be given, separated by \dQuote{+} and \dQuote{-} operators. See
+\code{\link{ergmConstraint}} for the detailed explanation of
+their semantics and also for an indexed list of the constraints visible to the \CRANpkg{ergm} package.
 
-The default is \code{~.}, for an unconstrained model.
+The default is to have no constraints except those provided through
+the \code{\link{ergmlhs}} API.
 
-See the \link[=ergmConstraint]{ERGM constraints} documentation for the
-constraints implemented in the \strong{\link[=ergm-package]{ergm}} package.
-Other packages may add their own constraints.
+Together with the model terms in the formula and the reference measure, the constraints
+define the distribution of networks being modeled.
 
-Note that not all possible combinations of constraints are supported.}
+It is also possible to specify a proposal function directly either
+by passing a string with the function's name (in which case,
+arguments to the proposal should be specified through the
+\code{MCMC.prop.args} argument to the relevant control function, or
+by giving it on the LHS of the hints formula to \code{MCMC.prop}
+argument to the control function. This will override
+the one chosen automatically.
+
+Note that not all possible combinations of constraints and reference
+measures are supported. However, for relatively simple constraints
+(i.e., those that simply permit or forbid specific dyads or sets of
+dyads from changing), arbitrary combinations should be possible.}
 
 \item{estimate}{One of "EGMME" for Equilibrium Generalized Method of Moments
 Estimation, based on a single network with some temporal information and

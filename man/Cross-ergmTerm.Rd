@@ -8,7 +8,7 @@
 # binary: Cross(formula)
 }
 \arguments{
-\item{formula}{model formula}
+\item{formula}{a one-sided \code{\link[=ergm]{ergm()}}-style formula with the terms to be evaluated}
 }
 \description{
 The Crossection Operator Term

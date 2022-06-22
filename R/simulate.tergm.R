@@ -51,19 +51,9 @@
 #' supports \code{nsim=1}.
 #' @template seed
 #' @param coef Parameters for the model.
-#' @param constraints A one-sided formula specifying one or more constraints on
-#' the support of the distribution of the networks being modeled. Multiple constraints may be given,
-#' separated by \dQuote{+} operators.  Together with the model terms in the
-#' formula and the reference measure, the constraints define the distribution
-#' of networks being modeled.
-#' 
-#' The default is \code{~.}, for an unconstrained model.
-#' 
-#' See the [ERGM constraints][ergmConstraint] documentation for the
-#' constraints implemented in the **[ergm][ergm-package]** package.
-#' Other packages may add their own constraints.
-#' 
-#' Note that not all possible combinations of constraints are supported.
+#'
+#' @template constraints
+#'
 #' @param monitor A one-sided formula specifying one or more terms whose
 #' value is to be monitored.  If \code{monitor} is specified as a character
 #' (one of \code{"formation"}, \code{"dissolution"}, and \code{"all"}) then

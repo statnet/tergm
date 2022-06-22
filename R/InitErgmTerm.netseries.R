@@ -298,7 +298,7 @@ InitErgmTerm..crossnets <- function(nw, arglist, ...){
 #'
 #' @usage
 #' # binary: Cross(formula)
-#' @param formula model formula
+#' @template ergmTerm-formula
 #'
 #' @template ergmTerm-general
 #' @import purrr

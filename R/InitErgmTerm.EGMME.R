@@ -30,7 +30,7 @@ stopifnot_dynamic <- function(nw, ..., dynamic=FALSE, .netseries.OK=FALSE){
 #'
 #' @usage
 #' # binary: Form(formula)
-#' @param formula model formula
+#' @template ergmTerm-formula
 #'
 #' @template ergmTerm-general
 #'
@@ -86,7 +86,7 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
 #'
 #' @usage
 #' # binary: Persist(formula)
-#' @param formula model formula
+#' @template ergmTerm-formula
 #'
 #' @template ergmTerm-general
 #'
@@ -124,7 +124,7 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
 #'
 #' @usage
 #' # binary: Diss(formula)
-#' @param formula model formula
+#' @template ergmTerm-formula
 #'
 #' @template ergmTerm-general
 #'
@@ -173,7 +173,7 @@ InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
 #'
 #' @usage
 #' # binary: Change(formula)
-#' @param formula model formula
+#' @template ergmTerm-formula
 #'
 #' @template ergmTerm-general
 #'
