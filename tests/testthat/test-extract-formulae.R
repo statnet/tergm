@@ -275,10 +275,10 @@ test_that(".extract.fd.formulae behaves reasonably", {
   R <- .extract.fd.formulae(F)
   expect_identical(environment(u), environment(R$form[[2]][[2]]))
   expect_identical(environment(v), environment(R$pers[[2]][[2]][[2]][[2]]))
-  expect_equal(~.P(~nodecov(uniquename)), R$form)
-  expect_equal(~offset(.M(~isolates))+.P(~concurrent), R$pers)
+  expect_equal(~.P(~nodecov(uniquename)), R$form, ignore_attr=TRUE)
+  expect_equal(~offset(.M(~isolates))+.P(~concurrent), R$pers, ignore_attr=TRUE)
   expect_equal(~edges, R$nonsep)
-  expect_equal(~.P(~nodecov(uniquename)) + edges + offset(.M(~isolates))+.P(~concurrent), R$all)
+  expect_equal(~.P(~nodecov(uniquename)) + edges + offset(.M(~isolates))+.P(~concurrent), R$all, ignore_attr=TRUE)
 
   nw <- network.initialize(10, dir = FALSE)
   expect_error(m <- ergm_model(R$form, nw = nw), "is/are not valid nodal attribute\\(s\\)")
