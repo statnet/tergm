@@ -8,7 +8,7 @@
 #  Copyright 2008-2022 Statnet Commons
 ################################################################################
 library(statnet.common)
-#opttest({
+opttest({
 library(tergm)
 options(tergm.eval.loglik=FALSE)
 
@@ -116,4 +116,4 @@ do.run(TRUE, prop.weights=c("default","random"))
 cat("=========== Undirected test ===========\n")
 do.run(FALSE, prop.weights=c("default","random"))
 
-#}, "dynamic MLE with block-diagonal constraints")
+}, "dynamic MLE with block-diagonal constraints")

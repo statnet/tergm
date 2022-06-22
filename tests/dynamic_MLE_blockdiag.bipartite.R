@@ -8,7 +8,7 @@
 #  Copyright 2008-2022 Statnet Commons
 ################################################################################
 library(statnet.common)
-#opttest({
+opttest({
 library(tergm)
 options(tergm.eval.loglik=FALSE)
 
@@ -120,4 +120,4 @@ stopifnot(z.error(form.mle(y0,y1m), coef(fit)[1], vcov(fit)[1,1]) <= tolerance)
 stopifnot(z.error(diss.mle(y0,y1m), coef(fit)[2], vcov(fit)[2,2]) <= tolerance)
 }
 
-#}, "dynamic MLE with block-diagonal constraints")
+}, "dynamic MLE with block-diagonal constraints")
