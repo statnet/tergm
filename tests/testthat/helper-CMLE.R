@@ -1,3 +1,5 @@
+logit<-function(p) log(p/(1-p))
+
 o <- options(tergm.eval.loglik=FALSE)
 
 CMLE.tools <- new.env()
@@ -11,8 +13,6 @@ CMLE.tools$z.error <- function(truth, est, variance){
   if(abs(truth-est)<1e-6) 0 # Infinite case
   else abs(truth-est)/sqrt(variance)
 }
-
-CMLE.tools$logit<-function(p) log(p/(1-p))
 
 CMLE.tools$form.mle<-function(y0,y1,y2){
   if(missing(y2)) logit(network.edgecount(y1-y0,na.omit=TRUE)/(network.dyadcount(y1)-network.edgecount(y0-is.na(y1))))
