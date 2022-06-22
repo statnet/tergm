@@ -132,9 +132,6 @@ Equilibrium Generalized Method of Moments Estimator (EGMME)
 version.
 }
 \details{
-This function is included for backwards compatibility, and users are
-encouraged to use the new \code{tergm} family of functions instead.
-
 The \code{stergm} function uses a pair of formulas, \code{formation} and
 \code{dissolution} to model tie-dynamics.  The dissolution formula, however, is
 parameterized in terms of tie persistence: negative coefficients imply lower
@@ -153,50 +150,6 @@ details. At this time, only linear ERGM terms are allowed.  \itemize{
 \code{browseVignettes(package='tergm')} \item A more detailed tutorial is
 available on the statnet wiki:
 \url{https://statnet.org/Workshops/tergm/tergm_tutorial.html} }
-}
-\examples{
-\dontrun{
-# EGMME Example
-par(ask=FALSE)
-n<-30
-g0<-network.initialize(n,dir=FALSE)
-
-#                     edges, degree(1), mean.age
-target.stats<-c(      n*1/2,    n*0.6,        20)
-
-dynfit<-stergm(g0,formation = ~edges+degree(1), dissolution = ~edges,
-               targets = ~edges+degree(1)+mean.age,
-               target.stats=target.stats, estimate="EGMME",
-               control=control.stergm(SA.plot.progress=TRUE))
-
-par(ask=TRUE)
-mcmc.diagnostics(dynfit)
-summary(dynfit)
-}
-
-\donttest{
-# CMLE Example
-data(samplk)
-
-# Fit a transition from Time 1 to Time 2
-samplk12 <- stergm(list(samplk1, samplk2),
-                   formation=~edges+mutual+transitiveties+cyclicalties,
-                   dissolution=~edges+mutual+transitiveties+cyclicalties,
-                   estimate="CMLE")
-
-mcmc.diagnostics(samplk12)
-summary(samplk12)
-
-# Fit a transition from Time 1 to Time 2 and from Time 2 to Time 3 jointly
-samplk123 <- stergm(list(samplk1, samplk2, samplk3),
-                    formation=~edges+mutual+transitiveties+cyclicalties,
-                    dissolution=~edges+mutual+transitiveties+cyclicalties,
-                    estimate="CMLE")
-
-mcmc.diagnostics(samplk123)
-summary(samplk123)
-}
-
 }
 \references{
 Krivitsky P.N. and Handcock M.S. (2014) A Separable Model for Dynamic Networks. \emph{Journal of the Royal Statistical Society, Series B}, 76(1): 29-46. \doi{10.1111/rssb.12014}

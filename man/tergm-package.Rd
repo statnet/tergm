@@ -73,7 +73,7 @@ models is under development.
 
 If you previously used the \code{\link[=stergm]{stergm()}} function in this package, please
 note that \code{\link[=stergm]{stergm()}} has been superceded by the new \code{\link{tergm}}
-function, and is likely to be deprecated in future releases.  The
+function, and has been deprecated.  The
 \code{dissolution} formula in \code{\link[=stergm]{stergm()}} maps to the new \code{Persist()}
 operator in the \code{\link[=tergm]{tergm()}} function, \strong{not} the \code{Diss()} operator.
 

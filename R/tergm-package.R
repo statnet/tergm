@@ -75,7 +75,7 @@
 #'
 #' If you previously used the [stergm()] function in this package, please
 #' note that [stergm()] has been superceded by the new \code{\link{tergm}}
-#' function, and is likely to be deprecated in future releases.  The
+#' function, and has been deprecated.  The
 #' \code{dissolution} formula in [stergm()] maps to the new \code{Persist()}
 #' operator in the [tergm()] function, **not** the \code{Diss()} operator.
 #'

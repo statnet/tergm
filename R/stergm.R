@@ -22,9 +22,6 @@
 #' [tergm()], whose special case it is, and may be removed in a future
 #' version.
 #' 
-#' This function is included for backwards compatibility, and users are  
-#' encouraged to use the new \code{tergm} family of functions instead.
-#' 
 #' The \code{stergm} function uses a pair of formulas, \code{formation} and 
 #' \code{dissolution} to model tie-dynamics.  The dissolution formula, however, is 
 #' parameterized in terms of tie persistence: negative coefficients imply lower 
@@ -119,50 +116,6 @@
 #' University Department of Statistics Technical Report}, 2012(2012-01).
 #' \url{https://web.archive.org/web/20170830053722/https://stat.psu.edu/research/technical-report-files/2012-technical-reports/TR1201A.pdf}
 #' 
-#' 
-#' @examples
-#' \dontrun{
-#' # EGMME Example
-#' par(ask=FALSE)
-#' n<-30
-#' g0<-network.initialize(n,dir=FALSE)
-#' 
-#' #                     edges, degree(1), mean.age
-#' target.stats<-c(      n*1/2,    n*0.6,        20)
-#' 
-#' dynfit<-stergm(g0,formation = ~edges+degree(1), dissolution = ~edges,
-#'                targets = ~edges+degree(1)+mean.age,
-#'                target.stats=target.stats, estimate="EGMME",
-#'                control=control.stergm(SA.plot.progress=TRUE))
-#' 
-#' par(ask=TRUE)
-#' mcmc.diagnostics(dynfit)
-#' summary(dynfit)
-#' }
-#'
-#' \donttest{
-#' # CMLE Example
-#' data(samplk)
-#' 
-#' # Fit a transition from Time 1 to Time 2
-#' samplk12 <- stergm(list(samplk1, samplk2),
-#'                    formation=~edges+mutual+transitiveties+cyclicalties,
-#'                    dissolution=~edges+mutual+transitiveties+cyclicalties,
-#'                    estimate="CMLE")
-#' 
-#' mcmc.diagnostics(samplk12)
-#' summary(samplk12)
-#' 
-#' # Fit a transition from Time 1 to Time 2 and from Time 2 to Time 3 jointly
-#' samplk123 <- stergm(list(samplk1, samplk2, samplk3),
-#'                     formation=~edges+mutual+transitiveties+cyclicalties,
-#'                     dissolution=~edges+mutual+transitiveties+cyclicalties,
-#'                     estimate="CMLE")
-#' 
-#' mcmc.diagnostics(samplk123)
-#' summary(samplk123)
-#' }
-#'
 #' @import network
 #' @import networkDynamic
 #' @export
