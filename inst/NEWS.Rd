@@ -64,11 +64,11 @@
 \section{Changes in version 4.1.0}{
   \subsection{NEW FEATURES}{
     \itemize{
-      \item Term documentation has been ported to the \pkg{ergm} 4.2 documentation API.
+      \item Term documentation has been ported to the \CRANpkg{ergm} 4.2 documentation API.
 
       \item New term operator \code{\link[=EdgeAges-ergmTerm]{EdgeAges}}.
 
-      \item Term and proposal keyword/concept \code{durational} is registered by \pkg{tergm}.
+      \item Term and proposal keyword/concept \code{durational} is registered by \CRANpkg{tergm}.
     }
   }
 
@@ -85,38 +85,16 @@
       \item Miscellaneous speed-ups.
 
       \item Documentation for some arguments and control parameters is now more standardized and detailed.
+
+      \item Dissolution parameter estimation in the simple (EDApprox) case is a bit more accurate.
     }
   }
 
   \subsection{DEPRECATED & DEFUNCT}{
     \itemize{
-      \item [stergm()] has been deprecated in favor of [tergm()], whose special case it is. It, and its associated functions may be removed in a future release.
+      \item \code{\link{stergm}()} has been deprecated in favor of [tergm()], whose special case it is. It, and its associated functions may be removed in a future release.
     }
   }
-  
-%%   \subsection{C-LEVEL FACILITIES}{
-%%     \itemize{
-%%       \item It is not clear that we need a subsection called "C-LEVEL FACILITIES".
-%%     }
-%%   }
-
-%%   \subsection{UTILITIES}{
-%%     \itemize{
-%%       \item Likewise, "UTILITIES" is probably unnecessary.
-%%     }
-%%   }
-
-%%   \subsection{INSTALLATION}{
-%%     \itemize{
-%%       \item ... as is "INSTALLATION".
-%%     }
-%%   }
-
-%%   \subsection{PACKAGE INSTALLATION}{
-%%     \itemize{
-%%       \item ditto.
-%%     }
-%%   }
 }
 
 
