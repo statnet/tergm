@@ -1,54 +1,62 @@
 # Platform
 
-|field    |value                        |
-|:--------|:----------------------------|
-|version  |R version 4.0.5 (2021-03-31) |
-|os       |Debian GNU/Linux 10 (buster) |
-|system   |x86_64, linux-gnu            |
-|ui       |RStudio                      |
-|language |(EN)                         |
-|collate  |en_US.UTF-8                  |
-|ctype    |en_US.UTF-8                  |
-|tz       |America/Los_Angeles          |
-|date     |2021-04-25                   |
+|field    |value                         |
+|:--------|:-----------------------------|
+|version  |R version 4.2.0 (2022-04-22)  |
+|os       |Debian GNU/Linux bookworm/sid |
+|system   |x86_64, linux-gnu             |
+|ui       |X11                           |
+|language |en_AU:en                      |
+|collate  |en_AU.UTF-8                   |
+|ctype    |en_AU.UTF-8                   |
+|tz       |Australia/Sydney              |
+|date     |2022-06-22                    |
+|pandoc   |2.9.2.1 @ /usr/bin/pandoc     |
 
 # Dependencies
 
-|package        |old    |new          |Δ  |
-|:--------------|:------|:------------|:--|
-|tergm          |3.7.0  |4.0.0-2177   |*  |
-|cachem         |NA     |1.0.4        |*  |
-|cli            |NA     |2.4.0        |*  |
-|coda           |0.19-4 |0.19-4       |   |
-|crayon         |NA     |1.4.1        |*  |
-|DEoptimR       |1.0-8  |1.0-8        |   |
-|ergm           |3.11.0 |4.0-6214     |*  |
-|fansi          |NA     |0.4.2        |*  |
-|fastmap        |NA     |1.1.0        |*  |
-|glue           |NA     |1.4.2        |*  |
-|lifecycle      |NA     |1.0.0        |*  |
-|lpSolve        |5.6.15 |5.6.15       |   |
-|lpSolveAPI     |NA     |5.5.2.0-17.7 |*  |
-|magrittr       |NA     |2.0.1        |*  |
-|memoise        |NA     |2.0.0        |*  |
-|network        |1.16.1 |1.17.0-666   |*  |
-|networkDynamic |0.10.1 |0.10.2       |*  |
-|pillar         |NA     |1.6.0        |*  |
-|rlang          |NA     |0.4.10       |*  |
-|rle            |0.9.2  |0.9.2        |   |
-|robustbase     |0.93-7 |0.93-7       |   |
-|statnet.common |4.4.1  |4.5.0-341    |*  |
-|tibble         |NA     |3.1.1        |*  |
-|trust          |0.1-8  |0.1-8        |   |
-|utf8           |NA     |1.2.1        |*  |
-|vctrs          |NA     |0.3.7        |*  |
+|package        |old          |new          |Δ  |
+|:--------------|:------------|:------------|:--|
+|tergm          |4.0.2        |4.1.0        |*  |
+|cachem         |1.0.6        |1.0.6        |   |
+|cli            |3.3.0        |3.3.0        |   |
+|coda           |0.19-4       |0.19-4       |   |
+|crayon         |1.5.1        |1.5.1        |   |
+|DEoptimR       |1.0-11       |1.0-11       |   |
+|digest         |0.6.29       |0.6.29       |   |
+|ellipsis       |0.3.2        |0.3.2        |   |
+|ergm           |4.2.2        |4.2.2        |   |
+|evaluate       |0.15         |0.15         |   |
+|fansi          |1.0.3        |1.0.3        |   |
+|fastmap        |1.1.0        |1.1.0        |   |
+|glue           |1.6.2        |1.6.2        |   |
+|highr          |0.9          |0.9          |   |
+|knitr          |1.39         |1.39         |   |
+|lattice        |0.20-45      |0.20-45      |   |
+|lifecycle      |1.0.1        |1.0.1        |   |
+|lpSolveAPI     |5.5.2.0-17.7 |5.5.2.0-17.7 |   |
+|magrittr       |2.0.3        |2.0.3        |   |
+|MASS           |7.3-57       |7.3-57       |   |
+|Matrix         |1.4-1        |1.4-1        |   |
+|memoise        |2.0.1        |2.0.1        |   |
+|network        |1.17.2       |1.17.2       |   |
+|networkDynamic |0.11.2       |0.11.2       |   |
+|nlme           |3.1-158      |3.1-158      |   |
+|pillar         |1.7.0        |1.7.0        |   |
+|pkgconfig      |2.0.3        |2.0.3        |   |
+|purrr          |0.3.4        |0.3.4        |   |
+|rlang          |1.0.2        |1.0.2        |   |
+|rle            |0.9.2        |0.9.2        |   |
+|robustbase     |0.95-0       |0.95-0       |   |
+|statnet.common |4.6.0        |4.6.0        |   |
+|stringi        |1.7.6        |1.7.6        |   |
+|stringr        |1.4.0        |1.4.0        |   |
+|tibble         |3.1.7        |3.1.7        |   |
+|trust          |0.1-8        |0.1-8        |   |
+|utf8           |1.2.2        |1.2.2        |   |
+|vctrs          |0.4.1        |0.4.1        |   |
+|xfun           |0.31         |0.31         |   |
+|yaml           |2.3.5        |2.3.5        |   |
 
 # Revdeps
-
-## New problems (2)
-
-|package                            |version |error  |warning |note   |
-|:----------------------------------|:-------|:------|:-------|:------|
-|[EpiModel](problems.md#epimodel)   |2.0.3   |__+2__ |        |       |
-|[tergmLite](problems.md#tergmlite) |2.2.1   |__+1__ |__+1__  |__+1__ |
 
