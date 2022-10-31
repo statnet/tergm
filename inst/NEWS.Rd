@@ -61,6 +61,32 @@
   % }
 %% }
 
+\section{Changes in version 4.1.1}{
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item \code{networkDynamic} now handles dimnames more consistently.
+    }
+  }
+
+  \subsection{OTHER USER-VISIBLE CHANGES}{
+    \itemize{
+      \item Documentation improvements.
+    }
+  }
+
+  \subsection{DEPRECATED & DEFUNCT}{
+    \itemize{
+      \item \code{stergm()} and related facilities have been deprecated.
+
+      \item Some vestigial files have been removed.
+
+      \item Workaround storing \code{ergm::simulate_formula()} is no longer needed.
+    }
+  }
+}
+
+
+
 \section{Changes in version 4.1.0}{
   \subsection{NEW FEATURES}{
     \itemize{
