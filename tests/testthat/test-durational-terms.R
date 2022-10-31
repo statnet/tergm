@@ -686,7 +686,6 @@ test_that("durational terms behave correctly with summary and godfather", {
 
 
 test_that("edges.ageinterval behaves correctly inside a dissolution operator", {
-  local_edition(3)
   set.seed(0)
 
   logit <- function(p) log(p/(1-p))

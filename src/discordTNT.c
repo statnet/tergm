@@ -157,7 +157,26 @@ MH_F_FN(Mf_discordTNT) {
   UnsrtELDestroy(sto->discordantEdges);
 }
 
+#define OUTVAL_NET(e,n) ((n)->outedges[(e)].value)
+#define INVAL_NET(e,n) ((n)->inedges[(e)].value)
+#define MIN_OUTEDGE_NET(a,n) (EdgetreeMinimum((n)->outedges, (a)))
+#define MIN_INEDGE_NET(a,n) (EdgetreeMinimum((n)->inedges, (a)))
+#define NEXT_OUTEDGE_NET(e,n) (EdgetreeSuccessor((n)->outedges,(e)))
+#define NEXT_INEDGE_NET(e,n) (EdgetreeSuccessor((n)->inedges,(e)))
 
+#define EXEC_THROUGH_EDGES_EATH_NET_DECL(node, ego, alter, tail, head, edge, net, subroutine) { \
+  Vertex (ego) = (node); \
+  Vertex (alter), (tail), (head); \
+  Edge (edge); \
+  (tail) = (ego); \
+  for((edge) = MIN_OUTEDGE_NET((ego),(net)); ((head) = (alter) = OUTVAL_NET((edge),(net))) != 0; (edge) = NEXT_OUTEDGE_NET((edge),(net))) { \
+    subroutine \
+  } \
+  (head) = (ego); \
+  for((edge) = MIN_INEDGE_NET((ego),(net)); ((tail) = (alter) = INVAL_NET((edge),(net))) != 0; (edge) = NEXT_INEDGE_NET((edge),(net))) { \
+    subroutine \
+  } \
+}
 
 /********************
     MH_discordBDStratTNT
@@ -197,9 +216,9 @@ MH_I_FN(Mi_discordBDStratTNT) {
   sto->nodes = Calloc(2, Vertex);
   sto->maxl = Calloc(2, int);
   
-  sto->BDTDNE = Calloc(sto->static_sto->nmixtypes, HashEL *);
-  sto->discordantEdges = Calloc(sto->static_sto->nmixtypes, HashEL *);  
-  for(int i = 0; i < sto->static_sto->nmixtypes; i++) {
+  sto->BDTDNE = Calloc(sto->static_sto->strat_nmixtypes, HashEL *);
+  sto->discordantEdges = Calloc(sto->static_sto->strat_nmixtypes, HashEL *);  
+  for(int i = 0; i < sto->static_sto->strat_nmixtypes; i++) {
     sto->BDTDNE[i] = HashELInitialize(0, NULL, NULL, FALSE, DIRECTED);
     sto->discordantEdges[i] = HashELInitialize(0, NULL, NULL, FALSE, DIRECTED);
   }
@@ -214,7 +233,7 @@ MH_X_FN(Mx_discordBDStratTNT) {
   if(type == TICK) {
     GET_STORAGE(discordBDStratTNTStorage, sto);
 
-    for(int i = 0; i < sto->static_sto->nmixtypes; i++) {
+    for(int i = 0; i < sto->static_sto->strat_nmixtypes; i++) {
       // transfer discordantEdges to nonDiscordantEdges
       for(int j = 1; j <= sto->discordantEdges[i]->list->nedges; j++) {
         HashELInsert(sto->discordantEdges[i]->list->tails[j], sto->discordantEdges[i]->list->heads[j], sto->nonDiscordantEdges[i]);
@@ -296,10 +315,8 @@ MH_P_FN(MH_discordBDStratTNT) {
   sto->maxl[0] = sto->static_sto->tailmaxl;  
   sto->maxl[1] = sto->static_sto->headmaxl;  
 
-  BDStratBlocksSetLast(*Mtail, *Mhead, in_network, sto->static_sto->blocks);
-
   // compute proposed dyad count for current mixing type (only)
-  Dyad proposeddyadstype = BDStratBlocksDyadCountOnToggle(*Mtail, *Mhead, sto->static_sto->blocks, strat_i, in_network ? +1 : -1, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
+  Dyad proposeddyadstype = BDStratBlocksDyadCountOnToggle(*Mtail, *Mhead, sto->static_sto->blocks, strat_i, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
 
   ComputeChangesToToggleability(Mtail, Mhead, sto->static_sto);
   
@@ -335,7 +352,7 @@ MH_P_FN(MH_discordBDStratTNT) {
   }
 
   // calculate logratio
-  double prob_weight = sto->static_sto->currentcumprob/sto->static_sto->proposedcumprob;
+  double prob_weight = sto->static_sto->current_total_weight/sto->static_sto->proposed_total_weight;
   
   double forward_network = in_network ? (ndyadstype == 0 ? 1.0/nedgestype : 0.5/nedgestype + (sto->static_sto->tailmaxl || sto->static_sto->headmaxl ? 0.0 : 0.5/ndyadstype)) : (nedgestype == 0 ? 1.0/ndyadstype : 0.5/ndyadstype);
   
@@ -355,10 +372,10 @@ MH_U_FN(Mu_discordBDStratTNT) {
   GET_STORAGE(discordBDStratTNTStorage, sto);
 
   // if any strat mixing types have changed toggleability status, update prob info accordingly
-  if(sto->static_sto->nmixtypestoupdate > 0) {
-    sto->static_sto->currentcumprob = sto->static_sto->proposedcumprob;
-    for(int i = 0; i < sto->static_sto->nmixtypestoupdate; i++) {
-      WtPopSetWt(sto->static_sto->mixtypestoupdate[i], edgestate ? sto->static_sto->originalprobvec[sto->static_sto->mixtypestoupdate[i]] : 0, sto->static_sto->wtp);          
+  if(sto->static_sto->strat_nmixtypestoupdate > 0) {
+    sto->static_sto->current_total_weight = sto->static_sto->proposed_total_weight;
+    for(int i = 0; i < sto->static_sto->strat_nmixtypestoupdate; i++) {
+      WtPopSetWt(sto->static_sto->strat_mixtypestoupdate[i], edgestate ? sto->static_sto->original_weights[sto->static_sto->strat_mixtypestoupdate[i]] : 0, sto->static_sto->wtp);          
     }
   }
 
@@ -371,7 +388,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
     ToggleKnownEdge(tail, head, sto->combined_BDTDNE, !edgestate);      
   }
 
-  BDStratBlocksToggleIf(tail, head, sto->static_sto->blocks, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
+  BDNodeListsToggleIf(tail, head, sto->static_sto->lists, sto->static_sto->tailmaxl, sto->static_sto->headmaxl);
 
   int tailattr = sto->static_sto->bd_vattr[tail];
   int headattr = sto->static_sto->bd_vattr[head];
@@ -412,7 +429,7 @@ MH_U_FN(Mu_discordBDStratTNT) {
 MH_F_FN(Mf_discordBDStratTNT) {
   GET_STORAGE(discordBDStratTNTStorage, sto);
   // free things used only in the dynamic proposal
-  for(int i = 0; i < sto->static_sto->nmixtypes; i++) {
+  for(int i = 0; i < sto->static_sto->strat_nmixtypes; i++) {
     HashELDestroy(sto->BDTDNE[i]);
     HashELDestroy(sto->discordantEdges[i]);
   }

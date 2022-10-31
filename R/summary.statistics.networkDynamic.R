@@ -49,14 +49,10 @@ summary_formula.networkDynamic <- function(object, at,..., basis=NULL){
     stop( "summary_formula.networkDynamic requires an 'at' parameter specifying the time points at which to summarize the formula")
   }
   basis <- NVL(basis, ergm.getnetwork(object))
-  t(rbind(sapply(at,
-              function(t){
-                nw <- network.extract.with.lasttoggle(basis, t)
-                # make sure this is dispatched to the .network  and not .networkDynamic version
-                # of summary statistics to avoid recurisve calls
-                getS3method("summary_formula","network")(object, basis=nw, ...)
-              }
-          )
-      )
-  )
+  do.call(rbind, lapply(at, function(t) {
+                              nw <- network.extract.with.lasttoggle(basis, t)
+                              # make sure this is dispatched to the .network  and not .networkDynamic version
+                              # of summary statistics to avoid recurisve calls
+                              getS3method("summary_formula","network")(object, basis=nw, ...)
+                            }))
 }
