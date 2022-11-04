@@ -39,17 +39,6 @@ env:
   PRIVATE: ''
 
 jobs:
-## Remove-Old-Artifacts:
-##   runs-on: ubuntu-latest
-##   timeout-minutes: 10
-##
-##   steps:
-##   - name: Remove old artifacts
-##     uses: c-hive/gha-remove-artifacts@v1.2.0
-##     with:
-##       age: '1 month'
-##       skip-recent: 8
-
   Set-Matrix-Private:
     runs-on: ubuntu-latest
     outputs:
@@ -88,23 +77,22 @@ jobs:
           if [[ "${{ env.IAM }}" == 'public' ]] # Public: full set.
           then
             config='{"config":[
-            {"os":"windows-latest", "r":"release", "timeout":360, "flags":"binaries, strict, vignettes, remote"},
-            {"os":"macOS-latest", "r":"release", "timeout":360, "flags":"binaries, ubsan, strict, vignettes, remote"},
-            {"os":"ubuntu-20.04", "r":"release", "rspm":"https://packagemanager.rstudio.com/cran/__linux__/focal/latest", "timeout":360, "flags":"full, ubsan, debug, strict"},
-            {"os":"ubuntu-20.04", "r":"devel", "rspm":"https://packagemanager.rstudio.com/cran/__linux__/focal/latest", "timeout":360, "flags":"vignettes, remote, strict"},
-            {"os":"ubuntu-20.04", "r":"release", "rspm":"https://packagemanager.rstudio.com/cran/__linux__/focal/latest", "timeout":360, "flags":"full, covr"}]}'
+            {"os":"windows-latest", "r":"release", "timeout":360, "flags":"binaries strict vignettes remote"},
+            {"os":"macOS-latest", "r":"release", "timeout":360, "flags":"binaries, ubsan full debug strict"},
+            {"os":"ubuntu-latest", "r":"release", "timeout":360, "flags":"full, ubsan, debug"},
+            {"os":"ubuntu-latest", "r":"devel", "timeout":360, "flags":"vignettes remote strict"},
+            {"os":"ubuntu-latest", "r":"release", "timeout":360, "flags":"full covr"}]}'
           elif [[ "${{ env.FOUND_PUBLIC }}" != '0' ]] # Private with no public analogue: reduced set.
           then
             config='{"config":[
-            {"os":"ubuntu-20.04", "r":"release", "rspm":"https://packagemanager.rstudio.com/cran/__linux__/focal/latest", "timeout":10, "flags":"none"}
+            {"os":"ubuntu-latest", "r":"release", "timeout":10, "flags":"none"}
             ]}'
           else # Private with public analogue: no checking.
             config=''
           fi
-          config="${config//'%'/'%25'}"
-          config="${config//$'\n'/'%0A'}"
-          config="${config//$'\r'/'%0D'}"
-          echo "::set-output name=matrix::$config"
+          config="${config//$'\r'/' '}"
+          config="${config//$'\n'/' '}"
+          echo "matrix=$config" >> $GITHUB_OUTPUT
 
   R-CMD-check:
     needs: Set-Matrix-Private
@@ -122,7 +110,6 @@ jobs:
     env:
       HOMEBREW_NO_INSTALL_CLEANUP: 1
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
-      RSPM: ${{ matrix.config.rspm }}
 
     steps:
       - name: If available, use the Janitor's key rather than the repository-specific key.
@@ -136,60 +123,38 @@ jobs:
           fi
         shell: bash
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
         with:
+          use-public-rspm: true
           r-version: ${{ matrix.config.r }}
 
-      - name: Install GhostScript (on Linux if running vignettes)
+      - name: Install tidy (on Linux if running vignettes)
         if: runner.os == 'Linux' && contains(matrix.config.flags, 'vignettes')
         run: |
-          /usr/bin/sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ghostscript
+          /usr/bin/sudo DEBIAN_FRONTEND=noninteractive apt-get install -y tidy
         shell: bash
 
-      - uses: r-lib/actions/setup-pandoc@v1
+      - uses: r-lib/actions/setup-pandoc@v2
 
       - name: Install tinytex (system)
         if: contains(matrix.config.flags, 'vignettes')
-        uses: r-lib/actions/setup-tinytex@v1
+        uses: r-lib/actions/setup-tinytex@v2
 
-      - name: Query dependencies
-        run: |
-          install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
-        shell: Rscript {0}
-
-      - name: Cache R packages
-        if: runner.os != 'Windows'
-        uses: actions/cache@v2
+      - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
-
-      - name: Install system dependencies
-        if: runner.os == 'Linux'
-        run: |
-          while read -r cmd
-          do
-            eval sudo $cmd
-          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
-          sudo apt-get install -y libcurl4-openssl-dev
-
-      - name: Install dependencies
-        run: |
-          remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran("pkgbuild"); stopifnot(require("pkgbuild"))
-          remotes::install_cran("rcmdcheck"); stopifnot(require("rcmdcheck"))
-          remotes::install_cran("covr"); stopifnot(require("covr"))
-        shell: Rscript {0}
+          extra-packages: |
+            any::rcmdcheck
+            any::covr
+            any::V8
+          needs: |
+            check
+            coverage
 
       - name: Install tinytex (R)
         if: contains(matrix.config.flags, 'vignettes')
         run: |
-          remotes::install_cran("tinytex")
           tinytex:::install_yihui_pkgs()
           tinytex::tlmgr_install("makeindex")
         shell: Rscript {0}
@@ -203,7 +168,7 @@ jobs:
 
       - name: Upload build results
         if: contains(matrix.config.flags, 'binaries') && !failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-binaries
           path: binaries
@@ -239,18 +204,21 @@ jobs:
 
           error_on <- if(Sys.getenv("FAIL_ON_WARN") == "true") "warning" else "error"
 
+          extra_flags <- c()
+
           if(Sys.getenv("USE_UBSAN") == "true"){
-            Sys.setenv(PKG_LIBS=paste(Sys.getenv("PKG_LIBS"), "-fsanitize=undefined"),
-                       PKG_CFLAGS=paste(Sys.getenv("PKG_CFLAGS"), "-fsanitize=undefined"),
-                       PKG_CXXFLAGS=paste(Sys.getenv("PKG_CXXFLAGS"), "-fsanitize=undefined"),
-                       UBSAN_OPTIONS=paste(Sys.getenv("UBSAN_OPTIONS"), "print_stacktrace=1"))
+            extra_flags <- c(extra_flags, "-fsanitize=undefined")
+            Sys.setenv(UBSAN_OPTIONS=paste(Sys.getenv("UBSAN_OPTIONS"), "print_stacktrace=1"))
           }
 
-          if(Sys.getenv("SET_DEBUG") == "true"){
-            Sys.setenv(PKG_LIBS=paste(Sys.getenv("PKG_LIBS"), "-UNDEBUG -DDEBUG"),
-                       PKG_CXXFLAGS=paste(Sys.getenv("PKG_CXXFLAGS"), "-UNDEBUG -DDEBUG"),
-                       PKG_CFLAGS=paste(Sys.getenv("PKG_CFLAGS"), "-UNDEBUG -DDEBUG"))
-          }
+          if(Sys.getenv("SET_DEBUG") == "true") extra_flags <- c(extra_flags, "-UNDEBUG", "-DDEBUG")
+
+          # Before R 4.3.0, R itself was not compliant.
+          if(getRversion() >= "4.3") extra_flags <- c(extra_flags, "-Wstrict-prototypes")
+
+          Sys.setenv(PKG_LIBS=paste(c(Sys.getenv("PKG_LIBS"), extra_flags), collapse=" "),
+                     PKG_CXXFLAGS=paste(c(Sys.getenv("PKG_CXXFLAGS"), extra_flags), collapse=" "),
+                     PKG_CFLAGS=paste(c(Sys.getenv("PKG_CFLAGS"), extra_flags), collapse=" "))
 
           rcmdcheck::rcmdcheck(args = check_args, build_args = build_args, error_on = error_on, check_dir = "check")
         shell: Rscript {0}
@@ -274,17 +242,12 @@ jobs:
         
       - name: Upload check results
         if: contains(matrix.config.flags, 'covr') == false && failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-results
           path: |
             check
             !check/*/00_pkg_src
-
-      - name: Preinstall package to work around an issue in covr # can be removed after covr update
-        if: contains(matrix.config.flags, 'covr')
-        run: R CMD INSTALL .
-        shell: bash
 
       - name: Test coverage
         if: contains(matrix.config.flags, 'covr')
