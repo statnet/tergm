@@ -48,3 +48,4 @@ Roxygen: list(markdown = TRUE)
 Config/testthat/parallel: true
 Config/testthat/edition: 3
 Encoding: UTF-8
+Remotes: github::statnet/ergm@4.3
