@@ -351,26 +351,12 @@ InitErgmTerm.edgecov.mean.age<-function(nw, arglist, ...) {
                       varnames = c("x", "attrname", "emptyval", "log"),
                       vartypes = c("matrix,network,character", "character", "numeric", "logical"),
                       defaultvalues = list(NULL, NULL, 0, FALSE),
-                      required = c(TRUE, FALSE, FALSE, FALSE))
-  
-  ### Check the network and arguments to make sure they are appropriate.
-  ### Process the arguments
-  if(is.network(a$x))
-    xm<-as.matrix(a$x,matrix.type="adjacency",a$attrname)
-  else if(is.character(a$x))
-    xm<-get.network.attribute(nw,a$x)
-  else
-    xm<-as.matrix(a$x)
-  
-  ### Construct the list to return
-  if(!is.null(a$attrname)) {
-    # Note: the sys.call business grabs the name of the x object from the 
-    # user's call.  Not elegant, but it works as long as the user doesn't
-    # pass anything complicated.
-    cn<-paste("mean",if(a$log) ".log" else "", ".age", as.character(a$attrname), sep = ".")
-  } else {
-    cn<-paste("mean",if(a$log) ".log" else "", ".age", as.character(sys.call(0)[[3]][2]), sep = ".")
-  }
+                      required = c(TRUE, FALSE, FALSE, FALSE),
+                      argexpr = substitute(arglist))
+
+  l <- ergm_edgecov_args("", nw, a); xm <- l$xm; cn <- l$cn
+  cn <- paste0("mean", if(a$log) ".log" else "", ".age", cn)
+
   inputs <- c(a$emptyval, if(a$log) 1 else 0, NCOL(xm), as.double(xm))
   attr(inputs, "ParamsBeforeCov") <- 3
   list(name="edgecov_mean_age", coef.names = cn, inputs = inputs, duration=TRUE, dependence=FALSE, emptynwstats = a$emptyval, auxiliaries = ~.lasttoggle)
@@ -403,26 +389,11 @@ InitErgmTerm.edgecov.ages<-function(nw, arglist, ...) {
                       varnames = c("x", "attrname"),
                       vartypes = c("matrix,network,character", "character"),
                       defaultvalues = list(NULL, NULL),
-                      required = c(TRUE, FALSE))
-  
-  ### Check the network and arguments to make sure they are appropriate.
-  ### Process the arguments
-  if(is.network(a$x))
-    xm<-as.matrix(a$x,matrix.type="adjacency",a$attrname)
-  else if(is.character(a$x))
-    xm<-get.network.attribute(nw,a$x)
-  else
-    xm<-as.matrix(a$x)
-  
-  ### Construct the list to return
-  if(!is.null(a$attrname)) {
-    # Note: the sys.call business grabs the name of the x object from the 
-    # user's call.  Not elegant, but it works as long as the user doesn't
-    # pass anything complicated.
-    cn<-paste("edgecov.ages", as.character(a$attrname), sep = ".")
-  } else {
-    cn<-paste("edgecov.ages", as.character(sys.call(0)[[3]][2]), sep = ".")
-  }
+                      required = c(TRUE, FALSE),
+                      argexpr = substitute(arglist))
+
+  l <- ergm_edgecov_args("edgecov.ages", nw, a); xm <- l$xm; cn <- l$cn
+
   inputs <- c(NCOL(xm), as.double(xm))
   attr(inputs, "ParamsBeforeCov") <- 1
   list(name="edgecov_ages", coef.names = cn, inputs = inputs, duration=TRUE, dependence=FALSE, auxiliaries = ~.lasttoggle)
