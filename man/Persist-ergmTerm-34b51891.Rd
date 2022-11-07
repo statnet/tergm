@@ -27,6 +27,8 @@ signs of the coefficients are negated.
 }
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "Persist", "subsection")}
 }
 \concept{durational}
 \concept{operator}

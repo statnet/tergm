@@ -37,5 +37,7 @@ value of the attribute.
 }
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "degree.mean.age", "subsection")}
 }
 \concept{durational}

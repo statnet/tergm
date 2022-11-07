@@ -24,6 +24,8 @@ coefficient for \code{Diss()} operator means more dissolution.
 }
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "Diss", "subsection")}
 }
 \concept{durational}
 \concept{operator}

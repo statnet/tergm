@@ -22,5 +22,7 @@ is to get an intended average duration.
 }
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "edge.ages", "subsection")}
 }
 \concept{durational}

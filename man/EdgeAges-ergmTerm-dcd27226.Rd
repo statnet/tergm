@@ -21,6 +21,8 @@ the tie under the given model formula.
 }
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "EdgeAges", "subsection")}
 }
 \concept{durational}
 \concept{operator}

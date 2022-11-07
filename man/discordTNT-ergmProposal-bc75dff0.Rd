@@ -16,4 +16,9 @@ defaults to \code{0.5}.
 \if{text}{\Sexpr[results=rd,stage=render]{ergm:::.formatProposalsText(ergm:::.buildProposalsList(proposal="discordTNT"))}}
 \if{latex}{\Sexpr[results=rd,stage=render]{ergm:::.formatProposalsLatex(ergm:::.buildProposalsList(proposal="discordTNT"))}}
 }
+\seealso{
+\code{\link{ergmProposal}} for index of proposals currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmProposal", "discordTNT", "subsection")}
+}
 \keyword{internal}

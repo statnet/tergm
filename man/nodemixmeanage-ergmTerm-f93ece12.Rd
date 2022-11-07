@@ -9,7 +9,7 @@
 #                          levels2=NULL, emptyval=0, log=FALSE)
 }
 \arguments{
-\item{attr}{quantitative attribute (see Specifying Vertex attributes and Levels (\code{?nodal_attributes}) for details.)}
+\item{attr}{a vertex attribute specification (see Specifying Vertex attributes and Levels (\code{?nodal_attributes}) for details.)}
 
 \item{b1levels, b2levels, levels, level2}{control what statistics are included in the model and the order in which they appear. \code{levels2} apply to all networks; \code{levels} applies to unipartite networks; \code{b1levels} and \code{b2levels} apply to bipartite networks (see Specifying Vertex attributes and Levels (\code{?nodal_attributes}) for details)}
 
@@ -33,5 +33,7 @@ of the amount of time elapsed since formation.
 }
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "nodemix.mean.age", "subsection")}
 }
 \concept{durational}

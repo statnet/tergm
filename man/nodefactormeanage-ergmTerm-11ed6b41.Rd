@@ -8,7 +8,7 @@
 # binary: nodefactor.mean.age(attr, levels=NULL, emptyval=0, log=FALSE)
 }
 \arguments{
-\item{attr}{quantitative attribute (see Specifying Vertex attributes and Levels (\code{?nodal_attributes}) for details.)}
+\item{attr}{a vertex attribute specification (see Specifying Vertex attributes and Levels (\code{?nodal_attributes}) for details.)}
 
 \item{levels}{controls what levels are included. Note that the default
 \code{levels} value for \code{nodefactor.mean.age} retains all levels, unlike the default
@@ -34,5 +34,7 @@ of the amount of time elapsed since formation.
 }
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "nodefactor.mean.age", "subsection")}
 }
 \concept{durational}

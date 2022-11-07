@@ -14,4 +14,9 @@ proposals stratified both by discordance status and edge status.  The argument
 \if{text}{\Sexpr[results=rd,stage=render]{ergm:::.formatProposalsText(ergm:::.buildProposalsList(proposal="staticDiscordTNT"))}}
 \if{latex}{\Sexpr[results=rd,stage=render]{ergm:::.formatProposalsLatex(ergm:::.buildProposalsList(proposal="staticDiscordTNT"))}}
 }
+\seealso{
+\code{\link{ergmProposal}} for index of proposals currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmProposal", "staticDiscordTNT", "subsection")}
+}
 \keyword{internal}

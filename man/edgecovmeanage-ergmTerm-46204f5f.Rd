@@ -8,12 +8,13 @@
 # binary: edgecov.mean.age(x, attrname=NULL, emptyval=0)
 }
 \arguments{
-\item{x, attrname}{either a square matrix of covariates, one for each possible
-edge in the network, the name of a network attribute of covariates,
-or a network; if the latter, optional argument \code{attrname} provides
-the name of the quantitative edge attribute to use for covariate values
-(in this case, missing edges in \code{x} are assigned a covariate value
-of zero).}
+\item{x, attrname}{either a square matrix of covariates, one for
+each possible edge in the network, the name of a network
+attribute of covariates, or a network; if the latter, or if the
+network attribute named by \code{x} is itself a network, optional
+argument \code{attrname} provides the name of the quantitative edge
+attribute to use for covariate values (in this case, missing
+edges in \code{x} are assigned a covariate value of zero).}
 
 \item{emptyval}{can be used to specify the value returned if the network is empty (or all extant edges have been weighted 0). This is, technically, an arbitrary value, but it should
 not have a substantial effect unless a non-negligible fraction of
@@ -32,5 +33,7 @@ The behavior when there are negative weights is undefined.
 }
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "edgecov.mean.age", "subsection")}
 }
 \concept{durational}
