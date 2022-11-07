@@ -71,6 +71,8 @@
   \subsection{OTHER USER-VISIBLE CHANGES}{
     \itemize{
       \item Documentation improvements.
+
+      \item Terms \code{\link[=edgecov.mean.age-ergmTerm]{edgecov.mean.age}()} and \code{\link[=edgecov.ages-ergmTerm]{edgecov.ages}()} now handle their arguments more consistently with \code{\link[ergm:edgecov-ergmTerm]{edgecov}()} and stop with error if the network does not have the specified attribute.
     }
   }
 
