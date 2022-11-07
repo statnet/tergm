@@ -43,7 +43,7 @@ attribute into which to store the name of the network to which
 that vertex originally belonged.}
 
 \item{detect.edgecov}{if \code{TRUE}, combine network attributes that
-look like dyadic covariate (\code{\link[ergm:edgecov-ergmTerm]{ergm::edgecov}}) matrices into a
+look like dyadic covariate (\code{\link[ergm:edgecov-ergmTerm-1fb5ef19]{ergm::edgecov}}) matrices into a
 block-diagonal matrix.}
 
 \item{keep.unshared.attr}{whether to keep those network, vertex,
@@ -101,21 +101,21 @@ Given a list of compatible networks, the \code{\link[=combine_networks]{combine_
 block-diagonal network, preserving attributes that can be
 preserved.
 }
-\section{Methods (by generic)}{
+\section{Functions}{
 \itemize{
-\item \code{print}: A wrapper around
+\item \code{print(combined_networks)}: A wrapper around
 \code{\link[network:network]{network::print.network()}} to print constituent network
 information and omit some internal variables.
 
-\item \code{summary}: A wrapper around
+\item \code{summary(combined_networks)}: A wrapper around
 \code{\link[network:network]{network::summary.network()}} to print constituent network
 information and omit some internal variables.
 
-\item \code{print}: A wrapper around
+\item \code{print(summary.combined_networks)}: A wrapper around
 \code{\link[network:network]{network::print.summary.network()}} to print constituent network
 information and omit some internal variables.
-}}
 
+}}
 \examples{
 
 data(samplk)

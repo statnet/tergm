@@ -38,9 +38,9 @@ convention.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{ergm_model}: Test if the \code{\link{ergm_model}} has duration-dependent terms, which call for \code{\link{lasttoggle}} data structures.
+\item \code{is.durational(ergm_model)}: Test if the \code{\link{ergm_model}} has duration-dependent terms, which call for \code{\link{lasttoggle}} data structures.
 
-\item \code{ergm_state}: Test if the \code{\link{ergm_state}} has duration-dependent terms, which call for \code{\link{lasttoggle}} data structures.
+\item \code{is.durational(ergm_state)}: Test if the \code{\link{ergm_state}} has duration-dependent terms, which call for \code{\link{lasttoggle}} data structures.
+
 }}
-
 \keyword{model}
