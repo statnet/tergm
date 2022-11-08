@@ -78,6 +78,7 @@ jobs:
           then
             config='{"config":[
             {"os":"windows-latest", "r":"release", "timeout":360, "flags":"binaries strict vignettes remote"},
+            {"os":"windows-latest", "r":"devel", "timeout":360, "flags":"binaries strict vignettes remote"},
             {"os":"macOS-latest", "r":"release", "timeout":360, "flags":"binaries, ubsan full debug strict"},
             {"os":"ubuntu-latest", "r":"release", "timeout":360, "flags":"full, ubsan, debug"},
             {"os":"ubuntu-latest", "r":"devel", "timeout":360, "flags":"vignettes remote strict"},
