@@ -21,6 +21,8 @@ network. It is mainly useful for CMLE estimation, and has no effect (i.e.,
 }
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "Cross", "subsection")}
 }
 \concept{durational}
 \concept{operator}

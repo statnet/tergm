@@ -20,6 +20,8 @@ by taking the dyads that have changed between time steps.
 }
 \seealso{
 \code{\link{ergmTerm}} for index of model terms currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "Change", "subsection")}
 }
 \concept{durational}
 \concept{operator}

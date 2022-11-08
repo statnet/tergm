@@ -1,4 +1,4 @@
-#  File man-roxygen/ergmTerm-attr.R in package tergm, part of the
+#  File man-roxygen/ergmReference-rdname.R in package tergm, part of the
 #  Statnet suite of packages for network analysis, https://statnet.org .
 #
 #  This software is distributed under the GPL-3 license.  It is free,
@@ -7,4 +7,5 @@
 #
 #  Copyright 2008-2022 Statnet Commons
 ################################################################################
-#' @param attr a vertex attribute specification (see Specifying Vertex attributes and Levels (`?nodal_attributes`) for details.)
+#' <% name <- if(startsWith(name, "'")) substr(name, 2, 1000) else name %>
+#' @rdname <%= ergm:::.term.rdname("ergmReference", name) %>

@@ -15,5 +15,7 @@ dynamic fitting and simulation.
 }
 \seealso{
 \code{\link{ergmHint}} for index of constraints and hints currently visible to the package.
+
+\Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmHint", "discord", "subsection")}
 }
 \concept{dyad-independent}

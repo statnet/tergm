@@ -123,9 +123,10 @@ test_that("durational terms behave correctly with summary and godfather", {
     } else {
       nw0 <- network.initialize(netsize,dir=TRUE)  
     }
-    
+
     nw0 %v% attrname <- attr
     nw0 %v% "mean_age_attr" <- mean_age_attr
+    nw0 %n% "edgewts" <- replace(wts, TRUE, 0) # A 0 matrix with the same dimensions.
     
     ages_from = c(1, 1, 4, 2, 5, 10, 1, 5)
     ages_to = c(2, 3, 15, 5, 7, 12, Inf, Inf) 
