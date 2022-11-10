@@ -308,7 +308,7 @@ control.tergm<-function(init=NULL,
 
                          CMLE.MCMC.burnin = 1024*16,
                          CMLE.MCMC.interval = 1024,
-                         CMLE.ergm=control.ergm(init=init, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop=MCMC.prop, MCMC.prop.weights=MCMC.prop.weights, MCMC.prop.args=MCMC.prop.args, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main),
+                         CMLE.ergm=control.ergm(init=init, MCMC.burnin=CMLE.MCMC.burnin, MCMC.interval=CMLE.MCMC.interval, MCMC.prop=MCMC.prop, MCMC.prop.weights=MCMC.prop.weights, MCMC.prop.args=MCMC.prop.args, MCMC.maxedges=MCMC.maxedges, MCMC.packagenames=MCMC.packagenames, parallel=parallel, parallel.type=parallel.type, parallel.version.check=parallel.version.check, force.main=force.main, term.options=term.options),
 
                          CMLE.NA.impute=c(),
                          CMLE.term.check.override=FALSE,

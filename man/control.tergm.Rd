@@ -20,7 +20,8 @@ control.tergm(
     CMLE.MCMC.interval, MCMC.prop = MCMC.prop, MCMC.prop.weights = MCMC.prop.weights,
     MCMC.prop.args = MCMC.prop.args, MCMC.maxedges = MCMC.maxedges, MCMC.packagenames =
     MCMC.packagenames, parallel = parallel, parallel.type = parallel.type,
-    parallel.version.check = parallel.version.check, force.main = force.main),
+    parallel.version.check = parallel.version.check, force.main = force.main,
+    term.options = term.options),
   CMLE.NA.impute = c(),
   CMLE.term.check.override = FALSE,
   EGMME.main.method = c("Gradient-Descent"),
