@@ -108,8 +108,8 @@
 #' @param basis For the \code{network} and \code{networkDynamic} methods,
 #'   the network to start the simulation from.  (If \code{basis} is missing,
 #'   the default is the left hand side of the \code{object} argument.)
-#' @param dynamic Logical; if \code{TRUE}, dynamic simulation is performed in
-#'   \code{tergm}; if \code{FALSE} (the default), ordinary \code{ergm}
+#' @param dynamic Logical; if \code{TRUE} (default for [tergm()] and [stergm()] output), dynamic simulation is performed in
+#'   \code{tergm}; if \code{FALSE} (the default for the [`formula`] method), ordinary \code{ergm}
 #'   simulation is performed instead.  Note that when \code{dynamic=FALSE},
 #'   default argument values for \code{ergm}'s \code{simulate} methods
 #'   are used.
@@ -216,7 +216,14 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
                           output=c("networkDynamic", "stats", "changes", "final", "ergm_state"),
                           nw.start = NULL,
                           stats = FALSE,
-                          verbose=FALSE, ...){
+                         verbose=FALSE, ..., dynamic=TRUE){
+
+  # If dynamic=FALSE, fall back to simulate.ergm().
+  if(!dynamic){
+    if(is(object, "tergm_EGMME")) stop("Non-dynamic simulation based on TERGM EGMME is not supported at this time.")
+    return(NextMethod())
+  }
+
   if(is(control, "control.simulate.stergm") || is(control, "control.simulate.network")) {
     control$MCMC.prop <- control$MCMC.prop.form
     control$MCMC.prop.weights <- control$MCMC.prop.weights.form
@@ -244,7 +251,7 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
 
   nw <- object$network
   if(is.null(nw.start)){
-    if(is(object, "tergm_CMLE")) stop('Simulating from TERGM CMLE fit requires the starting network to be specified in the nw.start argument: "first", "last", a numeric index of the network in the series (with "first"==1), or a network (NOT networkDynamic at this time).')
+    if(is(object, "tergm_CMLE")) stop('Simulating from TERGM CMLE fit in dynamic mode requires the starting network to be specified in the nw.start argument: "first", "last", a numeric index of the network in the series (with "first"==1), or a network (NOT networkDynamic at this time). To use "static" ERGM simulation, set dynamic=FALSE.')
     nw.start <- nw
   }else if(is.numeric(nw.start)){
     nwl <- uncombine_network(nw)
