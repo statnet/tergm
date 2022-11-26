@@ -111,6 +111,28 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
                list(emptynwstats=NULL)))
 }
 
+### TODO: Export this from ergm then remove from tergm.
+ergm_rename_terms <- function(model, namewrap){
+  for(i in seq_along(model$terms)){
+    model$terms[[i]]$coef.names <- namewrap(model$terms[[i]]$coef.names)
+    if(!is.null(model$terms[[i]]$params)) names(model$terms[[i]]$params) <- namewrap(names(model$terms[[i]]$params))
+  }
+  model
+}
+
+`InitErgmTerm.Cross (dynamic)` <- function(nw, arglist,  ...) {
+  stopifnot_dynamic(nw, .netseries.OK=TRUE, ...)
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = c("formula"),
+                      vartypes = c("formula"),
+                      defaultvalues = list(NULL),
+                      required = c(TRUE))
+
+  ergm_model(a$formula, nw, ..., terms.only=TRUE) %>%
+    ergm_rename_terms(function(x) paste0("Cross~", x))
+}
+
+
 #' @templateVar name Diss
 #' @title The Dissolution Operator Term
 #' @description The Dissolution Operator Term

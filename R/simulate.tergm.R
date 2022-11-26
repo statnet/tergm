@@ -246,21 +246,20 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
   if(is.null(nw.start)){
     if(is(object, "tergm_CMLE")) stop('Simulating from TERGM CMLE fit requires the starting network to be specified in the nw.start argument: "first", "last", a numeric index of the network in the series (with "first"==1), or a network (NOT networkDynamic at this time).')
     nw.start <- nw
-  }else if(is.numeric(nw.start)){
-    nwl <- uncombine_network(nw)
-    if(nw.start == 1) nw.start <- (nwl[[1]] %n% ".PrevNets")[[1]]
-    else nw.start <- nwl[[nw.start - 1]]
-    if(!is.network(nw.start)) stop("Invalid starting network specification.")
-  }else if(is.character(nw.start)){
-    nwl <- uncombine_network(nw)
-    nw.start <- switch(nw.start,
-                       first = (nwl[[1]] %n% ".PrevNets")[[1]],
-                       last = nwl[[length(nwl)]],
-                       stop("Invalid starting network specification."))
-    if(!is.network(nw.start)) stop("Invalid starting network specification.")                   
   }else if(is.networkDynamic(nw.start)){
     stop("Using a networkDynamic to start a simulation from a TERGM is not supported at this time.")
+  }else if(is.numeric(nw.start) || is.character(nw.start)){
+    if(is.character(nw.start))
+      nw.start <- switch(nw.start,
+                         first = 1L,
+                         last = length((nw %n% ".subnetattr")$n) + 1L,
+                         stop("Invalid starting network specification."))
+
+    nw.start <- if(nw.start == 1) (uncombine_network(nw,use.subnet.cache=TRUE)[[1]] %n% ".PrevNets")[[1]]
+                else uncombine_network(nw)[[nw.start-1]]
   }
+
+  if(!is.network(nw.start)) stop("Invalid starting network specification.")
 
   simulate_formula.network(object=object$formula, basis=nw.start,nsim=nsim,coef=coef, constraints=constraints, monitor=monitor, time.start=time.start, time.slices=time.slices, time.burnin=time.burnin, time.interval=time.interval,control=control, output=match.arg(output), stats=stats, verbose=verbose, dynamic=TRUE, ...)
 }
