@@ -195,11 +195,11 @@ test_that("simulate.network behaves reasonably", {
   new_stats <- simulate(new_nw6 ~ Form(~edges + concurrent) + Persist(~edges), coef = c(-3, 0.5, 1), output = "stats", time.slices = 10, stats = TRUE, monitor = ~triangle + degree(1), dynamic = TRUE)
   
   ## test for equality (attributes will differ)
-  expect_equal(old_nw1, new_nw1, check.attributes = FALSE)
-  expect_equal(old_nw2, new_nw2, check.attributes = FALSE)
-  expect_equal(old_nw4, new_nw4, check.attributes = FALSE)
-  expect_equal(old_nw5, new_nw5, check.attributes = FALSE)
-  expect_equal(old_nw6, new_nw6, check.attributes = FALSE)
+  expect_equal(old_nw1, new_nw1, ignore_attr = TRUE)
+  expect_equal(old_nw2, new_nw2, ignore_attr = TRUE)
+  expect_equal(old_nw4, new_nw4, ignore_attr = TRUE)
+  expect_equal(old_nw5, new_nw5, ignore_attr = TRUE)
+  expect_equal(old_nw6, new_nw6, ignore_attr = TRUE)
 
   expect_identical(attr(old_stats_nw, "stats"), attr(new_stats_nw, "stats"))
   expect_identical(attr(old_stats_nw, "stats.gen"), attr(new_stats_nw, "stats.gen"))
@@ -250,13 +250,13 @@ test_that("simulate.networkDynamic behaves reasonably", {
   new_nwD_constr2 <- simulate(new_nwD_constr ~ Form(~edges + concurrent) + Persist(~edges), constraints = ~bd(maxout=1), time.slices = 10, dynamic = TRUE)
 
   ## test for equality (attributes will differ)
-  expect_equal(old_nwD1, new_nwD1, check.attributes = FALSE)
-  expect_equal(old_nwD2, new_nwD2, check.attributes = FALSE)
-  expect_equal(old_nwD4, new_nwD4, check.attributes = FALSE)
-  expect_equal(old_nwD5, new_nwD5, check.attributes = FALSE)
-  expect_equal(old_nwD6, new_nwD6, check.attributes = FALSE)
-  expect_equal(old_nwD7, new_nwD7, check.attributes = FALSE)
-  expect_equal(old_nwD8, new_nwD8, check.attributes = FALSE)
+  expect_equal(old_nwD1, new_nwD1, ignore_attr = TRUE)
+  expect_equal(old_nwD2, new_nwD2, ignore_attr = TRUE)
+  expect_equal(old_nwD4, new_nwD4, ignore_attr = TRUE)
+  expect_equal(old_nwD5, new_nwD5, ignore_attr = TRUE)
+  expect_equal(old_nwD6, new_nwD6, ignore_attr = TRUE)
+  expect_equal(old_nwD7, new_nwD7, ignore_attr = TRUE)
+  expect_equal(old_nwD8, new_nwD8, ignore_attr = TRUE)
 
   expect_true(!is.null(attr(old_nwD8, "stats")))
   expect_true(!is.null(attr(new_nwD8, "stats")))
@@ -271,8 +271,8 @@ test_that("simulate.networkDynamic behaves reasonably", {
   expect_equal(old_stats$stats.gen, new_stats$stats.gen)
   expect_equal(cbind(old_stats$stats.form, old_stats$stats.diss), as.matrix(new_stats$stats.gen))
 
-  expect_equal(old_nwD_constr, new_nwD_constr, check.attributes = FALSE)
-  expect_equal(old_nwD_constr2, new_nwD_constr2, check.attributes = FALSE)
+  expect_equal(old_nwD_constr, new_nwD_constr, ignore_attr = TRUE)
+  expect_equal(old_nwD_constr2, new_nwD_constr2, ignore_attr = TRUE)
 
   expect_true(summary(network.collapse(old_nwD_constr, at = 10) ~ edges) > 0)
   expect_true(summary(network.collapse(old_nwD_constr2, at = 20) ~ edges) > 0)
