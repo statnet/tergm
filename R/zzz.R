@@ -46,6 +46,7 @@ eval(UPDATE_MY_SCTRL_EXPR)
   ergm_proposal_table("c", "Bernoulli", "|.dyads&sparse&discord|bd",  1, "discordTNT", "staticDiscordTNT")
   ergm_proposal_table("t", "Bernoulli", "|discord&sparse",  1, "discordTNT", "discordTNT")
   ergm_proposal_table("t", "Bernoulli", "|bdmax|blocks|strat|discord&sparse",  0, "discordBDStratTNT", "discordBDStratTNT")
+  ergm_proposal_table("c", "Bernoulli", "&maxedges&sparse",  0, "maxTNT", "maxTNT")
 }
 
 .RegisterKeywords <- function() {
