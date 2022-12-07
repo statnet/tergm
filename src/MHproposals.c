@@ -1,4 +1,9 @@
 
+#include "ergm_MHproposal.h"
+#include "ergm_changestat.h"
+#include "ergm_MHstorage.h"
+#include "ergm_Rutil.h"
+
 /********************
     MH_maxTNT
 ********************/
