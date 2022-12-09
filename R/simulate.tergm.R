@@ -249,14 +249,16 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
   }else if(is.networkDynamic(nw.start)){
     stop("Using a networkDynamic to start a simulation from a TERGM is not supported at this time.")
   }else if(is.numeric(nw.start) || is.character(nw.start)){
+    nw.t <- length((nw %n% ".subnetattr")$.TimeID$n) + 1L
     if(is.character(nw.start))
       nw.start <- switch(nw.start,
                          first = 1L,
-                         last = length((nw %n% ".subnetattr")$n) + 1L,
+                         last = nw.t,
                          stop("Invalid starting network specification."))
 
-    nw.start <- if(nw.start == 1) (uncombine_network(nw,use.subnet.cache=TRUE)[[1]] %n% ".PrevNets")[[1]]
-                else uncombine_network(nw)[[nw.start-1]]
+    nw.start <- if(nw.start < nw.t) (nw%n%".subnetattr")$.TimeID$.PrevNets[[nw.start]][[1]]
+      else if(nw.start == nw.t) uncombine_network(nw,use.subnet.cache=FALSE)[[nw.t-1]]
+      else stop("Invalid starting network specification: starting index exceeds the length of the network series.")
   }
 
   if(!is.network(nw.start)) stop("Invalid starting network specification.")
