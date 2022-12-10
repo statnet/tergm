@@ -16,9 +16,9 @@ join_nets <- function(nwl, blockID, blockName){
   if(!.same_constraints(nwl, "constraints")) stop("Networks have differing constraint structures. This is not supported at this time.")
   if(!.same_constraints(nwl, "obs.constraints")) stop("Networks have differing observation processes. This is not supported at this time.")
 
-  nw <- ergm.multi::combine_networks(nwl, blockID.vattr=blockID, blockName.vattr=blockName, ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints", "ergm"), subnet.cache=TRUE)
+  nw <- combine_networks(nwl, blockID.vattr=blockID, blockName.vattr=blockName, ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints", "ergm"), subnet.cache=TRUE)
 
-  nw %n% "ergm" <- .combine_ergmlhs(nwl)
+  nw %n% "ergm" <- combine_ergmlhs(nwl)
 
   nw %ergmlhs% "constraints" <-
       if(NVL(nwl[[1]] %ergmlhs% "constraints",base_env(~.))==base_env(~.))
