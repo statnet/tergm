@@ -286,6 +286,7 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
 
     mc <- match.call()
     mc[[1]] <- ergm::.simulate_formula.network
+    mc$dynamic <- NULL
     return(eval.parent(mc))
   }
 
@@ -485,6 +486,7 @@ simulate_formula.networkDynamic <- function(object, nsim=1, seed=NULL,
 
     mc <- match.call()
     mc[[1]] <- ergm::.simulate_formula.network
+    mc$dynamic <- NULL
     return(eval.parent(mc))
   }
 
