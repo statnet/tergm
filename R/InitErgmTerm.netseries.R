@@ -114,6 +114,7 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
     nwl[[t]] %n% ".PrevNets" <- list(nwl0[[t-1]])
     nwl[[t]] %n% ".TimeID" <- t
     nwl[[t]] %n% ".Time" <- times[t]
+    nwl[[t]] %n% ".TimeDelta" <- times[t] - times[t-1]
     nwl[[t]]
   })
 
@@ -153,6 +154,10 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
                 env=env, nw=nw, ...)
 }
 
+#' @templateVar name Form
+#' @template ergmTerm-rdname
+#' @usage NULL
+#' @template ergmTerm-N-arguments
 InitErgmTerm.Form <- function(nw, arglist,  ...){
   if(!is(nw, "tergm_NetSeries")) `InitErgmTerm.Form (dynamic)`(nw = nw, arglist = arglist, ...)
   else .call_N("Form", nw, arglist, ...)
@@ -178,6 +183,10 @@ InitErgmTerm.Form1 <- function(nw, arglist,  ...){
     )
 }
 
+#' @templateVar name Persist
+#' @template ergmTerm-rdname
+#' @usage NULL
+#' @template ergmTerm-N-arguments
 InitErgmTerm.Persist <- function(nw, arglist,  ...) {
   if(!is(nw, "tergm_NetSeries")) `InitErgmTerm.Persist (dynamic)`(nw = nw, arglist = arglist,...)
   else .call_N("Persist", nw, arglist, ...)
@@ -200,6 +209,10 @@ InitErgmTerm.Persist1 <- function(nw, arglist,  ...){
     wrap.ergm_model(m, nw, identity))
 }
 
+#' @templateVar name Diss
+#' @template ergmTerm-rdname
+#' @usage NULL
+#' @template ergmTerm-N-arguments
 InitErgmTerm.Diss <- function(nw, arglist,  ..., env=baseenv()) {
   if(!is(nw, "tergm_NetSeries")) `InitErgmTerm.Diss (dynamic)`(nw = nw, arglist = arglist, ...)
   else{
@@ -221,6 +234,10 @@ InitErgmTerm.Diss1 <- function(nw, arglist,  ..., env){
 }
 
 
+#' @templateVar name Change
+#' @template ergmTerm-rdname
+#' @usage NULL
+#' @template ergmTerm-N-arguments
 InitErgmTerm.Change <- function(nw, arglist,  ...) {
   if(!is(nw, "tergm_NetSeries")) `InitErgmTerm.Change (dynamic)`(nw = nw, arglist = arglist, ...)
   else .call_N("Change", nw, arglist, ...)
@@ -256,8 +273,9 @@ InitErgmTerm.Change1 <- function(nw, arglist,  ...){
 #'   `Cross(~TERM) == ~TERM` ) for EGMME and dynamic simulation.
 #'
 #' @usage
-#' # binary: Cross(formula)
+#' # binary: Cross(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL)
 #' @template ergmTerm-formula
+#' @template ergmTerm-N-arguments
 #'
 #' @template ergmTerm-general
 #' @import purrr

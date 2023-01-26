@@ -29,7 +29,7 @@ stopifnot_dynamic <- function(nw, ..., dynamic=FALSE, .netseries.OK=FALSE){
 #'   old-style `formation` model.
 #'
 #' @usage
-#' # binary: Form(formula)
+#' # binary: Form(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL)
 #' @template ergmTerm-formula
 #'
 #' @template ergmTerm-general
@@ -85,7 +85,7 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
 #'   signs of the coefficients are negated.
 #'
 #' @usage
-#' # binary: Persist(formula)
+#' # binary: Persist(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL)
 #' @template ergmTerm-formula
 #'
 #' @template ergmTerm-general
@@ -145,7 +145,7 @@ ergm_rename_terms <- function(model, namewrap){
 #'   coefficient for `Diss()` operator means more dissolution.
 #'
 #' @usage
-#' # binary: Diss(formula)
+#' # binary: Diss(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL)
 #' @template ergmTerm-formula
 #'
 #' @template ergmTerm-general
@@ -194,7 +194,7 @@ InitErgmTerm..intersect.lt.net<-function(nw, arglist, ...) {
 #'   by taking the dyads that have changed between time steps.
 #'
 #' @usage
-#' # binary: Change(formula)
+#' # binary: Change(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL)
 #' @template ergmTerm-formula
 #'
 #' @template ergmTerm-general
