@@ -379,7 +379,7 @@ CMLE.tools$do.run_1 <- function(dir, bip=FALSE, prop.weights="default"){
 
       ctrl <- control.tergm(CMLE.ergm=control.ergm(force.main=TRUE, MCMC.prop.weights=prop.weight))
 
-      set.seed(234)
+      set.seed(1234)
       fit<-tergm(list(y0,y1m) ~ Form(~edges) + Persist(~edges), estimate="CMLE", control=ctrl, times=c(1,2))
 
       expect_true(fit$estimate=="CMLE")
