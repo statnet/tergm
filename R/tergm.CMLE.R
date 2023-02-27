@@ -19,6 +19,7 @@ tergm.CMLE <- function(formula, times, ..., control, basis) {
       stop("Unsupported specification for the network series. See help for ",sQuote("NetSeries")," for arguments.")
     }
 
+    formula <- nonsimp_update.formula(formula, NetSeries~., from.new="NetSeries")
     nw <- NetSeries
   }
 
