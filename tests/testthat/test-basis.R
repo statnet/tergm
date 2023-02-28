@@ -17,17 +17,20 @@ test_that("basis works as expected for CMLE", {
   set.seed(0)
   sampfit1 <- tergm(net1 ~ Form(~edges + mutual + transitiveties + cyclicalties) +
                     Diss(~edges + mutual + transitiveties + cyclicalties),
+                    eval.loglik = TRUE,
                     estimate = "CMLE")
 
   set.seed(0)
   sampfit2 <- tergm(~Form(~edges + mutual + transitiveties + cyclicalties) +
                     Diss(~edges + mutual + transitiveties + cyclicalties),
+                    eval.loglik = TRUE,
                     basis = net1,
                     estimate = "CMLE")
 
   set.seed(0)
   sampfit3 <- tergm(net2 ~ Form(~edges + mutual + transitiveties + cyclicalties) +
                     Diss(~edges + mutual + transitiveties + cyclicalties),
+                    eval.loglik = TRUE,
                     basis = net1,
                     estimate = "CMLE")
 
