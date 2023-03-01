@@ -52,5 +52,5 @@ Encoding: UTF-8
 Remotes: github::statnet/statnet.common@master,
     github::statnet/network@master,
     github::statnet/networkDynamic@master,
-    github::statnet/ergm@basis,
-    github::statnet/ergm.multi@basis
+    github::statnet/ergm@master,
+    github::statnet/ergm.multi@master
