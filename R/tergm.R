@@ -70,6 +70,7 @@
 #' Constructed using \code{\link{control.tergm}}.
 #' @template verbose
 #' @param \dots Additional arguments, to be passed to lower-level functions.
+#' @param basis optional network data overriding the left hand side of \code{formula}
 #'
 #' @return \code{\link{tergm}} returns an object of class `tergm` that
 #'   inherits from `ergm` and has the usual methods ([coef.ergm()],
@@ -154,7 +155,7 @@ tergm <- function(formula, constraints = ~., estimate, times=NULL, offset.coef=N
                    targets=NULL, target.stats=NULL, SAN.offsets = NULL,
                    eval.loglik=NVL(getOption("tergm.eval.loglik"), getOption("ergm.eval.loglik")),
                    control=control.tergm(),
-                   verbose=FALSE, ...) {
+                   verbose=FALSE, ..., basis = eval_lhs.formula(formula)) {
   check.control.class("tergm", "tergm")
 
   tergm_call <- match.call(ergm)
@@ -167,11 +168,11 @@ tergm <- function(formula, constraints = ~., estimate, times=NULL, offset.coef=N
     stop("Argument formula must be a formula.")
   
   out <- switch(estimate,
-                CMLE=tergm.CMLE(formula=formula, times=times, constraints=constraints, estimate="MLE", offset.coef=offset.coef, target.stats=target.stats, eval.loglik=eval.loglik,control=control, verbose=verbose, ...),
-                CMPLE=tergm.CMLE(formula=formula, times=times, constraints=constraints, estimate="MPLE", offset.coef=offset.coef, target.stats=target.stats, eval.loglik=eval.loglik,control=control, verbose=verbose, ...),
+                CMLE=tergm.CMLE(formula=formula, times=times, constraints=constraints, estimate="MLE", offset.coef=offset.coef, target.stats=target.stats, eval.loglik=eval.loglik,control=control, verbose=verbose, ..., basis = basis),
+                CMPLE=tergm.CMLE(formula=formula, times=times, constraints=constraints, estimate="MPLE", offset.coef=offset.coef, target.stats=target.stats, eval.loglik=eval.loglik,control=control, verbose=verbose, ..., basis = basis),
                 EGMME=tergm.EGMME(formula, constraints,
                   offset.coef,
-                  targets, target.stats, SAN.offsets, estimate, control, verbose)
+                  targets, target.stats, SAN.offsets, estimate, control, verbose, basis = basis)
                 )
 
   out$call <- tergm_call

@@ -20,7 +20,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
   expect_equal(s1, s2)
 
   ## non-durational, curved
-  ff1 <- ~edges + triangle + gwesp(0, fixed = TRUE) + gwesp(fixed = FALSE, cutoff = 5) + isolates
+  ff1 <- ~edges + triangle + gwesp(0, fixed = TRUE) + gwesp(fixed = FALSE, cutoff = 100) + isolates
   s1 <- summary(ff1, basis = nw)
   s2 <- summary(~Cross(ff1), basis = nw)
   names(s1) <- paste0("Cross~", names(s1))
@@ -41,7 +41,7 @@ test_that("term Cross behaves reasonably in dynamic contexts", {
   expect_equal(s1, s2)
 
   ## durational, curved
-  ff3 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + gwesp(fixed = FALSE, cutoff = 5) + mean.age + Form(~edges + triangle + mean.age) + Diss(~gwesp(fixed = FALSE, cutoff = 5))
+  ff3 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + gwesp(fixed = FALSE, cutoff = 100) + mean.age + Form(~edges + triangle + mean.age) + Diss(~gwesp(fixed = FALSE, cutoff = 100))
   s1 <- summary(ff3, basis = nw)
   s2 <- summary(~Cross(ff3), basis = nw)
   names(s1) <- paste0("Cross~", names(s1))

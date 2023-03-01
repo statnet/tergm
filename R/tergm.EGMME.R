@@ -11,8 +11,8 @@
 tergm.EGMME <- function(formula, constraints, offset.coef,
                    targets, target.stats, SAN.offsets, estimate,
                  control,
-                 verbose) {
-  nw <- eval_lhs.formula(formula)
+                 verbose, basis) {
+  nw <- basis
 
   if(!is.network(nw)) stop("Argument nw must be a network.")
 

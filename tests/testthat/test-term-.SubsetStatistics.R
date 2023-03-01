@@ -20,7 +20,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
   expect_equal(s1, s2)
 
   ## non-durational, curved
-  ff1 <- ~edges + triangle + gwesp(0, fixed = TRUE) + gwesp(fixed = FALSE, cutoff = 5) + isolates
+  ff1 <- ~edges + triangle + gwesp(0, fixed = TRUE) + gwesp(fixed = FALSE, cutoff = 100) + isolates
   stats1 <- sample(which(c(TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, TRUE, TRUE)))
   s1 <- summary(ff1, basis = nw)[stats1]
   s2 <- summary(~.SubsetStatistics(ff1, stats1), basis = nw)
@@ -43,7 +43,7 @@ test_that("the .SubsetStatistics term behaves appropriately", {
   expect_equal(s1, s2)
 
   ## durational, curved
-  ff3 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + gwesp(fixed = FALSE, cutoff = 5) + mean.age + Form(~edges + triangle + mean.age) + Diss(~gwesp(fixed = FALSE, cutoff = 5))
+  ff3 <- ~edges + triangle + gwesp(0, fixed = TRUE) + isolates + gwesp(fixed = FALSE, cutoff = 100) + mean.age + Form(~edges + triangle + mean.age) + Diss(~gwesp(fixed = FALSE, cutoff = 100))
   stats3 <- c(TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)
   s1 <- summary(ff3, basis = nw)[stats3]
   s2 <- summary(~.SubsetStatistics(ff3, stats3), basis = nw)

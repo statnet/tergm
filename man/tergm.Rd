@@ -16,7 +16,8 @@ tergm(
   eval.loglik = NVL(getOption("tergm.eval.loglik"), getOption("ergm.eval.loglik")),
   control = control.tergm(),
   verbose = FALSE,
-  ...
+  ...,
+  basis = eval_lhs.formula(formula)
 )
 }
 \arguments{
@@ -98,6 +99,8 @@ detail. Note that very high values (5+) may significantly slow
 down processing.}
 
 \item{\dots}{Additional arguments, to be passed to lower-level functions.}
+
+\item{basis}{optional network data overriding the left hand side of \code{formula}}
 }
 \value{
 \code{\link{tergm}} returns an object of class \code{tergm} that
