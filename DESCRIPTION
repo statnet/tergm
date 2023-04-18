@@ -38,7 +38,8 @@ Suggests:
     knitr (>= 1.22),
     tibble,
     testthat,
-    covr
+    covr,
+    networkLite
 BugReports: https://github.com/statnet/tergm/issues
 Description: An integrated set of extensions to the 'ergm' package to analyze and simulate network evolution based on exponential-family random graph models (ERGM). 'tergm' is a part of the 'statnet' suite of packages for network analysis. See Krivitsky and Handcock (2014) <doi:10.1111/rssb.12014> and Carnegie, Krivitsky, Hunter, and Goodreau (2015) <doi:10.1080/10618600.2014.903087>.
 License: GPL-3 + file LICENSE
