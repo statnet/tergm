@@ -61,6 +61,31 @@
   % }
 %% }
 
+
+\section{Changes in version 4.2.0}{
+    \subsection{NEW FEATURES}{
+      \itemize{
+        \item Operators \code{Form()}, \code{Persist()}, \code{Diss()}, \code{Cross()}, and \code{Change()} can now specify time-varying network-level covariates using the syntax of \code{\link[ergm.multi:N-ergmTerm]{N}}.
+        \item \code{link{tergm}()} now supports a \code{basis=} argument like \code{\link{ergm}()} does.
+        \item \pkg{tergm}'s functions now support \CRANpkg{networkLite} objects in place of \CRANpkg{network} objects.
+     }
+   }
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item \code{\link{tergm}()}'s term options are now propagated correctly.
+      \item \pkg{tergm}'s \code{\link{simulate_formula.network}()} no longer propagates \code{dynamic} argument onto the \CRANpkg{ergm}'s back-end when \code{dynamic=FALSE}.
+    }
+  }
+
+  \subsection{OTHER USER-VISIBLE CHANGES}{
+    \itemize{
+      \item \CRANpkg{tergm} now relies on \CRANpkg{ergm.multi} for much of its back-end.
+    }
+  }
+}
+
+
 \section{Changes in version 4.1.1}{
   \subsection{BUG FIXES}{
     \itemize{
