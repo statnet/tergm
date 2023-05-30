@@ -1,62 +1,61 @@
 # Platform
 
-|field    |value                         |
-|:--------|:-----------------------------|
-|version  |R version 4.2.0 (2022-04-22)  |
-|os       |Debian GNU/Linux bookworm/sid |
-|system   |x86_64, linux-gnu             |
-|ui       |X11                           |
-|language |en_AU:en                      |
-|collate  |en_AU.UTF-8                   |
-|ctype    |en_AU.UTF-8                   |
-|tz       |Australia/Sydney              |
-|date     |2022-06-22                    |
-|pandoc   |2.9.2.1 @ /usr/bin/pandoc     |
+|field    |value                                                                                                                     |
+|:--------|:-------------------------------------------------------------------------------------------------------------------------|
+|version  |R version 4.3.0 (2023-04-21)                                                                                              |
+|os       |Rocky Linux 8.7 (Green Obsidian)                                                                                          |
+|system   |x86_64, linux-gnu                                                                                                         |
+|ui       |X11                                                                                                                       |
+|language |(EN)                                                                                                                      |
+|collate  |en_AU.UTF-8                                                                                                               |
+|ctype    |en_AU.UTF-8                                                                                                               |
+|tz       |:/etc/localtime                                                                                                           |
+|date     |2023-05-29                                                                                                                |
+|pandoc   |2.19.2 @ /apps/z_install_tree/linux-rocky8-ivybridge/gcc-12.2.0/pandoc-2.19.2-vrhsk7cphmufa3sa5pjklo336yruubte/bin/pandoc |
 
 # Dependencies
 
-|package        |old          |new          |Δ  |
-|:--------------|:------------|:------------|:--|
-|tergm          |4.0.2        |4.1.0        |*  |
-|cachem         |1.0.6        |1.0.6        |   |
-|cli            |3.3.0        |3.3.0        |   |
-|coda           |0.19-4       |0.19-4       |   |
-|crayon         |1.5.1        |1.5.1        |   |
-|DEoptimR       |1.0-11       |1.0-11       |   |
-|digest         |0.6.29       |0.6.29       |   |
-|ellipsis       |0.3.2        |0.3.2        |   |
-|ergm           |4.2.2        |4.2.2        |   |
-|evaluate       |0.15         |0.15         |   |
-|fansi          |1.0.3        |1.0.3        |   |
-|fastmap        |1.1.0        |1.1.0        |   |
-|glue           |1.6.2        |1.6.2        |   |
-|highr          |0.9          |0.9          |   |
-|knitr          |1.39         |1.39         |   |
-|lattice        |0.20-45      |0.20-45      |   |
-|lifecycle      |1.0.1        |1.0.1        |   |
-|lpSolveAPI     |5.5.2.0-17.7 |5.5.2.0-17.7 |   |
-|magrittr       |2.0.3        |2.0.3        |   |
-|MASS           |7.3-57       |7.3-57       |   |
-|Matrix         |1.4-1        |1.4-1        |   |
-|memoise        |2.0.1        |2.0.1        |   |
-|network        |1.17.2       |1.17.2       |   |
-|networkDynamic |0.11.2       |0.11.2       |   |
-|nlme           |3.1-158      |3.1-158      |   |
-|pillar         |1.7.0        |1.7.0        |   |
-|pkgconfig      |2.0.3        |2.0.3        |   |
-|purrr          |0.3.4        |0.3.4        |   |
-|rlang          |1.0.2        |1.0.2        |   |
-|rle            |0.9.2        |0.9.2        |   |
-|robustbase     |0.95-0       |0.95-0       |   |
-|statnet.common |4.6.0        |4.6.0        |   |
-|stringi        |1.7.6        |1.7.6        |   |
-|stringr        |1.4.0        |1.4.0        |   |
-|tibble         |3.1.7        |3.1.7        |   |
-|trust          |0.1-8        |0.1-8        |   |
-|utf8           |1.2.2        |1.2.2        |   |
-|vctrs          |0.4.1        |0.4.1        |   |
-|xfun           |0.31         |0.31         |   |
-|yaml           |2.3.5        |2.3.5        |   |
+|package        |old   |new        |Δ  |
+|:--------------|:-----|:----------|:--|
+|tergm          |4.1.1 |4.2-2510   |*  |
+|ergm           |NA    |4.5-7247   |*  |
+|ergm.multi     |NA    |0.2.0-4105 |*  |
+|network        |NA    |1.18.1     |*  |
+|networkDynamic |NA    |0.11.3     |*  |
+|statnet.common |NA    |4.9.0-423  |*  |
 
 # Revdeps
+
+## All (28)
+
+|package            |version |error |warning |note |
+|:------------------|:-------|:-----|:-------|:----|
+|[BasketballAnalyzeR](problems.md#basketballanalyzer)|0.5.0   |      |        |1    |
+|Bergm              |5.0.5   |      |        |     |
+|[Blaunet](problems.md#blaunet)|2.2.1   |      |        |1    |
+|btergm             |1.10.10 |      |        |     |
+|epimdr             |0.6-5   |      |        |     |
+|epimdr2            |1.0-9   |      |        |     |
+|[EpiModel](problems.md#epimodel)|2.3.2   |3     |        |     |
+|[ergm](problems.md#ergm)|4.5.0   |      |        |1    |
+|ergm.count         |4.1.1   |      |        |     |
+|ergm.ego           |1.0.1   |      |        |     |
+|ergm.multi         |0.1.2   |      |        |     |
+|ergm.rank          |4.1.0   |      |        |     |
+|ergMargins         |0.1.3.1 |      |        |     |
+|KinMixLite         |2.1.0   |      |        |     |
+|[latentnet](problems.md#latentnet)|2.10.6  |      |        |4    |
+|multinets          |0.2.2   |      |        |     |
+|ndtv               |0.13.3  |      |        |     |
+|network            |1.18.1  |      |        |     |
+|[networkDynamic](problems.md#networkdynamic)|0.11.3  |1     |        |     |
+|networkLite        |1.0.5   |      |        |     |
+|[pkggraph](problems.md#pkggraph)|0.2.3   |      |        |1    |
+|RDS                |0.9-6   |      |        |     |
+|rem                |1.3.1   |      |        |     |
+|sna                |2.7-1   |      |        |     |
+|[statnet](problems.md#statnet)|2019.6  |      |        |2    |
+|[statnet.common](problems.md#statnetcommon)|4.9.0   |      |        |1    |
+|tergmLite          |2.6.1   |      |        |     |
+|tsna               |0.3.5   |      |        |     |
 
