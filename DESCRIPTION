@@ -16,9 +16,9 @@ Authors@R: c(
         person("Kirk","Li",role=c("ctb"),email="kirkli@uw.edu"),
         person("Chad", "Klumb", role=c("ctb"), email="cklumb@gmail.com"))
 Depends:
-    ergm (>= 4.3.1),
+    ergm (>= 4.5.0),
     network (>= 1.18.0),
-    networkDynamic (>= 0.11.2)
+    networkDynamic (>= 0.11.3)
 Imports:
     methods,
     utils,
@@ -26,8 +26,8 @@ Imports:
     coda (>= 0.19.2),
     nlme (>= 3.1.139),
     MASS (>= 7.3.51.4),
-    statnet.common (>= 4.4.0),
-    ergm.multi,
+    statnet.common (>= 4.9.0),
+    ergm.multi (>= 0.2.0),
     purrr
 LinkingTo:
     ergm
