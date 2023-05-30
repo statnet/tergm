@@ -5,7 +5,7 @@
  *  open source, and has the attribution requirements (GPL Section 7) at
  *  https://statnet.org/attribution .
  *
- *  Copyright 2008-2022 Statnet Commons
+ *  Copyright 2008-2023 Statnet Commons
  */
 #ifndef _TERGM_CHANGESTATS_AUXNET_H_
 #define _TERGM_CHANGESTATS_AUXNET_H_
