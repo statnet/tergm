@@ -19,13 +19,6 @@
 #' Conditional MLE (CMLE) (Krivitsky and Handcock, 2010) and Equilibrium
 #' Generalized Method of Moments Estimator (EGMME) (Krivitsky, 2009).
 #' 
-#' \strong{Model Terms} See \code{\link{ergm}} and \code{\link{ergm-terms}} for
-#' details. At this time, only linear ERGM terms are allowed.  \itemize{
-#' \item For a brief demonstration, please see the tergm package vignette:
-#' \code{browseVignettes(package='tergm')} \item A more detailed tutorial is
-#' available on the statnet wiki:
-#' \url{https://statnet.org/Workshops/tergm/tergm_tutorial.html} }
-#' 
 #' @param formula an ERGM formula.
 #'
 #' @template constraints
@@ -77,7 +70,12 @@
 #'   [summary.ergm()], [mcmc.diagnostics()], etc.) implemented for
 #'   it. Note that [gof()] only works for the CMLE method.
 #'
-#' @seealso [ergm()], [network()], [`%v%`], [`%n%`], \code{\link{ergm-terms}}
+#' @seealso [`network`] and [NetSeries()] for the data structures,
+#'   [ergm()] and \code{\link{ergmTerm}} for model specification,
+#'   package vignette \code{browseVignettes(package='tergm')} for a
+#'   short demonstration, the Statnet web site
+#'   \url{https://statnet.org/workshop-tergm/} for a tutorial
+
 #' @references
 #'
 #' Krackhardt, D and Handcock, MS (2006) Heider vs Simmel: Emergent

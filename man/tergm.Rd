@@ -113,14 +113,6 @@ it. Note that \code{\link[=gof]{gof()}} only works for the CMLE method.
 Conditional MLE (CMLE) (Krivitsky and Handcock, 2010) and Equilibrium
 Generalized Method of Moments Estimator (EGMME) (Krivitsky, 2009).
 }
-\details{
-\strong{Model Terms} See \code{\link{ergm}} and \code{\link{ergm-terms}} for
-details. At this time, only linear ERGM terms are allowed.  \itemize{
-\item For a brief demonstration, please see the tergm package vignette:
-\code{browseVignettes(package='tergm')} \item A more detailed tutorial is
-available on the statnet wiki:
-\url{https://statnet.org/Workshops/tergm/tergm_tutorial.html} }
-}
 \examples{
 \dontrun{
 # EGMME Example
@@ -190,5 +182,9 @@ University Department of Statistics Technical Report}, 2012(2012-01).
 \url{http://stat.psu.edu/research/technical-report-files/2012-technical-reports/modeling-of-dynamic-networks-based-on-egocentric-data-with-durational-information}
 }
 \seealso{
-\code{\link[=ergm]{ergm()}}, \code{\link[=network]{network()}}, \code{\link{\%v\%}}, \code{\link{\%n\%}}, \code{\link{ergm-terms}}
+\code{\link{network}} and \code{\link[=NetSeries]{NetSeries()}} for the data structures,
+\code{\link[=ergm]{ergm()}} and \code{\link{ergmTerm}} for model specification,
+package vignette \code{browseVignettes(package='tergm')} for a
+short demonstration, the Statnet web site
+\url{https://statnet.org/workshop-tergm/} for a tutorial
 }

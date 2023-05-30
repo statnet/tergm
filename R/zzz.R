@@ -13,7 +13,7 @@
   if(!is.null(sm)) packageStartupMessage(sm)
 }
 
-#' @import ergm
+#' @rawNamespace import(ergm, except=c("snctrl"))
 .onLoad <- function(libname, pkgname){
   # . is used as a placeholder by stantet.common::NVL3().
   utils::globalVariables(".")

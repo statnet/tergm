@@ -273,13 +273,21 @@ InitErgmTerm.Change1 <- function(nw, arglist,  ...){
 #'   `Cross(~TERM) == ~TERM` ) for EGMME and dynamic simulation.
 #'
 #' @usage
-#' # binary: Cross(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL)
+#' # binary: Cross(
+#' #           formula,
+#' #           lm = ~1,
+#' #           subset = TRUE,
+#' #           weights = 1,
+#' #           contrasts = NULL,
+#' #           offset = 0,
+#' #           label = NULL
+#' #         )
 #' @template ergmTerm-formula
 #' @template ergmTerm-N-arguments
 #'
 #' @template ergmTerm-general
 #' @import purrr
-#' @import ergm.multi
+#' @rawNamespace import(ergm.multi, except=c("snctrl"))
 #'
 #' @concept operator
 #' @concept durational

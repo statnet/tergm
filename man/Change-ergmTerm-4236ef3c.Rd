@@ -7,7 +7,15 @@
 \alias{InitErgmTerm.Change}
 \title{The Change Operator Term}
 \usage{
-# binary: Change(formula, lm=~1, subset=TRUE, weights=1, contrasts=NULL, offset=0, label=NULL)
+# binary: Change(
+#           formula,
+#           lm = ~1,
+#           subset = TRUE,
+#           weights = 1,
+#           contrasts = NULL,
+#           offset = 0,
+#           label = NULL
+#         )
 }
 \arguments{
 \item{formula}{a one-sided \code{\link[=ergm]{ergm()}}-style formula with the terms to be evaluated}

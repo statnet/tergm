@@ -33,17 +33,7 @@
 #' If you are making the transition from old \code{stergm} to new \code{tergm}, note that
 #' the \code{dissolution} formula in \code{stergm} maps to the new \code{Persist()} 
 #' operator in the \code{tergm} function, NOT the \code{Diss()} operator.
-#' 
-#' 
-#' \strong{Model Terms} See \code{\link{ergm}} and \code{\link{ergm-terms}} for
-#' details. At this time, only linear ERGM terms are allowed.  \itemize{
-#' \item For a brief demonstration, please see the tergm package vignette:
-#' \code{browseVignettes(package='tergm')} \item A more detailed tutorial is
-#' available on the statnet wiki:
-#' \url{https://statnet.org/Workshops/tergm/tergm_tutorial.html} }
-#' 
 #'
-#' 
 #' @param nw A \code{\link[network]{network}} object (for EGMME); or
 #' \code{\link[networkDynamic]{networkDynamic}} object, a
 #' \code{\link{network.list}} object, or a \code{\link{list}} containing

@@ -143,13 +143,6 @@ unfortunate, and we have fixed this in the new \code{tergm} function.
 If you are making the transition from old \code{stergm} to new \code{tergm}, note that
 the \code{dissolution} formula in \code{stergm} maps to the new \code{Persist()}
 operator in the \code{tergm} function, NOT the \code{Diss()} operator.
-
-\strong{Model Terms} See \code{\link{ergm}} and \code{\link{ergm-terms}} for
-details. At this time, only linear ERGM terms are allowed.  \itemize{
-\item For a brief demonstration, please see the tergm package vignette:
-\code{browseVignettes(package='tergm')} \item A more detailed tutorial is
-available on the statnet wiki:
-\url{https://statnet.org/Workshops/tergm/tergm_tutorial.html} }
 }
 \references{
 Krivitsky P.N. and Handcock M.S. (2014) A Separable Model for Dynamic Networks. \emph{Journal of the Royal Statistical Society, Series B}, 76(1): 29-46. \doi{10.1111/rssb.12014}
