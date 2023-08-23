@@ -502,8 +502,7 @@ test_that("discordBDStratTNT handles undirected heterogeneous degree bound satur
                                  + strat(attr = ~strat_attr, pmat = pmat),
                   output = "final",
                   time.slices = 3,
-                  dynamic = TRUE,
-                  control = list(MCMC.burnin.min = 1e4, MCMC.burnin.max = 1e5))
+                  dynamic = TRUE)
   ## check constraints
   expect_true(all(summary(nws ~ nodemix(~blocks_attr, levels2 = levels2)) == 0))
   el <- as.edgelist(nws)
@@ -519,8 +518,7 @@ test_that("discordBDStratTNT handles undirected heterogeneous degree bound satur
                                   + strat(attr = ~strat_attr, pmat = pmat),
                    output = "final",
                    time.slices = 3,
-                   dynamic = TRUE,
-                   control = list(MCMC.burnin.min = 1e4, MCMC.burnin.max = 1e5))
+                   dynamic = TRUE)
   ## check constraints
   expect_true(all(summary(nws2 ~ nodemix(~blocks_attr, levels2 = levels2)) == 0))
   el <- as.edgelist(nws2)
@@ -553,8 +551,7 @@ test_that("discordBDStratTNT handles directed heterogeneous degree bound saturat
                                  + strat(attr = ~strat_attr, pmat = pmat),
                   output = "final",
                   time.slices = 3,
-                  dynamic = TRUE,
-                  control = list(MCMC.burnin.min = 1e3, MCMC.burnin.max = 1e5))
+                  dynamic = TRUE)
   ## check constraints
   expect_true(all(summary(nws ~ nodemix(~blocks_attr, levels2 = levels2)) == 0))
   el <- as.edgelist(nws)
@@ -573,8 +570,7 @@ test_that("discordBDStratTNT handles directed heterogeneous degree bound saturat
                                   + strat(attr = ~strat_attr, pmat = pmat),
                    output = "final",
                    time.slices = 3,
-                   dynamic = TRUE,
-                   control = list(MCMC.burnin.min = 1e3, MCMC.burnin.max = 1e5))
+                   dynamic = TRUE)
   ## check constraints
   expect_true(all(summary(nws2 ~ nodemix(~blocks_attr, levels2 = levels2)) == 0))
   el <- as.edgelist(nws2)
@@ -610,8 +606,7 @@ test_that("discordBDStratTNT handles bipartite heterogeneous degree bound satura
                                  + strat(attr = ~strat_attr, pmat = pmat),
                   output = "final",
                   time.slices = 3,
-                  dynamic = TRUE,
-                  control = list(MCMC.burnin.min = 1e4, MCMC.burnin.max = 1e5))
+                  dynamic = TRUE)
   ## check constraints
   expect_true(all(summary(nws ~ nodemix(~blocks_attr, levels2 = levels2)) == 0))
   el <- as.edgelist(nws)
@@ -627,8 +622,7 @@ test_that("discordBDStratTNT handles bipartite heterogeneous degree bound satura
                                   + strat(attr = ~strat_attr, pmat = pmat),
                    output = "final",
                    time.slices = 3,
-                   dynamic = TRUE,
-                   control = list(MCMC.burnin.min = 1e4, MCMC.burnin.max = 1e5))
+                   dynamic = TRUE)
   ## check constraints
   expect_true(all(summary(nws2 ~ nodemix(~blocks_attr, levels2 = levels2)) == 0))
   el <- as.edgelist(nws2)
@@ -658,8 +652,7 @@ test_that("discordBDStratTNT handles undirected homogeneous degree bound saturat
                                  + strat(attr = ~strat_attr, pmat = pmat),
                   output = "final",
                   time.slices = 3,
-                  dynamic = TRUE,
-                  control = list(MCMC.burnin.min = 1e4, MCMC.burnin.max = 1e5))
+                  dynamic = TRUE)
   ## check constraints
   expect_true(all(summary(nws ~ nodemix(~blocks_attr, levels2 = levels2)) == 0))
   el <- as.edgelist(nws)
@@ -674,8 +667,7 @@ test_that("discordBDStratTNT handles undirected homogeneous degree bound saturat
                                   + strat(attr = ~strat_attr, pmat = pmat),
                    output = "final",
                    time.slices = 3,
-                   dynamic = TRUE,
-                   control = list(MCMC.burnin.min = 1e4, MCMC.burnin.max = 1e5))
+                   dynamic = TRUE)
   ## check constraints
   expect_true(all(summary(nws2 ~ nodemix(~blocks_attr, levels2 = levels2)) == 0))
   el <- as.edgelist(nws2)
@@ -704,8 +696,7 @@ test_that("discordBDStratTNT handles directed homogeneous degree bound saturatio
                                  + strat(attr = ~strat_attr, pmat = pmat),
                   output = "final",
                   time.slices = 3,
-                  dynamic = TRUE,
-                  control = list(MCMC.burnin.min = 1e4, MCMC.burnin.max = 1e5))
+                  dynamic = TRUE)
   ## check constraints
   expect_true(all(summary(nws ~ nodemix(~blocks_attr, levels2 = levels2)) == 0))
   el <- as.edgelist(nws)
@@ -722,8 +713,7 @@ test_that("discordBDStratTNT handles directed homogeneous degree bound saturatio
                                   + strat(attr = ~strat_attr, pmat = pmat),
                    output = "final",
                    time.slices = 3,
-                   dynamic = TRUE,
-                   control = list(MCMC.burnin.min = 1e4, MCMC.burnin.max = 1e5))
+                   dynamic = TRUE)
   ## check constraints
   expect_true(all(summary(nws2 ~ nodemix(~blocks_attr, levels2 = levels2)) == 0))
   el <- as.edgelist(nws2)
@@ -754,8 +744,7 @@ test_that("discordBDStratTNT handles bipartite homogeneous degree bound saturati
                                  + strat(attr = ~strat_attr, pmat = pmat),
                   output = "final",
                   time.slices = 3,
-                  dynamic = TRUE,
-                  control = list(MCMC.burnin.min = 1e4, MCMC.burnin.max = 1e5))
+                  dynamic = TRUE)
   ## check constraints
   expect_true(all(summary(nws ~ nodemix(~blocks_attr, levels2 = levels2)) == 0))
   el <- as.edgelist(nws)
@@ -770,8 +759,7 @@ test_that("discordBDStratTNT handles bipartite homogeneous degree bound saturati
                                   + strat(attr = ~strat_attr, pmat = pmat),
                    output = "final",
                    time.slices = 3,
-                   dynamic = TRUE,
-                   control = list(MCMC.burnin.min = 1e4, MCMC.burnin.max = 1e5))
+                   dynamic = TRUE)
   ## check constraints
   expect_true(all(summary(nws2 ~ nodemix(~blocks_attr, levels2 = levels2)) == 0))
   el <- as.edgelist(nws2)
