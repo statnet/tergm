@@ -191,7 +191,7 @@ typedef struct {
   HashEL **BDTDNE;
   
   HashEL **discordantEdges;
-  HashEL **nonDiscordantEdges;
+  HashEL **edges;
   
   Vertex *nodes;
   int *maxl;
@@ -210,7 +210,7 @@ MH_I_FN(Mi_discordBDStratTNT) {
   // copy a few things and handle purely temporal aspects
   BDStratTNTStorage *static_sto = MH_STORAGE;
   ALLOC_STORAGE(1, discordBDStratTNTStorage, sto);
-  sto->nonDiscordantEdges = static_sto->hash;
+  sto->edges = static_sto->hash;
   sto->static_sto = static_sto;
   
   sto->nodes = R_Calloc(2, Vertex);
@@ -234,11 +234,6 @@ MH_X_FN(Mx_discordBDStratTNT) {
     GET_STORAGE(discordBDStratTNTStorage, sto);
 
     for(int i = 0; i < sto->static_sto->strat_nmixtypes; i++) {
-      // transfer discordantEdges to nonDiscordantEdges
-      for(int j = 1; j <= HashELSize(sto->discordantEdges[i]); j++) {
-        HashELInsert(sto->discordantEdges[i]->list->tails[j], sto->discordantEdges[i]->list->heads[j], sto->nonDiscordantEdges[i]);
-      }
-
       // clear all the discordance information
       if(HashELSize(sto->BDTDNE[i]) > 0) HashELClear(sto->BDTDNE[i]);
       if(HashELSize(sto->discordantEdges[i]) > 0) HashELClear(sto->discordantEdges[i]);      
@@ -261,7 +256,7 @@ MH_P_FN(MH_discordBDStratTNT) {
   sto->static_sto->stratmixingtype = strat_i;
   
   // number of edges of this mixing type
-  int nedgestype = HashELSize(sto->nonDiscordantEdges[strat_i]) + HashELSize(sto->discordantEdges[strat_i]);
+  int nedgestype = HashELSize(sto->edges[strat_i]);
   
   Dyad ndyadstype = BDStratBlocksDyadCount(sto->static_sto->blocks, strat_i);
   
@@ -274,14 +269,10 @@ MH_P_FN(MH_discordBDStratTNT) {
     // propose from network
     if((unif_rand() < 0.5 && nedgestype > 0) || ndyadstype == 0) {
       // propose toggling off an existing edge of strat mixing type strat_i
-      if(unif_rand() < ((double) HashELSize(sto->nonDiscordantEdges[strat_i]))/nedgestype) {
-        HashELGetRand(Mtail, Mhead, sto->nonDiscordantEdges[strat_i]);
-        in_discord = FALSE;
-      } else {
-        HashELGetRand(Mtail, Mhead, sto->discordantEdges[strat_i]);
-        in_discord = TRUE;
-      }
+      HashELGetRand(Mtail, Mhead, sto->edges[strat_i]);
+
       in_network = TRUE;
+      in_discord = kh_get(DyadMapInt, dur_inf->discord, TH(Mtail[0], Mhead[0])) != kh_none;
     } else {
       // select a random BD toggleable dyad of strat mixing type strat_i and propose toggling it
       BDStratBlocksGetRandWithCount(Mtail, Mhead, sto->static_sto->blocks, strat_i, ndyadstype);
@@ -380,10 +371,10 @@ MH_U_FN(Mu_discordBDStratTNT) {
   }
 
   // add or remove the dyad being toggled from the relevant edge set(s)/network
+  HashELToggleKnown(tail, head, sto->edges[sto->static_sto->stratmixingtype], edgestate);
   if(sto->in_discord == edgestate) {
     HashELToggleKnown(tail, head, sto->discordantEdges[sto->static_sto->stratmixingtype], edgestate);      
   } else {
-    HashELToggleKnown(tail, head, sto->nonDiscordantEdges[sto->static_sto->stratmixingtype], edgestate);
     HashELToggleKnown(tail, head, sto->BDTDNE[sto->static_sto->stratmixingtype], !edgestate);
     ToggleKnownEdge(tail, head, sto->combined_BDTDNE, !edgestate);      
   }
