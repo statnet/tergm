@@ -27,3 +27,10 @@ A set of binaries is built after every commit to the repository. We strongly enc
 You will need to extract the MacOS `.tgz` or the Windows `.zip` file from the outer `.zip` file before installing. These binaries are usually built under the latest version of R and their operating system and may not work under other versions.
 
 You may also want to install the corresponding latest binaries for packages on which `tergm` depends, in particular [`statnet.common`](https://github.com/statnet/statnet.common), [`network`](https://github.com/statnet/network), [`networkDynamic`](https://github.com/statnet/networkDynamic), and [`ergm`](https://github.com/statnet/ergm).
+
+
+
+## Code of Conduct
+
+Please note that the tergm project is released with a [Contributor Code of Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.
+
