@@ -120,7 +120,7 @@ CMLE.tools$do.run_2 <- function(dir, bip=FALSE, prop.weights="default"){
 
   for(prop.weight in prop.weights){
 
-    test_that(paste("Force CMPLE on", completeness, netdesc, "proposal", prop.weight), {
+    test_that(paste("Force CMLE on", completeness, netdesc, "proposal", prop.weight), {
 
       ctrl <- control.tergm(CMLE.ergm=control.ergm(force.main=TRUE, MCMC.prop.weights=prop.weight))
 
@@ -202,7 +202,7 @@ CMLE.tools$do.run_2 <- function(dir, bip=FALSE, prop.weights="default"){
   
   for(prop.weight in prop.weights){
 
-    test_that(paste("Force CMPLE on", completeness, netdesc, "proposal", prop.weight), {
+    test_that(paste("Force CMLE on", completeness, netdesc, "proposal", prop.weight), {
 
       ctrl <- control.tergm(CMLE.ergm=control.ergm(force.main=TRUE, MCMC.prop.weights=prop.weight))
 
@@ -293,7 +293,7 @@ CMLE.tools$do.run_1 <- function(dir, bip=FALSE, prop.weights="default"){
 
   for(prop.weight in prop.weights){
 
-    test_that(paste("Force CMPLE on", completeness, netdesc, "proposal", prop.weight), {
+    test_that(paste("Force CMLE on", completeness, netdesc, "proposal", prop.weight), {
 
       ctrl <- control.tergm(CMLE.ergm=control.ergm(force.main=TRUE, MCMC.prop.weights=prop.weight))
 
@@ -375,7 +375,7 @@ CMLE.tools$do.run_1 <- function(dir, bip=FALSE, prop.weights="default"){
   
   for(prop.weight in prop.weights){
 
-    test_that(paste("Force CMPLE on", completeness, netdesc, "proposal", prop.weight), {
+    test_that(paste("Force CMLE on", completeness, netdesc, "proposal", prop.weight), {
 
       ctrl <- control.tergm(CMLE.ergm=control.ergm(force.main=TRUE, MCMC.prop.weights=prop.weight))
 
