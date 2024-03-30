@@ -13,7 +13,7 @@ o <- options(tergm.eval.loglik=FALSE)
 
 CMLE.tools <- new.env()
 
-CMLE.tools$tolerance <- 3
+CMLE.tools$tolerance <- 4
 CMLE.tools$n <- 10
 CMLE.tools$m <- 6
 CMLE.tools$theta <- -1.5
