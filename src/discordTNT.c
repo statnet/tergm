@@ -219,8 +219,8 @@ MH_I_FN(Mi_discordBDStratTNT) {
   sto->BDTDNE = Calloc(sto->static_sto->strat_nmixtypes, HashEL *);
   sto->discordantEdges = Calloc(sto->static_sto->strat_nmixtypes, HashEL *);  
   for(int i = 0; i < sto->static_sto->strat_nmixtypes; i++) {
-    sto->BDTDNE[i] = HashELInitialize(0, NULL, NULL, FALSE, DIRECTED);
-    sto->discordantEdges[i] = HashELInitialize(0, NULL, NULL, FALSE, DIRECTED);
+    sto->BDTDNE[i] = HashELInitialize(0, NULL, NULL, FALSE);
+    sto->discordantEdges[i] = HashELInitialize(0, NULL, NULL, FALSE);
   }
   sto->combined_BDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL);
   sto->combined_nonBDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL);
