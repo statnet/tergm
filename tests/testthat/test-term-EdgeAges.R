@@ -30,7 +30,7 @@ test_that("the EdgeAges term behaves consistently with some existing durational 
       nw1 %n% "time" <- 0
 
       for(nw in list(nw0, nw1)) {
-        mat <- matrix(runif(net_size*net_size), net_size, net_size)
+        mat <- suppressWarnings(matrix(runif(net_size*net_size), if(bipartite) bipartite else net_size, net_size - bipartite))
         if(!directed && !bipartite) mat <- (mat + t(mat))/2
 
         set.seed(seed)
@@ -110,7 +110,7 @@ test_that("the EdgeAges term behaves appropriately for general submodels", {
       nw1 %n% "time" <- 0
 
       for(nw in list(nw0, nw1)) {
-        mat <- matrix(runif(net_size*net_size), net_size, net_size)
+        mat <- suppressWarnings(matrix(runif(net_size*net_size), if(bipartite) bipartite else net_size, net_size - bipartite))
         if(!directed && !bipartite) mat <- (mat + t(mat))/2
 
         set.seed(seed)
