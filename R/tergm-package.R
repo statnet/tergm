@@ -7,11 +7,7 @@
 #
 #  Copyright 2008-2023 Statnet Commons
 ################################################################################
-#' Fit, Simulate and Diagnose Dynamic Network Models derived from
-#' Exponential-Family Random Graph Models
-#'
-#'
-#' \code{\link[=tergm-package]{tergm}} is a collection of extensions to the
+#' @details \code{\link[=tergm-package]{tergm}} is a collection of extensions to the
 #' \code{\link[=ergm-package]{ergm}} package to fit, diagnose, and simulate
 #' models for dynamic networks --- networks that evolve over time --- based on
 #' exponential-family random graph models (ERGMs). For a list of functions type
@@ -84,8 +80,6 @@
 #' newsgroup, references and links to further resources are provided there.
 #'
 #'
-#' @name tergm-package
-#' @docType package
 #' @references
 #' Hanneke S, Fu W and Xing EP (2010). Discrete
 #' Temporal Models of Social Networks. \emph{Electronic Journal of Statistics},
@@ -127,4 +121,4 @@
 #' \emph{Journal of Statistical Software}, 24(4).
 #' \doi{10.18637/jss.v024.i04}
 #' @keywords package models
-NULL
+"_PACKAGE"
