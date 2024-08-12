@@ -304,5 +304,5 @@ InitErgmTerm.Cross1 <- function(nw, arglist,  ...){
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  ergm_model(a$formula, nw, ...)
+  ergm_model(a$formula, nw, ..., terms.only=TRUE)
 }
