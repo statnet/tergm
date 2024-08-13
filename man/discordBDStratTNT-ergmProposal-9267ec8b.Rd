@@ -15,7 +15,7 @@ rather than the temporal operator networks).
 
 arguments are the same as for \code{\link[ergm:BDStratTNT-ergmProposal]{BDStratTNT}},
 and should be passed in via the \code{\link[ergm:bd-ergmConstraint]{bd}} and
-code{\link[ergm:blocks-ergmConstraint]{blocks}} constraints and
+\code{\link[ergm:blocks-ergmConstraint]{blocks}} constraints and
 \code{\link[ergm:strat-ergmHint]{strat}} hint.
 }
 \details{

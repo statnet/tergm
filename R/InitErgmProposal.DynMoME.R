@@ -12,7 +12,7 @@
 #' @aliases InitErgmProposal.discordTNT
 #' @title Temperal TNT proposal
 #' @description A temporal version of \code{\link[ergm:TNT-ergmProposal]{TNT}}, with approximately
-#'   code{discordance_fraction} of proposed toggles being made on the set of discordant dyads,
+#'   \code{discordance_fraction} of proposed toggles being made on the set of discordant dyads,
 #'   approximately \code{1 - discordance_fraction} of proposed toggles being TNT proposals from
 #'   network.  The value of \code{discordance_fraction} can be set by the user as a proposal argument,
 #'   defaults to `0.5`.
@@ -42,7 +42,7 @@ InitErgmProposal.discordTNT <- function(arguments, nw, ...) {
 #'
 #'   arguments are the same as for \code{\link[ergm:BDStratTNT-ergmProposal]{BDStratTNT}},
 #'   and should be passed in via the \code{\link[ergm:bd-ergmConstraint]{bd}} and
-#'   code{\link[ergm:blocks-ergmConstraint]{blocks}} constraints and
+#'   \code{\link[ergm:blocks-ergmConstraint]{blocks}} constraints and
 #'   \code{\link[ergm:strat-ergmHint]{strat}} hint.
 #' @template ergmProposal-general
 NULL

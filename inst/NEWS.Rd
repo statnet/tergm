@@ -424,7 +424,7 @@
     If set to "zeros", the initial values are set to zeros.
         \item \code{SA.oh.memory = 100000} Absolute maximum number of data points per thread to store in the full optimization history.
       }
-      \item  Changes to \code{simulate.stergm} parameters: addition of \code{duration.dependent} parameter: {Logical: Whether the model terms in formula or model are duration dependent. E.g., if a duration-dependent term  is used in estimation/simulation model, the probability of forming or dissolving a tie may dependent on the age the dyad status. If TRUE, the matrix of tie ages will be allocated.}
+      \item  Changes to \code{simulate.stergm} parameters: addition of \code{duration.dependent} parameter to control whether the model terms in formula or model are duration dependent. E.g., if a duration-dependent term  is used in estimation/simulation model, the probability of forming or dissolving a tie may dependent on the age the dyad status.
     }
   }
 
