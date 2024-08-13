@@ -285,6 +285,16 @@ test_that("simulate.networkDynamic behaves reasonably", {
   expect_equal(unname(summary(network.collapse(new_nwD_constr2, at = 20) ~ concurrent)), 0)
 })
 
+test_that("Dynamic simulation error messages are correct", {
+  nw <- network.initialize(100, directed = FALSE)
+
+  expect_error(simulate(nw ~ Form(~edges) + Persist(~edges), coef = c(5, 5), dynamic = TRUE, control = control.simulate.formula.tergm(MCMC.maxedges=2)),
+               "^Number of edges in a simulated network exceeds the maximum set by the 'MCMC.maxedges' control parameter.$")
+
+  expect_error(simulate(nw ~ Form(~edges) + Persist(~edges), coef = c(5, 5), dynamic = TRUE, control = control.simulate.formula.tergm(MCMC.maxchanges=2)),
+               "^Logging of changes in the network has been requested, and the storage capacity specified by 'MCMC.maxchanges' has been exceeded.$")
+})
+
 statnet.common::opttest({
 test_that("simulate.tergm behaves reasonably", {
   nw <- network.initialize(100, directed = FALSE)

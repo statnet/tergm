@@ -68,6 +68,14 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
   
   z <- tergm_MCMC_slave(state, eta.comb, control, verbose)
 
+  if(z$status)
+    stop(switch(z$status,
+                paste0("Number of edges in a simulated network exceeds the maximum set by the ", sQuote("MCMC.maxedges"), " control parameter."), # 1: MCMCDyn_TOO_MANY_EDGES
+                "A Metropolis-Hastings proposal has failed.", # 2: MCMCDyn_MH_FAILED
+                paste0("Logging of changes in the network has been requested, and the storage capacity specified by ", sQuote("MCMC.maxchanges"), " has been exceeded.") # 3: MCMCDyn_TOO_MANY_CHANGES
+                )
+         )
+
   state <- z$state
   
   diffedgelist<-if(control$changes) {
@@ -137,7 +145,7 @@ tergm_MCMC_slave <- function(state, eta, control, verbose){
              as.integer(verbose),
              PACKAGE="tergm")
 
-  if(z$status != 0) stop("MCMCDyn failed with error code ", z$status)
+  if(z$status) return(z) # If there is an error.
   
   z$state <- update(z$state)
   

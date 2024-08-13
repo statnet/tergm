@@ -10,7 +10,7 @@
 logit<-function(p) log(p/(1-p))
 ilogit<-function(x) 1/(1+exp(-x))
 
-o <- options(tergm.eval.loglik=FALSE)
+options(tergm.eval.loglik = FALSE, useFancyQuotes = FALSE)
 
 CMLE.tools <- new.env()
 
