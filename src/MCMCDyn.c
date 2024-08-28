@@ -51,42 +51,44 @@ SEXP MCMCDyn_wrapper(SEXP stateR, // ergm_state
   SEXP sample = PROTECT(allocVector(REALSXP, (asInteger(nsteps) + 1)*m->n_stats));
   memset(REAL(sample), 0, (asInteger(nsteps) + 1)*m->n_stats*sizeof(double));
   memcpy(REAL(sample), s->stats, m->n_stats*sizeof(double));
-  
-  SEXP difftime = PROTECT(allocVector(INTSXP, asInteger(log_changes) ? asInteger(maxchanges) : 0));
-  SEXP difftail = PROTECT(allocVector(INTSXP, asInteger(log_changes) ? asInteger(maxchanges) : 0));
-  SEXP diffhead = PROTECT(allocVector(INTSXP, asInteger(log_changes) ? asInteger(maxchanges) : 0));
-  SEXP diffto = PROTECT(allocVector(INTSXP, asInteger(log_changes) ? asInteger(maxchanges) : 0));
-  memset(INTEGER(difftime), 0, asInteger(log_changes) ? asInteger(maxchanges)*sizeof(int) : 0);
-  memset(INTEGER(difftail), 0, asInteger(log_changes) ? asInteger(maxchanges)*sizeof(int) : 0);
-  memset(INTEGER(diffhead), 0, asInteger(log_changes) ? asInteger(maxchanges)*sizeof(int) : 0);
-  memset(INTEGER(diffto), 0, asInteger(log_changes) ? asInteger(maxchanges)*sizeof(int) : 0);
+
+  int initial_capacity = 100;
+  DiffVec difftime = diff_new(initial_capacity);
+  DiffVec difftail = diff_new(initial_capacity);
+  DiffVec diffhead = diff_new(initial_capacity);
+  DiffVec diffto = diff_new(initial_capacity);
 
   SEXP status;
   if(MHp) status = PROTECT(ScalarInteger(MCMCSampleDyn(s,
               dur_inf,
               REAL(eta),
-              asInteger(collect)?REAL(sample):NULL, asInteger(maxedges), asInteger(maxchanges), asInteger(log_changes), (Vertex *)INTEGER(difftime), (Vertex *)INTEGER(difftail), (Vertex *)INTEGER(diffhead), INTEGER(diffto),
+              asInteger(collect)?REAL(sample):NULL, asInteger(maxedges), asInteger(maxchanges), asInteger(log_changes), &difftime, &difftail, &diffhead, &diffto,
               asInteger(nsteps), asInteger(min_MH_interval), asInteger(max_MH_interval), asReal(MH_pval), asReal(MH_interval_add), asInteger(burnin), asInteger(interval),
               asInteger(verbose))));
   else status = PROTECT(ScalarInteger(MCMCDyn_MH_FAILED));
-   
+
   const char *outn[] = {"status", "s", "state", "diffnwtime", "diffnwtails", "diffnwheads", "diffnwdirs", ""};
   SEXP outl = PROTECT(mkNamed(VECSXP, outn));
   SET_VECTOR_ELT(outl, 0, status);
   SET_VECTOR_ELT(outl, 1, sample);
-  
+
   /* record new generated network to pass back to R */
   if(asInteger(status) == MCMCDyn_OK){
     s->stats = REAL(sample) + asInteger(nsteps)*m->n_stats;
     SET_VECTOR_ELT(outl, 2, ErgmStateRSave(s));
   }
-  
-  SET_VECTOR_ELT(outl, 3, difftime);
-  SET_VECTOR_ELT(outl, 4, difftail);
-  SET_VECTOR_ELT(outl, 5, diffhead);
-  SET_VECTOR_ELT(outl, 6, diffto);
 
-  ErgmStateDestroy(s);  
+  SET_VECTOR_ELT(outl, 3, PROTECT(diff_to_SEXP(&difftime)));
+  SET_VECTOR_ELT(outl, 4, PROTECT(diff_to_SEXP(&difftail)));
+  SET_VECTOR_ELT(outl, 5, PROTECT(diff_to_SEXP(&diffhead)));
+  SET_VECTOR_ELT(outl, 6, PROTECT(diff_to_SEXP(&diffto)));
+
+  diff_clear(&difftime);
+  diff_clear(&difftail);
+  diff_clear(&diffhead);
+  diff_clear(&diffto);
+
+  ErgmStateDestroy(s);
   PutRNGstate();  /* Disable RNG before returning */
   UNPROTECT(7);
   return outl;
@@ -98,9 +100,9 @@ SEXP MCMCDyn_wrapper(SEXP stateR, // ergm_state
  Using the parameters contained in the array eta, obtain the
  network statistics for a sample of size nsteps.  burnin is the
  initial number of Markov chain steps before sampling anything
- and interval is the number of MC steps between successive 
+ and interval is the number of MC steps between successive
  networks in the sample.  Put all the sampled statistics into
- the statistics array. 
+ the statistics array.
 *********************/
 MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                 StoreTimeAndLasttoggle *dur_inf,
@@ -110,10 +112,10 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                 int maxedges,
                 int maxchanges,
                 int log_changes,
-                Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,            
+                DiffVec *difftime, DiffVec *difftail, DiffVec *diffhead, DiffVec *diffto,
                 // MCMC settings.
                 unsigned int nsteps, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
-                unsigned int burnin, unsigned int interval, 
+                unsigned int burnin, unsigned int interval,
                 // Verbosity.
                 int verbose){
   Network *nwp = s->nwp;
@@ -126,8 +128,8 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
   /*if (verbose)
     Rprintf("Total m->n_stats is %i; total nsteps is %d\n",
     m->n_stats,nsteps);*/
-  
-  
+
+
   /* Burn in step. */
 
   for(i=0;i<burnin;i++){
@@ -141,18 +143,18 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
     // Check that we didn't run out of log space.
     if(status==MCMCDyn_TOO_MANY_CHANGES)
       return MCMCDyn_TOO_MANY_CHANGES;
-  
+
     // If we need to return a network, then stop right there, since the network is too big to return, so stop early.
     if(maxedges!=0 && EDGECOUNT(nwp) >= maxedges-1)
       return MCMCDyn_TOO_MANY_EDGES;
   }
-  
+
   //Rprintf("MCMCSampleDyn post burnin numdissolve %d\n", *numdissolve);
-  
+
   if (verbose){
     Rprintf("Returned from STERGM burnin\n");
   }
-  
+
   /* Now sample networks */
   for (i=0; i < nsteps; i++){
     /* Set current vector of stats equal to previous vector */
@@ -172,16 +174,16 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                       stats,
                       maxchanges, log_changes ? &nextdiffedge : NULL, difftime, difftail, diffhead, diffto,
                       min_MH_interval, max_MH_interval, MH_pval, MH_interval_add, verbose);
-      
+
       // Check that we didn't run out of log space.
       if(status==MCMCDyn_TOO_MANY_CHANGES)
         return MCMCDyn_TOO_MANY_CHANGES;
-      
+
       // If we need to return a network, then stop right there, since the network is too big to return, so stop early.
       if(maxedges!=0 && EDGECOUNT(nwp) >= maxedges-1)
     return MCMCDyn_TOO_MANY_EDGES;
     }
-    
+
     //Rprintf("MCMCSampleDyn loop numdissolve %d\n", *numdissolve);
     if (verbose){
       if( ((3*i) % nsteps)<3 && nsteps > 500){
@@ -190,7 +192,13 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
     }
   }
 
-  if(log_changes) difftime[0]=difftail[0]=diffhead[0]=diffto[0]=nextdiffedge-1;
+  if(log_changes) {
+      // nextdiffedge - 1 == 0 always?
+      diff_append(difftime, nextdiffedge - 1);
+      diff_append(difftail, nextdiffedge - 1);
+      diff_append(diffhead, nextdiffedge - 1);
+      diff_append(diffto, nextdiffedge - 1);
+  }
   return MCMCDyn_OK;
 }
 
@@ -223,11 +231,11 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
                            // Space for output.
                            double *stats,
                            unsigned int maxchanges, Edge *nextdiffedge,
-                           Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
+                           DiffVec *difftime, DiffVec *difftail, DiffVec *diffhead, DiffVec *diffto,
                            // MCMC settings.
                            unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
                            // Verbosity.
-                           int verbose){                              
+                           int verbose){
   Network *nwp = s->nwp;
   Model *m = s->m;
   MHProposal *MHp = s->MHp;
@@ -240,20 +248,20 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
   if(stats) addonto(stats, m->workspace, m->n_stats);
 
   /* Run the process. */
-  
+
   double cutoff;
-  double 
+  double
     si = 0, // sum of increments
     si2 = 0, // sum of squared increments
-    sw = 0, // sum of weights 
+    sw = 0, // sum of weights
     sw2 = 0 // sum of squared weights
     ;
   double sdecay = 1 - 1.0/min_MH_interval;
-  
+
   unsigned int step=0; // So that we could print out the number of steps later.
   for(unsigned int finished = 0, extrasteps = 0; step < max_MH_interval && finished < extrasteps+1; step++) {
     unsigned int prev_discord = kh_size(discord);
-    
+
     MHp->logratio = 0;
     (*(MHp->p_func))(MHp, nwp); /* Call MHp function to propose toggles */
     //      Rprintf("Back from proposal; step=%d\n",step);
@@ -263,11 +271,11 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
       switch(MHp->togglehead[0]){
       case MH_UNRECOVERABLE:
     error("Something very bad happened during proposal. Memory has not been deallocated, so restart R soon.");
-    
+
       case MH_IMPOSSIBLE:
     Rprintf("MH MHProposal function encountered a configuration from which no toggle(s) can be proposed.\n");
     return MCMCDyn_MH_FAILED;
-    
+
       case MH_UNSUCCESSFUL:
       case MH_CONSTRAINT:
     continue;
@@ -275,20 +283,20 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
     }
 
     ChangeStats(MHp->ntoggles, MHp->toggletail, MHp->togglehead, nwp, m);
-    
-    //  Rprintf("change stats:"); 
+
+    //  Rprintf("change stats:");
     /* Calculate inner product */
     double ip = dotprod(eta, m->workspace, m->n_stats);
-      //  Rprintf("%f ", m->workspace[i]); 
+      //  Rprintf("%f ", m->workspace[i]);
     //}
-    //  Rprintf("\n ip %f dedges %f\n", ip, m->workspace[0]); 
+    //  Rprintf("\n ip %f dedges %f\n", ip, m->workspace[0]);
     /* The logic is to set exp(cutoff) = exp(ip) * qratio ,
        then let the MHp probability equal min{exp(cutoff), 1.0}.
        But we'll do it in log space instead.  */
     cutoff = ip + MHp->logratio;
-    
+
     /* if we accept the proposed network */
-    if (cutoff >= 0.0 || log(unif_rand()) < cutoff) { 
+    if (cutoff >= 0.0 || log(unif_rand()) < cutoff) {
       /* Hold off updating timesteamps until the changes are committed,
          which doesn't happen until later. */
       for (unsigned int i=0; i < MHp->ntoggles; i++){
@@ -305,17 +313,17 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
     sw++; si += i;
     sw2 *= sdecay*sdecay; si2 *= sdecay;
     sw2++; si2 += i*i;
-         
-    if(step >= min_MH_interval && !finished) { 
+
+    if(step >= min_MH_interval && !finished) {
       // Now, perform the test:
       double mi = (double)si / sw, mi2 = (double)si2 / sw;
-      
+
       double vi = mi2 - mi*mi;
       double zi = mi / sqrt(vi * sw2/(sw*sw)); // denom = sqrt(sum(w^2 * v)/sum(w)^2)
       double pi = pnorm(zi, 0, 1, FALSE, FALSE); // Pr(Z > zi)
 
       if(verbose>=5) Rprintf("%u: sw=%2.2f sw2=%2.2f d=%d i=%d si=%2.2f si2=%2.2f mi=%2.2f vi=%2.2f ni=%2.2f zi=%2.2f pi=%2.2f\n", step, sw, sw2, kh_size(discord), i, si, si2, mi, vi, (sw*sw)/sw2, zi, pi);
-  
+
       if(pi > MH_pval){
     extrasteps = step*MH_interval_add+round(runif(0,1));
     finished++;
@@ -326,7 +334,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
   }
 
   /* Step finished: record changes. */
-  
+
   if(verbose>=4){
     if(step>=max_MH_interval ) Rprintf("Convergence not achieved after %u M-H steps.\n",step);
     else Rprintf("Convergence achieved after %u M-H steps.\n",step);
@@ -343,25 +351,25 @@ MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
                                    // Space for output.
                                    double *stats,
                                    unsigned int maxchanges, Edge *nextdiffedge,
-                                   Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
+                                   DiffVec *difftime, DiffVec *difftail, DiffVec *diffhead, DiffVec *diffto,
                                    // Verbosity.
                                    int verbose){
   StoreDyadMapInt *discord = dur_inf->discord;
   int t = dur_inf->time;
-  
+
   Network *nwp = s->nwp;
   Model *m = s->m;
   MHProposal *MHp = s->MHp;
 
   if(nextdiffedge) {
     TailHead dyad;
-    kh_foreach_key(discord, dyad,{    
+    kh_foreach_key(discord, dyad,{
         if(*nextdiffedge<maxchanges){
           // and record the toggle.
-          if(difftime) difftime[*nextdiffedge] = t;
-          if(difftail) difftail[*nextdiffedge] = dyad.tail;
-          if(diffhead) diffhead[*nextdiffedge] = dyad.head;
-          if(diffto) diffto[*nextdiffedge] = GetEdge(dyad.tail,dyad.head,nwp);
+          if(difftime) diff_append(difftime, t);
+          if(difftail) diff_append(difftail, dyad.tail);
+          if(diffhead) diff_append(diffhead, dyad.head);
+          if(diffto) diff_append(diffto, GetEdge(dyad.tail,dyad.head,nwp));
           (*nextdiffedge)++;
         }else{
           return(MCMCDyn_TOO_MANY_CHANGES);
