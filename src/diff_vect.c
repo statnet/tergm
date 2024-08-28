@@ -6,19 +6,19 @@ DiffVec diff_new(int capacity) {
     DiffVec diff = {
         .size = 0,
         .capacity = capacity,
-        .content = R_calloc(capacity, sizeof(int)),
+        .content = R_Calloc(capacity, int),
     };
     return diff;
 }
 
 void diff_clear(DiffVec* diff) {
-    R_free(diff->content);
+    R_Free(diff->content);
 }
 
 void diff_append(DiffVec* diff, int value) {
     if (diff->size == diff->capacity) {
         diff->capacity *= 2;
-        diff->content = R_realloc(diff->content, diff->capacity * sizeof(int));
+        diff->content = R_Realloc(diff->content, diff->capacity, int);
     }
     diff->content[diff->size++] = value;
 }
