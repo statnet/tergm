@@ -1,3 +1,4 @@
+#include <R.h>
 #include <stdlib.h>
 #include "diff_vect.h"
 
