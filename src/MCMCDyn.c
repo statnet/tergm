@@ -90,6 +90,7 @@ SEXP MCMCDyn_wrapper(SEXP stateR, // ergm_state
 
   ErgmStateDestroy(s);
   PutRNGstate();  /* Disable RNG before returning */
+            Rprintf("N changes: %d", difftime.size);
   UNPROTECT(7);
   return outl;
 }
@@ -193,7 +194,6 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
   }
 
   if(log_changes) {
-      // nextdiffedge - 1 == 0 always?
       diff_append(difftime, nextdiffedge - 1);
       diff_append(difftail, nextdiffedge - 1);
       diff_append(diffhead, nextdiffedge - 1);
