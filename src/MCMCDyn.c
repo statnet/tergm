@@ -57,6 +57,11 @@ SEXP MCMCDyn_wrapper(SEXP stateR, // ergm_state
   DiffVec difftail = diff_new(initial_capacity);
   DiffVec diffhead = diff_new(initial_capacity);
   DiffVec diffto = diff_new(initial_capacity);
+  // pre-allocate the 0th element for size
+  diff_append(&difftime, 0);
+  diff_append(&difftail, 0);
+  diff_append(&diffhead, 0);
+  diff_append(&diffto, 0);
 
   SEXP status;
   if(MHp) status = PROTECT(ScalarInteger(MCMCSampleDyn(s,
@@ -193,10 +198,10 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
   }
 
   if(log_changes) {
-      diff_append(difftime, nextdiffedge - 1);
-      diff_append(difftail, nextdiffedge - 1);
-      diff_append(diffhead, nextdiffedge - 1);
-      diff_append(diffto, nextdiffedge - 1);
+      difftime->content[0] = nextdiffedge - 1;
+      difftail->content[0] = nextdiffedge - 1;
+      diffhead->content[0] = nextdiffedge - 1;
+      diffto->content[0] = nextdiffedge - 1;
   }
   return MCMCDyn_OK;
 }
