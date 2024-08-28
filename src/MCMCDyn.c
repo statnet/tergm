@@ -90,7 +90,6 @@ SEXP MCMCDyn_wrapper(SEXP stateR, // ergm_state
 
   ErgmStateDestroy(s);
   PutRNGstate();  /* Disable RNG before returning */
-            Rprintf("N changes: %d", difftime.size);
   UNPROTECT(7);
   return outl;
 }
