@@ -9,15 +9,15 @@
 ################################################################################
 
 #' Collects a sample of networks and returns the statistics of each sample
-#' 
+#'
 #' \code{tergm_MCMC_sample} is a low-level internal function not intended to
 #' be called directly by end users. It collects a sample of networks and
-#' returns the statistics of each sample, along with a toggle matrix of the 
+#' returns the statistics of each sample, along with a toggle matrix of the
 #' changes needed from the original network to each in the sample.
-#' 
+#'
 #' This function is normally called inside \code{\link{simulate.tergm}} functions
 #' to prepare inputs for the C sampling code and return its results
-#' 
+#'
 #' @aliases tergm_MCMC_sample tergm_MCMC_slave
 #' @param nw a \code{\link{network}} object
 #' @param model the model, as returned by \code{\link{ergm_model}}
@@ -27,14 +27,14 @@
 #' @param eta the vector of natural parameters
 #' @param control the list of control parameters
 #' @template verbose
-#' @return returns the MCMC sample as a list containing: 
+#' @return returns the MCMC sample as a list containing:
 #' \itemize{
 #'   \item statsmatrix.gen: the matrix of sampled statistics for \code{model},
 #'     relative to the initial network
 #'   \item statsmatrix.mon: the matrix of sampled statistics for \code{model.mon},
-#'     relative to the initial network 
+#'     relative to the initial network
 #'   \item newnetwork: \code{ergm_state} with the final network from the
-#'     sampling process 
+#'     sampling process
 #'   \item changed: a matrix of changes, where the first column is
 #'     the timestamp of the change, the second and third columns are the tail and head
 #'     (respectively) of the changed dyad, and the fourth column is the edge state to which
@@ -50,11 +50,11 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
                                verbose=FALSE,...,
                                eta = ergm.eta(theta, model$etamap)
                                ){
-  # this is where we combine models and pad out eta 
+  # this is where we combine models and pad out eta
   # with 0s as necessary to accomodate the monitoring model
   model.comb <- c(model, model.mon)
   proposal$aux.slots <- model.comb$slots.extra.aux$proposal
-  
+
   eta.comb <- c(eta, rep(0, NVL(model.mon$etamap$etalength, 0)))
 
   # always collect if monitoring model is passed
@@ -62,10 +62,10 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
 
   #
   #   Check for truncation of the returned edge list
-  #  
-  
+  #
+
   state <- ergm_state(nw, model=model.comb, proposal=proposal, stats=rep(0,nparam(model.comb, canonical=TRUE)))
-  
+
   z <- tergm_MCMC_slave(state, eta.comb, control, verbose)
 
   if(z$status)
@@ -77,10 +77,15 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
          )
 
   state <- z$state
-  
+
   diffedgelist<-if(control$changes) {
     if(z$diffnwtime[1]>0){
-      tmp <- cbind(z$diffnwtime[2:(z$diffnwtime[1]+1)],z$diffnwtails[2:(z$diffnwtails[1]+1)],z$diffnwheads[2:(z$diffnwheads[1]+1)],z$diffnwdirs[2:(z$diffnwdirs[1]+1)])
+      tmp <- cbind(
+        z$diffnwtime[2:(z$diffnwtime[1]+1)],
+        z$diffnwtails[2:(z$diffnwtails[1]+1)],
+        z$diffnwheads[2:(z$diffnwheads[1]+1)],
+        z$diffnwdirs[2:(z$diffnwdirs[1]+1)]
+      )
       colnames(tmp) <- c("time","tail","head","to")
       tmp
     }else{
@@ -94,7 +99,7 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
   mode(diffedgelist) <- "integer" # Might save some memory.
 
   statsmatrix <- z$statsmatrix
-  
+
   if(!is.null(statsmatrix)) colnames(statsmatrix) <- param_names(model.comb, canonical = TRUE)
 
   # this is where we separate monitored stats from generative stats if model.mon is passed
@@ -125,7 +130,7 @@ tergm_MCMC_slave <- function(state, eta, control, verbose){
 
   maxedges <- NVL(control$MCMC.maxedges, Inf)
   maxchanges <- control$MCMC.maxchanges
-  
+
   z <- .Call("MCMCDyn_wrapper",
              state,
              as.double(deInf(eta)),
@@ -146,16 +151,16 @@ tergm_MCMC_slave <- function(state, eta, control, verbose){
              PACKAGE="tergm")
 
   if(z$status) return(z) # If there is an error.
-  
+
   z$state <- update(z$state)
-  
+
   statsmatrix <-
     if(collect) matrix(z$s, nrow=control$time.samplesize+1,
                             ncol=nparam(state,canonical=TRUE),
                             byrow = TRUE)[-1,,drop=FALSE]
     else
       NULL
-  
+
   c(z,
     list(statsmatrix = statsmatrix))
 }
