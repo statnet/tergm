@@ -1,5 +1,4 @@
 #include <R.h>
-#include <stdlib.h>
 #include "diff_vect.h"
 
 DiffVec diff_new(int capacity) {
