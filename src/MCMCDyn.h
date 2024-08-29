@@ -17,10 +17,7 @@
 #include "tergm_model.h"
 #include "ergm_state.h"
 #include "changestats_lasttoggle.h"
-/*#include "diff_vect.h"*/
-
-#include "ergm_kvec.h"
-typedef kvec_t(int) kvint;
+#include "kvint.h"
 
 // TODO: This might be worth moving into a common "constants.h".
 typedef enum MCMCDynStatus_enum {
