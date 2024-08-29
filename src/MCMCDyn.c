@@ -16,6 +16,17 @@
  should have (k,j) with k>j.
 *****************/
 
+SEXP kvint_to_SEXP(kvint v) {
+    int size = kv_size(v);
+    SEXP out = PROTECT(allocVector(INTSXP, size));
+    int *out_ptr = INTEGER(out);
+    for (int i = 0; i < size; i++) {
+        out_ptr[i] = kv_A(v, i);
+    }
+    UNPROTECT(1);
+    return out;
+}
+
 /*****************
  void MCMCDyn_wrapper
 
@@ -52,16 +63,18 @@ SEXP MCMCDyn_wrapper(SEXP stateR, // ergm_state
   memset(REAL(sample), 0, (asInteger(nsteps) + 1)*m->n_stats*sizeof(double));
   memcpy(REAL(sample), s->stats, m->n_stats*sizeof(double));
 
-  int initial_capacity = 100;
-  DiffVec difftime = diff_new(initial_capacity);
-  DiffVec difftail = diff_new(initial_capacity);
-  DiffVec diffhead = diff_new(initial_capacity);
-  DiffVec diffto = diff_new(initial_capacity);
+  kvint difftime, difftail, diffhead, diffto;
+  kv_init(difftime);
+  kv_init(difftail);
+  kv_init(diffhead);
+  kv_init(diffto);
+
   // pre-allocate the 0th element for size
-  diff_append(&difftime, 0);
-  diff_append(&difftail, 0);
-  diff_append(&diffhead, 0);
-  diff_append(&diffto, 0);
+  kv_push(int, difftime, 0);
+  kv_push(int, difftail, 0);
+  kv_push(int, diffhead, 0);
+  kv_push(int, diffto, 0);
+
 
   SEXP status;
   if(MHp) status = PROTECT(ScalarInteger(MCMCSampleDyn(s,
@@ -83,15 +96,15 @@ SEXP MCMCDyn_wrapper(SEXP stateR, // ergm_state
     SET_VECTOR_ELT(outl, 2, ErgmStateRSave(s));
   }
 
-  SET_VECTOR_ELT(outl, 3, PROTECT(diff_to_SEXP(&difftime)));
-  SET_VECTOR_ELT(outl, 4, PROTECT(diff_to_SEXP(&difftail)));
-  SET_VECTOR_ELT(outl, 5, PROTECT(diff_to_SEXP(&diffhead)));
-  SET_VECTOR_ELT(outl, 6, PROTECT(diff_to_SEXP(&diffto)));
+  SET_VECTOR_ELT(outl, 3, PROTECT(kvint_to_SEXP(difftime)));
+  SET_VECTOR_ELT(outl, 4, PROTECT(kvint_to_SEXP(difftail)));
+  SET_VECTOR_ELT(outl, 5, PROTECT(kvint_to_SEXP(diffhead)));
+  SET_VECTOR_ELT(outl, 6, PROTECT(kvint_to_SEXP(diffto)));
 
-  diff_clear(&difftime);
-  diff_clear(&difftail);
-  diff_clear(&diffhead);
-  diff_clear(&diffto);
+  kv_destroy(difftime);
+  kv_destroy(difftail);
+  kv_destroy(diffhead);
+  kv_destroy(diffto);
 
   ErgmStateDestroy(s);
   PutRNGstate();  /* Disable RNG before returning */
@@ -117,7 +130,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                 int maxedges,
                 int maxchanges,
                 int log_changes,
-                DiffVec *difftime, DiffVec *difftail, DiffVec *diffhead, DiffVec *diffto,
+                kvint *difftime, kvint *difftail, kvint *diffhead, kvint *diffto,
                 // MCMC settings.
                 unsigned int nsteps, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
                 unsigned int burnin, unsigned int interval,
@@ -198,10 +211,10 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
   }
 
   if(log_changes) {
-      difftime->content[0] = nextdiffedge - 1;
-      difftail->content[0] = nextdiffedge - 1;
-      diffhead->content[0] = nextdiffedge - 1;
-      diffto->content[0] = nextdiffedge - 1;
+      kv_A(*difftime, 0) = nextdiffedge - 1;
+      kv_A(*difftail, 0) = nextdiffedge - 1;
+      kv_A(*diffhead, 0) = nextdiffedge - 1;
+      kv_A(*diffto, 0) = nextdiffedge - 1;
   }
   return MCMCDyn_OK;
 }
@@ -235,7 +248,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
                            // Space for output.
                            double *stats,
                            unsigned int maxchanges, Edge *nextdiffedge,
-                           DiffVec *difftime, DiffVec *difftail, DiffVec *diffhead, DiffVec *diffto,
+                           kvint *difftime, kvint *difftail, kvint *diffhead, kvint *diffto,
                            // MCMC settings.
                            unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
                            // Verbosity.
@@ -355,7 +368,7 @@ MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
                                    // Space for output.
                                    double *stats,
                                    unsigned int maxchanges, Edge *nextdiffedge,
-                                   DiffVec *difftime, DiffVec *difftail, DiffVec *diffhead, DiffVec *diffto,
+                                   kvint *difftime, kvint *difftail, kvint *diffhead, kvint *diffto,
                                    // Verbosity.
                                    int verbose){
   StoreDyadMapInt *discord = dur_inf->discord;
@@ -370,10 +383,10 @@ MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
     kh_foreach_key(discord, dyad,{
         if(*nextdiffedge<maxchanges){
           // and record the toggle.
-          if(difftime) diff_append(difftime, t);
-          if(difftail) diff_append(difftail, dyad.tail);
-          if(diffhead) diff_append(diffhead, dyad.head);
-          if(diffto) diff_append(diffto, GetEdge(dyad.tail,dyad.head,nwp));
+          if(difftime) kv_push(int, *difftime, t);
+          if(difftail) kv_push(int, *difftail, dyad.tail);
+          if(diffhead) kv_push(int, *diffhead, dyad.head);
+          if(diffto) kv_push(int, *diffto, GetEdge(dyad.tail,dyad.head,nwp));
           (*nextdiffedge)++;
         }else{
           return(MCMCDyn_TOO_MANY_CHANGES);
