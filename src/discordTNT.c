@@ -213,11 +213,11 @@ MH_I_FN(Mi_discordBDStratTNT) {
   sto->nonDiscordantEdges = static_sto->hash;
   sto->static_sto = static_sto;
   
-  sto->nodes = Calloc(2, Vertex);
-  sto->maxl = Calloc(2, int);
+  sto->nodes = R_Calloc(2, Vertex);
+  sto->maxl = R_Calloc(2, int);
   
-  sto->BDTDNE = Calloc(sto->static_sto->strat_nmixtypes, HashEL *);
-  sto->discordantEdges = Calloc(sto->static_sto->strat_nmixtypes, HashEL *);  
+  sto->BDTDNE = R_Calloc(sto->static_sto->strat_nmixtypes, HashEL *);
+  sto->discordantEdges = R_Calloc(sto->static_sto->strat_nmixtypes, HashEL *);  
   for(int i = 0; i < sto->static_sto->strat_nmixtypes; i++) {
     sto->BDTDNE[i] = HashELInitialize(0, NULL, NULL, FALSE);
     sto->discordantEdges[i] = HashELInitialize(0, NULL, NULL, FALSE);
@@ -433,11 +433,11 @@ MH_F_FN(Mf_discordBDStratTNT) {
     HashELDestroy(sto->BDTDNE[i]);
     HashELDestroy(sto->discordantEdges[i]);
   }
-  Free(sto->BDTDNE);
-  Free(sto->discordantEdges);
+  R_Free(sto->BDTDNE);
+  R_Free(sto->discordantEdges);
   
-  Free(sto->nodes);
-  Free(sto->maxl);
+  R_Free(sto->nodes);
+  R_Free(sto->maxl);
   
   NetworkDestroy(sto->combined_BDTDNE);
   NetworkDestroy(sto->combined_nonBDTDNE);
@@ -446,7 +446,7 @@ MH_F_FN(Mf_discordBDStratTNT) {
   // let BDStratTNT's F_FN do most of the work
   MH_STORAGE = sto->static_sto;
   Mf_BDStratTNT(MHp, nwp);
-  Free(sto->static_sto);
+  R_Free(sto->static_sto);
   MH_STORAGE = sto;
-  // MHp->storage itself should be Freed by MHProposalDestroy
+  // MHp->storage itself should be R_Freed by MHProposalDestroy
 }
