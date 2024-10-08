@@ -127,14 +127,6 @@ InitErgmTerm..union.lt.net<-function(nw, arglist, ...) {
                list(emptynwstats=NULL)))
 }
 
-### TODO: Export this from ergm then remove from tergm.
-ergm_rename_terms <- function(model, namewrap){
-  for(i in seq_along(model$terms)){
-    model$terms[[i]]$coef.names <- namewrap(model$terms[[i]]$coef.names)
-    if(!is.null(model$terms[[i]]$params)) names(model$terms[[i]]$params) <- namewrap(names(model$terms[[i]]$params))
-  }
-  model
-}
 
 `InitErgmTerm.Cross (dynamic)` <- function(nw, arglist,  ...) {
   stopifnot_dynamic(nw, .netseries.OK=TRUE, ...)
@@ -144,8 +136,10 @@ ergm_rename_terms <- function(model, namewrap){
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  ergm_model(a$formula, nw, ..., terms.only=TRUE) %>%
-    ergm_rename_terms(function(x) paste0("Cross~", x))
+  m <- ergm_model(a$formula, nw, ..., terms.only=TRUE)
+  param_names(m) <- list(paste0("Cross~", param_names(m, canonical = FALSE)),
+                         paste0("Cross~", param_names(m, canonical = TRUE)))
+  m
 }
 
 
