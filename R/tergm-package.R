@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
 #' @details \CRANpkg{tergm} is a collection of extensions to the
 #' \CRANpkg{ergm} package to fit, diagnose, and simulate
