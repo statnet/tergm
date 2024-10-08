@@ -33,13 +33,13 @@
 #' 
 #' @param times For CMLE and CMPLE estimation, times or indexes at
 #'   which the networks whose transition is to be modeled are
-#'   observed. Default to \code{c(0,1)} if \code{nw} is a
-#'   \code{\link[networkDynamic]{networkDynamic}} and to
-#'   \code{1:length(nw)} (all transitions) if \code{nw} is a
-#'   \code{\link{network.list}} or a \code{\link{list}}. Unused for
-#'   EGMME. Note that at this time, the selected time points will be
-#'   treated as temporally adjacent. Irregluarly spaced time series
-#'   are not supported at this time.
+#'   observed. This argument is mandatory if \code{nw} is a
+#'   [`networkDynamic`] and defaults to \code{1:length(nw)} (all
+#'   transitions) if \code{nw} is a [`network.list`] or a
+#'   [`list`]. Ignored when estimating EGMME or if LHS is already a
+#'   [`NetSeries`]. Note that at this time, the selected time points
+#'   will be treated as temporally adjacent. Irregluarly spaced time
+#'   series are not supported at this time.
 #' 
 #' @param offset.coef Numeric vector to specify offset parameters.
 #' @param targets One-sided \code{\link{ergm}}-style formula specifying
