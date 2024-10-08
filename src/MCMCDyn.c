@@ -143,7 +143,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
       return MCMCDyn_TOO_MANY_CHANGES;
   
     // If we need to return a network, then stop right there, since the network is too big to return, so stop early.
-    if(maxedges!=0 && nwp->nedges >= maxedges-1)
+    if(maxedges!=0 && EDGECOUNT(nwp) >= maxedges-1)
       return MCMCDyn_TOO_MANY_EDGES;
   }
   
@@ -178,7 +178,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
         return MCMCDyn_TOO_MANY_CHANGES;
       
       // If we need to return a network, then stop right there, since the network is too big to return, so stop early.
-      if(maxedges!=0 && nwp->nedges >= maxedges-1)
+      if(maxedges!=0 && EDGECOUNT(nwp) >= maxedges-1)
     return MCMCDyn_TOO_MANY_EDGES;
     }
     
