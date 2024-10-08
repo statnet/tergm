@@ -39,6 +39,7 @@ Suggests:
     testthat (>= 3.2.1.1),
     covr (>= 3.6.4),
     networkLite (>= 1.0.5),
+    rlang,
     lattice,
     parallel
 BugReports: https://github.com/statnet/tergm/issues
