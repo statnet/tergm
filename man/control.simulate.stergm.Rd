@@ -59,7 +59,7 @@ and \code{MCMC.burnin.max} to the same value.}
 
 \item{MCMC.prop.weights.form}{Specifies the proposal weighting scheme to
 be used in the MCMC Metropolis-Hastings algorithm.  Possible
-choices may be determined by calling \code{\link{ergm_proposal_table}}.}
+choices may be determined by calling \code{\link[ergm:ergm_proposal_table]{ergm_proposal_table()}}.}
 
 \item{MCMC.prop.weights.diss, MCMC.prop.args.diss, MCMC.prop.diss}{Ignored. These are included
 for backwards compatibility of calls to \code{control}
@@ -73,7 +73,7 @@ direct way of specifying additional arguments to proposals.}
 \item{MCMC.maxchanges}{Maximum number of changes for
 which to allocate space.}
 
-\item{term.options}{A list of additional arguments to be passed to term initializers. See \code{\link[=term.options]{? term.options}}.}
+\item{term.options}{A list of additional arguments to be passed to term initializers. See \code{\link[ergm:ergm-options]{? term.options}}.}
 
 \item{MCMC.packagenames}{Names of packages in which to look for change
 statistic functions in addition to those autodetected. This argument should
@@ -86,17 +86,17 @@ A list with arguments as components.
 Auxiliary function as user interface for fine-tuning STERGM simulation.
 }
 \details{
-This function is only used within a call to the \code{\link{simulate}}
-function.  See the \code{usage} section in \code{\link{simulate.stergm}} for
+This function is only used within a call to the \code{\link[=simulate]{simulate()}}
+function.  See the Usage section in \code{\link[=simulate.stergm]{simulate.stergm()}} for
 details.
 
 These functions are included for backwards compatibility, and users are
 encouraged to use \code{control.simulate.tergm} or
-\code{control.simulate.formula.tergm} with the \code{\link{simulate.tergm}}
+\code{control.simulate.formula.tergm} with the \code{\link[=simulate.tergm]{simulate.tergm()}}
 family of functions instead.  When a
 \code{control.simulate.stergm} or \code{control.simulate.network} object
-is passed to one of the \code{\link{simulate.stergm}} functions,
-the corresponding \code{\link{simulate.tergm}} function is invoked,
+is passed to one of the \code{\link[=simulate.stergm]{simulate.stergm()}} functions,
+the corresponding \code{\link[=simulate.tergm]{simulate.tergm()}} function is invoked,
 and uses the formation proposal control arguments, ignoring the
 dissolution proposal control arguments.
 
@@ -105,8 +105,8 @@ tie persistence.  As a result it maps to the new \code{Persist()} operator
 in \code{tergm}, NOT the \code{Diss()} operator
 }
 \seealso{
-\code{\link{simulate.stergm}},
-\code{\link{simulate.formula}}.  \code{\link{control.stergm}}
-performs a similar function for \code{\link{stergm}}.
+\code{\link[=simulate.stergm]{simulate.stergm()}},
+\code{\link[ergm:simulate.formula]{simulate.formula()}}.  \code{\link[=control.stergm]{control.stergm()}}
+performs a similar function for \code{\link[=stergm]{stergm()}}.
 }
 \keyword{models}

@@ -12,8 +12,8 @@
 #' 
 #' Auxiliary function as user interface for fine-tuning TERGM simulation.
 #' 
-#' This function is only used within a call to the \code{\link{simulate}}
-#' function.  See the \code{usage} section in \code{\link{simulate.tergm}} for
+#' This function is only used within a call to the [simulate()]
+#' function.  See the Usage section in [simulate.tergm()] for
 #' details.
 #' 
 #' @param
@@ -36,7 +36,7 @@
 #'
 #' @param MCMC.prop.weights Specifies the proposal weighting scheme to 
 #'   be used in the MCMC Metropolis-Hastings algorithm.  Possible
-#'   choices may be determined by calling \code{\link{ergm_proposal_table}}.
+#'   choices may be determined by calling [ergm_proposal_table()].
 #'
 #' @param MCMC.prop.args An alternative, direct way of specifying 
 #'   additional arguments to the proposal.
@@ -54,9 +54,9 @@
 #'
 #' @return A list with arguments as components.
 #'
-#' @seealso \code{\link{simulate.tergm}},
-#'   \code{\link{simulate.formula}}.  \code{\link{control.tergm}}
-#'   performs a similar function for \code{\link{tergm}}.
+#' @seealso [simulate.tergm()],
+#'   [simulate.formula()].  [control.tergm()]
+#'   performs a similar function for [tergm()].
 #'
 #' @keywords models
 #'

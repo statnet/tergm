@@ -20,7 +20,7 @@ which the time elapsed since formation is greater than or equal to
 is in the semiopen interval \verb{[from, to)} .
 }
 \seealso{
-\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+\code{\link[ergm:ergmTerm]{ergmTerm}} for index of model terms currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "edges.ageinterval", "subsection")}
 }

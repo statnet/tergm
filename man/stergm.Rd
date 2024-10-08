@@ -23,14 +23,14 @@ stergm(
 )
 }
 \arguments{
-\item{nw}{A \code{\link[network]{network}} object (for EGMME); or
-\code{\link[networkDynamic]{networkDynamic}} object, a
-\code{\link{network.list}} object, or a \code{\link{list}} containing
+\item{nw}{A \code{\link[network:network]{network}} object (for EGMME); or
+\code{\link[networkDynamic:networkDynamic]{networkDynamic}} object, a
+\code{\link[ergm:network.list]{network.list}} object, or a \code{\link{list}} containing
 networks (for CMLE and CMPLE).
 
 \code{stergm} understands the \code{\link{lasttoggle}} "API".}
 
-\item{formation, dissolution}{One-sided \code{\link{ergm}}-style formulas for
+\item{formation, dissolution}{One-sided \code{\link[ergm:ergm]{ergm()}}-style formulas for
 the formation and dissolution models, respectively.  In \code{stergm},
 the dissolution formula is parameterized in
 terms of tie persistence: negative coefficients imply lower rates of persistence
@@ -40,11 +40,11 @@ negation of these coefficients.}
 \item{constraints}{A formula specifying one or more constraints
 on the support of the distribution of the networks being modeled. Multiple constraints
 may be given, separated by \dQuote{+} and \dQuote{-} operators. See
-\code{\link{ergmConstraint}} for the detailed explanation of
+\code{\link[ergm:ergmConstraint]{ergmConstraint}} for the detailed explanation of
 their semantics and also for an indexed list of the constraints visible to the \pkg{ergm} package.
 
 The default is to have no constraints except those provided through
-the \code{\link{ergmlhs}} API.
+the \code{\link[ergm:ergmlhs]{ergmlhs}} API.
 
 Together with the model terms in the formula and the reference measure, the constraints
 define the distribution of networks being modeled.
@@ -73,9 +73,9 @@ instead of MLE.  CMPLE is extremely inaccurate at this time.}
 \item{times}{For CMLE and CMPLE estimation, times or indexes at
 which the networks whose transition is to be modeled are
 observed. Default to \code{c(0,1)} if \code{nw} is a
-\code{\link[networkDynamic]{networkDynamic}} and to
+\code{\link[networkDynamic:networkDynamic]{networkDynamic}} and to
 \code{1:length(nw)} (all transitions) if \code{nw} is a
-\code{\link{network.list}} or a \code{\link{list}}. Unused for
+\code{\link[ergm:network.list]{network.list}} or a \code{\link{list}}. Unused for
 EGMME. Note that at this time, the selected time points will be
 treated as temporally adjacent. Irregularly spaced time series
 are not supported at this time.}
@@ -86,14 +86,14 @@ parameters.}
 \item{offset.coef.diss}{Numeric vector to specify offset dissolution
 parameters.}
 
-\item{targets}{One-sided \code{\link{ergm}}-style formula specifying
+\item{targets}{One-sided \code{\link[ergm:ergm]{ergm()}}-style formula specifying
 statistics whose moments are used for the EGMME. Unused for CMLE and CMPLE.
 Targets is required for EGMME estimation. It may contain any valid ergm
 terms.  Any offset terms are used only during the
 preliminary SAN run; they are removed automatically for the EGMME proper.
 If \code{targets} is specified as a character
 (one of \code{"formation"} and \code{"dissolution"}) then
-the function \code{\link{.extract.fd.formulae}} is used to determine the
+the function \code{\link[=.extract.fd.formulae]{.extract.fd.formulae()}} is used to determine the
 corresponding formula; the user should be aware of its behavior and limitations.}
 
 \item{target.stats}{A vector specifying the values of the \code{targets}
@@ -101,13 +101,13 @@ statistics that EGMME will try to match.  Defaults to the statistics of
 \code{nw}. Unused for CMLE and CMPLE.}
 
 \item{eval.loglik}{Whether or not to calculate the log-likelihood
-of a CMLE STERGM fit. See \code{\link{ergm}} for details. Can be
+of a CMLE STERGM fit. See \code{\link[ergm:ergm]{ergm()}} for details. Can be
 set globally via \code{option(tergm.eval.loglik=...)}, falling back to
 \code{getOption("ergm.eval.loglik")} if not set.}
 
 \item{control}{A list of control parameters for algorithm tuning.
-Constructed using \code{\link{control.stergm}}.  Remapped to
-\code{\link{control.tergm}}.}
+Constructed using \code{\link[=control.stergm]{control.stergm()}}.  Remapped to
+\code{\link[=control.tergm]{control.tergm()}}.}
 
 \item{verbose}{A logical or an integer to control the amount of
 progress and diagnostic information to be printed. \code{FALSE}/\code{0}
@@ -120,11 +120,11 @@ down processing.}
 \item{SAN.offsets}{Offset coefficients (if any) to use during the SAN run.}
 }
 \value{
-\code{\link{stergm}} returns an object of class \code{\link{tergm}};
+\code{\link[=stergm]{stergm()}} returns an object of class \code{\link{tergm}};
 see \code{\link[=tergm]{tergm()}} for details and methods.
 }
 \description{
-\code{\link{stergm}} is used for finding Separable Temporal ERGMs'
+\code{\link[=stergm]{stergm()}} fits Separable Temporal ERGMs'
 (STERGMs) Conditional MLE (CMLE) (Krivitsky and Handcock, 2014) and
 Equilibrium Generalized Method of Moments Estimator (EGMME)
 (Krivitsky, 2009). This function is deprecated in favor of
@@ -153,5 +153,5 @@ University Department of Statistics Technical Report}, 2012(2012-01).
 \url{https://web.archive.org/web/20170830053722/https://stat.psu.edu/research/technical-report-files/2012-technical-reports/TR1201A.pdf}
 }
 \seealso{
-ergm, network, \\%v\\%, \\%n\\%, \code{\link{ergm-terms}}
+\code{\link[ergm:ergm]{ergm()}}, \code{\link[network:network]{network}}, \code{\link[network:network.extraction]{\%v\%}}, \code{\link[network:network.extraction]{\%n\%}}, \code{\link[ergm:ergmTerm]{ergmTerm}}
 }

@@ -19,12 +19,12 @@ is.durational(object, ...)
 \method{is.durational}{formula}(object, response = NULL, basis = ergm.getnetwork(object), ...)
 }
 \arguments{
-\item{object}{An ERGM formula, \code{\link{ergm_model}} object, or
-\code{\link{ergm_state}} object.}
+\item{object}{An ERGM formula, \code{\link[ergm:ergm_model]{ergm_model}} object, or
+\code{\link[ergm:ergm_state]{ergm_state}} object.}
 
 \item{\dots}{Unused at this time.}
 
-\item{response, basis}{See \code{\link[=ergm]{ergm()}}.}
+\item{response, basis}{See \code{\link[ergm:ergm]{ergm()}}.}
 }
 \value{
 \code{TRUE} if the ERGM terms in the model are duration dependent;
@@ -38,9 +38,9 @@ convention.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{is.durational(ergm_model)}: Test if the \code{\link{ergm_model}} has duration-dependent terms, which call for \code{\link{lasttoggle}} data structures.
+\item \code{is.durational(ergm_model)}: Test if the \code{\link[ergm:ergm_model]{ergm_model}} has duration-dependent terms, which call for \code{\link{lasttoggle}} data structures.
 
-\item \code{is.durational(ergm_state)}: Test if the \code{\link{ergm_state}} has duration-dependent terms, which call for \code{\link{lasttoggle}} data structures.
+\item \code{is.durational(ergm_state)}: Test if the \code{\link[ergm:ergm_state]{ergm_state}} has duration-dependent terms, which call for \code{\link{lasttoggle}} data structures.
 
 }}
 \keyword{model}

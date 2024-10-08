@@ -18,8 +18,8 @@
 #' 
 #' Auxiliary function as user interface for fine-tuning 'tergm' fitting.
 #' 
-#' This function is only used within a call to the \code{\link{tergm}}
-#' function.  See the \code{usage} section in \code{\link{tergm}} for details.
+#' This function is only used within a call to the [tergm()]
+#' function.  See the Usage section in [tergm()] for details.
 #' 
 #' @param init numeric or \code{NA} vector equal in
 #'   length to the number of parameters in the
@@ -38,14 +38,14 @@
 #' 
 #'   \item Initial values for the elements that are \code{NA} are fit
 #'   using the method specified by
-#'   \code{\link[=control.ergm]{control$init.method}}.
+#'   \code{\link[ergm:control.ergm]{control$init.method}}.
 #' 
 #'   } Passing coefficients from a previous run can be used to
-#'   "resume" an uncoverged \code{\link{tergm}} run.
+#'   "resume" an uncoverged [tergm()] run.
 #' @param init.method Estimation method used to acquire initial values
 #'   for estimation. If \code{NULL} (the default), the initial values
 #'   are computed using the edges dissolution approximation (Carnegie
-#'   et al.) when appropriate; note that this relies on \code{\link{.extract.fd.formulae}}
+#'   et al.) when appropriate; note that this relies on [.extract.fd.formulae()]
 #'   to identify the formation and dissolution parts of the formula; the user should
 #'   be aware of its behavior and limitations.
 #'   If \code{init.method} is set to "zeros", the initial values are set to zeros.
@@ -62,7 +62,7 @@
 #' @param CMLE.MCMC.interval Number of Metropolis-Hastings steps
 #'   between successive draws when running MCMC MLE.
 #' @param CMLE.ergm Control parameters used
-#'   to fit the CMLE.  See \code{\link{control.ergm}}.
+#'   to fit the CMLE.  See [control.ergm()].
 #' @param CMLE.NA.impute In TERGM CMLE, missing dyads in
 #'   transitioned-to networks are accommodated using methods of
 #'   Handcock and Gile (2009), but a similar approach to
@@ -70,13 +70,13 @@
 #'   that are not, currently, implemented.  \code{CMLE.NA.impute}
 #'   controls how missing dyads in transitioned-from networks are be
 #'   imputed. See argument \code{imputers} of
-#'   \code{\link{impute.network.list}} for details.
+#'   [impute.network.list()] for details.
 #' 
 #'   By default, no imputation is performed, and the fitting stops
 #'   with an error if any transitioned-from networks have missing
 #'   dyads.
 #' @param CMLE.term.check.override The method
-#'   \code{\link{tergm}{tergm}} uses at this time to fit a series of
+#'   [tergm()] uses at this time to fit a series of
 #'   more than two networks requires certain assumptions to be made
 #'   about the ERGM terms being used, which are tested before a fit is
 #'   attempted. This test sometimes fails despite the model being
@@ -124,14 +124,14 @@
 #'   \code{EGMME.MCMC.burnin.min} and \code{EGMME.MCMC.burnin.max} to
 #'   the same value.
 #' @param SAN.maxit When \code{target.stats} argument is passed to
-#' [ergm()], the maximum number of attempts to use \code{\link{san}}
+#' [ergm()], the maximum number of attempts to use [san()]
 #' to obtain a network with statistics close to those specified.
 #' @param SAN.nsteps.times Multiplier for \code{SAN.nsteps} relative to
 #' \code{MCMC.burnin}. This lets one control the amount of SAN burn-in
 #' (arguably, the most important of SAN parameters) without overriding the
 #' other SAN defaults.
 #' @param SAN SAN control parameters.  See
-#'   \code{\link{control.san}}
+#'   [control.san()]
 #' @param SA.restarts Maximum number of times to restart a failed
 #'   optimization process.
 #' @param SA.burnin Number of time steps to advance the starting
@@ -144,7 +144,7 @@
 #'   heatmap representing the estimated gradient.
 #' 
 #'   Do NOT use these with non-interactive plotting devices like
-#'   \code{\link{pdf}}. (In fact, it will refuse to do that with a
+#'   [pdf()]. (In fact, it will refuse to do that with a
 #'   warning.)
 #' @param SA.max.plot.points If \code{SA.plot.progress==TRUE}, the
 #'   maximum number of time points to be plotted. Defaults to 400. If
@@ -277,9 +277,9 @@
 #'   \code{EGMME.MCMC.burnin.add} and \code{CMLE.MCMC.burnin} and
 #'   \code{CMLE.MCMC.interval}.
 #' @return A list with arguments as components.
-#' @seealso \code{\link{tergm}}. The
-#'   \code{\link{control.simulate.tergm}} function performs a similar
-#'   function for \code{\link{simulate.tergm}}.
+#' @seealso [tergm()]. The
+#'   [control.simulate.tergm()] function performs a similar
+#'   function for [simulate.tergm()].
 #' @references Boer, P., Huisman, M., Snijders,
 #'   T.A.B., and Zeggelink, E.P.H. (2003), StOCNET User\'s
 #'   Manual. Version 1.4.

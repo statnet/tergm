@@ -76,17 +76,17 @@ control.simulate.network <- function(MCMC.burnin.min = 1000,
 #' 
 #' Auxiliary function as user interface for fine-tuning STERGM simulation.
 #' 
-#' This function is only used within a call to the \code{\link{simulate}}
-#' function.  See the \code{usage} section in \code{\link{simulate.stergm}} for
+#' This function is only used within a call to the [simulate()]
+#' function.  See the Usage section in [simulate.stergm()] for
 #' details.
 #'
 #' These functions are included for backwards compatibility, and users are  
 #' encouraged to use \code{control.simulate.tergm} or
-#' \code{control.simulate.formula.tergm} with the \code{\link{simulate.tergm}}
+#' \code{control.simulate.formula.tergm} with the [simulate.tergm()]
 #' family of functions instead.  When a
 #' \code{control.simulate.stergm} or \code{control.simulate.network} object 
-#' is passed to one of the \code{\link{simulate.stergm}} functions, 
-#' the corresponding \code{\link{simulate.tergm}} function is invoked,
+#' is passed to one of the [simulate.stergm()] functions, 
+#' the corresponding [simulate.tergm()] function is invoked,
 #' and uses the formation proposal control arguments, ignoring the 
 #' dissolution proposal control arguments.
 #' 
@@ -113,7 +113,7 @@ control.simulate.network <- function(MCMC.burnin.min = 1000,
 #' 
 #' @param MCMC.prop.weights.form Specifies the proposal weighting scheme to 
 #'   be used in the MCMC Metropolis-Hastings algorithm.  Possible
-#'   choices may be determined by calling \code{\link{ergm_proposal_table}}.
+#'   choices may be determined by calling [ergm_proposal_table()].
 #' 
 #' @param MCMC.prop.args.form An alternative,
 #'   direct way of specifying additional arguments to proposals.
@@ -135,9 +135,9 @@ control.simulate.network <- function(MCMC.burnin.min = 1000,
 #' 
 #' @return A list with arguments as components.
 #' 
-#' @seealso \code{\link{simulate.stergm}},
-#'   \code{\link{simulate.formula}}.  \code{\link{control.stergm}}
-#'   performs a similar function for \code{\link{stergm}}.
+#' @seealso [simulate.stergm()],
+#'   [simulate.formula()].  [control.stergm()]
+#'   performs a similar function for [stergm()].
 #'
 #' @keywords models
 #'

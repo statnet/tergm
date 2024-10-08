@@ -12,8 +12,8 @@ impute.network.list(
 )
 }
 \arguments{
-\item{nwl}{A list of \code{\link{network}} objects or a
-\code{\link{network.list}} object.}
+\item{nwl}{A list of \code{\link[network:network]{network}} objects or a
+\code{\link[ergm:network.list]{network.list}} object.}
 
 \item{imputers}{A character vector giving one or more methods to
 impute missing dyads. Currenly implemented methods are as
@@ -61,6 +61,6 @@ of networks with missing dyads imputed according to a list of imputation
 directives.
 }
 \seealso{
-\code{\link{network}}, \code{\link{is.na}}
+\code{\link[network:network]{network}}, \code{\link[=is.na]{is.na()}}
 }
 \keyword{manip}

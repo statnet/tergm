@@ -15,14 +15,14 @@
 #' returns the statistics of each sample, along with a toggle matrix of the 
 #' changes needed from the original network to each in the sample.
 #' 
-#' This function is normally called inside \code{\link{simulate.tergm}} functions
+#' This function is normally called inside [simulate.tergm()] functions
 #' to prepare inputs for the C sampling code and return its results
 #' 
 #' @aliases tergm_MCMC_sample tergm_MCMC_slave
-#' @param nw a \code{\link{network}} object
-#' @param model the model, as returned by \code{\link{ergm_model}}
-#' @param model.mon the optional monitoring model, as returned by \code{\link{ergm_model}}
-#' @param proposal the proposal, as returned by \code{\link{ergm_proposal}}
+#' @param nw a [`network`] object
+#' @param model the model, as returned by [`ergm_model`]
+#' @param model.mon the optional monitoring model, as returned by [`ergm_model`]
+#' @param proposal the proposal, as returned by [ergm_proposal()]
 #' @param theta the vector of curved parameters
 #' @param eta the vector of natural parameters
 #' @param control the list of control parameters
@@ -41,7 +41,7 @@
 #'     the dyad was changed; this is only returned if \code{control$changes} is \code{TRUE}
 #'   \item maxchanges: the \code{maxchanges} value from the control list
 #' }
-#' @seealso \code{\link{simulate.tergm}}
+#' @seealso [simulate.tergm()]
 #' @keywords internal
 #' @export
 tergm_MCMC_sample <- function(nw, model, model.mon = NULL,

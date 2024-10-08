@@ -105,7 +105,7 @@ length to the number of parameters in the formation/dissolution
 model or \code{NULL} (the default); the initial values for the
 estimation and coefficient offset terms. If \code{NULL} is
 passed, all of the initial values are computed using the method
-specified by \code{\link[=control.ergm]{control$init.method}}.
+specified by \code{\link[ergm:control.ergm]{control$init.method}}.
 If a numeric vector is given, the elements of the vector are
 interpreted as follows: \itemize{ \item Elements corresponding to
 terms enclosed in \code{offset()} are used as the fixed offset
@@ -117,15 +117,15 @@ coefficients. These should match the offset values given in
 
 \item Initial values for the elements that are \code{NA} are fit
 using the method specified by
-\code{\link[=control.ergm]{control$init.method}}.
+\code{\link[ergm:control.ergm]{control$init.method}}.
 
 } Passing coefficients from a previous run can be used to
-"resume" an uncoverged \code{\link{stergm}} run.}
+"resume" an uncoverged \code{\link[=stergm]{stergm()}} run.}
 
 \item{init.method}{Estimation method used to acquire initial values
 for estimation. If \code{NULL} (the default), the initial values
 are computed using the edges dissolution approximation (Carnegie
-et al.) when appropriate; note that this relies on \code{\link{.extract.fd.formulae}}
+et al.) when appropriate; note that this relies on \code{\link[=.extract.fd.formulae]{.extract.fd.formulae()}}
 to identify the formation and dissolution parts of the formula; the user should
 be aware of its behavior and limitations.
 If \code{init.method} is set to "zeros", the initial values are set to zeros.}
@@ -158,10 +158,10 @@ between successive draws when running MCMC MLE.}
 
 \item{CMLE.ergm}{A convenience argument for specifying both
 \code{CMLE.form.ergm} and \code{CMLE.diss.ergm} at once.
-See \code{\link{control.ergm}}.}
+See \code{\link[ergm:control.ergm]{control.ergm()}}.}
 
 \item{CMLE.form.ergm}{Control parameters used to fit the CMLE.  See
-\code{\link{control.ergm}}.}
+\code{\link[ergm:control.ergm]{control.ergm()}}.}
 
 \item{CMLE.diss.ergm}{Ignored, with the exception of initial parameter values.}
 
@@ -172,14 +172,14 @@ transitioned-from networks requires much more complex methods
 that are not, currently, implemented.  \code{CMLE.NA.impute}
 controls how missing dyads in transitioned-from networks are be
 imputed. See argument \code{imputers} of
-\code{\link{impute.network.list}} for details.
+\code{\link[=impute.network.list]{impute.network.list()}} for details.
 
 By default, no imputation is performed, and the fitting stops
 with an error if any transitioned-from networks have missing
 dyads.}
 
 \item{CMLE.term.check.override}{The method
-\code{\link{stergm}{stergm}} uses at this time to fit a series of
+\code{\link[=stergm]{stergm()}} uses at this time to fit a series of
 more than two networks requires certain assumptions to be made
 about the ERGM terms being used, which are tested before a fit is
 attempted. This test sometimes fails despite the model being
@@ -236,7 +236,7 @@ the same value.}
 \code{CMLE.MCMC.interval}.}
 
 \item{SAN.maxit}{When \code{target.stats} argument is passed to
-\code{\link[=ergm]{ergm()}}, the maximum number of attempts to use \code{\link{san}}
+\code{\link[ergm:ergm]{ergm()}}, the maximum number of attempts to use \code{\link[ergm:san]{san()}}
 to obtain a network with statistics close to those specified.}
 
 \item{SAN.nsteps.times}{Multiplier for \code{SAN.nsteps} relative to
@@ -245,7 +245,7 @@ to obtain a network with statistics close to those specified.}
 other SAN defaults.}
 
 \item{SAN}{SAN control parameters.  See
-\code{\link{control.san}}}
+\code{\link[ergm:control.san]{control.san()}}}
 
 \item{SA.restarts}{Maximum number of times to restart a failed
 optimization process.}
@@ -261,7 +261,7 @@ a heatmap representing correlations of target statistics and a
 heatmap representing the estimated gradient.
 
 Do NOT use these with non-interactive plotting devices like
-\code{\link{pdf}}. (In fact, it will refuse to do that with a
+\code{\link[=pdf]{pdf()}}. (In fact, it will refuse to do that with a
 warning.)}
 
 \item{SA.max.plot.points}{If \code{SA.plot.progress==TRUE}, the
@@ -403,7 +403,7 @@ average, and "none" to use the last value.}
 statistics at the final estimate and compute the covariance
 matrix (and hence standard errors) of the parameters. This sample
 is stored and can also be used by
-\code{\link[=mcmc.diagnostics]{mcmc.diagnostics()}} to assess convergence.}
+\code{\link[ergm:mcmc.diagnostics]{mcmc.diagnostics()}} to assess convergence.}
 
 \item{SA.phase3.samplesize.runs}{This many optimization runs will
 be used to determine whether the optimization has converged and
@@ -414,25 +414,25 @@ error somewhere in the optimization process will cause it to
 restart with a smaller gain value. Otherwise, the process will
 stop. This is mainly used for debugging}
 
-\item{term.options}{A list of additional arguments to be passed to term initializers. See \code{\link[=term.options]{? term.options}}.}
+\item{term.options}{A list of additional arguments to be passed to term initializers. See \code{\link[ergm:ergm-options]{? term.options}}.}
 
 \item{seed}{Seed value (integer) for the random number generator.  See
-\code{\link[base]{set.seed}}.}
+\code{\link[=set.seed]{set.seed()}}.}
 
-\item{parallel}{Number of threads in which to run the sampling. Defaults to
-0 (no parallelism). See the entry on \link[=ergm-parallel]{parallel processing}
+\item{parallel}{Number of threads in which to run the
+sampling. Defaults to 0 (no parallelism). See \code{\link[ergm:ergm-parallel]{ergm-parallel}}
 for details and troubleshooting.}
 
-\item{parallel.type}{API to use for parallel processing. Supported values
-are \code{"MPI"} and \code{"PSOCK"}. Defaults to using the \code{parallel}
-package with PSOCK clusters. See \code{\link{ergm-parallel}}}
+\item{parallel.type}{API to use for parallel processing. Defaults
+to using the \CRANpkg{parallel} package with PSOCK clusters. See
+\code{\link[ergm:ergm-parallel]{ergm-parallel}}.}
 
-\item{parallel.version.check}{Logical: If TRUE, check that the version of
-\code{\link[=ergm-package]{ergm}} running on the slave nodes is the same as
-that running on the master node.}
+\item{parallel.version.check}{Logical: If TRUE, check that the
+version of \CRANpkg{ergm} running on the slave
+nodes is the same as that running on the master node.}
 
 \item{parallel.inherit.MT}{Logical: If TRUE, slave nodes and
-processes inherit the \code{\link[=set.MT_terms]{set.MT_terms()}} setting.}
+processes inherit the \code{\link[ergm:ergm-parallel]{set.MT_terms()}} setting.}
 
 \item{\dots}{Additional arguments, passed to other functions This argument
 is helpful because it collects any control parameters that have been
@@ -445,8 +445,8 @@ A list with arguments as components.
 Auxiliary function as user interface for fine-tuning 'stergm' fitting.
 }
 \details{
-This function is only used within a call to the \code{\link{stergm}}
-function.  See the \code{usage} section in \code{\link{stergm}} for details.
+This function is only used within a call to the \code{\link[=stergm]{stergm()}}
+function.  See the Usage section in \code{\link[=stergm]{stergm()}} for details.
 Generally speaking, \code{control.stergm} is remapped to \code{control.tergm},
 with dissolution controls ignored and formation controls used as controls
 for the overall \code{tergm} process.  An exception to this rule is the
@@ -476,7 +476,7 @@ Algorithm for Fitting ERGMs, Penn State Department of Statistics Technical
 Report.
 }
 \seealso{
-\code{\link{stergm}},\code{\link{tergm}},\code{\link{control.tergm}}. The
-\code{\link{control.simulate.stergm}} function performs a similar
-function for \code{\link{simulate.tergm}}.
+\code{\link[=stergm]{stergm()}}, \code{\link[=tergm]{tergm()}}, \code{\link[=control.tergm]{control.tergm()}}. The
+\code{\link[=control.simulate.stergm]{control.simulate.stergm()}} function performs a similar
+function for \code{\link[=simulate.tergm]{simulate.tergm()}}.
 }

@@ -26,11 +26,11 @@ tergm(
 \item{constraints}{A formula specifying one or more constraints
 on the support of the distribution of the networks being modeled. Multiple constraints
 may be given, separated by \dQuote{+} and \dQuote{-} operators. See
-\code{\link{ergmConstraint}} for the detailed explanation of
+\code{\link[ergm:ergmConstraint]{ergmConstraint}} for the detailed explanation of
 their semantics and also for an indexed list of the constraints visible to the \pkg{ergm} package.
 
 The default is to have no constraints except those provided through
-the \code{\link{ergmlhs}} API.
+the \code{\link[ergm:ergmlhs]{ergmlhs}} API.
 
 Together with the model terms in the formula and the reference measure, the constraints
 define the distribution of networks being modeled.
@@ -58,24 +58,24 @@ instead of MLE.  CMPLE is extremely inaccurate at this time.}
 
 \item{times}{For CMLE and CMPLE estimation, times or indexes at
 which the networks whose transition is to be modeled are
-observed. Default to \code{c(0,1)} if \code{nw} is a
-\code{\link[networkDynamic]{networkDynamic}} and to
-\code{1:length(nw)} (all transitions) if \code{nw} is a
-\code{\link{network.list}} or a \code{\link{list}}. Unused for
-EGMME. Note that at this time, the selected time points will be
-treated as temporally adjacent. Irregluarly spaced time series
-are not supported at this time.}
+observed. This argument is mandatory if \code{nw} is a
+\code{\link[networkDynamic:networkDynamic]{networkDynamic}} and defaults to \code{1:length(nw)} (all
+transitions) if \code{nw} is a \code{\link[ergm:network.list]{network.list}} or a
+\code{\link{list}}. Ignored when estimating EGMME or if LHS is already a
+\code{\link{NetSeries}}. Note that at this time, the selected time points
+will be treated as temporally adjacent. Irregluarly spaced time
+series are not supported at this time.}
 
 \item{offset.coef}{Numeric vector to specify offset parameters.}
 
-\item{targets}{One-sided \code{\link{ergm}}-style formula specifying
+\item{targets}{One-sided \code{\link[ergm:ergm]{ergm()}}-style formula specifying
 statistics whose moments are used for the EGMME. Unused for CMLE and CMPLE.
 Targets is required for EGMME estimation. It may contain any valid ergm
 terms.  Any offset terms are used only during the
 preliminary SAN run; they are removed automatically for the EGMME proper.
 If \code{targets} is specified as a character
 (one of \code{"formation"} and \code{"dissolution"}) then
-the function \code{\link{.extract.fd.formulae}} is used to determine the
+the function \code{\link[=.extract.fd.formulae]{.extract.fd.formulae()}} is used to determine the
 corresponding formula; the user should be aware of its behavior and limitations.}
 
 \item{target.stats}{A vector specifying the values of the \code{targets}
@@ -85,12 +85,12 @@ statistics that EGMME will try to match.  Defaults to the statistics of
 \item{SAN.offsets}{Offset coefficients (if any) to use during the SAN run.}
 
 \item{eval.loglik}{Whether or not to calculate the log-likelihood
-of a CMLE TERGM fit. See \code{\link{ergm}} for details. Can be
+of a CMLE TERGM fit. See \code{\link[ergm:ergm]{ergm()}} for details. Can be
 set globally via \code{option(tergm.eval.loglik=...)}, falling back to
 \code{getOption("ergm.eval.loglik")} if not set.}
 
 \item{control}{A list of control parameters for algorithm tuning.
-Constructed using \code{\link{control.tergm}}.}
+Constructed using \code{\link[=control.tergm]{control.tergm()}}.}
 
 \item{verbose}{A logical or an integer to control the amount of
 progress and diagnostic information to be printed. \code{FALSE}/\code{0}
@@ -103,13 +103,13 @@ down processing.}
 \item{basis}{optional network data overriding the left hand side of \code{formula}}
 }
 \value{
-\code{\link{tergm}} returns an object of class \code{tergm} that
-inherits from \code{ergm} and has the usual methods (\code{\link[=coef.ergm]{coef.ergm()}},
-\code{\link[=summary.ergm]{summary.ergm()}}, \code{\link[=mcmc.diagnostics]{mcmc.diagnostics()}}, etc.) implemented for
-it. Note that \code{\link[=gof]{gof()}} only works for the CMLE method.
+\code{\link[=tergm]{tergm()}} returns an object of class \code{\link{tergm}} that
+inherits from \code{\link[ergm:ergm]{ergm}} and has the usual methods (\code{\link[ergm:ergm-deprecated]{coef.ergm()}},
+\code{\link[ergm:summary.ergm]{summary.ergm()}}, \code{\link[ergm:mcmc.diagnostics]{mcmc.diagnostics()}}, etc.) implemented for
+it. Note that \code{\link[ergm:gof]{gof()}} only works for the CMLE method.
 }
 \description{
-\code{\link{tergm}} is used for finding Temporal ERGMs' (TERGMs) and Separable Temporal ERGMs' (STERGMs)
+\code{\link[=tergm]{tergm()}} fits Temporal ERGMs' (TERGMs) and Separable Temporal ERGMs' (STERGMs)
 Conditional MLE (CMLE) (Krivitsky and Handcock, 2010) and Equilibrium
 Generalized Method of Moments Estimator (EGMME) (Krivitsky, 2009).
 }
@@ -182,8 +182,8 @@ University Department of Statistics Technical Report}, 2012(2012-01).
 \url{http://stat.psu.edu/research/technical-report-files/2012-technical-reports/modeling-of-dynamic-networks-based-on-egocentric-data-with-durational-information}
 }
 \seealso{
-\code{\link{network}} and \code{\link[=NetSeries]{NetSeries()}} for the data structures,
-\code{\link[=ergm]{ergm()}} and \code{\link{ergmTerm}} for model specification,
+\code{\link[network:network]{network}}, \code{\link[networkDynamic:networkDynamic]{networkDynamic}}, and \code{\link[=NetSeries]{NetSeries()}} for the data structures,
+\code{\link[ergm:ergm]{ergm()}} and \code{\link[ergm:ergmTerm]{ergmTerm}} for model specification,
 package vignette \code{browseVignettes(package='tergm')} for a
 short demonstration, the Statnet web site
 \url{https://statnet.org/workshop-tergm/} for a tutorial

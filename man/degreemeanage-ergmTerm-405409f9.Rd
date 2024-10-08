@@ -36,7 +36,7 @@ statistics are calculated for nodes having each separate
 value of the attribute.
 }
 \seealso{
-\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+\code{\link[ergm:ergmTerm]{ergmTerm}} for index of model terms currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "degree.mean.age", "subsection")}
 }

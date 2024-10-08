@@ -32,7 +32,7 @@ InitErgmProposal.discordTNT <- function(arguments, nw, ...) {
 #' @templateVar name discordBDStratTNT
 #' @aliases InitErgmProposal.discordBDStratTNT
 #' @title Temperal TNT proposal with degree bounds
-#' @description A temporal version of \code{\link[ergm:ergm-proposals]{BDStratTNT}}.  Within each
+#' @description A temporal version of \code{\link[ergm:BDStratTNT-ergmProposal]{BDStratTNT}}.  Within each
 #'   mixing type, approximately 50\% of proposed toggles are made on
 #'   dyads, and approximately 50\% of proposed toggles are
 #'   proposals from the network, all subject to the bounded degree

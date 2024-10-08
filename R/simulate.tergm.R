@@ -11,17 +11,17 @@
 #' Draw from the distribution of a Temporal Exponential Family
 #' Random Graph Model
 #' 
-#' \code{\link[stats]{simulate}} is used to draw from temporal
+#' [simulate()] is used to draw from temporal
 #' exponential family random network models in their natural parameterizations.
-#' See \code{\link{tergm}} for more information on these models.
+#' See [tergm()] for more information on these models.
 #' 
 #' The dynamic process is run forward and the results are returned. For the
-#' method for \code{\link{networkDynamic}}, the simulation is resumed from the
+#' method for [`networkDynamic`], the simulation is resumed from the
 #' last generated time point of \code{basis} (or the left hand side of \code{object}
 #' if \code{basis} is missing), by default with the same model
 #' and parameters.
 #' 
-#' The starting network for the \code{\link{tergm}} object method
+#' The starting network for the [`tergm`] object method
 #' (\code{simulate.tergm}) is determined by the \code{nw.start} argument.
 #' 
 #'   \itemize{
@@ -31,23 +31,23 @@
 #'      if the \code{object} carries a time stamp from which to start
 #'      or resume the simulation, either in the form
 #'      of a \code{"time"} network attribute (for the
-#'      \code{\link{network}} method --- see the
-#'      \code{\link{lasttoggle}} "API") or
-#'      in the form of an \code{\link{net.obs.period}} network attribute (for the
-#'      \code{\link{networkDynamic}} method), this attribute will be used. (If
+#'      [`network`] method --- see the
+#'      [`lasttoggle`] "API") or
+#'      in the form of an [`net.obs.period`] network attribute (for the
+#'      [`networkDynamic`] method), this attribute will be used. (If
 #'      specified, \code{time.start} will override it with a warning.)
 #'    }
 #'    \item{Othewise, the simulation starts at 0.}
 #'  }
 #' 
 #' @aliases simulate.tergm simulate_formula.network simulate_formula.networkDynamic
-#' @param object for \code{simulate.tergm}, an object of type \code{\link{tergm}} giving a model fit;
+#' @param object for \code{simulate.tergm}, an object of type [`tergm`] giving a model fit;
 #'   for \code{simulate_formula.network} and \code{simulate_formula.networkDynamic}, a formula specifying
 #'   the model
 #' 
-#' \code{simulate_formula.network} understands the \code{\link{lasttoggle}} "API".
+#' \code{simulate_formula.network} understands the [`lasttoggle`] "API".
 #' @param nsim Number of replications (separate chains of networks) of the
-#' process to run and return. The \code{\link{networkDynamic}} method only
+#' process to run and return. The [`networkDynamic`] method only
 #' supports \code{nsim=1}.
 #' @template seed
 #' @param coef Parameters for the model.
@@ -57,7 +57,7 @@
 #' @param monitor A one-sided formula specifying one or more terms whose
 #' value is to be monitored.  If \code{monitor} is specified as a character
 #' (one of \code{"formation"}, \code{"dissolution"}, and \code{"all"}) then
-#' the function \code{\link{.extract.fd.formulae}} is used to determine the
+#' the function [.extract.fd.formulae()] is used to determine the
 #' corresponding formula; the user should be aware of its behavior and limitations.
 #' @param time.slices Number of time slices (or statistics) to return from each
 #' replication of the dynamic process. See below for return types. Defaults to
@@ -73,10 +73,10 @@
 #' state of the network is sampled (\code{time.start}) and the the beginning of
 #' the spell that should be recorded for the newly simulated network state.
 #' @param control A list of control parameters for algorithm tuning.
-#' Constructed using \code{\link{control.simulate.tergm}} or
-#' \code{\link{control.simulate.formula.tergm}}.  For backwards compatibility,
-#' control lists from \code{\link{control.simulate.stergm}} and
-#' \code{\link{control.simulate.network}} are allowed in calls to
+#' Constructed using [control.simulate.tergm()] or
+#' [control.simulate.formula.tergm()].  For backwards compatibility,
+#' control lists from [control.simulate.stergm()] and
+#' [control.simulate.network()] are allowed in calls to
 #' \code{simulate.tergm}; they are mapped to \code{control.simulate.tergm}
 #' by assigning:
 #' \itemize{
@@ -96,7 +96,7 @@
 #' fitting the model; or}
 #' \item{`network`}{specify the network directly.}
 #' }
-#' \code{\link{networkDynamic}}s
+#' [`networkDynamic`]s
 #' cannot be used as starting networks for \code{simulate.tergm} at this time.
 #' (They can be used as starting networks for \code{simulate_formula.networkDynamic},
 #' of course.)
@@ -114,27 +114,27 @@
 #'   default argument values for \code{ergm}'s \code{simulate} methods
 #'   are used.
 #' @return Depends on the \code{output} argument:
-#'  \item{"stats"}{If \code{stats == FALSE}, an \code{\link{mcmc}} matrix with
+#'  \item{"stats"}{If \code{stats == FALSE}, an [`mcmc`] matrix with
 #'    monitored statistics, and if \code{stats == TRUE}, a
 #'    list containing elements \code{stats} for statistics specified in the
 #'    \code{monitor} argument, and \code{stats.gen} for the model statistics.
 #'    If \code{stats == FALSE} and no monitored statistics are specified,
 #'    an empty list is returned, with a warning.
-#'    When \code{nsim>1}, an \code{\link{mcmc.list}} (or list of them) of
+#'    When \code{nsim>1}, an [`mcmc.list`] (or list of them) of
 #'    the statistics is returned instead.}
-#'  \item{"networkDynamic"}{A \code{\link[networkDynamic]{networkDynamic}}
+#'  \item{"networkDynamic"}{A [`networkDynamic`]
 #'    object representing the simulated process, with ties present in the
 #'    initial network having onset \code{-Inf} and ties present at the end
 #'    of the simulation having terminus \code{+Inf}. The method for
-#'    \code{\link[networkDynamic]{networkDynamic}} returns the initial
-#'    \code{\link[networkDynamic]{networkDynamic}} with simulated changes
-#'    applied to it. The \code{\link{net.obs.period}} network attribute is
+#'    [`networkDynamic`] returns the initial
+#'    [`networkDynamic`] with simulated changes
+#'    applied to it. The [`net.obs.period`] network attribute is
 #'    updated (or added if not existing) to reflect the time period that was
 #'    simulated. If the network does not have any \code{\link[networkDynamic]{persistent.ids}} 
 #'    defined for vertices, a vertex.pid will be attached in a vertex attribute 
 #'    named \code{'tergm_pid'} to facilitate 'bookkeeping' between the networkDynamic 
 #'    argument and the simulated network time step.
-#'    Additionally, attributes (\code{\link{attr}}, not network
+#'    Additionally, attributes ([attr()], not network
 #'    attributes) are attached as follows:
 #'    \describe{
 #'      \item{\code{formula}, \code{monitor}:}{Model
@@ -144,8 +144,8 @@
 #'      \item{\code{changes}:}{A four-column matrix summarizing the changes in the
 #'    \code{"changes"} output. (This may be removed in the future.)}
 #'    } 
-#'    When \code{nsim>1}, a \code{\link{network.list}} of these
-#'    \code{\link{networkDynamic}}s is returned.
+#'    When \code{nsim>1}, a [`network.list`] of these
+#'    [`networkDynamic`]s is returned.
 #'  }
 #'  
 #'  \item{"changes"}{An integer matrix with four columns (\code{time},
@@ -160,18 +160,18 @@
 #'      while a row \code{c(5,2,3,0)} indicates that in that time, that
 #'      tie was dissolved, so that it is was present at time point \eqn{4}
 #'      and absent at time point \eqn{5}.
-#'      Additionally, the same attributes (\code{\link{attr}}, not network
+#'      Additionally, the same attributes ([attr()], not network
 #'      attributes) as with \code{output=="networkDynamic"} are attached.
 #'      When \code{nsim>1}, a list of these change matrices is returned.}
-#'  \item{"final"}{A \code{\link[network]{network}}
+#'  \item{"final"}{A [`network`]
 #'    object representing the last network in the series generated.
-#'    \code{\link{lasttoggle}} and \code{time} attributes are also included.
-#'    Additionally, the same attributes (\code{\link{attr}}, not network
+#'    [`lasttoggle`] and \code{time} attributes are also included.
+#'    Additionally, the same attributes ([attr()], not network
 #'    attributes) as with \code{output=="networkDynamic"} are attached.
-#'    When \code{nsim>1}, a \code{\link{network.list}} of these
-#'    \code{\link{network}}s is returned.
+#'    When \code{nsim>1}, a [`network.list`] of these
+#'    [`network`]s is returned.
 #'  }
-#'  \item{"ergm_state"}{The \code{\link[ergm]{ergm_state}} object resulting
+#'  \item{"ergm_state"}{The [`ergm_state`] object resulting
 #'    from the simulation.  Attributes are attached as for other output types.}
 #'  Note that when using \code{simulate_formula.networkDynamic} with either
 #'    \code{"final"} or \code{"ergm_state"} for \code{output}, the nodes

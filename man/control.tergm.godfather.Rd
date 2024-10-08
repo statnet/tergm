@@ -7,7 +7,7 @@
 control.tergm.godfather(term.options = NULL)
 }
 \arguments{
-\item{term.options}{A list of additional arguments to be passed to term initializers. See \code{\link[=term.options]{? term.options}}.}
+\item{term.options}{A list of additional arguments to be passed to term initializers. See \code{\link[ergm:ergm-options]{? term.options}}.}
 }
 \description{
 Returns a list of its arguments.

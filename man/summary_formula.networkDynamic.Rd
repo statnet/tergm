@@ -9,15 +9,15 @@
 }
 \arguments{
 \item{object}{An \code{\link{formula}} object with a
-\code{\link{networkDynamic}} as its LHS. (See
-\code{\link[ergm]{summary_formula}} for more details.)}
+\code{\link[networkDynamic:networkDynamic]{networkDynamic}} as its LHS. (See
+\code{\link[ergm:summary_formula]{summary_formula()}} for more details.)}
 
 \item{at}{A vector of time points at which to calculate the
 statistics.}
 
 \item{\dots}{Further arguments passed to or used by methods.}
 
-\item{basis}{An optional \code{\link{networkDynamic}} object
+\item{basis}{An optional \code{\link[networkDynamic:networkDynamic]{networkDynamic}} object
 relative to which the statistics should be calculated.}
 }
 \value{
@@ -26,9 +26,9 @@ point in \code{at}, and columns for each term of the formula,
 containing the corresponding statistics measured on the network.
 }
 \description{
-A method for \code{\link[ergm]{summary_formula}} to calculate the
-specified statistics for an observed \code{\link{networkDynamic}} at the
-specified time point(s).  See \code{\link{ergm-terms}} for more information
+A method for \code{\link[ergm:summary_formula]{summary_formula()}} to calculate the
+specified statistics for an observed \code{\link[networkDynamic:networkDynamic]{networkDynamic}} at the
+specified time point(s).  See \code{\link[ergm:ergmTerm]{ergmTerm}} for more information
 on the statistics that may be specified.
 }
 \examples{
@@ -43,7 +43,7 @@ add.edges.active(my.nD,tail=1:2,head=2:3,onset=5,terminus=8)
 summary(my.nD~isolates+edges, at=1:10)
 }
 \seealso{
-\code{\link[=ergm]{ergm()}}, \code{\link{networkDynamic}}, \code{\link{ergm-terms}},
-\link{summary.formula}
+\code{\link[ergm:ergm]{ergm()}}, \code{\link[networkDynamic:networkDynamic]{networkDynamic}}, \code{\link[ergm:ergmTerm]{ergmTerm}},
+\code{\link[=summary.formula]{summary.formula()}}
 }
 \keyword{models}

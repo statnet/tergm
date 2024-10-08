@@ -53,16 +53,16 @@
 )
 }
 \arguments{
-\item{object}{an object of type \code{\link{network}} or \code{\link{networkDynamic}}}
+\item{object}{an object of type \code{\link[network:network]{network}} or \code{\link[networkDynamic:networkDynamic]{networkDynamic}}}
 
 \item{nsim}{Number of replications (separate chains of networks) of the
-process to run and return. The \code{\link{networkDynamic}} method only
+process to run and return. The \code{\link[networkDynamic:networkDynamic]{networkDynamic}} method only
 supports \code{nsim=1}.}
 
 \item{seed}{Seed value (integer) for the random number generator.  See
-\code{\link[base]{set.seed}}.}
+\code{\link[=set.seed]{set.seed()}}.}
 
-\item{formation, dissolution}{One-sided \code{\link{ergm}}-style formulas for
+\item{formation, dissolution}{One-sided \code{\link[ergm:ergm]{ergm()}}-style formulas for
 the formation and dissolution models, respectively.  The dissolution model is parameterized in terms of tie persistence.}
 
 \item{coef.form}{Parameters for the formation model.}
@@ -72,11 +72,11 @@ the formation and dissolution models, respectively.  The dissolution model is pa
 \item{constraints}{A formula specifying one or more constraints
 on the support of the distribution of the networks being modeled. Multiple constraints
 may be given, separated by \dQuote{+} and \dQuote{-} operators. See
-\code{\link{ergmConstraint}} for the detailed explanation of
+\code{\link[ergm:ergmConstraint]{ergmConstraint}} for the detailed explanation of
 their semantics and also for an indexed list of the constraints visible to the \pkg{ergm} package.
 
 The default is to have no constraints except those provided through
-the \code{\link{ergmlhs}} API.
+the \code{\link[ergm:ergmlhs]{ergmlhs}} API.
 
 Together with the model terms in the formula and the reference measure, the constraints
 define the distribution of networks being modeled.
@@ -97,7 +97,7 @@ dyads from changing), arbitrary combinations should be possible.}
 \item{monitor}{A one-sided formula specifying one or more terms whose
 value is to be monitored.  If \code{monitor} is specified as a character
 (one of \code{"formation"}, \code{"dissolution"}, and \code{"all"}) then
-the function \code{\link{.extract.fd.formulae}} is used to determine the
+the function \code{\link[=.extract.fd.formulae]{.extract.fd.formulae()}} is used to determine the
 corresponding formula; the user should be aware of its behavior and limitations.}
 
 \item{time.slices}{Number of time slices (or statistics) to return from each
@@ -119,8 +119,8 @@ state of the network is sampled (\code{time.start}) and the the beginning of
 the spell that should be recorded for the newly simulated network state.}
 
 \item{control}{A list of control parameters for algorithm tuning,
-constructed using \code{\link{control.simulate.network}}.  These are mapped
-to \code{\link{control.simulate.formula.tergm}} controls by assigning:
+constructed using \code{\link[=control.simulate.network]{control.simulate.network()}}.  These are mapped
+to \code{\link[=control.simulate.formula.tergm]{control.simulate.formula.tergm()}} controls by assigning:
 \itemize{
 \item \code{MCMC.prop.form} to \code{MCMC.prop},
 \item \code{MCMC.prop.args.form} to \code{MCMC.prop.args}, and
@@ -146,7 +146,7 @@ down processing.}
 \item{\dots}{Further arguments passed to or used by methods.}
 }
 \value{
-Depends on the \code{output} argument.  See \code{\link{simulate.tergm}}
+Depends on the \code{output} argument.  See \code{\link[=simulate.tergm]{simulate.tergm()}}
 for details.  Note that some formation/dissolution separated
 information is also attached to the return value for calls made through
 \code{simulate.network} and \code{simulate.networkDynamic} in
@@ -157,7 +157,7 @@ The \code{simulate.network} and \code{simulate.networkDynamic} wrappers
 are provided for backwards compatibility.  It is recommended that new
 code make use of the \code{simulate_formula.network} and
 \code{simulate_formula.networkDynamic} functions instead.  See
-\code{\link{simulate.tergm}} for details on these new functions.
+\code{\link[=simulate.tergm]{simulate.tergm()}} for details on these new functions.
 }
 \details{
 Note that return values may be structured differently than in past versions.

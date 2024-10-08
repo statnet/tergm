@@ -1,5 +1,5 @@
 Package: tergm
-Version: 4.2-2562
+Version: 4.2-2563
 Date: 2024-10-08
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
@@ -47,7 +47,7 @@ Description: An integrated set of extensions to the 'ergm' package to analyze an
 License: GPL-3 + file LICENSE
 URL: https://statnet.org
 VignetteBuilder: rmarkdown, knitr
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.2.9000
 Roxygen: list(markdown = TRUE)
 Config/testthat/parallel: true
 Config/testthat/edition: 3

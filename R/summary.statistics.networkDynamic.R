@@ -10,26 +10,26 @@
 
 #' Calculation of networkDynamic statistics.
 #' 
-#' A method for \code{\link[ergm]{summary_formula}} to calculate the
-#' specified statistics for an observed \code{\link{networkDynamic}} at the
-#' specified time point(s).  See \code{\link{ergm-terms}} for more information
+#' A method for [summary_formula()] to calculate the
+#' specified statistics for an observed [`networkDynamic`] at the
+#' specified time point(s).  See [`ergmTerm`] for more information
 #' on the statistics that may be specified.
 #' 
 #' 
 #' @aliases summary.formula
-#' @param object An \code{\link{formula}} object with a
-#'   \code{\link{networkDynamic}} as its LHS. (See
-#'   \code{\link[ergm]{summary_formula}} for more details.)
+#' @param object An [`formula`] object with a
+#'   [`networkDynamic`] as its LHS. (See
+#'   [summary_formula()] for more details.)
 #' @param at A vector of time points at which to calculate the
 #'   statistics.
-#' @param basis An optional \code{\link{networkDynamic}} object
+#' @param basis An optional [`networkDynamic`] object
 #'   relative to which the statistics should be calculated.
 #' @param \dots Further arguments passed to or used by methods.
 #' @return A matrix with \code{length(at)} rows, one for each time
 #'   point in \code{at}, and columns for each term of the formula,
 #'   containing the corresponding statistics measured on the network.
-#' @seealso [ergm()], [`networkDynamic`], [`ergm-terms`],
-#'   [summary.formula]
+#' @seealso [ergm()], [`networkDynamic`], [`ergmTerm`],
+#'   [summary.formula()]
 #' @keywords models
 #' @examples
 #' 

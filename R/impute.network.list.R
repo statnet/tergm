@@ -16,8 +16,8 @@
 #' directives.
 #' 
 #' 
-#' @param nwl A list of \code{\link{network}} objects or a
-#'   \code{\link{network.list}} object.
+#' @param nwl A list of [`network`] objects or a
+#'   [`network.list`] object.
 #' @param imputers A character vector giving one or more methods to
 #'   impute missing dyads. Currenly implemented methods are as
 #'   follows: \describe{ \item{`next`}{Impute the state of the same
@@ -53,7 +53,7 @@
 #'   returned, but they can be useful for imputing dyads in the last
 #'   network in \code{nwl}, when using \code{"next"} imputer.
 #' @return A list of networks with missing dyads imputed.
-#' @seealso \code{\link{network}}, \code{\link{is.na}}
+#' @seealso [`network`], [is.na()]
 #' @keywords manip
 #' @export impute.network.list
 impute.network.list <- function(nwl, imputers=c(), nwl.prepend=list(), nwl.append=list()){

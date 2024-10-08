@@ -47,7 +47,7 @@ join_nets <- function(nwl, blockID, blockName){
 #'
 #' @param NA.impute How missing dyads in transitioned-from networks
 #'   are be imputed when using conditional estimation. See argument
-#'   \code{imputers} of \code{\link{impute.network.list}} for details.
+#'   \code{imputers} of [impute.network.list()] for details.
 #'
 #' @return A network object with temporal metadata.
 #'
@@ -59,7 +59,7 @@ join_nets <- function(nwl, blockID, blockName){
 #'   It is almost always better to modify the original networks and
 #'   regenerate the series.
 #'
-#' @seealso [Help on model specification][ergm-terms] for specific terms.
+#' @seealso [`ergmTerm`] for specific terms.
 #' 
 #' @examples
 #'

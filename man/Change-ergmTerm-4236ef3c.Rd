@@ -18,7 +18,7 @@
 #         )
 }
 \arguments{
-\item{formula}{a one-sided \code{\link[=ergm]{ergm()}}-style formula with the terms to be evaluated}
+\item{formula}{a one-sided \code{\link[ergm:ergm]{ergm()}}-style formula with the terms to be evaluated}
 
 \item{lm, subset, weights, contrasts, offset, label}{\strong{\code{\link[=NetSeries]{NetSeries()}} LHS only} arguments to specify time-varying parameters. See \code{\link[ergm.multi:N-ergmTerm-c9b59cc1]{N()}} term operator in the \pkg{ergm.multi} for details. \code{lm} formula may reference \code{.Time} for the network's time index, \code{.TimeID} for the its index in the network series (where the initial network is 1 and the first modelled network is 2), and \code{.TimeDelta} for the time elapsed between the network and the immediately previous network in the series.}
 }
@@ -31,7 +31,7 @@ and produces the corresponding model for a network constructed
 by taking the dyads that have changed between time steps.
 }
 \seealso{
-\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+\code{\link[ergm:ergmTerm]{ergmTerm}} for index of model terms currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "Change", "subsection")}
 }
