@@ -92,7 +92,7 @@
 #' Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
 #' Egocentric Data with Durational Information. \emph{Pennsylvania State
 #' University Department of Statistics Technical Report}, 2012(2012-01).
-#' \url{http://stat.psu.edu/research/technical-report-files/2012-technical-reports/modeling-of-dynamic-networks-based-on-egocentric-data-with-durational-information}
+#' \url{https://arxiv.org/abs/2203.06866}
 #' 
 #'
 #' @examples

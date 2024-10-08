@@ -424,7 +424,7 @@ sampling. Defaults to 0 (no parallelism). See \code{\link[ergm:ergm-parallel]{er
 for details and troubleshooting.}
 
 \item{parallel.type}{API to use for parallel processing. Defaults
-to using the \CRANpkg{parallel} package with PSOCK clusters. See
+to using the \pkg{parallel} package with PSOCK clusters. See
 \code{\link[ergm:ergm-parallel]{ergm-parallel}}.}
 
 \item{parallel.version.check}{Logical: If TRUE, check that the

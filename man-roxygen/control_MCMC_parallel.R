@@ -12,7 +12,7 @@
 #'   sampling. Defaults to 0 (no parallelism). See [`ergm-parallel`]
 #'   for details and troubleshooting.
 #' @param parallel.type API to use for parallel processing. Defaults
-#'   to using the \CRANpkg{parallel} package with PSOCK clusters. See
+#'   to using the \pkg{parallel} package with PSOCK clusters. See
 #'   [`ergm-parallel`].
 #' @param parallel.version.check Logical: If TRUE, check that the
 #'   version of \CRANpkg{ergm} running on the slave
