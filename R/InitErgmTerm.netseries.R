@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
 
 .same_constraints <- function(nwl, nattr){
@@ -47,7 +47,7 @@ join_nets <- function(nwl, blockID, blockName){
 #'
 #' @param NA.impute How missing dyads in transitioned-from networks
 #'   are be imputed when using conditional estimation. See argument
-#'   \code{imputers} of \code{\link{impute.network.list}} for details.
+#'   \code{imputers} of [impute.network.list()] for details.
 #'
 #' @return A network object with temporal metadata.
 #'
@@ -59,7 +59,7 @@ join_nets <- function(nwl, blockID, blockName){
 #'   It is almost always better to modify the original networks and
 #'   regenerate the series.
 #'
-#' @seealso [Help on model specification][ergm-terms] for specific terms.
+#' @seealso [`ergmTerm`] for specific terms.
 #' 
 #' @examples
 #'
@@ -304,5 +304,5 @@ InitErgmTerm.Cross1 <- function(nw, arglist,  ...){
                       defaultvalues = list(NULL),
                       required = c(TRUE))
 
-  ergm_model(a$formula, nw, ...)
+  ergm_model(a$formula, nw, ..., terms.only=TRUE)
 }

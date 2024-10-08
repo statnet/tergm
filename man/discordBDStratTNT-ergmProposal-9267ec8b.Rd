@@ -5,7 +5,7 @@
 \alias{InitErgmProposal.discordBDStratTNT}
 \title{Temperal TNT proposal with degree bounds}
 \description{
-A temporal version of \code{\link[ergm:ergm-proposals]{BDStratTNT}}.  Within each
+A temporal version of \code{\link[ergm:BDStratTNT-ergmProposal]{BDStratTNT}}.  Within each
 mixing type, approximately 50\\% of proposed toggles are made on
 dyads, and approximately 50\\% of proposed toggles are
 proposals from the network, all subject to the bounded degree
@@ -15,7 +15,7 @@ rather than the temporal operator networks).
 
 arguments are the same as for \code{\link[ergm:BDStratTNT-ergmProposal]{BDStratTNT}},
 and should be passed in via the \code{\link[ergm:bd-ergmConstraint]{bd}} and
-code{\link[ergm:blocks-ergmConstraint]{blocks}} constraints and
+\code{\link[ergm:blocks-ergmConstraint]{blocks}} constraints and
 \code{\link[ergm:strat-ergmHint]{strat}} hint.
 }
 \details{
@@ -24,7 +24,7 @@ code{\link[ergm:blocks-ergmConstraint]{blocks}} constraints and
 \if{latex}{\Sexpr[results=rd,stage=render]{ergm:::.formatProposalsLatex(ergm:::.buildProposalsList(proposal="discordBDStratTNT"))}}
 }
 \seealso{
-\code{\link{ergmProposal}} for index of proposals currently visible to the package.
+\code{\link[ergm:ergmProposal]{ergmProposal}} for index of proposals currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmProposal", "discordBDStratTNT", "subsection")}
 }

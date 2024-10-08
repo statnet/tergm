@@ -20,13 +20,13 @@ tergm_MCMC_sample(
 tergm_MCMC_slave(state, eta, control, verbose)
 }
 \arguments{
-\item{nw}{a \code{\link{network}} object}
+\item{nw}{a \code{\link[network:network]{network}} object}
 
-\item{model}{the model, as returned by \code{\link{ergm_model}}}
+\item{model}{the model, as returned by \code{\link[ergm:ergm_model]{ergm_model}}}
 
-\item{model.mon}{the optional monitoring model, as returned by \code{\link{ergm_model}}}
+\item{model.mon}{the optional monitoring model, as returned by \code{\link[ergm:ergm_model]{ergm_model}}}
 
-\item{proposal}{the proposal, as returned by \code{\link{ergm_proposal}}}
+\item{proposal}{the proposal, as returned by \code{\link[ergm:ergm_proposal]{ergm_proposal()}}}
 
 \item{control}{the list of control parameters}
 
@@ -66,10 +66,10 @@ changes needed from the original network to each in the sample.
 lower-level function that actually calls the C code.
 }
 \details{
-This function is normally called inside \code{\link{simulate.tergm}} functions
+This function is normally called inside \code{\link[=simulate.tergm]{simulate.tergm()}} functions
 to prepare inputs for the C sampling code and return its results
 }
 \seealso{
-\code{\link{simulate.tergm}}
+\code{\link[=simulate.tergm]{simulate.tergm()}}
 }
 \keyword{internal}

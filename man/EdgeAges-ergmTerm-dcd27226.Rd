@@ -20,7 +20,7 @@ all extant ties of the tie age times the on-toggle change statistics for
 the tie under the given model formula.
 }
 \seealso{
-\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+\code{\link[ergm:ergmTerm]{ergmTerm}} for index of model terms currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "EdgeAges", "subsection")}
 }

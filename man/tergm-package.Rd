@@ -3,16 +3,17 @@
 \docType{package}
 \name{tergm-package}
 \alias{tergm-package}
-\title{Fit, Simulate and Diagnose Dynamic Network Models derived from
-Exponential-Family Random Graph Models}
+\title{tergm: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models}
 \description{
-\code{\link[=tergm-package]{tergm}} is a collection of extensions to the
-\code{\link[=ergm-package]{ergm}} package to fit, diagnose, and simulate
+An integrated set of extensions to the 'ergm' package to analyze and simulate network evolution based on exponential-family random graph models (ERGM). 'tergm' is a part of the 'statnet' suite of packages for network analysis. See Krivitsky and Handcock (2014) \doi{10.1111/rssb.12014} and Carnegie, Krivitsky, Hunter, and Goodreau (2015) \doi{10.1080/10618600.2014.903087}.
+}
+\details{
+\CRANpkg{tergm} is a collection of extensions to the
+\CRANpkg{ergm} package to fit, diagnose, and simulate
 models for dynamic networks --- networks that evolve over time --- based on
 exponential-family random graph models (ERGMs). For a list of functions type
 \code{help(package='tergm')}
-}
-\details{
+
 When publishing results obtained using this package, please cite the
 original authors as described in \code{citation(package="tergm")}.
 
@@ -20,7 +21,7 @@ All programs derived from this package must cite it.
 
 An exponential-family random graph model (ERGM) postulates an exponential
 family over the sample space of networks of interest, and
-\code{\link[=ergm-package]{ergm}} package implements a suite of tools for
+\CRANpkg{ergm} package implements a suite of tools for
 modeling single networks using ERGMs.
 
 There have been a number of extensions of ERGMs for modeling the evolution
@@ -33,7 +34,7 @@ dynamic models when only a cross-sectional network is available, provided
 some temporal information for it is available as well.
 
 This package aims to implement these and other ERGM-based models for network
-evolution. At this time, it implements, via the \code{\link{tergm}}
+evolution. At this time, it implements, via the \code{\link[=tergm]{tergm()}}
 function, a general framework for modeling tie dynamics in temporal networks
 with flexible model specification (including (S)TERGMs).  Estimation options
 include a conditional MLE (CMLE) approach for fitting to a series of
@@ -41,12 +42,12 @@ networks and an Equilibrium Generalized Method of Moments Estimation (EGMME)
 for fitting to a single network with temporal information. For further
 development, see the referenced papers.
 }
-\section{Temporal model specification in \pkg{tergm}}{
+\section{Temporal model specification in \CRANpkg{tergm}}{
 
 
 The operator terms implemented by \pkg{tergm} are \code{Form()},
 \code{Persist()}, \code{Diss()}, \code{Cross()}, and \code{Change()}.  These are used
-to specify how the \code{ergm} terms (\code{\link{ergmTerm}}) in a formula are
+to specify how the \code{ergm} terms (\code{\link[ergm:ergmTerm]{ergmTerm}}) in a formula are
 evaluated across a network time-series.  Note, you cannot use one
 of these operators within another temporal, so
 \code{Cross(~Form(~edges))} is not a valid specification. (Generally,
@@ -72,7 +73,7 @@ models is under development.
 
 
 If you previously used the \code{\link[=stergm]{stergm()}} function in this package, please
-note that \code{\link[=stergm]{stergm()}} has been superceded by the new \code{\link{tergm}}
+note that \code{\link[=stergm]{stergm()}} has been superceded by the new \code{\link[=tergm]{tergm()}}
 function, and has been deprecated.  The
 \code{dissolution} formula in \code{\link[=stergm]{stergm()}} maps to the new \code{Persist()}
 operator in the \code{\link[=tergm]{tergm()}} function, \strong{not} the \code{Diss()} operator.
@@ -122,6 +123,38 @@ Morris M, Handcock MS, Hunter DR (2008).  Specification of
 Exponential-Family Random Graph Models: Terms and Computational Aspects.
 \emph{Journal of Statistical Software}, 24(4).
 \doi{10.18637/jss.v024.i04}
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://statnet.org}
+  \item Report bugs at \url{https://github.com/statnet/tergm/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Pavel N. Krivitsky \email{pavel@statnet.org} (\href{https://orcid.org/0000-0002-9101-3362}{ORCID})
+
+Authors:
+\itemize{
+  \item Mark S. Handcock \email{handcock@stat.ucla.edu} [thesis advisor]
+}
+
+Other contributors:
+\itemize{
+  \item David R. Hunter \email{dhunter@stat.psu.edu} [contributor]
+  \item Steven M. Goodreau \email{goodreau@u.washington.edu} [contributor, thesis advisor]
+  \item Martina Morris \email{morrism@u.washington.edu} [contributor, thesis advisor]
+  \item Nicole Bohme Carnegie \email{nicole.carnegie@nyu.edu} [contributor]
+  \item Carter T. Butts \email{buttsc@uci.edu} [contributor]
+  \item Ayn Leslie-Cook \email{aynlc3@uw.edu} [contributor]
+  \item Skye Bender-deMoll \email{skyebend@skyeome.net} [contributor]
+  \item Li Wang \email{lxwang@gmail.com} [contributor]
+  \item Kirk Li \email{kirkli@uw.edu} [contributor]
+  \item Chad Klumb \email{cklumb@gmail.com} [contributor]
+  \item Adrien Le Guillou \email{git@aleguillou.org} (\href{https://orcid.org/0000-0002-4791-418X}{ORCID}) [contributor]
+}
+
 }
 \keyword{models}
 \keyword{package}

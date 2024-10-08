@@ -54,7 +54,7 @@ and \code{MCMC.burnin.max} to the same value.}
 
 \item{MCMC.prop.weights}{Specifies the proposal weighting scheme to
 be used in the MCMC Metropolis-Hastings algorithm.  Possible
-choices may be determined by calling \code{\link{ergm_proposal_table}}.}
+choices may be determined by calling \code{\link[ergm:ergm_proposal_table]{ergm_proposal_table()}}.}
 
 \item{MCMC.prop.args}{An alternative, direct way of specifying
 additional arguments to the proposal.}
@@ -64,7 +64,7 @@ additional arguments to the proposal.}
 \item{MCMC.maxchanges}{Maximum number of changes for
 which to allocate space.}
 
-\item{term.options}{A list of additional arguments to be passed to term initializers. See \code{\link[=term.options]{? term.options}}.}
+\item{term.options}{A list of additional arguments to be passed to term initializers. See \code{\link[ergm:ergm-options]{? term.options}}.}
 
 \item{MCMC.packagenames}{Names of packages in which to look for change
 statistic functions in addition to those autodetected. This argument should
@@ -77,13 +77,13 @@ A list with arguments as components.
 Auxiliary function as user interface for fine-tuning TERGM simulation.
 }
 \details{
-This function is only used within a call to the \code{\link{simulate}}
-function.  See the \code{usage} section in \code{\link{simulate.tergm}} for
+This function is only used within a call to the \code{\link[=simulate]{simulate()}}
+function.  See the Usage section in \code{\link[=simulate.tergm]{simulate.tergm()}} for
 details.
 }
 \seealso{
-\code{\link{simulate.tergm}},
-\code{\link{simulate.formula}}.  \code{\link{control.tergm}}
-performs a similar function for \code{\link{tergm}}.
+\code{\link[=simulate.tergm]{simulate.tergm()}},
+\code{\link[ergm:simulate.formula]{simulate.formula()}}.  \code{\link[=control.tergm]{control.tergm()}}
+performs a similar function for \code{\link[=tergm]{tergm()}}.
 }
 \keyword{models}

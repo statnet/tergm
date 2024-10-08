@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
 
 #' Collects a sample of networks and returns the statistics of each sample
@@ -15,14 +15,14 @@
 #' returns the statistics of each sample, along with a toggle matrix of the 
 #' changes needed from the original network to each in the sample.
 #' 
-#' This function is normally called inside \code{\link{simulate.tergm}} functions
+#' This function is normally called inside [simulate.tergm()] functions
 #' to prepare inputs for the C sampling code and return its results
 #' 
 #' @aliases tergm_MCMC_sample tergm_MCMC_slave
-#' @param nw a \code{\link{network}} object
-#' @param model the model, as returned by \code{\link{ergm_model}}
-#' @param model.mon the optional monitoring model, as returned by \code{\link{ergm_model}}
-#' @param proposal the proposal, as returned by \code{\link{ergm_proposal}}
+#' @param nw a [`network`] object
+#' @param model the model, as returned by [`ergm_model`]
+#' @param model.mon the optional monitoring model, as returned by [`ergm_model`]
+#' @param proposal the proposal, as returned by [ergm_proposal()]
 #' @param theta the vector of curved parameters
 #' @param eta the vector of natural parameters
 #' @param control the list of control parameters
@@ -41,7 +41,7 @@
 #'     the dyad was changed; this is only returned if \code{control$changes} is \code{TRUE}
 #'   \item maxchanges: the \code{maxchanges} value from the control list
 #' }
-#' @seealso \code{\link{simulate.tergm}}
+#' @seealso [simulate.tergm()]
 #' @keywords internal
 #' @export
 tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
@@ -67,6 +67,14 @@ tergm_MCMC_sample <- function(nw, model, model.mon = NULL,
   state <- ergm_state(nw, model=model.comb, proposal=proposal, stats=rep(0,nparam(model.comb, canonical=TRUE)))
   
   z <- tergm_MCMC_slave(state, eta.comb, control, verbose)
+
+  if(z$status)
+    stop(switch(z$status,
+                paste0("Number of edges in a simulated network exceeds the maximum set by the ", sQuote("MCMC.maxedges"), " control parameter."), # 1: MCMCDyn_TOO_MANY_EDGES
+                "A Metropolis-Hastings proposal has failed.", # 2: MCMCDyn_MH_FAILED
+                paste0("Logging of changes in the network has been requested, and the storage capacity specified by ", sQuote("MCMC.maxchanges"), " has been exceeded.") # 3: MCMCDyn_TOO_MANY_CHANGES
+                )
+         )
 
   state <- z$state
   
@@ -137,7 +145,7 @@ tergm_MCMC_slave <- function(state, eta, control, verbose){
              as.integer(verbose),
              PACKAGE="tergm")
 
-  if(z$status != 0) stop("MCMCDyn failed with error code ", z$status)
+  if(z$status) return(z) # If there is an error.
   
   z$state <- update(z$state)
   

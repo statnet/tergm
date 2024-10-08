@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
 ###########################################################################
 # The <control.stergm> function allows the ergm fitting process to be tuned
@@ -18,8 +18,8 @@
 #' 
 #' Auxiliary function as user interface for fine-tuning 'stergm' fitting.
 #' 
-#' This function is only used within a call to the \code{\link{stergm}}
-#' function.  See the \code{usage} section in \code{\link{stergm}} for details.
+#' This function is only used within a call to the [stergm()]
+#' function.  See the Usage section in [stergm()] for details.
 #' Generally speaking, \code{control.stergm} is remapped to \code{control.tergm},
 #' with dissolution controls ignored and formation controls used as controls
 #' for the overall \code{tergm} process.  An exception to this rule is the
@@ -49,14 +49,14 @@
 #' 
 #'   \item Initial values for the elements that are \code{NA} are fit
 #'   using the method specified by
-#'   \code{\link[=control.ergm]{control$init.method}}.
+#'   \code{\link[ergm:control.ergm]{control$init.method}}.
 #' 
 #'   } Passing coefficients from a previous run can be used to
-#'   "resume" an uncoverged \code{\link{stergm}} run.
+#'   "resume" an uncoverged [stergm()] run.
 #' @param init.method Estimation method used to acquire initial values
 #'   for estimation. If \code{NULL} (the default), the initial values
 #'   are computed using the edges dissolution approximation (Carnegie
-#'   et al.) when appropriate; note that this relies on \code{\link{.extract.fd.formulae}}
+#'   et al.) when appropriate; note that this relies on [.extract.fd.formulae()]
 #'   to identify the formation and dissolution parts of the formula; the user should
 #'   be aware of its behavior and limitations.
 #'   If \code{init.method} is set to "zeros", the initial values are set to zeros.
@@ -77,9 +77,9 @@
 #'   between successive draws when running MCMC MLE.
 #' @param CMLE.ergm A convenience argument for specifying both
 #'   \code{CMLE.form.ergm} and \code{CMLE.diss.ergm} at once.
-#'   See \code{\link{control.ergm}}.
+#'   See [control.ergm()].
 #' @param CMLE.form.ergm Control parameters used to fit the CMLE.  See
-#'   \code{\link{control.ergm}}.
+#'   [control.ergm()].
 #' @param CMLE.diss.ergm
 #'   Ignored, with the exception of initial parameter values.
 #' @param CMLE.NA.impute In STERGM CMLE, missing dyads in
@@ -89,13 +89,13 @@
 #'   that are not, currently, implemented.  \code{CMLE.NA.impute}
 #'   controls how missing dyads in transitioned-from networks are be
 #'   imputed. See argument \code{imputers} of
-#'   \code{\link{impute.network.list}} for details.
+#'   [impute.network.list()] for details.
 #' 
 #'   By default, no imputation is performed, and the fitting stops
 #'   with an error if any transitioned-from networks have missing
 #'   dyads.
 #' @param CMLE.term.check.override The method
-#'   \code{\link{stergm}{stergm}} uses at this time to fit a series of
+#'   [stergm()] uses at this time to fit a series of
 #'   more than two networks requires certain assumptions to be made
 #'   about the ERGM terms being used, which are tested before a fit is
 #'   attempted. This test sometimes fails despite the model being
@@ -141,14 +141,14 @@
 #'   \code{EGMME.MCMC.burnin.min} and \code{EGMME.MCMC.burnin.max} to
 #'   the same value.
 #' @param SAN.maxit When \code{target.stats} argument is passed to
-#' [ergm()], the maximum number of attempts to use \code{\link{san}}
+#' [ergm()], the maximum number of attempts to use [san()]
 #' to obtain a network with statistics close to those specified.
 #' @param SAN.nsteps.times Multiplier for \code{SAN.nsteps} relative to
 #' \code{MCMC.burnin}. This lets one control the amount of SAN burn-in
 #' (arguably, the most important of SAN parameters) without overriding the
 #' other SAN defaults.
 #' @param SAN SAN control parameters.  See
-#'   \code{\link{control.san}}
+#'   [control.san()]
 #' @param SA.restarts Maximum number of times to restart a failed
 #'   optimization process.
 #' @param SA.burnin Number of time steps to advance the starting
@@ -161,7 +161,7 @@
 #'   heatmap representing the estimated gradient.
 #' 
 #'   Do NOT use these with non-interactive plotting devices like
-#'   \code{\link{pdf}}. (In fact, it will refuse to do that with a
+#'   [pdf()]. (In fact, it will refuse to do that with a
 #'   warning.)
 #' @param SA.max.plot.points If \code{SA.plot.progress==TRUE}, the
 #'   maximum number of time points to be plotted. Defaults to 400. If
@@ -299,9 +299,9 @@
 #' deprecated; a warning message is printed in case of deprecated arguments.
 #'
 #' @return A list with arguments as components.
-#' @seealso \code{\link{stergm}},\code{\link{tergm}},\code{\link{control.tergm}}. The
-#'   \code{\link{control.simulate.stergm}} function performs a similar
-#'   function for \code{\link{simulate.tergm}}.
+#' @seealso [stergm()], [tergm()], [control.tergm()]. The
+#'   [control.simulate.stergm()] function performs a similar
+#'   function for [simulate.tergm()].
 #' @references Boer, P., Huisman, M., Snijders,
 #'   T.A.B., and Zeggelink, E.P.H. (2003), StOCNET User\'s
 #'   Manual. Version 1.4.

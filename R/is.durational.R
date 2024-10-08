@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
 ###############################################################################
 # These functions are used to detect whether a ERGM formula/model/etcs are 
@@ -19,8 +19,8 @@
 #' 
 #' These functions test whether an ERGM is duration dependent or not.
 #' 
-#' @param object An ERGM formula, \code{\link{ergm_model}} object, or
-#'                 \code{\link{ergm_state}} object.
+#' @param object An ERGM formula, [`ergm_model`] object, or
+#'                 [`ergm_state`] object.
 #' @param \dots Unused at this time.
 #' @return \code{TRUE} if the ERGM terms in the model are duration dependent; 
 #'           \code{FALSE} otherwise.
@@ -34,14 +34,14 @@ is.durational<-function(object,...) UseMethod("is.durational")
 #' @export
 is.durational.NULL <- function(object, ...) FALSE # By convention.
 
-#' @describeIn is.durational Test if the \code{\link{ergm_model}} has duration-dependent terms, which call for \code{\link{lasttoggle}} data structures.
+#' @describeIn is.durational Test if the [`ergm_model`] has duration-dependent terms, which call for [`lasttoggle`] data structures.
 #' @export
 is.durational.ergm_model <- function(object, ...){
 #' @import purrr
   map(object$terms, "duration") %>% unlist %>% NVL(FALSE) %>% max %>% as.logical
 }
 
-#' @describeIn is.durational Test if the \code{\link{ergm_state}} has duration-dependent terms, which call for \code{\link{lasttoggle}} data structures.
+#' @describeIn is.durational Test if the [`ergm_state`] has duration-dependent terms, which call for [`lasttoggle`] data structures.
 #' @export
 is.durational.ergm_state <- function(object, ...){
   is.durational(object$model)

@@ -1,4 +1,4 @@
-/*  File src/include_stubs.c in package tergm, part of the
+/*  File src/kvint.h in package tergm, part of the
  *  Statnet suite of packages for network analysis, https://statnet.org .
  *
  *  This software is distributed under the GPL-3 license.  It is free,
@@ -7,4 +7,13 @@
  *
  *  Copyright 2008-2024 Statnet Commons
  */
-#include "ergm_stubs.c"
+#ifndef INCLUDE_SRC_KVINT_H_
+#define INCLUDE_SRC_KVINT_H_
+
+#include <Rinternals.h>
+#include "ergm_kvec.h"
+
+typedef kvec_t(int) kvint;
+SEXP kvint_to_SEXP(kvint v);
+
+#endif  // INCLUDE_SRC_KVINT_H_

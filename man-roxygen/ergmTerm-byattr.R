@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
 #' @param byarg specifies a vertex attribute (see Specifying Vertex attributes and Levels (`?nodal_attributes`) for details.). If specified, then separate degree
 #'   statistics are calculated for nodes having each separate

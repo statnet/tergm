@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
 #' @param emptyval can be used to specify the value returned if the network does not have any actors
 #'   with degree in the specified range. This is, technically, an arbitrary value, but it should

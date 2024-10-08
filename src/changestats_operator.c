@@ -5,7 +5,7 @@
  *  open source, and has the attribution requirements (GPL Section 7) at
  *  https://statnet.org/attribution .
  *
- *  Copyright 2008-2023 Statnet Commons
+ *  Copyright 2008-2024 Statnet Commons
  */
 #include "ergm_util.h"
 #include "tergm_model.h"
@@ -42,8 +42,8 @@ X_CHANGESTAT_FN(x_on_union_lt_net_Network){
       // Here, we want (y0|y1) / y1: edges in y0 but not in y1.
       // TODO: Optimize.
       unsigned int nt=kh_size(dur_inf->discord), pos=0;
-      Vertex *tails = Calloc(nt, Vertex);
-      Vertex *heads = Calloc(nt, Vertex);
+      Vertex *tails = R_Calloc(nt, Vertex);
+      Vertex *heads = R_Calloc(nt, Vertex);
       kh_foreach_key(dur_inf->discord, dyad, {
           if(!IS_OUTEDGE(dyad.tail, dyad.head)){
             tails[pos] = dyad.tail;
@@ -54,7 +54,7 @@ X_CHANGESTAT_FN(x_on_union_lt_net_Network){
 
       ChangeStats(pos, tails, heads, auxnet->onwp, m);
       memcpy(CHANGE_STAT, m->workspace, m->n_stats*sizeof(double));
-      Free(tails); Free(heads);
+      R_Free(tails); R_Free(heads);
     }
     break;
   default: break;
@@ -115,8 +115,8 @@ X_CHANGESTAT_FN(x_on_intersect_lt_net_Network){
       // Here, we want (y0&y1) / y0: edges in y1 but not in y0.
       // TODO: Optimize.
       unsigned int nt=kh_size(dur_inf->discord), pos=0;
-      Vertex *tails = Calloc(nt, Vertex);
-      Vertex *heads = Calloc(nt, Vertex);
+      Vertex *tails = R_Calloc(nt, Vertex);
+      Vertex *heads = R_Calloc(nt, Vertex);
       kh_foreach_key(dur_inf->discord, dyad, {
           if(IS_OUTEDGE(dyad.tail, dyad.head)){
             tails[pos] = dyad.tail;
@@ -127,7 +127,7 @@ X_CHANGESTAT_FN(x_on_intersect_lt_net_Network){
 
       ChangeStats(pos, tails, heads, auxnet->onwp, m);
       memcpy(CHANGE_STAT, m->workspace, m->n_stats*sizeof(double));
-      Free(tails); Free(heads);
+      R_Free(tails); R_Free(heads);
     }
     break;
   default: break;
@@ -220,8 +220,8 @@ X_CHANGESTAT_FN(x_on_discord_lt_net_Network){
       TailHead dyad;
       // TODO: Optimize.
       unsigned int nt=kh_size(dur_inf->discord), pos=0;
-      Vertex *tails = Calloc(nt, Vertex);
-      Vertex *heads = Calloc(nt, Vertex);
+      Vertex *tails = R_Calloc(nt, Vertex);
+      Vertex *heads = R_Calloc(nt, Vertex);
       kh_foreach_key(dur_inf->discord, dyad, {
           tails[pos] = dyad.tail;
           heads[pos] = dyad.head;
@@ -230,7 +230,7 @@ X_CHANGESTAT_FN(x_on_discord_lt_net_Network){
 
       ChangeStats(pos, tails, heads, auxnet->onwp, m);
       memcpy(CHANGE_STAT, m->workspace, m->n_stats*sizeof(double));
-      Free(tails); Free(heads);
+      R_Free(tails); R_Free(heads);
     }
     break;
   default: break;
@@ -320,7 +320,7 @@ typedef struct {
 I_CHANGESTAT_FN(i_EdgeAges) {
   ALLOC_STORAGE(1, EdgeAges_storage, sto);
   sto->model = ModelInitialize(getListElement(mtp->R, "submodel"), mtp->ext_state, nwp, FALSE);
-  sto->stats = Calloc(N_CHANGE_STATS, double);
+  sto->stats = R_Calloc(N_CHANGE_STATS, double);
 
   EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
     ChangeStats1(tail, head, nwp, sto->model, edge_var);
@@ -380,5 +380,5 @@ S_CHANGESTAT_FN(s_EdgeAges) {
 F_CHANGESTAT_FN(f_EdgeAges) {
   GET_STORAGE(EdgeAges_storage, sto);
   ModelDestroy(nwp, sto->model);
-  Free(sto->stats);
+  R_Free(sto->stats);
 }

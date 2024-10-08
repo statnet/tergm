@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
 ################################################################################
 # stergm --- fit Separable Temporal ERGMs.
@@ -15,7 +15,7 @@
 
 #' Separable Temporal Exponential Family Random Graph Models (Deprecated)
 #' 
-#' \code{\link{stergm}} is used for finding Separable Temporal ERGMs'
+#' [stergm()] fits Separable Temporal ERGMs'
 #' (STERGMs) Conditional MLE (CMLE) (Krivitsky and Handcock, 2014) and
 #' Equilibrium Generalized Method of Moments Estimator (EGMME)
 #' (Krivitsky, 2009). This function is deprecated in favor of
@@ -34,13 +34,13 @@
 #' the \code{dissolution} formula in \code{stergm} maps to the new \code{Persist()} 
 #' operator in the \code{tergm} function, NOT the \code{Diss()} operator.
 #'
-#' @param nw A \code{\link[network]{network}} object (for EGMME); or
-#' \code{\link[networkDynamic]{networkDynamic}} object, a
-#' \code{\link{network.list}} object, or a \code{\link{list}} containing
+#' @param nw A [`network`] object (for EGMME); or
+#' [`networkDynamic`] object, a
+#' [`network.list`] object, or a [`list`] containing
 #' networks (for CMLE and CMPLE).
 #' 
-#' \code{stergm} understands the \code{\link{lasttoggle}} "API".
-#' @param formation,dissolution One-sided \code{\link{ergm}}-style formulas for
+#' \code{stergm} understands the [`lasttoggle`] "API".
+#' @param formation,dissolution One-sided [ergm()]-style formulas for
 #' the formation and dissolution models, respectively.  In \code{stergm}, 
 #' the dissolution formula is parameterized in
 #' terms of tie persistence: negative coefficients imply lower rates of persistence
@@ -60,9 +60,9 @@
 #' @param times For CMLE and CMPLE estimation, times or indexes at
 #'   which the networks whose transition is to be modeled are
 #'   observed. Default to \code{c(0,1)} if \code{nw} is a
-#'   \code{\link[networkDynamic]{networkDynamic}} and to
+#'   [`networkDynamic`] and to
 #'   \code{1:length(nw)} (all transitions) if \code{nw} is a
-#'   \code{\link{network.list}} or a \code{\link{list}}. Unused for
+#'   [`network.list`] or a [`list`]. Unused for
 #'   EGMME. Note that at this time, the selected time points will be
 #'   treated as temporally adjacent. Irregularly spaced time series
 #'   are not supported at this time.
@@ -71,32 +71,32 @@
 #' parameters.
 #' @param offset.coef.diss Numeric vector to specify offset dissolution
 #' parameters.
-#' @param targets One-sided \code{\link{ergm}}-style formula specifying
+#' @param targets One-sided [ergm()]-style formula specifying
 #' statistics whose moments are used for the EGMME. Unused for CMLE and CMPLE.
 #' Targets is required for EGMME estimation. It may contain any valid ergm
 #' terms.  Any offset terms are used only during the 
 #' preliminary SAN run; they are removed automatically for the EGMME proper.
 #' If \code{targets} is specified as a character
 #' (one of \code{"formation"} and \code{"dissolution"}) then
-#' the function \code{\link{.extract.fd.formulae}} is used to determine the
+#' the function [.extract.fd.formulae()] is used to determine the
 #' corresponding formula; the user should be aware of its behavior and limitations.
 #' @param SAN.offsets Offset coefficients (if any) to use during the SAN run.
 #' @param target.stats A vector specifying the values of the \code{targets}
 #' statistics that EGMME will try to match.  Defaults to the statistics of
 #' \code{nw}. Unused for CMLE and CMPLE.
 #' @param eval.loglik Whether or not to calculate the log-likelihood
-#'   of a CMLE STERGM fit. See \code{\link{ergm}} for details. Can be
+#'   of a CMLE STERGM fit. See [ergm()] for details. Can be
 #'   set globally via `option(tergm.eval.loglik=...)`, falling back to
 #'   `getOption("ergm.eval.loglik")` if not set.
 #' @param control A list of control parameters for algorithm tuning.
-#' Constructed using \code{\link{control.stergm}}.  Remapped to 
-#' \code{\link{control.tergm}}.
+#' Constructed using [control.stergm()].  Remapped to 
+#' [control.tergm()].
 #' @template verbose
 #' @param \dots Additional arguments, to be passed to lower-level functions.
-#' @return \code{\link{stergm}} returns an object of class [`tergm`];
+#' @return [stergm()] returns an object of class [`tergm`];
 #'         see [tergm()] for details and methods.
 #'
-#' @seealso ergm, network, \%v\%, \%n\%, \code{\link{ergm-terms}}
+#' @seealso [ergm()], [`network`], [`%v%`], [`%n%`], [`ergmTerm`]
 #' @references
 #'
 #' Krivitsky P.N. and Handcock M.S. (2014) A Separable Model for Dynamic Networks. \emph{Journal of the Royal Statistical Society, Series B}, 76(1): 29-46. \doi{10.1111/rssb.12014}

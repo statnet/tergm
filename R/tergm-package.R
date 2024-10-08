@@ -5,14 +5,10 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
-#' Fit, Simulate and Diagnose Dynamic Network Models derived from
-#' Exponential-Family Random Graph Models
-#'
-#'
-#' \code{\link[=tergm-package]{tergm}} is a collection of extensions to the
-#' \code{\link[=ergm-package]{ergm}} package to fit, diagnose, and simulate
+#' @details \CRANpkg{tergm} is a collection of extensions to the
+#' \CRANpkg{ergm} package to fit, diagnose, and simulate
 #' models for dynamic networks --- networks that evolve over time --- based on
 #' exponential-family random graph models (ERGMs). For a list of functions type
 #' \code{help(package='tergm')}
@@ -25,7 +21,7 @@
 #'
 #' An exponential-family random graph model (ERGM) postulates an exponential
 #' family over the sample space of networks of interest, and
-#' \code{\link[=ergm-package]{ergm}} package implements a suite of tools for
+#' \CRANpkg{ergm} package implements a suite of tools for
 #' modeling single networks using ERGMs.
 #'
 #' There have been a number of extensions of ERGMs for modeling the evolution
@@ -38,7 +34,7 @@
 #' some temporal information for it is available as well.
 #'
 #' This package aims to implement these and other ERGM-based models for network
-#' evolution. At this time, it implements, via the \code{\link{tergm}}
+#' evolution. At this time, it implements, via the [tergm()]
 #' function, a general framework for modeling tie dynamics in temporal networks
 #' with flexible model specification (including (S)TERGMs).  Estimation options
 #' include a conditional MLE (CMLE) approach for fitting to a series of
@@ -46,7 +42,7 @@
 #' for fitting to a single network with temporal information. For further
 #' development, see the referenced papers.
 #'
-#' @section Temporal model specification in \pkg{tergm}:
+#' @section Temporal model specification in \CRANpkg{tergm}:
 #'
 #' The operator terms implemented by \pkg{tergm} are `Form()`,
 #' `Persist()`, `Diss()`, `Cross()`, and `Change()`.  These are used
@@ -74,7 +70,7 @@
 #' @section Compatibility with previous versions:
 #'
 #' If you previously used the [stergm()] function in this package, please
-#' note that [stergm()] has been superceded by the new \code{\link{tergm}}
+#' note that [stergm()] has been superceded by the new [tergm()]
 #' function, and has been deprecated.  The
 #' \code{dissolution} formula in [stergm()] maps to the new \code{Persist()}
 #' operator in the [tergm()] function, **not** the \code{Diss()} operator.
@@ -84,8 +80,6 @@
 #' newsgroup, references and links to further resources are provided there.
 #'
 #'
-#' @name tergm-package
-#' @docType package
 #' @references
 #' Hanneke S, Fu W and Xing EP (2010). Discrete
 #' Temporal Models of Social Networks. \emph{Electronic Journal of Statistics},
@@ -127,4 +121,4 @@
 #' \emph{Journal of Statistical Software}, 24(4).
 #' \doi{10.18637/jss.v024.i04}
 #' @keywords package models
-NULL
+"_PACKAGE"

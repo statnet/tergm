@@ -5,7 +5,7 @@
  *  open source, and has the attribution requirements (GPL Section 7) at
  *  https://statnet.org/attribution .
  *
- *  Copyright 2008-2023 Statnet Commons
+ *  Copyright 2008-2024 Statnet Commons
  */
 #include "changestats_duration.h"
 
@@ -289,9 +289,9 @@ I_CHANGESTAT_FN(i_nodefactor_mean_age) {
   sto->nodecov = INTEGER(getListElement(mtp->R, "nodecov"));
   sto->log = asInteger(getListElement(mtp->R, "log"));
   sto->emptyvals = REAL(getListElement(mtp->R, "emptynwstats"));
-  sto->edges = Calloc(N_CHANGE_STATS, int);
-  sto->ages = Calloc(N_CHANGE_STATS, double);
-  sto->newages = Calloc(N_CHANGE_STATS, double);
+  sto->edges = R_Calloc(N_CHANGE_STATS, int);
+  sto->ages = R_Calloc(N_CHANGE_STATS, double);
+  sto->newages = R_Calloc(N_CHANGE_STATS, double);
 
   // populate fields with initial edge set
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);  
@@ -329,7 +329,7 @@ X_CHANGESTAT_FN(x_nodefactor_mean_age) {
     } else {
       int transform = sto->log;
 
-      double *oldages = Calloc(N_CHANGE_STATS, double);
+      double *oldages = R_Calloc(N_CHANGE_STATS, double);
       memcpy(oldages, sto->ages, N_CHANGE_STATS*sizeof(double));      
       memset(sto->ages, 0, N_CHANGE_STATS*sizeof(double));
       
@@ -351,7 +351,7 @@ X_CHANGESTAT_FN(x_nodefactor_mean_age) {
         CHANGE_STAT[i] = sto->edges[i] ? (sto->ages[i] - oldages[i])/sto->edges[i] : 0;          
       }
       
-      Free(oldages);
+      R_Free(oldages);
     }
   }  
 }
@@ -452,9 +452,9 @@ U_CHANGESTAT_FN(u_nodefactor_mean_age) {
 F_CHANGESTAT_FN(f_nodefactor_mean_age) {
   GET_STORAGE(nodefactor_mean_age_storage, sto);
 
-  Free(sto->edges);
-  Free(sto->ages);
-  Free(sto->newages);
+  R_Free(sto->edges);
+  R_Free(sto->ages);
+  R_Free(sto->newages);
 }
 
 S_CHANGESTAT_FN(s_nodefactor_mean_age) {  
@@ -464,8 +464,8 @@ S_CHANGESTAT_FN(s_nodefactor_mean_age) {
   double *emptyvals = REAL(getListElement(mtp->R, "emptynwstats"));
   int transform = asInteger(getListElement(mtp->R, "log"));
 
-  int *edges = Calloc(N_CHANGE_STATS, int);
-  double *ages = Calloc(N_CHANGE_STATS, double);
+  int *edges = R_Calloc(N_CHANGE_STATS, int);
+  double *ages = R_Calloc(N_CHANGE_STATS, double);
   
   EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
     int et = ElapsedTime(tail,head,dur_inf);
@@ -492,8 +492,8 @@ S_CHANGESTAT_FN(s_nodefactor_mean_age) {
     }
   }
 
-  Free(edges);
-  Free(ages);
+  R_Free(edges);
+  R_Free(ages);
 }
 
 // mean age of ties by mixing type
@@ -515,14 +515,14 @@ I_CHANGESTAT_FN(i_nodemix_mean_age) {
   sto->nodecov = INTEGER(getListElement(mtp->R, "nodecov"));
   sto->log = asInteger(getListElement(mtp->R, "log"));
   sto->emptyvals = REAL(getListElement(mtp->R, "emptynwstats"));
-  sto->edges = Calloc(N_CHANGE_STATS, int);
-  sto->ages = Calloc(N_CHANGE_STATS, double);
-  sto->newages = Calloc(N_CHANGE_STATS, double);
+  sto->edges = R_Calloc(N_CHANGE_STATS, int);
+  sto->ages = R_Calloc(N_CHANGE_STATS, double);
+  sto->newages = R_Calloc(N_CHANGE_STATS, double);
 
   int nr = asInteger(getListElement(mtp->R, "nr"));
   int nc = asInteger(getListElement(mtp->R, "nc"));
   
-  sto->indmat = Calloc(nr, int *);
+  sto->indmat = R_Calloc(nr, int *);
   sto->indmat[0] = INTEGER(getListElement(mtp->R, "indmat"));
   for(int i = 1; i < nr; i++) {
     sto->indmat[i] = sto->indmat[i - 1] + nc;
@@ -559,7 +559,7 @@ X_CHANGESTAT_FN(x_nodemix_mean_age) {
     } else {
       int transform = sto->log;
 
-      double *oldages = Calloc(N_CHANGE_STATS, double);
+      double *oldages = R_Calloc(N_CHANGE_STATS, double);
       memcpy(oldages, sto->ages, N_CHANGE_STATS*sizeof(double));      
       memset(sto->ages, 0, N_CHANGE_STATS*sizeof(double));
       
@@ -577,7 +577,7 @@ X_CHANGESTAT_FN(x_nodemix_mean_age) {
         CHANGE_STAT[i] = sto->edges[i] ? (sto->ages[i] - oldages[i])/sto->edges[i] : 0;          
       }
       
-      Free(oldages);
+      R_Free(oldages);
     }
   }  
 }
@@ -627,10 +627,10 @@ U_CHANGESTAT_FN(u_nodemix_mean_age) {
 F_CHANGESTAT_FN(f_nodemix_mean_age) {
   GET_STORAGE(nodemix_mean_age_storage, sto);
 
-  Free(sto->edges);
-  Free(sto->ages);
-  Free(sto->newages);
-  Free(sto->indmat);  
+  R_Free(sto->edges);
+  R_Free(sto->ages);
+  R_Free(sto->newages);
+  R_Free(sto->indmat);  
 }
 
 S_CHANGESTAT_FN(s_nodemix_mean_age) {
@@ -643,14 +643,14 @@ S_CHANGESTAT_FN(s_nodemix_mean_age) {
   int nr = asInteger(getListElement(mtp->R, "nr"));
   int nc = asInteger(getListElement(mtp->R, "nc"));
   
-  int **indmat = Calloc(nr, int *);
+  int **indmat = R_Calloc(nr, int *);
   indmat[0] = INTEGER(getListElement(mtp->R, "indmat"));
   for(int i = 1; i < nr; i++) {
     indmat[i] = indmat[i - 1] + nc;
   }
 
-  int *edges = Calloc(N_CHANGE_STATS, int);
-  double *ages = Calloc(N_CHANGE_STATS, double);
+  int *edges = R_Calloc(N_CHANGE_STATS, int);
+  double *ages = R_Calloc(N_CHANGE_STATS, double);
   
   EXEC_THROUGH_NET_EDGES_PRE(tail, head, edge_var, {
     int et = ElapsedTime(tail,head,dur_inf);
@@ -672,9 +672,9 @@ S_CHANGESTAT_FN(s_nodemix_mean_age) {
     }
   }
 
-  Free(indmat);
-  Free(edges);
-  Free(ages);
+  R_Free(indmat);
+  R_Free(edges);
+  R_Free(ages);
 }
 
 /*****************
@@ -854,11 +854,11 @@ typedef struct {
 I_CHANGESTAT_FN(i_degree_mean_age){
   ALLOC_STORAGE(1, degree_mean_age_storage, sto);
   
-  sto->ages = Calloc(N_CHANGE_STATS, double);
-  sto->counts = Calloc(N_CHANGE_STATS, int);
+  sto->ages = R_Calloc(N_CHANGE_STATS, double);
+  sto->counts = R_Calloc(N_CHANGE_STATS, int);
   
-  sto->prop_ages = Calloc(N_CHANGE_STATS, double);
-  sto->prop_counts = Calloc(N_CHANGE_STATS, int);
+  sto->prop_ages = R_Calloc(N_CHANGE_STATS, double);
+  sto->prop_counts = R_Calloc(N_CHANGE_STATS, int);
   
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
@@ -1073,10 +1073,10 @@ U_CHANGESTAT_FN(u_degree_mean_age){
 F_CHANGESTAT_FN(f_degree_mean_age){
   GET_STORAGE(degree_mean_age_storage, sto);
 
-  Free(sto->ages);
-  Free(sto->counts);
-  Free(sto->prop_ages);
-  Free(sto->prop_counts);  
+  R_Free(sto->ages);
+  R_Free(sto->counts);
+  R_Free(sto->prop_ages);
+  R_Free(sto->prop_counts);  
 }
 
 S_CHANGESTAT_FN(s_degree_mean_age){
@@ -1123,11 +1123,11 @@ typedef degree_mean_age_storage degree_by_attr_mean_age_storage;
 I_CHANGESTAT_FN(i_degree_by_attr_mean_age){
   ALLOC_STORAGE(1, degree_by_attr_mean_age_storage, sto);
   
-  sto->ages = Calloc(N_CHANGE_STATS, double);
-  sto->counts = Calloc(N_CHANGE_STATS, int);
+  sto->ages = R_Calloc(N_CHANGE_STATS, double);
+  sto->counts = R_Calloc(N_CHANGE_STATS, int);
   
-  sto->prop_ages = Calloc(N_CHANGE_STATS, double);
-  sto->prop_counts = Calloc(N_CHANGE_STATS, int);
+  sto->prop_ages = R_Calloc(N_CHANGE_STATS, double);
+  sto->prop_counts = R_Calloc(N_CHANGE_STATS, int);
   
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
@@ -1367,10 +1367,10 @@ U_CHANGESTAT_FN(u_degree_by_attr_mean_age){
 F_CHANGESTAT_FN(f_degree_by_attr_mean_age){
   GET_STORAGE(degree_by_attr_mean_age_storage, sto);
 
-  Free(sto->ages);
-  Free(sto->counts);
-  Free(sto->prop_ages);
-  Free(sto->prop_counts);  
+  R_Free(sto->ages);
+  R_Free(sto->counts);
+  R_Free(sto->prop_ages);
+  R_Free(sto->prop_counts);  
 }
 
 
@@ -1429,11 +1429,11 @@ typedef degree_mean_age_storage degrange_mean_age_storage;
 I_CHANGESTAT_FN(i_degrange_mean_age){
   ALLOC_STORAGE(1, degrange_mean_age_storage, sto);
   
-  sto->ages = Calloc(N_CHANGE_STATS, double);
-  sto->counts = Calloc(N_CHANGE_STATS, int);
+  sto->ages = R_Calloc(N_CHANGE_STATS, double);
+  sto->counts = R_Calloc(N_CHANGE_STATS, int);
   
-  sto->prop_ages = Calloc(N_CHANGE_STATS, double);
-  sto->prop_counts = Calloc(N_CHANGE_STATS, int);
+  sto->prop_ages = R_Calloc(N_CHANGE_STATS, double);
+  sto->prop_counts = R_Calloc(N_CHANGE_STATS, int);
   
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
@@ -1669,10 +1669,10 @@ U_CHANGESTAT_FN(u_degrange_mean_age){
 F_CHANGESTAT_FN(f_degrange_mean_age){
   GET_STORAGE(degrange_mean_age_storage, sto);
 
-  Free(sto->ages);
-  Free(sto->counts);
-  Free(sto->prop_ages);
-  Free(sto->prop_counts);  
+  R_Free(sto->ages);
+  R_Free(sto->counts);
+  R_Free(sto->prop_ages);
+  R_Free(sto->prop_counts);  
 }
 
 
@@ -1719,11 +1719,11 @@ typedef degree_mean_age_storage degrange_by_attr_mean_age_storage;
 I_CHANGESTAT_FN(i_degrange_by_attr_mean_age){
   ALLOC_STORAGE(1, degrange_by_attr_mean_age_storage, sto);
   
-  sto->ages = Calloc(N_CHANGE_STATS, double);
-  sto->counts = Calloc(N_CHANGE_STATS, int);
+  sto->ages = R_Calloc(N_CHANGE_STATS, double);
+  sto->counts = R_Calloc(N_CHANGE_STATS, int);
   
-  sto->prop_ages = Calloc(N_CHANGE_STATS, double);
-  sto->prop_counts = Calloc(N_CHANGE_STATS, int);
+  sto->prop_ages = R_Calloc(N_CHANGE_STATS, double);
+  sto->prop_counts = R_Calloc(N_CHANGE_STATS, int);
   
   GET_AUX_STORAGE(StoreTimeAndLasttoggle, dur_inf);
     
@@ -1990,10 +1990,10 @@ U_CHANGESTAT_FN(u_degrange_by_attr_mean_age){
 F_CHANGESTAT_FN(f_degrange_by_attr_mean_age){
   GET_STORAGE(degrange_by_attr_mean_age_storage, sto);
 
-  Free(sto->ages);
-  Free(sto->counts);
-  Free(sto->prop_ages);
-  Free(sto->prop_counts);  
+  R_Free(sto->ages);
+  R_Free(sto->counts);
+  R_Free(sto->prop_ages);
+  R_Free(sto->prop_counts);  
 }
 
 

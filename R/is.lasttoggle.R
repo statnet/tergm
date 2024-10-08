@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
 ###############################################################################
 # is.lasttoggle function tests whether a nw object, with the inherited model 
@@ -20,7 +20,7 @@
 #'                about dyad edge histories.
 #' 
 #' @details The \code{tergm} package handles durational information attached to
-#'            \code{\link{network}} objects by way of the \code{time} and 
+#'            [`network`] objects by way of the \code{time} and 
 #'            \code{lasttoggle} network attributes.  The \code{lasttoggle} data
 #'            structure is a 3-column matrix; the first two columns are tails 
 #'            and heads (respectively) of dyads, and the third column is the last

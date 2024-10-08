@@ -8,13 +8,22 @@
 # binary: edgecov.ages(x, attrname=NULL)
 }
 \arguments{
-\item{x, attrname}{either a square matrix of covariates, one for
-each possible edge in the network, the name of a network
-attribute of covariates, or a network; if the latter, or if the
-network attribute named by \code{x} is itself a network, optional
-argument \code{attrname} provides the name of the quantitative edge
-attribute to use for covariate values (in this case, missing
-edges in \code{x} are assigned a covariate value of zero).}
+\item{x, attrname}{a specification for the dyadic covariate: either
+one of the following, or the name of a network attribute
+containing one of the following: \describe{
+
+\item{a covariate matrix}{with dimensions \eqn{n \times n}{n*n}
+for unipartite networks and \eqn{b \times (n-b)}{b*(n-b)} for
+bipartite networks; \code{attrname}, if given, is used to construct
+the term name.}
+
+\item{a network object}{with the same size and bipartitedness as
+LHS; \code{attrname}, if given, provides the name of the
+quantitative edge attribute to use for covariate values (in
+this case, missing edges in \code{x} are assigned a covariate value
+of zero).}
+
+}}
 }
 \description{
 Weighted sum of ages of extant ties
@@ -32,7 +41,7 @@ produce highly biased dissolution parameter estimates if the goal
 is to get an intended average duration.
 }
 \seealso{
-\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+\code{\link[ergm:ergmTerm]{ergmTerm}} for index of model terms currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "edgecov.ages", "subsection")}
 }

@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
 ################################################################################
 # tergm --- fit Separable Temporal ERGMs.
@@ -15,7 +15,7 @@
 
 #' Temporal Exponential-Family Random Graph Models
 #' 
-#' \code{\link{tergm}} is used for finding Temporal ERGMs' (TERGMs) and Separable Temporal ERGMs' (STERGMs)
+#' [tergm()] fits Temporal ERGMs' (TERGMs) and Separable Temporal ERGMs' (STERGMs)
 #' Conditional MLE (CMLE) (Krivitsky and Handcock, 2010) and Equilibrium
 #' Generalized Method of Moments Estimator (EGMME) (Krivitsky, 2009).
 #' 
@@ -33,45 +33,45 @@
 #' 
 #' @param times For CMLE and CMPLE estimation, times or indexes at
 #'   which the networks whose transition is to be modeled are
-#'   observed. Default to \code{c(0,1)} if \code{nw} is a
-#'   \code{\link[networkDynamic]{networkDynamic}} and to
-#'   \code{1:length(nw)} (all transitions) if \code{nw} is a
-#'   \code{\link{network.list}} or a \code{\link{list}}. Unused for
-#'   EGMME. Note that at this time, the selected time points will be
-#'   treated as temporally adjacent. Irregluarly spaced time series
-#'   are not supported at this time.
+#'   observed. This argument is mandatory if \code{nw} is a
+#'   [`networkDynamic`] and defaults to \code{1:length(nw)} (all
+#'   transitions) if \code{nw} is a [`network.list`] or a
+#'   [`list`]. Ignored when estimating EGMME or if LHS is already a
+#'   [`NetSeries`]. Note that at this time, the selected time points
+#'   will be treated as temporally adjacent. Irregluarly spaced time
+#'   series are not supported at this time.
 #' 
 #' @param offset.coef Numeric vector to specify offset parameters.
-#' @param targets One-sided \code{\link{ergm}}-style formula specifying
+#' @param targets One-sided [ergm()]-style formula specifying
 #' statistics whose moments are used for the EGMME. Unused for CMLE and CMPLE.
 #' Targets is required for EGMME estimation. It may contain any valid ergm
 #' terms.  Any offset terms are used only during the 
 #' preliminary SAN run; they are removed automatically for the EGMME proper.
 #' If \code{targets} is specified as a character
 #' (one of \code{"formation"} and \code{"dissolution"}) then
-#' the function \code{\link{.extract.fd.formulae}} is used to determine the
+#' the function [.extract.fd.formulae()] is used to determine the
 #' corresponding formula; the user should be aware of its behavior and limitations.
 #' @param SAN.offsets Offset coefficients (if any) to use during the SAN run.
 #' @param target.stats A vector specifying the values of the \code{targets}
 #' statistics that EGMME will try to match.  Defaults to the statistics of
 #' \code{nw}. Unused for CMLE and CMPLE.
 #' @param eval.loglik Whether or not to calculate the log-likelihood
-#'   of a CMLE TERGM fit. See \code{\link{ergm}} for details. Can be
+#'   of a CMLE TERGM fit. See [ergm()] for details. Can be
 #'   set globally via `option(tergm.eval.loglik=...)`, falling back to
 #'   `getOption("ergm.eval.loglik")` if not set.
 #' @param control A list of control parameters for algorithm tuning.
-#' Constructed using \code{\link{control.tergm}}.
+#' Constructed using [control.tergm()].
 #' @template verbose
 #' @param \dots Additional arguments, to be passed to lower-level functions.
 #' @param basis optional network data overriding the left hand side of \code{formula}
 #'
-#' @return \code{\link{tergm}} returns an object of class `tergm` that
-#'   inherits from `ergm` and has the usual methods ([coef.ergm()],
+#' @return [tergm()] returns an object of class [`tergm`] that
+#'   inherits from [`ergm`] and has the usual methods ([coef.ergm()],
 #'   [summary.ergm()], [mcmc.diagnostics()], etc.) implemented for
 #'   it. Note that [gof()] only works for the CMLE method.
 #'
-#' @seealso [`network`] and [NetSeries()] for the data structures,
-#'   [ergm()] and \code{\link{ergmTerm}} for model specification,
+#' @seealso [`network`], [`networkDynamic`], and [NetSeries()] for the data structures,
+#'   [ergm()] and [`ergmTerm`] for model specification,
 #'   package vignette \code{browseVignettes(package='tergm')} for a
 #'   short demonstration, the Statnet web site
 #'   \url{https://statnet.org/workshop-tergm/} for a tutorial
@@ -92,7 +92,7 @@
 #' Krivitsky, P.N. (2012). Modeling of Dynamic Networks based on
 #' Egocentric Data with Durational Information. \emph{Pennsylvania State
 #' University Department of Statistics Technical Report}, 2012(2012-01).
-#' \url{http://stat.psu.edu/research/technical-report-files/2012-technical-reports/modeling-of-dynamic-networks-based-on-egocentric-data-with-durational-information}
+#' \url{https://arxiv.org/abs/2203.06866}
 #' 
 #'
 #' @examples

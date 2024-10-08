@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
 library(tergm)
 
@@ -14,12 +14,10 @@ logit<-function(p)log(p/(1-p))
 coef.form.f<-function(coef.diss,density) -log(((1+exp(coef.diss))/(density/(1-density)))-1)
 
 simtest <- function(S, edges, dur, n, dir=FALSE, bip=0){
-  m <- if(bip) bip else n
-  
   target.stats<-edges
   coef.diss<-logit(1-1/dur)
   
-  dc <- matrix(rnorm(n*m),n,m)
+  dc <- suppressWarnings(matrix(rnorm(n*n),if(bip) bip else n, if(bip) n-bip else n))
   if(!dir && !bip) dc <- dc+t(dc)
   # Note that if nw1!=nw2, then
   # summary(nw1~edgecov(dc)+edgecov.ages(dc))!=summary(nw2~edgecov(dc)+edgecov.ages(dc))

@@ -14,7 +14,7 @@ frequency (typically about 50 percent).  May be used in
 dynamic fitting and simulation.
 }
 \seealso{
-\code{\link{ergmHint}} for index of constraints and hints currently visible to the package.
+\code{\link[ergm:ergmHint]{ergmHint}} for index of constraints and hints currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmHint", "discord", "subsection")}
 }

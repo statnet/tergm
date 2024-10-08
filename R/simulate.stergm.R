@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
 #========================================================================
 # This file contains the following 3 functions for simulating stergms
@@ -86,7 +86,7 @@
 #' are provided for backwards compatibility.  It is recommended that new
 #' code make use of the \code{simulate_formula.network} and
 #' \code{simulate_formula.networkDynamic} functions instead.  See
-#' \code{\link{simulate.tergm}} for details on these new functions.
+#' [simulate.tergm()] for details on these new functions.
 #'
 #' Note that return values may be structured differently than in past versions.
 #' 
@@ -101,11 +101,11 @@
 #' 
 #' @aliases simulate.stergm simulate.network simulate.networkDynamic
 #'
-#' @param object an object of type \code{\link{network}} or \code{\link{networkDynamic}}
-#' @param formation,dissolution One-sided \code{\link{ergm}}-style formulas for
+#' @param object an object of type [`network`] or [`networkDynamic`]
+#' @param formation,dissolution One-sided [ergm()]-style formulas for
 #' the formation and dissolution models, respectively.  The dissolution model is parameterized in terms of tie persistence.
 #' @param nsim Number of replications (separate chains of networks) of the
-#' process to run and return. The \code{\link{networkDynamic}} method only
+#' process to run and return. The [`networkDynamic`] method only
 #' supports \code{nsim=1}.
 #' @template seed
 #' @param coef.form Parameters for the formation model.
@@ -116,7 +116,7 @@
 #' @param monitor A one-sided formula specifying one or more terms whose
 #' value is to be monitored.  If \code{monitor} is specified as a character
 #' (one of \code{"formation"}, \code{"dissolution"}, and \code{"all"}) then
-#' the function \code{\link{.extract.fd.formulae}} is used to determine the
+#' the function [.extract.fd.formulae()] is used to determine the
 #' corresponding formula; the user should be aware of its behavior and limitations.
 #' @param time.slices Number of time slices (or statistics) to return from each
 #' replication of the dynamic process. See below for return types. Defaults to
@@ -132,8 +132,8 @@
 #' state of the network is sampled (\code{time.start}) and the the beginning of
 #' the spell that should be recorded for the newly simulated network state.
 #' @param control A list of control parameters for algorithm tuning,
-#' constructed using \code{\link{control.simulate.network}}.  These are mapped
-#' to \code{\link{control.simulate.formula.tergm}} controls by assigning:
+#' constructed using [control.simulate.network()].  These are mapped
+#' to [control.simulate.formula.tergm()] controls by assigning:
 #' \itemize{
 #'   \item \code{MCMC.prop.form} to \code{MCMC.prop},
 #'   \item \code{MCMC.prop.args.form} to \code{MCMC.prop.args}, and
@@ -149,7 +149,7 @@
 #' returned.
 #' @template verbose
 #' @param \dots Further arguments passed to or used by methods.
-#' @return Depends on the \code{output} argument.  See \code{\link{simulate.tergm}}
+#' @return Depends on the \code{output} argument.  See [simulate.tergm()]
 #'         for details.  Note that some formation/dissolution separated
 #'         information is also attached to the return value for calls made through
 #'         \code{simulate.network} and \code{simulate.networkDynamic} in

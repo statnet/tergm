@@ -1,6 +1,6 @@
 Package: tergm
-Version: 4.2.0
-Date: 2023-05-30
+Version: 4.2.1
+Date: 2024-10-08
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
         person(c("Pavel", "N."), "Krivitsky", role=c("aut","cre"), email="pavel@statnet.org", comment=c(ORCID="0000-0002-9101-3362")),
@@ -14,38 +14,39 @@ Authors@R: c(
         person("Skye", "Bender-deMoll", role=c("ctb"), email="skyebend@skyeome.net"),
         person("Li","Wang",role=c("ctb"),email="lxwang@gmail.com"),
         person("Kirk","Li",role=c("ctb"),email="kirkli@uw.edu"),
-        person("Chad", "Klumb", role=c("ctb"), email="cklumb@gmail.com"))
+        person("Chad", "Klumb", role=c("ctb"), email="cklumb@gmail.com"),
+        person("Adrien", "Le Guillou", role=c("ctb"), email="git@aleguillou.org", comment=c(ORCID="0000-0002-4791-418X")))
 Depends:
-    ergm (>= 4.5.0),
-    network (>= 1.18.0),
-    networkDynamic (>= 0.11.3)
+    ergm (>= 4.7.0),
+    network (>= 1.18.2),
+    networkDynamic (>= 0.11.4)
 Imports:
+    robustbase (>= 0.95),
+    coda (>= 0.19-4.1),
+    statnet.common (>= 4.10.0),
+    ergm.multi (>= 0.2.1),
+    purrr (>= 1.0.2),
     methods,
     utils,
-    robustbase (>= 0.93.5),
-    coda (>= 0.19.2),
-    nlme (>= 3.1.139),
-    MASS (>= 7.3.51.4),
-    statnet.common (>= 4.9.0),
-    ergm.multi (>= 0.2.0),
-    purrr
+    nlme,
+    MASS
 LinkingTo:
     ergm
 Suggests:
-    lattice (>= 0.20.38),
-    parallel,
-    rmarkdown (>= 1.12),
-    knitr (>= 1.22),
-    tibble,
-    testthat,
-    covr,
-    networkLite
+    rmarkdown (>= 2.28),
+    knitr (>= 1.48),
+    tibble (>= 3.2.1),
+    testthat (>= 3.2.1.1),
+    covr (>= 3.6.4),
+    networkLite (>= 1.0.5),
+    lattice,
+    parallel
 BugReports: https://github.com/statnet/tergm/issues
 Description: An integrated set of extensions to the 'ergm' package to analyze and simulate network evolution based on exponential-family random graph models (ERGM). 'tergm' is a part of the 'statnet' suite of packages for network analysis. See Krivitsky and Handcock (2014) <doi:10.1111/rssb.12014> and Carnegie, Krivitsky, Hunter, and Goodreau (2015) <doi:10.1080/10618600.2014.903087>.
 License: GPL-3 + file LICENSE
 URL: https://statnet.org
 VignetteBuilder: rmarkdown, knitr
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2.9000
 Roxygen: list(markdown = TRUE)
 Config/testthat/parallel: true
 Config/testthat/edition: 3

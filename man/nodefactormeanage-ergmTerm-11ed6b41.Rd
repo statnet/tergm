@@ -33,7 +33,7 @@ equaling the average, over all half-ties incident on nodes of that level,
 of the amount of time elapsed since formation.
 }
 \seealso{
-\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+\code{\link[ergm:ergmTerm]{ergmTerm}} for index of model terms currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "nodefactor.mean.age", "subsection")}
 }

@@ -9,7 +9,7 @@ about dyad edge histories.
 }
 \details{
 The \code{tergm} package handles durational information attached to
-\code{\link{network}} objects by way of the \code{time} and
+\code{\link[network:network]{network}} objects by way of the \code{time} and
 \code{lasttoggle} network attributes.  The \code{lasttoggle} data
 structure is a 3-column matrix; the first two columns are tails
 and heads (respectively) of dyads, and the third column is the last

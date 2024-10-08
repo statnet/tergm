@@ -11,7 +11,7 @@ NetSeries(..., order = 1, NA.impute = NULL)
 \enumerate{
 \item A list of identically- dimensioned and directed networks.
 \item Several networks as arguments.
-\item A \code{\link{networkDynamic}} object and a numeric vector of time indices.
+\item A \code{\link[networkDynamic:networkDynamic]{networkDynamic}} object and a numeric vector of time indices.
 }}
 
 \item{order}{how many previous networks to store as an accessible
@@ -19,7 +19,7 @@ covariate of the model.}
 
 \item{NA.impute}{How missing dyads in transitioned-from networks
 are be imputed when using conditional estimation. See argument
-\code{imputers} of \code{\link{impute.network.list}} for details.}
+\code{imputers} of \code{\link[=impute.network.list]{impute.network.list()}} for details.}
 }
 \value{
 A network object with temporal metadata.
@@ -55,5 +55,5 @@ ergm(monks ~ Form(~edges)+Persist(~edges))
 
 }
 \seealso{
-\link[=ergm-terms]{Help on model specification} for specific terms.
+\code{\link[ergm:ergmTerm]{ergmTerm}} for specific terms.
 }

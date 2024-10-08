@@ -35,7 +35,7 @@ with degree greater than or equal to
 since the tie's formation. The optional argument
 }
 \seealso{
-\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+\code{\link[ergm:ergmTerm]{ergmTerm}} for index of model terms currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "degrange.mean.age", "subsection")}
 }

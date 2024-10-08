@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
 
 ## run tests conditionally on availability of the networkLite package
@@ -51,7 +51,7 @@ if(require("networkLite")) {
         nwL_1 <- simulate(nwL ~ Form(~edges + nodefactor("a") + nodecov(~b^2 + b)) +
                                 Persist(~edges),
                           coef = coef, output = "final", dynamic = TRUE)
-        expect_is(nwL_1, "networkLite")
+        expect_s3_class(nwL_1, "networkLite")
 
         expect_equal(as.edgelist(nw_1), as.edgelist(nwL_1))
         expect_identical(nw_1 %n% "lasttoggle", nwL_1 %n% "lasttoggle")
@@ -68,7 +68,7 @@ if(require("networkLite")) {
         nwL_2 <- simulate(nwL_1 ~ Form(~edges + nodefactor("a") + nodecov(~b^2 + b)) +
                                   Persist(~edges),
                           coef = coef, output = "final", dynamic = TRUE)
-        expect_is(nwL_2, "networkLite")
+        expect_s3_class(nwL_2, "networkLite")
 
         expect_equal(as.edgelist(nw_2), as.edgelist(nwL_2))
         expect_identical(nw_2 %n% "lasttoggle", nwL_2 %n% "lasttoggle")
@@ -84,7 +84,7 @@ if(require("networkLite")) {
         nwL_3 <- simulate(nwL_2 ~ Form(~edges + nodefactor("a") + nodecov(~b^2 + b)) +
                                   Persist(~edges),
                           coef = coef, output = "final", dynamic = TRUE)
-        expect_is(nwL_3, "networkLite")
+        expect_s3_class(nwL_3, "networkLite")
 
         expect_equal(as.edgelist(nw_3), as.edgelist(nwL_3))
         expect_identical(nw_3 %n% "lasttoggle", nwL_3 %n% "lasttoggle")

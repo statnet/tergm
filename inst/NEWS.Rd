@@ -5,7 +5,7 @@
 %  open source, and has the attribution requirements (GPL Section 7) at
 %  https://statnet.org/attribution .
 %
-%  Copyright 2008-2023 Statnet Commons
+%  Copyright 2008-2024 Statnet Commons
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \name{NEWS}
 \title{NEWS file for the \code{\link[=tergm-package]{tergm}} package}
@@ -62,11 +62,47 @@
 %% }
 
 
+\section{Changes in version 4.2.1}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item{
+        In TERGM simulation, space for toggle history is now dynamically allocated; this is mainly visible in more efficient memory usage.
+      }
+     }
+   }
+
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item{
+        \code{Calloc()}, \code{Realloc()}, and \code{Free()} C calls now use their \code{R_}-prefixed counterparts.
+      }
+      \item{
+        \code{\link{tergm}()} with CMLE for \code{\link[networkDynamic]{networkDynamic}} now stops with an informative error message if \code{times=} is not passed.
+      }
+      \item{
+        Some corner cases in the discordant bounded-degree stratified TNT proposal have been fixed.
+      }
+      \item{
+        General documentation fixes and improvements.
+      }
+    }
+  }
+
+  \subsection{OTHER USER-VISIBLE CHANGES}{
+    \itemize{
+      \item{
+        Error messages in TERGM MCMC sampling are now more informative.
+      }
+    }
+  }
+}
+
+
 \section{Changes in version 4.2.0}{
     \subsection{NEW FEATURES}{
       \itemize{
         \item Operators \code{Form()}, \code{Persist()}, \code{Diss()}, \code{Cross()}, and \code{Change()} can now specify time-varying network-level covariates using the syntax of \code{\link[ergm.multi:N-ergmTerm]{N}}.
-        \item \code{link{tergm}()} now supports a \code{basis=} argument like \code{\link{ergm}()} does.
+        \item \code{\link{tergm}()} now supports a \code{basis=} argument like \code{\link{ergm}()} does.
         \item \pkg{tergm}'s functions now support \CRANpkg{networkLite} objects in place of \CRANpkg{network} objects.
      }
    }
@@ -417,14 +453,15 @@
 
   \subsection{OTHER USER-VISIBLE CHANGES}{
     \itemize{
-      \item Changes to \code{control.stergm} parameters:
-      \itemize{
-        \item \code{init.method} If \code{NULL} (the default), the initial values
-    are computed using the edges dissolution approximation (Carnegie et al.) when appropriate. 
-    If set to "zeros", the initial values are set to zeros.
-        \item \code{SA.oh.memory = 100000} Absolute maximum number of data points per thread to store in the full optimization history.
+      \item{
+        Changes to \code{control.stergm} parameters:
+        \itemize{
+          \item \code{init.method} If \code{NULL} (the default), the initial values
+          are computed using the edges dissolution approximation (Carnegie et al.) when appropriate.
+          If set to "zeros", the initial values are set to zeros.
+          \item \code{SA.oh.memory = 100000} Absolute maximum number of data points per thread to store in the full optimization history.
       }
-      \item  Changes to \code{simulate.stergm} parameters: addition of \code{duration.dependent} parameter: {Logical: Whether the model terms in formula or model are duration dependent. E.g., if a duration-dependent term  is used in estimation/simulation model, the probability of forming or dissolving a tie may dependent on the age the dyad status. If TRUE, the matrix of tie ages will be allocated.}
+      \item  Changes to \code{simulate.stergm} parameters: addition of \code{duration.dependent} parameter to control whether the model terms in formula or model are duration dependent. E.g., if a duration-dependent term  is used in estimation/simulation model, the probability of forming or dissolving a tie may dependent on the age the dyad status.
     }
   }
 

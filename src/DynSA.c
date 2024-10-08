@@ -5,7 +5,7 @@
  *  open source, and has the attribution requirements (GPL Section 7) at
  *  https://statnet.org/attribution .
  *
- *  Copyright 2008-2023 Statnet Commons
+ *  Copyright 2008-2024 Statnet Commons
  */
 #include "DynSA.h"
 #include "changestats_lasttoggle.h"
@@ -150,7 +150,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s,
       if(status==MCMCDyn_TOO_MANY_CHANGES)
         return MCMCDyn_TOO_MANY_CHANGES;
       
-      if(nwp->nedges >= maxedges-1)
+      if(EDGECOUNT(nwp) >= maxedges-1)
         return MCMCDyn_TOO_MANY_EDGES;
     }
 
@@ -169,7 +169,7 @@ MCMCDynStatus MCMCDynSArun(ErgmState *s,
       if(status==MCMCDyn_TOO_MANY_CHANGES)
         return MCMCDyn_TOO_MANY_CHANGES;
       
-      if(nwp->nedges >= maxedges-1)
+      if(EDGECOUNT(nwp) >= maxedges-1)
         return MCMCDyn_TOO_MANY_EDGES;
     
       for(unsigned int k=0;k<nstatsmonitor; k++){

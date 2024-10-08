@@ -32,7 +32,7 @@ equaling the average, over all ties of that mixing type,
 of the amount of time elapsed since formation.
 }
 \seealso{
-\code{\link{ergmTerm}} for index of model terms currently visible to the package.
+\code{\link[ergm:ergmTerm]{ergmTerm}} for index of model terms currently visible to the package.
 
 \Sexpr[results=rd,stage=render]{ergm:::.formatTermKeywords("ergmTerm", "nodemix.mean.age", "subsection")}
 }

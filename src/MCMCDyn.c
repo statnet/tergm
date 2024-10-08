@@ -5,7 +5,7 @@
  *  open source, and has the attribution requirements (GPL Section 7) at
  *  https://statnet.org/attribution .
  *
- *  Copyright 2008-2023 Statnet Commons
+ *  Copyright 2008-2024 Statnet Commons
  */
 #include "MCMCDyn.h"
 #include "ergm_util.h"
@@ -52,20 +52,23 @@ SEXP MCMCDyn_wrapper(SEXP stateR, // ergm_state
   memset(REAL(sample), 0, (asInteger(nsteps) + 1)*m->n_stats*sizeof(double));
   memcpy(REAL(sample), s->stats, m->n_stats*sizeof(double));
   
-  SEXP difftime = PROTECT(allocVector(INTSXP, asInteger(log_changes) ? asInteger(maxchanges) : 0));
-  SEXP difftail = PROTECT(allocVector(INTSXP, asInteger(log_changes) ? asInteger(maxchanges) : 0));
-  SEXP diffhead = PROTECT(allocVector(INTSXP, asInteger(log_changes) ? asInteger(maxchanges) : 0));
-  SEXP diffto = PROTECT(allocVector(INTSXP, asInteger(log_changes) ? asInteger(maxchanges) : 0));
-  memset(INTEGER(difftime), 0, asInteger(log_changes) ? asInteger(maxchanges)*sizeof(int) : 0);
-  memset(INTEGER(difftail), 0, asInteger(log_changes) ? asInteger(maxchanges)*sizeof(int) : 0);
-  memset(INTEGER(diffhead), 0, asInteger(log_changes) ? asInteger(maxchanges)*sizeof(int) : 0);
-  memset(INTEGER(diffto), 0, asInteger(log_changes) ? asInteger(maxchanges)*sizeof(int) : 0);
+  kvint difftime, difftail, diffhead, diffto;
+  kv_init(difftime);
+  kv_init(difftail);
+  kv_init(diffhead);
+  kv_init(diffto);
+
+  // pre-allocate the 0th element for size
+  kv_push(int, difftime, 0);
+  kv_push(int, difftail, 0);
+  kv_push(int, diffhead, 0);
+  kv_push(int, diffto, 0);
 
   SEXP status;
   if(MHp) status = PROTECT(ScalarInteger(MCMCSampleDyn(s,
               dur_inf,
               REAL(eta),
-              asInteger(collect)?REAL(sample):NULL, asInteger(maxedges), asInteger(maxchanges), asInteger(log_changes), (Vertex *)INTEGER(difftime), (Vertex *)INTEGER(difftail), (Vertex *)INTEGER(diffhead), INTEGER(diffto),
+              asInteger(collect)?REAL(sample):NULL, asInteger(maxedges), asInteger(maxchanges), asInteger(log_changes), &difftime, &difftail, &diffhead, &diffto,
               asInteger(nsteps), asInteger(min_MH_interval), asInteger(max_MH_interval), asReal(MH_pval), asReal(MH_interval_add), asInteger(burnin), asInteger(interval),
               asInteger(verbose))));
   else status = PROTECT(ScalarInteger(MCMCDyn_MH_FAILED));
@@ -81,10 +84,15 @@ SEXP MCMCDyn_wrapper(SEXP stateR, // ergm_state
     SET_VECTOR_ELT(outl, 2, ErgmStateRSave(s));
   }
   
-  SET_VECTOR_ELT(outl, 3, difftime);
-  SET_VECTOR_ELT(outl, 4, difftail);
-  SET_VECTOR_ELT(outl, 5, diffhead);
-  SET_VECTOR_ELT(outl, 6, diffto);
+  SET_VECTOR_ELT(outl, 3, PROTECT(kvint_to_SEXP(difftime)));
+  SET_VECTOR_ELT(outl, 4, PROTECT(kvint_to_SEXP(difftail)));
+  SET_VECTOR_ELT(outl, 5, PROTECT(kvint_to_SEXP(diffhead)));
+  SET_VECTOR_ELT(outl, 6, PROTECT(kvint_to_SEXP(diffto)));
+
+  kv_destroy(difftime);
+  kv_destroy(difftail);
+  kv_destroy(diffhead);
+  kv_destroy(diffto);
 
   ErgmStateDestroy(s);  
   PutRNGstate();  /* Disable RNG before returning */
@@ -110,7 +118,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                 int maxedges,
                 int maxchanges,
                 int log_changes,
-                Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,            
+                kvint *difftime, kvint *difftail, kvint *diffhead, kvint *diffto,
                 // MCMC settings.
                 unsigned int nsteps, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
                 unsigned int burnin, unsigned int interval, 
@@ -143,7 +151,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
       return MCMCDyn_TOO_MANY_CHANGES;
   
     // If we need to return a network, then stop right there, since the network is too big to return, so stop early.
-    if(maxedges!=0 && nwp->nedges >= maxedges-1)
+    if(maxedges!=0 && EDGECOUNT(nwp) >= maxedges-1)
       return MCMCDyn_TOO_MANY_EDGES;
   }
   
@@ -178,7 +186,7 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
         return MCMCDyn_TOO_MANY_CHANGES;
       
       // If we need to return a network, then stop right there, since the network is too big to return, so stop early.
-      if(maxedges!=0 && nwp->nedges >= maxedges-1)
+      if(maxedges!=0 && EDGECOUNT(nwp) >= maxedges-1)
     return MCMCDyn_TOO_MANY_EDGES;
     }
     
@@ -190,7 +198,12 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
     }
   }
 
-  if(log_changes) difftime[0]=difftail[0]=diffhead[0]=diffto[0]=nextdiffedge-1;
+  if(log_changes) {
+      kv_A(*difftime, 0) = nextdiffedge - 1;
+      kv_A(*difftail, 0) = nextdiffedge - 1;
+      kv_A(*diffhead, 0) = nextdiffedge - 1;
+      kv_A(*diffto, 0) = nextdiffedge - 1;
+  }
   return MCMCDyn_OK;
 }
 
@@ -223,7 +236,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
                            // Space for output.
                            double *stats,
                            unsigned int maxchanges, Edge *nextdiffedge,
-                           Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
+                           kvint *difftime, kvint *difftail, kvint *diffhead, kvint *diffto,
                            // MCMC settings.
                            unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
                            // Verbosity.
@@ -343,7 +356,7 @@ MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
                                    // Space for output.
                                    double *stats,
                                    unsigned int maxchanges, Edge *nextdiffedge,
-                                   Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
+                                   kvint *difftime, kvint *difftail, kvint *diffhead, kvint *diffto,
                                    // Verbosity.
                                    int verbose){
   StoreDyadMapInt *discord = dur_inf->discord;
@@ -358,10 +371,10 @@ MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
     kh_foreach_key(discord, dyad,{    
         if(*nextdiffedge<maxchanges){
           // and record the toggle.
-          if(difftime) difftime[*nextdiffedge] = t;
-          if(difftail) difftail[*nextdiffedge] = dyad.tail;
-          if(diffhead) diffhead[*nextdiffedge] = dyad.head;
-          if(diffto) diffto[*nextdiffedge] = GetEdge(dyad.tail,dyad.head,nwp);
+          if(difftime) kv_push(int, *difftime, t);
+          if(difftail) kv_push(int, *difftail, dyad.tail);
+          if(diffhead) kv_push(int, *diffhead, dyad.head);
+          if(diffto) kv_push(int, *diffto, GetEdge(dyad.tail,dyad.head,nwp));
           (*nextdiffedge)++;
         }else{
           return(MCMCDyn_TOO_MANY_CHANGES);

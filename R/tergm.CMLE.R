@@ -5,7 +5,7 @@
 #  open source, and has the attribution requirements (GPL Section 7) at
 #  https://statnet.org/attribution .
 #
-#  Copyright 2008-2023 Statnet Commons
+#  Copyright 2008-2024 Statnet Commons
 ################################################################################
 tergm.CMLE <- function(formula, times, ..., control, basis) {
   nw <- basis
@@ -14,6 +14,8 @@ tergm.CMLE <- function(formula, times, ..., control, basis) {
     if(inherits(nw, "network.list") || (is.list(nw) && !is.network(nw) && is.network(nw[[1]]))){
       NetSeries <- NetSeries(nw, NA.impute=control$CMLE.NA.impute)
     }else if(inherits(nw,"networkDynamic")){
+      if(is.null(times)) stop("When estimating CMLE on ", sQuote("networkDynamic"), " data, you must specify ",
+                              sQuote("times="), ".")
       NetSeries <- NetSeries(nw, times, NA.impute=control$CMLE.NA.impute)
     }else{
       stop("Unsupported specification for the network series. See help for ",sQuote("NetSeries")," for arguments.")
