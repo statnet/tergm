@@ -17,6 +17,7 @@
 #include "tergm_model.h"
 #include "ergm_state.h"
 #include "changestats_lasttoggle.h"
+#include "kvint.h"
 
 // TODO: This might be worth moving into a common "constants.h".
 typedef enum MCMCDynStatus_enum {
@@ -34,10 +35,10 @@ MCMCDynStatus MCMCSampleDyn(ErgmState *s,
                 int maxedges,
                 int maxchanges,
                 int log_changes,
-                Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,            
+                kvint *difftime, kvint *difftail, kvint *diffhead, kvint *diffto,
                 // MCMC settings.
                 unsigned int nsteps, unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
-                unsigned int burnin, unsigned int interval, 
+                unsigned int burnin, unsigned int interval,
                 // Verbosity.
                 int verbose);
 
@@ -47,7 +48,7 @@ MCMCDynStatus MCMCDyn1Step(ErgmState *s,
                            // Space for output.
                            double *stats,
                            unsigned int maxchanges, Edge *nextdiffedge,
-                           Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
+                           kvint *difftime, kvint *difftail, kvint *diffhead, kvint *diffto,
                            // MCMC settings.
                            unsigned int min_MH_interval, unsigned int max_MH_interval, double MH_pval, double MH_interval_add,
                            // Verbosity.
@@ -58,7 +59,7 @@ MCMCDynStatus MCMCDyn1Step_advance(ErgmState *s,
                                    // Space for output.
                                    double *stats,
                                    unsigned int maxchanges, Edge *nextdiffedge,
-                                   Vertex *difftime, Vertex *difftail, Vertex *diffhead, int *diffto,
+                                   kvint *difftime, kvint *difftail, kvint *diffhead, kvint *diffto,
                                    // Verbosity.
                                    int verbose);
 #endif
