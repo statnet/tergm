@@ -460,46 +460,14 @@
           are computed using the edges dissolution approximation (Carnegie et al.) when appropriate.
           If set to "zeros", the initial values are set to zeros.
           \item \code{SA.oh.memory = 100000} Absolute maximum number of data points per thread to store in the full optimization history.
+        }
       }
       \item  Changes to \code{simulate.stergm} parameters: addition of \code{duration.dependent} parameter to control whether the model terms in formula or model are duration dependent. E.g., if a duration-dependent term  is used in estimation/simulation model, the probability of forming or dissolving a tie may dependent on the age the dyad status.
     }
   }
-
-  % \subsection{NEW FEATURES}{
-  %   \itemize{
-  %   }
-  % }
-  
-  % \subsection{DEPRECATED & DEFUNCT}{
-  %   \itemize{
-  %   }
-  % }
-  
-  % \subsection{C-LEVEL FACILITIES}{
-  %   \itemize{
-  %     \item It is not clear that we need a subsection called "C-LEVEL FACILITIES".
-  %   }
-  % }
-
-  % \subsection{UTILITIES}{
-  %   \itemize{
-  %     \item Likewise, "UTILITIES" is probably unnecessary.
-  %   }
-  % }
-
-  % \subsection{INSTALLATION}{
-  %   \itemize{
-  %     \item ... as is "INSTALLATION".
-  %   }
-  % }
-
-  % \subsection{PACKAGE INSTALLATION}{
-  %   \itemize{
-  %     \item ditto.
-  %   }
-  % }
-
 }
+
+
 \section{Changes in version 3.1.3}{
 
   \subsection{BUG FIXES}{
@@ -523,41 +491,6 @@
       details.
     }
   }
-
-  % \subsection{NEW FEATURES}{
-  %   \itemize{
-  %   }
-  % }
-  
-  % \subsection{DEPRECATED & DEFUNCT}{
-  %   \itemize{
-  %   }
-  % }
-  
-  % \subsection{C-LEVEL FACILITIES}{
-  %   \itemize{
-  %     \item It is not clear that we need a subsection called "C-LEVEL FACILITIES".
-  %   }
-  % }
-
-  % \subsection{UTILITIES}{
-  %   \itemize{
-  %     \item Likewise, "UTILITIES" is probably unnecessary.
-  %   }
-  % }
-
-  % \subsection{INSTALLATION}{
-  %   \itemize{
-  %     \item ... as is "INSTALLATION".
-  %   }
-  % }
-
-  % \subsection{PACKAGE INSTALLATION}{
-  %   \itemize{
-  %     \item ditto.
-  %   }
-  % }
-
 }
 
 
