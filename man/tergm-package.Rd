@@ -152,6 +152,7 @@ Other contributors:
   \item Li Wang \email{lxwang@gmail.com} [contributor]
   \item Kirk Li \email{kirkli@uw.edu} [contributor]
   \item Chad Klumb \email{cklumb@gmail.com} [contributor]
+  \item Adrien Le Guillou \email{git@aleguillou.org} (\href{https://orcid.org/0000-0002-4791-418X}{ORCID}) [contributor]
 }
 
 }

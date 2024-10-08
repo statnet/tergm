@@ -14,7 +14,8 @@ Authors@R: c(
         person("Skye", "Bender-deMoll", role=c("ctb"), email="skyebend@skyeome.net"),
         person("Li","Wang",role=c("ctb"),email="lxwang@gmail.com"),
         person("Kirk","Li",role=c("ctb"),email="kirkli@uw.edu"),
-        person("Chad", "Klumb", role=c("ctb"), email="cklumb@gmail.com"))
+        person("Chad", "Klumb", role=c("ctb"), email="cklumb@gmail.com"),
+        person("Adrien", "Le Guillou", role=c("ctb"), email="git@aleguillou.org", comment=c(ORCID="0000-0002-4791-418X")))
 Depends:
     ergm (>= 4.7.0),
     network (>= 1.18.2),
