@@ -17,7 +17,7 @@
 // from last time step and any changed edges. The storage
 // auxnet->onwp should be initialized as y0 xor y1 at the end.
 I_CHANGESTAT_FN(i__discord_lt_net_Network){
-  I_AUXNET(NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL));
+  I_AUXNET(NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE));
   GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
   TailHead dyad;
   kh_foreach_key(dur_inf->discord, dyad, {
