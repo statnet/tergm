@@ -18,7 +18,7 @@
 // auxnet->onwp should be initialized as y0 xor y1 at the end.
 I_CHANGESTAT_FN(i__discord_lt_net_Network){
   I_AUXNET(NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE));
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
   TailHead dyad;
   kh_foreach_key(dur_inf->discord, dyad, {
       AddEdgeToTrees(dyad.tail,dyad.head, auxnet->onwp);
@@ -27,7 +27,7 @@ I_CHANGESTAT_FN(i__discord_lt_net_Network){
 
 U_CHANGESTAT_FN(u__discord_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
   if(dur_inf->ticktock){
     // NB: Here, edgestate is state of (tail,head) in the input
     // network, so we don't know the edge state in onwp.
@@ -43,7 +43,7 @@ X_CHANGESTAT_FN(x__discord_lt_net_Network){
       // NB: Dropping and reconstructing the network here might be
       // faster, but may break the u_functions that depend on it.
 
-      GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+      GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
       TailHead dyad;
       // Here, we need to toggle all edges that were toggled in the
       // current (soon to be previous) time step, which should result
@@ -71,7 +71,7 @@ F_CHANGESTAT_FN(f__discord_lt_net_Network){
 // auxnet->onwp should be initialized as y0&y1 at the end.
 I_CHANGESTAT_FN(i__intersect_lt_net_Network){
   I_AUXNET(NetworkCopy(nwp));
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
   TailHead dyad;
   kh_foreach_key(dur_inf->discord, dyad, {
       DeleteEdgeFromTrees(dyad.tail,dyad.head, auxnet->onwp);
@@ -80,7 +80,7 @@ I_CHANGESTAT_FN(i__intersect_lt_net_Network){
 
 U_CHANGESTAT_FN(u__intersect_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
   if(dur_inf->ticktock){
     // If the edge is not in y0, changing y1 won't matter. We infer that the
     // edge was in y0 if either it's in y1 *and* last toggle time is
@@ -106,7 +106,7 @@ X_CHANGESTAT_FN(x__intersect_lt_net_Network){
       // NB: Dropping and reconstructing the network here might be
       // faster, but may break the u_functions that depend on it.
 
-      GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+      GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
       TailHead dyad;
       // Here, we need to add all edges that were added in the current
       // (soon to be previous) time step. One way to discover them is
@@ -132,7 +132,7 @@ F_CHANGESTAT_FN(f__intersect_lt_net_Network){
 // initialized as y0|y1 at the end.
 I_CHANGESTAT_FN(i__union_lt_net_Network){
   I_AUXNET(NetworkCopy(nwp));
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
   TailHead dyad;
   kh_foreach_key(dur_inf->discord, dyad, {
     if(EdgetreeSearch(dyad.tail, dyad.head, auxnet->onwp->outedges) == 0) {
@@ -143,7 +143,7 @@ I_CHANGESTAT_FN(i__union_lt_net_Network){
 
 U_CHANGESTAT_FN(u__union_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
   if(dur_inf->ticktock){
     // If the edge is in y0, changing y1 won't matter. We infer that the
     // edge was not in y0 if either it's in y1 *and* last toggle time is
@@ -169,7 +169,7 @@ X_CHANGESTAT_FN(x__union_lt_net_Network){
       // NB: Dropping and reconstructing the network here might be
       // faster, but may break the u_functions that depend on it.
 
-      GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+      GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
       TailHead dyad;
       // Here, we need to delete all edges that were toggled off in
       // the current (soon to be previous) time step. One way to
@@ -195,7 +195,7 @@ F_CHANGESTAT_FN(f__union_lt_net_Network){
 // be initialized as y0 at the end.
 I_CHANGESTAT_FN(i__previous_lt_net_Network){
   I_AUXNET(NetworkCopy(nwp));
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
   TailHead dyad;
   kh_foreach_key(dur_inf->discord, dyad, {
       ToggleEdge(dyad.tail,dyad.head, auxnet->onwp);
@@ -204,7 +204,7 @@ I_CHANGESTAT_FN(i__previous_lt_net_Network){
 
 U_CHANGESTAT_FN(u__previous_lt_net_Network){
   GET_AUX_STORAGE(StoreAuxnet, auxnet);
-  GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+  GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
 
   // If we are within a time step (between a TICK and a TOCK), then
   // the previous network state is fixed. Otherwise, toggles of this
@@ -220,7 +220,7 @@ X_CHANGESTAT_FN(x__previous_lt_net_Network){
       // NB: Dropping and reconstructing the network here might be
       // faster, but may break the u_functions that depend on it.
 
-      GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+      GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
       TailHead dyad;
       // I.e., we toggle what was just toggled.
       kh_foreach_key(dur_inf->discord, dyad, {

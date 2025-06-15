@@ -37,7 +37,7 @@ X_CHANGESTAT_FN(x_on_union_lt_net_Network){
   switch(type){
   case TICK:
     {
-      GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+      GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
       TailHead dyad;
       // Here, we want (y0|y1) / y1: edges in y0 but not in y1.
       // TODO: Optimize.
@@ -65,7 +65,7 @@ X_CHANGESTAT_FN(x_on_union_lt_net_Network){
 
 Z_CHANGESTAT_FN(z_on_union_lt_net_Network){
   GET_STORAGE(Model, m);
-  GET_AUX_STORAGE_NUM(StoreAuxnet, prevnet, 2);
+  GET_AUX_STORAGE(2, StoreAuxnet, prevnet);
 
   double *tmp = m->workspace;
   m->workspace = CHANGE_STAT;
@@ -110,7 +110,7 @@ X_CHANGESTAT_FN(x_on_intersect_lt_net_Network){
   switch(type){
   case TICK:
     {
-      GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+      GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
       TailHead dyad;
       // Here, we want (y0&y1) / y0: edges in y1 but not in y0.
       // TODO: Optimize.
@@ -216,7 +216,7 @@ X_CHANGESTAT_FN(x_on_discord_lt_net_Network){
   switch(type){
   case TICK:
     {
-      GET_AUX_STORAGE_NUM(StoreTimeAndLasttoggle, dur_inf, 1);
+      GET_AUX_STORAGE(1, StoreTimeAndLasttoggle, dur_inf);
       TailHead dyad;
       // TODO: Optimize.
       unsigned int nt=kh_size(dur_inf->discord), pos=0;
@@ -241,7 +241,7 @@ X_CHANGESTAT_FN(x_on_discord_lt_net_Network){
 
 Z_CHANGESTAT_FN(z_on_discord_lt_net_Network){
   GET_STORAGE(Model, m);
-  GET_AUX_STORAGE_NUM(StoreAuxnet, prevnet, 2);
+  GET_AUX_STORAGE(2, StoreAuxnet, prevnet);
 
   double *tmp = m->workspace;
   m->workspace = CHANGE_STAT;
