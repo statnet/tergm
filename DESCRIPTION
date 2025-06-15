@@ -1,6 +1,6 @@
 Package: tergm
-Version: 4.2.1
-Date: 2024-10-08
+Version: 4.2.2
+Date: 2025-06-15
 Title: Fit, Simulate and Diagnose Models for Network Evolution Based on Exponential-Family Random Graph Models
 Authors@R: c(
         person(c("Pavel", "N."), "Krivitsky", role=c("aut","cre"), email="pavel@statnet.org", comment=c(ORCID="0000-0002-9101-3362")),
@@ -17,15 +17,15 @@ Authors@R: c(
         person("Chad", "Klumb", role=c("ctb"), email="cklumb@gmail.com"),
         person("Adrien", "Le Guillou", role=c("ctb"), email="git@aleguillou.org", comment=c(ORCID="0000-0002-4791-418X")))
 Depends:
-    ergm (>= 4.7.0),
-    network (>= 1.18.2),
-    networkDynamic (>= 0.11.4)
+    ergm (>= 4.9.0),
+    network (>= 1.19.0),
+    networkDynamic (>= 0.11.5)
 Imports:
-    robustbase (>= 0.95),
+    robustbase (>= 0.99-4-1),
     coda (>= 0.19-4.1),
-    statnet.common (>= 4.10.0),
-    ergm.multi (>= 0.2.1),
-    purrr (>= 1.0.2),
+    statnet.common (>= 4.12.0),
+    ergm.multi (>= 0.3.0),
+    purrr (>= 1.0.4),
     methods,
     utils,
     nlme,
@@ -33,13 +33,13 @@ Imports:
 LinkingTo:
     ergm
 Suggests:
-    rmarkdown (>= 2.28),
-    knitr (>= 1.48),
-    tibble (>= 3.2.1),
-    testthat (>= 3.2.1.1),
+    rmarkdown (>= 2.29),
+    knitr (>= 1.50),
+    tibble (>= 3.3.0),
+    testthat (>= 3.2.3),
     covr (>= 3.6.4),
-    networkLite (>= 1.0.5),
-    rlang,
+    networkLite (>= 1.1.0),
+    rlang (>= 1.1.6),
     lattice,
     parallel
 BugReports: https://github.com/statnet/tergm/issues

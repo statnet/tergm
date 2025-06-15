@@ -1,11 +1,11 @@
-/*  File src/discordTNT.c in package tergm, part of the
- *  Statnet suite of packages for network analysis, https://statnet.org .
+/*  File src/discordTNT.c in package tergm, part of the Statnet suite of
+ *  packages for network analysis, https://statnet.org .
  *
- *  This software is distributed under the GPL-3 license.  It is free,
- *  open source, and has the attribution requirements (GPL Section 7) at
+ *  This software is distributed under the GPL-3 license.  It is free, open
+ *  source, and has the attribution requirements (GPL Section 7) at
  *  https://statnet.org/attribution .
  *
- *  Copyright 2008-2024 Statnet Commons
+ *  Copyright 2008-2025 Statnet Commons
  */
 #include "ergm_MHproposal.h"
 #include "ergm_edgelist.h"
@@ -222,8 +222,8 @@ MH_I_FN(Mi_discordBDStratTNT) {
     sto->BDTDNE[i] = HashELInitialize(0, NULL, NULL, FALSE);
     sto->discordantEdges[i] = HashELInitialize(0, NULL, NULL, FALSE);
   }
-  sto->combined_BDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL);
-  sto->combined_nonBDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL);
+  sto->combined_BDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE);
+  sto->combined_nonBDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE);
   sto->transferEL = UnsrtELInitialize(0, NULL, NULL, FALSE);
 
   sto->discordance_fraction = asReal(getListElement(MHp->R, "discordance_fraction"));  
@@ -242,8 +242,8 @@ MH_X_FN(Mx_discordBDStratTNT) {
     // for now, destroy and recreate each time step (can we do this more efficiently?)
     NetworkDestroy(sto->combined_BDTDNE);
     NetworkDestroy(sto->combined_nonBDTDNE);
-    sto->combined_BDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL);
-    sto->combined_nonBDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE, FALSE, 0, NULL);
+    sto->combined_BDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE);
+    sto->combined_nonBDTDNE = NetworkInitialize(NULL, NULL, 0, N_NODES, DIRECTED, BIPARTITE);
   }
 }
 

@@ -1,11 +1,11 @@
-%  File inst/NEWS.Rd in package tergm, part of the
-%  Statnet suite of packages for network analysis, https://statnet.org .
+%  File inst/NEWS.Rd in package tergm, part of the Statnet suite of packages
+%  for network analysis, https://statnet.org .
 %
-%  This software is distributed under the GPL-3 license.  It is free,
-%  open source, and has the attribution requirements (GPL Section 7) at
+%  This software is distributed under the GPL-3 license.  It is free, open
+%  source, and has the attribution requirements (GPL Section 7) at
 %  https://statnet.org/attribution .
 %
-%  Copyright 2008-2024 Statnet Commons
+%  Copyright 2008-2025 Statnet Commons
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \name{NEWS}
 \title{NEWS file for the \code{\link[=tergm-package]{tergm}} package}
@@ -60,6 +60,17 @@
   %   }
   % }
 %% }
+
+
+\section{Changes in version 4.2.2}{
+  \subsection{C-LEVEL FACILITIES}{
+    \itemize{
+      \item{
+        Update to work with \CRANpkg{ergm} 4.9 ABI.
+      }
+    }
+  }
+}
 
 
 \section{Changes in version 4.2.1}{
