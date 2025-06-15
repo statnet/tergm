@@ -62,6 +62,17 @@
 %% }
 
 
+\section{Changes in version 4.2.2}{
+  \subsection{C-LEVEL FACILITIES}{
+    \itemize{
+      \item{
+        Update to work with \CRANpkg{ergm} 4.9 ABI.
+      }
+    }
+  }
+}
+
+
 \section{Changes in version 4.2.1}{
   \subsection{NEW FEATURES}{
     \itemize{
