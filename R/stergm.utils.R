@@ -60,8 +60,8 @@ network.extract.with.lasttoggle <- function(nwd, at){
   # first obtain all tails, heads, and lasttoggle times <= at in the nwd
   valid_eids <- valid.eids(nwd)
 
-  tails <- unlist(lapply(nwd$mel, "[[", "outl"))[valid_eids]
-  heads <- unlist(lapply(nwd$mel, "[[", "inl"))[valid_eids]
+  tails <- unlist(lapply(nwd$mel, "[[", "outl")[valid_eids])
+  heads <- unlist(lapply(nwd$mel, "[[", "inl")[valid_eids])
   lts <- unlist(lapply(lapply(lapply(nwd$mel, "[[", "atl"), "[[", 
                   "active"), function(x) suppressWarnings(max(x[x <= at]))))[valid_eids]
 
