@@ -580,7 +580,7 @@ tergm.EGMME.SA.Phase2.C <- function(state, model, model.mon,
              as.double(control$MCMC.burnin.pval),
              as.double(control$MCMC.burnin.add),
              as.integer(deInf(maxedges, "maxint")),
-             as.integer(maxchanges),
+             as.integer(deInf(maxchanges, "maxint")),
              as.integer(max(verbose-1,0)),
              PACKAGE="tergm")
 

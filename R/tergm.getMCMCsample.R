@@ -140,7 +140,7 @@ tergm_MCMC_slave <- function(state, eta, control, verbose){
              # output settings.
              as.integer(collect),
              as.integer(deInf(maxedges, "maxint")),
-             as.integer(maxchanges),
+             as.integer(deInf(maxchanges, "maxint")),
              as.integer(control$changes),
              as.integer(verbose),
              PACKAGE="tergm")
