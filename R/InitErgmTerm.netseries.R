@@ -217,10 +217,12 @@ InitErgmTerm.Cross1 <- function(nw, arglist,  ...){
 #' @template ergmTerm-formula
 #' @param lag how many time steps to look back; at this time, only 1
 #'   is implemented.
-#' @param transform a `function(x, y)` given an array of covariates
-#'   and the sociomatrix of the *previous* network to optionally
-#'   transform `x`, `NULL` to leave unchanged, or a character string
-#'   indicating a preset; current presets include \describe{
+#' @param transform either a `function(x, y, nw)` given an array of
+#'   covariates and the sociomatrix of the *previous* network, and the
+#'   previous network itself, to optionally transform `x`; an
+#'   \CRANpkg{rlang}-style formula with those variables; `NULL` to
+#'   leave unchanged, or a character string indicating a preset;
+#'   current presets include \describe{
 #'
 #' \item{`"signed"`}{multiplies each change statistic by \eqn{(2
 #' y^{t-1}_{i,j} - 1)}}
@@ -246,7 +248,7 @@ InitErgmTerm.Cross1 <- function(nw, arglist,  ...){
 InitErgmTerm.Lag <- function(nw, arglist, ..., env=baseenv()) {
   if (!is(nw, "tergm_NetSeries")) ergm_Init_stop("This term does not support non-netseries input at this time.")
   ownargs <- list(varnames = c("formula", "lag", "transform"),
-                  vartypes = c("formula", "numeric", "function,character"),
+                  vartypes = c("formula", "numeric", "function,formula,character"),
                   defaultvalues = list(NULL, 1, function(x, ...) x),
                   required = c(TRUE, FALSE, FALSE))
   .call_N("Lag", nw, arglist, ownargs = ownargs, ..., env=env)
@@ -261,10 +263,18 @@ InitErgmTerm.Lag1 <- function(nw, arglist, ...) {
 
   NVL(a$transform) <- function(x, ...) x
 
+  if (is(a$transform, "formula")) {
+    e <- environment(a$transform)
+    f <- a$transform
+    a$transform <- function(x, y, ...) {
+      eval(ult(f), list2env(list(x = x, y = y, nw = nw), parent = e))
+    }
+  }
+
   if (is.character(a$transform)) {
     presets <- c("signed", "nonzero", "positive")
     a$transform <- switch(match.arg(a$transform, presets),
-                          signed = function(x, y, ...) c(2*y-1)*x,
+                          signed = function(x, y, ...) c(2 * y - 1) * x,
                           nonzero = function(x, ...) x != 0,
                           positive = function(x, ...) x > 0,
                           negative = function(x, ...) x < 0,
@@ -273,12 +283,13 @@ InitErgmTerm.Lag1 <- function(nw, arglist, ...) {
 
   if (a$lag != 1) ergm_Init_stop("Lags other than 1 are not currently implemented.")
 
-  mple <- ergmMPLE(a$formula, basis = (nw%n%".PrevNets")[[1]],
+  lagnw <- (nw%n%".PrevNets")[[1]]
+  mple <- ergmMPLE(a$formula, basis = lagnw,
                    expand.bipartite = TRUE, output = "array")
   y <- mple$response
   x <- mple$predictor
 
-  pred <- a$transform(x = x, y = y)
+  pred <- a$transform(x = x, y = y, nw = lagnw)
   if (ncol(pred) == 0) ergm_Init_stop("Formula produced 0 statistics.")
 
   terms <- imap(dimnames(pred)[[3]],

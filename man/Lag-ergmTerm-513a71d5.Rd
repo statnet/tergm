@@ -23,10 +23,12 @@
 \item{lag}{how many time steps to look back; at this time, only 1
 is implemented.}
 
-\item{transform}{a \verb{function(x, y)} given an array of covariates
-and the sociomatrix of the \emph{previous} network to optionally
-transform \code{x}, \code{NULL} to leave unchanged, or a character string
-indicating a preset; current presets include \describe{
+\item{transform}{either a \verb{function(x, y, nw)} given an array of
+covariates and the sociomatrix of the \emph{previous} network, and the
+previous network itself, to optionally transform \code{x}; an
+\CRANpkg{rlang}-style formula with those variables; \code{NULL} to
+leave unchanged, or a character string indicating a preset;
+current presets include \describe{
 
 \item{\code{"signed"}}{multiplies each change statistic by \eqn{(2
 y^{t-1}_{i,j} - 1)}}
