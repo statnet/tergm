@@ -37,3 +37,4 @@ by taking the dyads that have changed between time steps.
 }
 \concept{durational}
 \concept{operator}
+\concept{temporal}

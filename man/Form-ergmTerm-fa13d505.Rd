@@ -39,3 +39,4 @@ old-style \code{formation} model.
 }
 \concept{durational}
 \concept{operator}
+\concept{temporal}

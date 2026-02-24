@@ -44,3 +44,4 @@ signs of the coefficients are negated.
 }
 \concept{durational}
 \concept{operator}
+\concept{temporal}

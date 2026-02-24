@@ -49,5 +49,6 @@ eval(UPDATE_MY_SCTRL_EXPR)
 }
 
 .RegisterKeywords <- function() {
-  ergm_keyword(name='durational', short='dur', description="", popular=TRUE, package="tergm")
+  ergm_keyword(name = "durational", short = "dur", description = "this term is designed for temporal ERGMs with duration information", popular = TRUE, package = "tergm")
+  ergm_keyword(name = "temporal", short = "temp", description = "this term is designed for temporal ERGMs", popular = TRUE, package = "tergm")
 }

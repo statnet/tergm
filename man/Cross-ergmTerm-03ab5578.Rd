@@ -36,3 +36,4 @@ network. It is mainly useful for CMLE estimation, and has no effect (i.e.,
 }
 \concept{durational}
 \concept{operator}
+\concept{temporal}
