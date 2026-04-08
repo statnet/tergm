@@ -137,6 +137,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Pavel N. Krivitsky \email{pavel@statnet.org} (\href{https://orcid.org/0000-0002-9101-3362}{ORCID})
   \item Mark S. Handcock \email{handcock@stat.ucla.edu} [thesis advisor]
 }
 

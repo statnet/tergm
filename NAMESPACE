@@ -28,6 +28,7 @@ export(tergm)
 export(tergm.godfather)
 export(tergm_MCMC_sample)
 export(tergm_MCMC_slave)
+export(unNetSeries)
 import(ergm, except=c("snctrl"))
 import(ergm.multi, except=c("snctrl"))
 

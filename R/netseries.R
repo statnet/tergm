@@ -8,28 +8,6 @@
 #  Copyright 2008-2025 Statnet Commons
 ################################################################################
 
-.same_constraints <- function(nwl, nattr){
-  map(nwl, get.network.attribute, nattr) %>% map(NVL, ~.) %>% map(empty_env) %>% all_identical
-}
-
-join_nets <- function(nwl, blockID, blockName){
-  if(!.same_constraints(nwl, "constraints")) stop("Networks have differing constraint structures. This is not supported at this time.")
-  if(!.same_constraints(nwl, "obs.constraints")) stop("Networks have differing observation processes. This is not supported at this time.")
-
-  nw <- combine_networks(nwl, blockID.vattr=blockID, blockName.vattr=blockName, ignore.nattr = c(eval(formals(combine_networks)$ignore.nattr), "constraints", "obs.constraints", "ergm"), subnet.cache=TRUE)
-
-  nw %n% "ergm" <- combine_ergmlhs(nwl)
-
-  nw %ergmlhs% "constraints" <-
-      if(NVL(nwl[[1]] %ergmlhs% "constraints",base_env(~.))==base_env(~.))
-        base_env(substitute(~blockdiag(blockID), list(blockID=blockID)))
-      else
-        append_rhs.formula(nwl[[1]]%ergmlhs%"constraints", list(call("blockdiag",".TimeID")), TRUE)
-  if(!is.null(nwl[[1]]%ergmlhs%"obs.constraints")) nw %ergmlhs% "obs.constraints" <- nwl[[1]]%ergmlhs%"obs.constraints"
-
-  nw
-}
-
 #' A network series specification for conditional modeling.
 #'
 #' A function for specifying the LHS of a temporal network series ERGM.
@@ -125,10 +103,24 @@ NetSeries <- function(..., order=1, NA.impute=NULL){
   }
   
   # Now, just combine them using the Networks() constructor.
-  nw <- join_nets(nwl,".TimeID",".Time")
+  nw <- Networks(nwl)
+  nw %n% ".combiner" <- c("NetSeries", nw %n% ".combiner")
   # Add previous networks combined.
-  nw %n% ".PrevNet" <- join_nets(nwl0,".TimeID",".Time")
-  nw %ergmlhs% "constraints" <- nonsimp_update.formula(nw%ergmlhs%"constraints", .~.+discord(".PrevNet"))
+  nw %n% ".PrevNet" <- Networks(nwl0)
+  nw %ergmlhs% "constraints" <- c(ergm_flatten_conterm_list(nw %ergmlhs% "constraints") %||% term_list(list()),
+                                  term_list(quote(discord(".PrevNet")), env = baseenv())) |> unique()
 
   structure(nw, class = c("tergm_NetSeries", class(nw)))
+}
+
+#' @rdname NetSeries
+#' @description `unNetSeries()` extracts the networks in the series into a list.
+#'
+#' @param object a multinetwork network returned by `NetSeries()`
+#'
+#' @export
+unNetSeries <- function(object) {
+  assert_combined_network(object, "NetSeries", FALSE)
+  nwl <- uncombine_network(object, populate = TRUE)
+  c(nwl[[1L]] %n% ".PrevNets", nwl)
 }

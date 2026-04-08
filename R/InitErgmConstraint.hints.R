@@ -19,10 +19,14 @@
 #'
 #' @template ergmHint-general
 #' @concept dyad-independent
-InitErgmConstraint.discord <- function(lhs.nw, ref=NULL, ...){
-  nw <- if(is.character(ref)) lhs.nw %n% ref else lhs.nw
+InitErgmConstraint.discord <- function(nw, arglist, ...) {
+  a <- check.ErgmTerm(nw, arglist,
+                      varnames = "ref",
+                      vartypes = "character",
+                      defaultvalues = list(NULL),
+                      required = c(FALSE))
 
-  if(...length())
-     ergm_Init_abort(paste("discord hint takes at most one arguments at this time."))
-   list(dependence = FALSE, priority=10, nw=nw)
+  nw <- if(is.character(a$ref)) nw %n% a$ref else nw
+
+  list(dependence = FALSE, priority = 10, nw = nw)
 }

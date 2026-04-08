@@ -27,8 +27,7 @@
   # Just call N() operator.
   call.ErgmTerm(as.call(c(list(as.name("N")),
                     c(a[c("formula", "lm", "subset", "weights", "contrasts", "offset")],
-                      label=ergm_mk_std_op_namewrap(term,a$label),
-                      .NetworkID=".TimeID", .NetworkName=".Time")
+                      label=ergm_mk_std_op_namewrap(term,a$label))
                     )),
                 env=env, nw=nw, ...)
 }

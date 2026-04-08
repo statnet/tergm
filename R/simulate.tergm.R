@@ -134,7 +134,7 @@
 #'    defined for vertices, a vertex.pid will be attached in a vertex attribute 
 #'    named \code{'tergm_pid'} to facilitate 'bookkeeping' between the networkDynamic 
 #'    argument and the simulated network time step.
-#'    Additionally, attributes ([attr()], not network
+#'    Additionally, attributes ([base::attr()], not network
 #'    attributes) are attached as follows:
 #'    \describe{
 #'      \item{\code{formula}, \code{monitor}:}{Model
@@ -160,13 +160,13 @@
 #'      while a row \code{c(5,2,3,0)} indicates that in that time, that
 #'      tie was dissolved, so that it is was present at time point \eqn{4}
 #'      and absent at time point \eqn{5}.
-#'      Additionally, the same attributes ([attr()], not network
+#'      Additionally, the same attributes ([base::attr()], not network
 #'      attributes) as with \code{output=="networkDynamic"} are attached.
 #'      When \code{nsim>1}, a list of these change matrices is returned.}
 #'  \item{"final"}{A [`network`]
 #'    object representing the last network in the series generated.
 #'    [`lasttoggle`] and \code{time} attributes are also included.
-#'    Additionally, the same attributes ([attr()], not network
+#'    Additionally, the same attributes ([base::attr()], not network
 #'    attributes) as with \code{output=="networkDynamic"} are attached.
 #'    When \code{nsim>1}, a [`network.list`] of these
 #'    [`network`]s is returned.
@@ -249,16 +249,16 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
   }else if(is.networkDynamic(nw.start)){
     stop("Using a networkDynamic to start a simulation from a TERGM is not supported at this time.")
   }else if(is.numeric(nw.start) || is.character(nw.start)){
-    nw.t <- length((nw %n% ".subnetattr")$.TimeID$n) + 1L
+    nw.t <- length(nw %n% ".snl") + 1L
     if(is.character(nw.start))
       nw.start <- switch(nw.start,
                          first = 1L,
                          last = nw.t,
                          stop("Invalid starting network specification."))
 
-    nw.start <- if(nw.start < nw.t) (nw%n%".subnetattr")$.TimeID$.PrevNets[[nw.start]][[1]]
-      else if(nw.start == nw.t) uncombine_network(nw,use.subnet.cache=FALSE)[[nw.t-1]]
-      else stop("Invalid starting network specification: starting index exceeds the length of the network series.")
+    nw.start <- if (nw.start < nw.t) (nw%n%".snl")$.PrevNets[[nw.start]][[1]]
+                else if (nw.start == nw.t) unNetSeries(nw)[[nw.t]]
+                else stop("Invalid starting network specification: starting index exceeds the length of the network series.")
   }
 
   if(!is.network(nw.start)) stop("Invalid starting network specification.")
@@ -323,8 +323,10 @@ simulate_formula.network <- function(object, nsim=1, seed=NULL,
                       )
   }
 
-  proposal <- ergm_proposal(constraints, arguments = control$MCMC.prop.args, nw = nw,
-                            weights = control$MCMC.prop.weights, hints = control$MCMC.prop, class="t")
+  con <- map(list(constraints, control$MCMC.prop), ergm_flatten_conterm_list) |>
+    do.call(c, args = _)
+  proposal <- ergm_proposal(con, arguments = control$MCMC.prop.args, nw = nw,
+                            weights = control$MCMC.prop.weights, class="t")
 
   model <- ergm_model(formula, nw, dynamic=TRUE, term.options=control$term.options, extra.aux=list(proposal=proposal$auxiliaries, system=~.lasttoggle))
   proposal$aux.slots <- model$slots.extra.aux$proposal

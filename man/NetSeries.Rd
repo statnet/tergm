@@ -2,9 +2,12 @@
 % Please edit documentation in R/netseries.R
 \name{NetSeries}
 \alias{NetSeries}
+\alias{unNetSeries}
 \title{A network series specification for conditional modeling.}
 \usage{
 NetSeries(..., order = 1, NA.impute = NULL)
+
+unNetSeries(object)
 }
 \arguments{
 \item{...}{series specification, in one of three formats:
@@ -20,12 +23,16 @@ covariate of the model.}
 \item{NA.impute}{How missing dyads in transitioned-from networks
 are be imputed when using conditional estimation. See argument
 \code{imputers} of \code{\link[=impute.network.list]{impute.network.list()}} for details.}
+
+\item{object}{a multinetwork network returned by \code{NetSeries()}}
 }
 \value{
 A network object with temporal metadata.
 }
 \description{
 A function for specifying the LHS of a temporal network series ERGM.
+
+\code{unNetSeries()} extracts the networks in the series into a list.
 }
 \note{
 It is not recommended to modify the network returned by

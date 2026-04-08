@@ -208,7 +208,7 @@ simulated. If the network does not have any \code{\link[networkDynamic]{persiste
 defined for vertices, a vertex.pid will be attached in a vertex attribute
 named \code{'tergm_pid'} to facilitate 'bookkeeping' between the networkDynamic
 argument and the simulated network time step.
-Additionally, attributes (\code{\link[statnet.common:attr]{attr()}}, not network
+Additionally, attributes (\code{\link[base:attr]{base::attr()}}, not network
 attributes) are attached as follows:
 \describe{
 \item{\code{formula}, \code{monitor}:}{Model
@@ -234,13 +234,13 @@ absent at time point \eqn{4} and present at time point \eqn{5};
 while a row \code{c(5,2,3,0)} indicates that in that time, that
 tie was dissolved, so that it is was present at time point \eqn{4}
 and absent at time point \eqn{5}.
-Additionally, the same attributes (\code{\link[statnet.common:attr]{attr()}}, not network
+Additionally, the same attributes (\code{\link[base:attr]{base::attr()}}, not network
 attributes) as with \code{output=="networkDynamic"} are attached.
 When \code{nsim>1}, a list of these change matrices is returned.}
 \item{"final"}{A \code{\link[network:network]{network}}
 object representing the last network in the series generated.
 \code{\link{lasttoggle}} and \code{time} attributes are also included.
-Additionally, the same attributes (\code{\link[statnet.common:attr]{attr()}}, not network
+Additionally, the same attributes (\code{\link[base:attr]{base::attr()}}, not network
 attributes) as with \code{output=="networkDynamic"} are attached.
 When \code{nsim>1}, a \code{\link[ergm:network.list]{network.list}} of these
 \code{\link[network:network]{network}}s is returned.

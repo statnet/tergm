@@ -21,6 +21,7 @@
 
   .RegisterProposals()
   .RegisterKeywords()
+  .RegisterCombiners()
 }
 
 # TODO: Figure out some automatic way to keep this in sync with statnet.common.
@@ -51,4 +52,8 @@ eval(UPDATE_MY_SCTRL_EXPR)
 .RegisterKeywords <- function() {
   ergm_keyword(name = "durational", short = "dur", description = "this term is designed for temporal ERGMs with duration information", popular = TRUE, package = "tergm")
   ergm_keyword(name = "temporal", short = "temp", description = "this term is designed for temporal ERGMs", popular = TRUE, package = "tergm")
+}
+
+.RegisterCombiners <- function() {
+  ergm.multi_combiner("NetSeries", c(constructor = "NetSeries()", construct = "network series", element = "time point", id = ".TimeID", name = ".Time"))
 }
