@@ -256,7 +256,7 @@ simulate.tergm<-function(object, nsim=1, seed=NULL,
                          last = nw.t,
                          stop("Invalid starting network specification."))
 
-    nw.start <- if (nw.start < nw.t) (nw%n%".snl")$.PrevNets[[nw.start]][[1]]
+    nw.start <- if (nw.start < nw.t) (nw%n%".snattr")$.PrevNets[[nw.start]][[1]]
                 else if (nw.start == nw.t) unNetSeries(nw)[[nw.t]]
                 else stop("Invalid starting network specification: starting index exceeds the length of the network series.")
   }
