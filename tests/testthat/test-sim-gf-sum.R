@@ -8,63 +8,111 @@
 #  Copyright 2008-2025 Statnet Commons
 ################################################################################
 
-logit<-function(p)log(p/(1-p))
+logit <- function(p) log(p / (1 - p))
 
-coef.form.f<-function(coef.diss,density) -log(((1+exp(coef.diss))/(density/(1-density)))-1)
+coef.form.f <- function(coef.diss, density) {
+  -log(((1 + exp(coef.diss)) / (density / (1 - density))) - 1)
+}
 
-simtest <- function(S, edges, dur, n, dir=FALSE, bip=0){
-  target.stats<-edges
-  coef.diss<-logit(1-1/dur)
+simtest <- function(S, edges, dur, n, dir = FALSE, bip = 0) {
+  target.stats <- edges
+  coef.diss <- logit(1 - 1 / dur)
 
-  dc <- suppressWarnings(matrix(rnorm(n*n),if(bip) bip else n, if(bip) n-bip else n))
-  if(!dir && !bip) dc <- dc+t(dc)
+  dc <- suppressWarnings(
+    matrix(rnorm(n * n), if (bip) bip else n, if (bip) n - bip else n)
+  )
+  if (!dir && !bip) dc <- dc + t(dc)
   # Note that if nw1!=nw2, then
-  # summary(nw1~edgecov(dc)+edgecov.ages(dc))!=summary(nw2~edgecov(dc)+edgecov.ages(dc))
+  # summary(nw1~edgecov(dc)+edgecov.ages(dc))!=
+  #   summary(nw2~edgecov(dc)+edgecov.ages(dc))
   # with probability 1. Thus, they offer a sort of a checksum of a network.
 
-  g0<-network.initialize(n, dir=dir, bipartite=bip)
+  g0 <- network.initialize(n, dir = dir, bipartite = bip)
   g0 %n% "dc" <- dc
   g0 %n% "time" <- 0
 
   dyads <- network.dyadcount(g0)
-  density<-edges/dyads
+  density <- edges / dyads
 
-  coef.form<-coef.form.f(coef.diss,density)
+  coef.form <- coef.form.f(coef.diss, density)
 
   # Get a reasonably close starting network.
-  g1<-san(g0~edges,target.stats=target.stats,verbose=TRUE)
+  g1 <- san(g0 ~ edges, target.stats = target.stats, verbose = TRUE)
 
-  g1 %n% "lasttoggle" <- cbind(as.edgelist(g1), -rgeom(network.edgecount(g1),1/4))
+  g1 %n% "lasttoggle" <- cbind(
+    as.edgelist(g1),
+    -rgeom(network.edgecount(g1), 1 / 4)
+  )
 
   print(coef.form)
   print(coef.diss)
 
   # Simulate. Starting from an ordinary network:
-  dynsim<-simulate(g1 ~ Form(~edges) + Persist(~edges),coef=c(coef.form,coef.diss),time.slices=S,verbose=TRUE,monitor=~edgecov("dc")+edgecov.ages("dc"), dynamic=TRUE)
+  dynsim <- simulate(
+    g1 ~ Form(~edges) + Persist(~edges),
+    coef = c(coef.form, coef.diss),
+    time.slices = S,
+    verbose = TRUE,
+    monitor = ~edgecov("dc") + edgecov.ages("dc"),
+    dynamic = TRUE
+  )
 
   sim.stats <- attr(dynsim, "stats")
 
   # Resuming from a networkDynamic:
-  dynsim2<-simulate(dynsim ~ Form(~edges) + Persist(~edges),coef=c(coef.form,coef.diss),time.slices=S,verbose=TRUE,monitor=~edgecov("dc")+edgecov.ages("dc"), dynamic=TRUE)
+  dynsim2 <- simulate(
+    dynsim ~ Form(~edges) + Persist(~edges),
+    coef = c(coef.form, coef.diss),
+    time.slices = S,
+    verbose = TRUE,
+    monitor = ~edgecov("dc") + edgecov.ages("dc"),
+    dynamic = TRUE
+  )
 
   sim.stats <- rbind(sim.stats, attr(dynsim2, "stats"))
 
   # Resuming from a resumed networkDynamic:
-  dynsim3<-simulate(dynsim2 ~ Form(~edges) + Persist(~edges),coef=c(coef.form,coef.diss),time.slices=S,verbose=TRUE,monitor=~edgecov("dc")+edgecov.ages("dc"), dynamic=TRUE)
+  dynsim3 <- simulate(
+    dynsim2 ~ Form(~edges) + Persist(~edges),
+    coef = c(coef.form, coef.diss),
+    time.slices = S,
+    verbose = TRUE,
+    monitor = ~edgecov("dc") + edgecov.ages("dc"),
+    dynamic = TRUE
+  )
 
   sim.stats <- rbind(sim.stats, attr(dynsim3, "stats"))
 
   # Replay the simulation using a networkDynamic:
-  gf1.stats <- as.matrix(tergm.godfather(dynsim3~edgecov("dc")+edgecov.ages("dc"), start=0, end=S*3))
+  gf1.stats <- as.matrix(
+    tergm.godfather(
+      dynsim3 ~ edgecov("dc") + edgecov.ages("dc"),
+      start = 0,
+      end = S * 3
+    )
+  )
 
-  # Replay the sim using networkDynamic with no explicit time params (should be using net.obs.period)
-  gf1b.stats <- as.matrix(tergm.godfather(dynsim3~edgecov("dc")+edgecov.ages("dc")))
+  # Replay the sim using networkDynamic with no explicit time params
+  # (should be using net.obs.period)
+  gf1b.stats <- as.matrix(
+    tergm.godfather(dynsim3 ~ edgecov("dc") + edgecov.ages("dc"))
+  )
 
   # Replay the simulation using a network + list of changes:
-  gf2.stats <- as.matrix(tergm.godfather(g1~edgecov("dc")+edgecov.ages("dc"), start=0, end=S*3, changes=attr(dynsim3,"changes")))
+  gf2.stats <- as.matrix(
+    tergm.godfather(
+      g1 ~ edgecov("dc") + edgecov.ages("dc"),
+      start = 0,
+      end = S * 3,
+      changes = attr(dynsim3, "changes")
+    )
+  )
 
   # Evaluate summary statistics directly:
-  summ.stats <- summary(dynsim3~edgecov("dc")+edgecov.ages("dc"), at=1:(S*3))
+  summ.stats <- summary(
+    dynsim3 ~ edgecov("dc") + edgecov.ages("dc"),
+    at = 1:(S * 3)
+  )
 
   # If they aren't all identical, we are in trouble.
   expect_equal(sim.stats, gf1.stats)

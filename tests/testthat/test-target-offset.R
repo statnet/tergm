@@ -13,35 +13,47 @@ opttest({
   test_that("EGMME models with offsets and targets fit without error", {
     data(florentine)
     net <- flobusiness
-    summary(net ~ edges+degree(3))
+    summary(net ~ edges + degree(3))
     set.seed(3)
 
     # default initialization
-    mod1 <- tergm(flobusiness ~ Form(~edges) + Form(~offset(degree(3))) + Persist(~offset(edges)),
-                   offset.coef=c(0.8,log(9)),
-                   targets="formation",
-                   estimate="EGMME"
+    mod1 <- tergm(
+      flobusiness ~ Form(~edges) + Form(~offset(degree(3))) +
+        Persist(~offset(edges)),
+      offset.coef = c(0.8, log(9)),
+      targets = "formation",
+      estimate = "EGMME"
     )
 
     # init.method set to zeros works
-    mod2 <- tergm(flobusiness ~ Form(~edges + offset(degree(3))) + Persist(~offset(edges)),
-                   offset.coef=c(0.8,log(9)),
-                   targets="formation",
-                   estimate="EGMME",control=control.tergm(init.method='zeros'))
+    mod2 <- tergm(
+      flobusiness ~ Form(~edges + offset(degree(3))) + Persist(~offset(edges)),
+      offset.coef = c(0.8, log(9)),
+      targets = "formation",
+      estimate = "EGMME",
+      control = control.tergm(init.method = "zeros")
+    )
 
-    # this works, auto defaulting SAN coefs if they are different from stergm init.form
-    mod3 <- tergm(flobusiness ~ Form(~edges) + Form(~offset(degree(3))) + Persist(~offset(edges)),
-                   offset.coef=c(0.8,log(9)),
-                   targets="formation", estimate="EGMME",
-                   control=control.tergm(init=c(-3,0.8,log(9)))
+    # this works, auto defaulting SAN coefs if they are different from
+    # stergm init.form
+    mod3 <- tergm(
+      flobusiness ~ Form(~edges) + Form(~offset(degree(3))) +
+        Persist(~offset(edges)),
+      offset.coef = c(0.8, log(9)),
+      targets = "formation",
+      estimate = "EGMME",
+      control = control.tergm(init = c(-3, 0.8, log(9)))
     )
 
     # we can explicitly specify the target and target stats
-    mod4 <- tergm(flobusiness ~ Form(~edges) + Form(~offset(degree(3))) + Persist(~offset(edges)),
-                   offset.coef=c(0.8,log(9)),
-                   targets=~edges, target.stats = 15,
-                   estimate="EGMME",
-                   control=control.tergm(init=c(-3,0.8,log(9)))
+    mod4 <- tergm(
+      flobusiness ~ Form(~edges) + Form(~offset(degree(3))) +
+        Persist(~offset(edges)),
+      offset.coef = c(0.8, log(9)),
+      targets = ~edges,
+      target.stats = 15,
+      estimate = "EGMME",
+      control = control.tergm(init = c(-3, 0.8, log(9)))
     )
 
     # Verify all four models produce coefficients without error
@@ -49,7 +61,16 @@ opttest({
 
     # Verify simulation runs without error for all models
     for (mod in list(mod1, mod2, mod3, mod4)) {
-      print(apply(simulate(mod, monitor=~edges+degree(3), output="stats", time.slices=200), 2, mean))
+      print(apply(
+        simulate(
+          mod,
+          monitor = ~edges + degree(3),
+          output = "stats",
+          time.slices = 200
+        ),
+        2,
+        mean
+      ))
     }
   })
-}, testname='target_offset')
+}, testname = "target_offset")

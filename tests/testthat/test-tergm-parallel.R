@@ -15,15 +15,16 @@ opttest({
     net <- flobusiness
     set.seed(1)
 
-    mod1 <- tergm(flobusiness ~ Form(~edges + degree(3)) + Persist(~offset(edges)),
-                   offset.coef=log(9),
-                   targets="formation",
-                   estimate="EGMME",
-                   control=control.tergm(parallel=2, parallel.type="PSOCK")
+    mod1 <- tergm(
+      flobusiness ~ Form(~edges + degree(3)) + Persist(~offset(edges)),
+      offset.coef = log(9),
+      targets = "formation",
+      estimate = "EGMME",
+      control = control.tergm(parallel = 2, parallel.type = "PSOCK")
     )
     expect_true(inherits(mod1, "tergm"))
   })
-}, testname='tergm_parallel')
+}, testname = "tergm_parallel")
 
 opttest({
   test_that("tergm EGMME runs in parallel (MPI)", {
@@ -31,12 +32,13 @@ opttest({
     net <- flobusiness
     set.seed(1)
 
-    mod1 <- tergm(flobusiness ~ Form(~edges + degree(3)) + Persist(~offset(edges)),
-                   offset.coef=log(9),
-                   targets="formation",
-                   estimate="EGMME",
-                   control=control.tergm(parallel=2, parallel.type="MPI")
+    mod1 <- tergm(
+      flobusiness ~ Form(~edges + degree(3)) + Persist(~offset(edges)),
+      offset.coef = log(9),
+      targets = "formation",
+      estimate = "EGMME",
+      control = control.tergm(parallel = 2, parallel.type = "MPI")
     )
     expect_true(inherits(mod1, "tergm"))
   })
-}, testname='tergm_parallel_MPI', testvar="ENABLE_MPI_TESTS")
+}, testname = "tergm_parallel_MPI", testvar = "ENABLE_MPI_TESTS")
