@@ -278,6 +278,17 @@ InitErgmTerm..previous.lt.net<-function(nw, arglist, ...) {
        dependence=FALSE)
 }
 
+# NB: It's important to define these here, because their environment
+# will be that of package tergm, as opposed to that of that specific
+# InitErgmTerm..lasttoggle() call.
+lasttoggle_encode <- function(el, nw0) list(time=as.integer(NVL(nw0 %n% "time", 0)),
+                                            lasttoggle=as.integer(nw0 %n% "lasttoggle"))
+lasttoggle_decode <- function(ext.state, el, nw0){
+  nw0 %n% "time" <- ext.state$time
+  nw0 %n% "lasttoggle" <- matrix(ext.state$lasttoggle, ncol=3)
+  list(el=el, nw0=nw0)
+}
+
 InitErgmTerm..lasttoggle <- function(nw, arglist, ...){
   stopifnot_dynamic(nw, ...)
   a <- check.ErgmTerm(nw, arglist,
@@ -290,12 +301,8 @@ InitErgmTerm..lasttoggle <- function(nw, arglist, ...){
        coef.names=c(),
        duration=TRUE,
        dependence=FALSE,
-       ext.encode = function(el, nw0) list(time=as.integer(NVL(nw0 %n% "time", 0)), lasttoggle=as.integer(nw0 %n% "lasttoggle")),
-       ext.decode = function(ext.state, el, nw0){
-         nw0 %n% "time" <- ext.state$time
-         nw0 %n% "lasttoggle" <- matrix(ext.state$lasttoggle, ncol=3)
-         list(el=el, nw0=nw0)
-       }
+       ext.encode = lasttoggle_encode,
+       ext.decode = lasttoggle_decode
        )
 }
 
