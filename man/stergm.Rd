@@ -153,5 +153,5 @@ University Department of Statistics Technical Report}, 2012(2012-01).
 \url{https://web.archive.org/web/20170830053722/https://stat.psu.edu/research/technical-report-files/2012-technical-reports/TR1201A.pdf}
 }
 \seealso{
-\code{\link[ergm:ergm]{ergm()}}, \code{\link[network:network]{network}}, \code{\link[network:network.extraction]{\%v\%}}, \code{\link[network:network.extraction]{\%n\%}}, \code{\link[ergm:ergmTerm]{ergmTerm}}
+\code{\link[ergm:ergm]{ergm()}}, \code{\link[network:network]{network}}, \code{\link[network:\%v\%]{\%v\%}}, \code{\link[network:\%n\%]{\%n\%}}, \code{\link[ergm:ergmTerm]{ergmTerm}}
 }

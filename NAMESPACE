@@ -39,18 +39,28 @@ import(purrr)
 import(statnet.common)
 import(stats)
 importFrom(MASS,ginv)
-importFrom(coda,effectiveSize)
-importFrom(coda,mcmc)
-importFrom(coda,mcmc.list)
-importFrom(ergm,mcmc.diagnostics)
-importFrom(ergm,summary_formula)
+importFrom(coda,
+  effectiveSize,
+  mcmc,
+  mcmc.list
+)
+importFrom(ergm,
+  mcmc.diagnostics,
+  summary_formula
+)
 importFrom(methods,is)
-importFrom(nlme,corAR1)
-importFrom(nlme,gls)
-importFrom(robustbase,covMcd)
-importFrom(robustbase,lmrob)
+importFrom(nlme,
+  corAR1,
+  gls
+)
+importFrom(robustbase,
+  covMcd,
+  lmrob
+)
 importFrom(stats,simulate)
-importFrom(utils,getS3method)
-importFrom(utils,modifyList)
-importFrom(utils,packageVersion)
+importFrom(utils,
+  getS3method,
+  modifyList,
+  packageVersion
+)
 useDynLib(tergm)

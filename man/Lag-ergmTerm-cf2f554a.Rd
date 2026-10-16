@@ -38,7 +38,7 @@ the change statistic has the respective value}
 
 }}
 
-\item{lm, subset, weights, contrasts, offset, label}{\strong{\code{\link[=NetSeries]{NetSeries()}} LHS only} arguments to specify time-varying parameters. See \code{\link[ergm.multi:N-ergmTerm-c9b59cc1]{N()}} term operator in the \pkg{ergm.multi} for details. \code{lm} formula may reference \code{.Time} for the network's time index, \code{.TimeID} for the its index in the network series (where the initial network is 1 and the first modelled network is 2), and \code{.TimeDelta} for the time elapsed between the network and the immediately previous network in the series.}
+\item{lm, subset, weights, contrasts, offset, label}{\strong{\code{\link[=NetSeries]{NetSeries()}} LHS only} arguments to specify time-varying parameters. See \code{\link[ergm.multi:N-ergmTerm]{N()}} term operator in the \pkg{ergm.multi} for details. \code{lm} formula may reference \code{.Time} for the network's time index, \code{.TimeID} for the its index in the network series (where the initial network is 1 and the first modelled network is 2), and \code{.TimeDelta} for the time elapsed between the network and the immediately previous network in the series.}
 }
 \description{
 This term takes an ERGM formula that is evaluated on a

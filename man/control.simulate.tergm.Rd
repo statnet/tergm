@@ -64,7 +64,7 @@ additional arguments to the proposal.}
 \item{MCMC.maxchanges}{Maximum number of changes for
 which to allocate space.}
 
-\item{term.options}{A list of additional arguments to be passed to term initializers. See \code{\link[ergm:ergm-options]{? term.options}}.}
+\item{term.options}{A list of additional arguments to be passed to term initializers. See \code{\link[ergm:term.options]{? term.options}}.}
 
 \item{MCMC.packagenames}{Names of packages in which to look for change
 statistic functions in addition to those autodetected. This argument should

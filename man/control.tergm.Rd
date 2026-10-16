@@ -363,7 +363,7 @@ statistics values to compute the guard width.}
 greater effects than others, it improves numerical conditioning
 and makes estimation more stable to rescale the \eqn{k}th
 estimating function by \eqn{s_k = (\sum_{i=1}^{q}
-  G_{i,k}^2/V_{i,i})^{-p/2}}, where \eqn{G_{i,k}} is the estimated
+G_{i,k}^2/V_{i,i})^{-p/2}}, where \eqn{G_{i,k}} is the estimated
 gradient of the \eqn{i}th target statistics with respect to
 \eqn{k}th parameter. This parameter sets the value of \eqn{p}:
 \code{0} for no rescaling, \code{1} (default) for scaling by
@@ -395,7 +395,7 @@ error somewhere in the optimization process will cause it to
 restart with a smaller gain value. Otherwise, the process will
 stop. This is mainly used for debugging}
 
-\item{term.options}{A list of additional arguments to be passed to term initializers. See \code{\link[ergm:ergm-options]{? term.options}}.}
+\item{term.options}{A list of additional arguments to be passed to term initializers. See \code{\link[ergm:term.options]{? term.options}}.}
 
 \item{seed}{Seed value (integer) for the random number generator.  See
 \code{\link[=set.seed]{set.seed()}}.}
@@ -413,7 +413,7 @@ version of \CRANpkg{ergm} running on the slave
 nodes is the same as that running on the master node.}
 
 \item{parallel.inherit.MT}{Logical: If TRUE, slave nodes and
-processes inherit the \code{\link[ergm:ergm-parallel]{set.MT_terms()}} setting.}
+processes inherit the \code{\link[ergm:set.MT_terms]{set.MT_terms()}} setting.}
 }
 \value{
 A list with arguments as components.

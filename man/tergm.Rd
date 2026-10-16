@@ -104,7 +104,7 @@ down processing.}
 }
 \value{
 \code{\link[=tergm]{tergm()}} returns an object of class \code{\link{tergm}} that
-inherits from \code{\link[ergm:ergm]{ergm}} and has the usual methods (\code{\link[ergm:ergm-deprecated]{coef.ergm()}},
+inherits from \code{\link[ergm:ergm]{ergm}} and has the usual methods (\code{\link[ergm:coef.ergm]{coef.ergm()}},
 \code{\link[ergm:summary.ergm]{summary.ergm()}}, \code{\link[ergm:mcmc.diagnostics]{mcmc.diagnostics()}}, etc.) implemented for
 it. Note that \code{\link[ergm:gof]{gof()}} only works for the CMLE method.
 }
