@@ -183,7 +183,7 @@ tergm <- function(formula, constraints = ~., estimate, times=NULL, offset.coef=N
                                              `Gradient-Descent`="Gradient Descent Equilibrium Generalized Method of Moments Results"))
   out$control <- control
   out$constraints <- constraints
-  out$tergm_version <- packageVersion("tergm")
+  out$tergm_version <- namespaceVersion("tergm")
 
   out
 }

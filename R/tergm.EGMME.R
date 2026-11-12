@@ -183,7 +183,7 @@ tergm.EGMME <- function(formula, constraints, offset.coef,
                 offset = model$etamap$offsettheta,
                 mle.lik = NA,
                 MPLE_is_MLE = FALSE,
-                ergm_version = packageVersion("ergm")))
+                ergm_version = namespaceVersion("ergm")))
 
   class(out) <- c("tergm_EGMME", "tergm", "ergm")
   out
