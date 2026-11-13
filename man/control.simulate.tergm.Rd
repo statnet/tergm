@@ -83,7 +83,7 @@ details.
 }
 \seealso{
 \code{\link[=simulate.tergm]{simulate.tergm()}},
-\code{\link[ergm:simulate.formula]{simulate.formula()}}.  \code{\link[=control.tergm]{control.tergm()}}
+\code{\link[statnet.common:simulate.formula]{simulate.formula()}}.  \code{\link[=control.tergm]{control.tergm()}}
 performs a similar function for \code{\link[=tergm]{tergm()}}.
 }
 \keyword{models}

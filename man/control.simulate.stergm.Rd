@@ -106,7 +106,7 @@ in \code{tergm}, NOT the \code{Diss()} operator
 }
 \seealso{
 \code{\link[=simulate.stergm]{simulate.stergm()}},
-\code{\link[ergm:simulate.formula]{simulate.formula()}}.  \code{\link[=control.stergm]{control.stergm()}}
+\code{\link[statnet.common:simulate.formula]{simulate.formula()}}.  \code{\link[=control.stergm]{control.stergm()}}
 performs a similar function for \code{\link[=stergm]{stergm()}}.
 }
 \keyword{models}
